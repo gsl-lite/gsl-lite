@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="GSL lite" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="bin/Release/optional3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../.travis.yml" />
+		<Unit filename="../CHANGES.txt" />
+		<Unit filename="../CMakeLists.txt" />
+		<Unit filename="../LICENSE" />
+		<Unit filename="../README.md" />
+		<Unit filename="../include/config.h" />
+		<Unit filename="../include/fail_fast.h" />
+		<Unit filename="../include/gsl-lite.h" />
+		<Unit filename="../test/CMakeLists.txt" />
+		<Unit filename="../test/gsl-lite.t.cpp" />
+		<Unit filename="../test/gsl-lite.t.h" />
+		<Unit filename="../test/lest_cpp03.hpp" />
+		<Unit filename="../test/not_null.t.cpp" />
+		<Unit filename="../test/owner.t.cpp" />
+		<Unit filename="../test/t.bat" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
