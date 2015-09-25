@@ -53,7 +53,7 @@ CASE( "not_null<>: Doesn't compile construction from a null pointer (define gsl_
     not_null< int* > p3;
 
 # if gsl_HAVE_UNIQUE_PTR
-    std::unique_ptr< int > up = std::make_unique<int>(120);
+    std::unique_ptr< int > up = std::make_unique<int>( 120 );
     not_null< int* > p4 = up;
 # endif
 #endif
@@ -61,7 +61,11 @@ CASE( "not_null<>: Doesn't compile construction from a null pointer (define gsl_
 
 CASE( "not_null<>: Terminates/throws if constructed from a null pointer" )
 {
-    struct F { static void blow() { int* z = NULL; not_null<int*> p(z); } };
+#if gsl_HAVE_NULLPTR
+    struct F { static void blow() { int * z = nullptr; not_null<int*> p(z); } };
+#else
+    struct F { static void blow() { int * z = NULL; not_null<int*> p(z); } };
+#endif
 
     EXPECT_THROWS( F::blow() );
 }
@@ -81,7 +85,7 @@ CASE( "not_null<>: Terminates/throws if assigned a null pointer" )
 
 CASE( "not_null<>: Can access value if pointer is non-null" )
 {
-    struct F { static bool helper(not_null<int*> p) { return *p == 12; } };
+    struct F { static bool helper( not_null<int*> p ) { return *p == 12; } };
 
     int i = 12;
     not_null< int* > p = &i; 
@@ -114,7 +118,7 @@ CASE( "not_null<>: Doesn't compile assignment to an unrelated pointer (define gs
 
 #ifdef gsl_CONFIRM_COMPILATION_ERRORS
     not_null< Unrelated* > r = p;
-    not_null< Unrelated* > s = reinterpret_cast< Unrelated* >(p);
+    not_null< Unrelated* > s = reinterpret_cast< Unrelated* >( p );
 #endif
 }
 
