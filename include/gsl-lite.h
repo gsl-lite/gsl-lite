@@ -22,21 +22,25 @@
 #include "fail_fast.h"
 #include <memory>
 
-namespace Guide
-{
+namespace Guide {
 
 //
 // GSL.owner: ownership pointers 
 //
 #if gsl_HAVE_SHARED_PTR
-using std::unique_ptr;
-using std::shared_ptr;
+  using std::unique_ptr;
+  using std::shared_ptr;
 #endif
 
-template <class T>
-struct owner { typedef T type; };
+#if gsl_HAVE_ALIAS_TEMPLATE
+  template< class T > using owner = T;
+#else
+  template< class T > struct owner { typedef T type; };
+# define Owner(t)  ::Guide::owner<t>::type
+#endif
 
-#define Owner(t)  ::Guide::owner<t>::type
+#define gsl_HAVE_OWNER_TEMPLATE  gsl_HAVE_ALIAS_TEMPLATE
+#define gsl_HAVE_OWNER_MACRO    !gsl_HAVE_ALIAS_TEMPLATE
 
 //
 // GSL.assert: assertions

@@ -22,7 +22,14 @@ namespace {
 CASE( "owner(): Can use as the pointer it stands for" )
 {
     struct F { static void incr( int * i ) { *i += 1; } };
+    
+#if gsl_HAVE_OWNER_TEMPLATE
+    owner<int*> p = new int( 120 );
+#elif gsl_HAVE_OWNER_MACRO
     Owner(int*) p = new int( 120 );
+#else
+# error Expecting one of gsl_HAVE_OWNER_TEMPLATE, gsl_HAVE_OWNER_MACRO.
+#endif
 
     EXPECT( (p != NULL) );
     EXPECT(  p != (void*)0 );
@@ -31,7 +38,7 @@ CASE( "owner(): Can use as the pointer it stands for" )
 #endif 
     EXPECT( *p == 120 );
 
-    F::incr(p);
+    F::incr( p );
 
     EXPECT( *p == 121 );
 }
