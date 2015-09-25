@@ -17,6 +17,9 @@
 
 #pragma once
 
+#ifndef GSL_FAIL_FAST_H_INCLUDED
+#define GSL_FAIL_FAST_H_INCLUDED
+
 #include "config.h"
 #include <exception>
 #include <stdexcept>
@@ -47,5 +50,7 @@ inline void fail_fast_assert(bool cond, const char* const) { if (!cond) gsl_QUAL
 #endif // gsl_THROW_ON_FAILURE
 
 }
+
+#endif // GSL_FAIL_FAST_H_INCLUDED
 
 // end of file

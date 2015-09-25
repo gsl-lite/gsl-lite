@@ -8,6 +8,9 @@
 
 #pragma once
 
+#ifndef GSL_CONFIG_H_INCLUDED
+#define GSL_CONFIG_H_INCLUDED
+
 #if defined(_MSC_VER)
 # define gsl_COMPILER_MSVC_VERSION   ((_MSC_VER - 600 ) / 100)
 #else
@@ -41,5 +44,7 @@
 #else
 # define gsl_QUAL_NS_STD(name) std::name
 #endif
+
+#endif // GSL_CONFIG_H_INCLUDED
 
 // end of file

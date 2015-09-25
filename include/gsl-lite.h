@@ -17,6 +17,9 @@
 
 #pragma once
 
+#ifndef GSL_GSL_LITE_H_INCLUDED
+#define GSL_GSL_LITE_H_INCLUDED
+
 //#include "array_view.h"     // array_view, strided_array_view...
 //#include "string_view.h"    // zstring, string_view, zstring_builder...
 #include "fail_fast.h"
@@ -145,5 +148,7 @@ private:
 };
 
 } // namespace Guide
+
+#endif // GSL_GSL_LITE_H_INCLUDED
 
 // end of file
