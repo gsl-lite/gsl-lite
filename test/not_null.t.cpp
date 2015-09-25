@@ -51,7 +51,7 @@ CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_
 #endif 
 }
 
-CASE( "not_null<>: Disallows construction from ... (define gsl_CONFIRM_COMPILATION_ERRORS)" )
+CASE( "not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIRM_COMPILATION_ERRORS)" )
 {
 #ifdef gsl_CONFIRM_COMPILATION_ERRORS
 # if gsl_HAVE_UNIQUE_PTR
@@ -120,7 +120,7 @@ CASE( "not_null<>: Terminates assignment from related pointer types for null poi
     EXPECT_THROWS( p = z );
 }
 
-CASE( "not_null<>: Allows construction from a non-null pointer" )
+CASE( "not_null<>: Allows construction from a non-null underlying pointer" )
 {
     int i = 12; 
 
@@ -139,7 +139,7 @@ CASE( "not_null<>: Allows construction from a non-null user-defined ref-counted 
     EXPECT( p.get() == &i );
 }
 
-CASE( "not_null<>: Allows construction from related pointer types" )
+CASE( "not_null<>: Allows construction from a non-null related pointer" )
 {
     MyDerived derived;
     not_null< MyBase* > p = &derived;
@@ -147,7 +147,7 @@ CASE( "not_null<>: Allows construction from related pointer types" )
     EXPECT( (void*)p.get() == &derived );
 }
 
-CASE( "not_null<>: Allows construction from not_null related pointer types" )
+CASE( "not_null<>: Allows construction from a not_null related pointer type" )
 {
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
@@ -157,7 +157,7 @@ CASE( "not_null<>: Allows construction from not_null related pointer types" )
     EXPECT( q == p );
 }
 
-CASE( "not_null<>: Allows assignment from not_null related pointer type non-null" )
+CASE( "not_null<>: Allows assignment from a not_null related pointer type" )
 {
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
@@ -168,7 +168,7 @@ CASE( "not_null<>: Allows assignment from not_null related pointer type non-null
     EXPECT( q == p );
 }
 
-CASE( "not_null<>: Allows assignment from bare recast pointer if non-null" )
+CASE( "not_null<>: Allows assignment from a non-null bare recast pointer" )
 {
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
