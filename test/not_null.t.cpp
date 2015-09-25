@@ -99,12 +99,25 @@ CASE( "not_null<>: Terminates assignment from a null pointer value" )
     int i = 12;
     not_null<int*> p = &i; 
 #if gsl_HAVE_NULLPTR
-    int * q = nullptr;
+    int * z = nullptr;
 #else
-    int * q = NULL;
+    int * z = NULL;
 #endif 
 
-    EXPECT_THROWS( p = q );
+    EXPECT_THROWS( p = z );
+}
+
+CASE( "not_null<>: Terminates assignment from related pointer types for null pointer value" )
+{
+#if gsl_HAVE_NULLPTR
+    MyDerived * z = nullptr;
+#else
+    MyDerived * z = NULL;
+#endif 
+    MyDerived derived;
+    not_null< MyBase* > p = &derived;
+
+    EXPECT_THROWS( p = z );
 }
 
 CASE( "not_null<>: Allows construction from a non-null pointer" )
