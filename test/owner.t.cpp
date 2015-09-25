@@ -19,7 +19,7 @@
 
 namespace {
 
-CASE( "owner(): Can use as the pointer it stands for" )
+CASE( "owner(): Allows its use as the (pointer) type it stands for" )
 {
     struct F { static void incr( int * i ) { *i += 1; } };
     
