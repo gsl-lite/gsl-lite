@@ -15,7 +15,7 @@ struct MyBase {};
 struct MyDerived : public MyBase {};
 struct Unrelated {};
 
-// stand-in for a user-defined ref-counted class
+// Stand-in for a user-defined ref-counted class.
 template<typename T>
 struct RefCounted
 {
@@ -44,15 +44,15 @@ CASE( "not_null<>: Can construct from a non-null user-defined ref-counted type" 
 CASE( "not_null<>: Doesn't compile construction from a null pointer (define gsl_CONFIRM_COMPILATION_ERRORS)" )
 {
 #ifdef gsl_CONFIRM_COMPILATION_ERRORS
-#if gsl_HAVE_NULLPTR
+# if gsl_HAVE_NULLPTR
     not_null< int* > p1 = nullptr; 
-#else
+# else
     not_null< int* > p1 = NULL;
-#endif 
+# endif 
     not_null< std::vector<char>* > p2 = 0;
     not_null< int* > p3;
 
-#if gsl_HAVE_UNIQUE_PTR
+# if gsl_HAVE_UNIQUE_PTR
     std::unique_ptr< int > up = std::make_unique<int>(120);
     not_null< int* > p4 = up;
 # endif
