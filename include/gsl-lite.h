@@ -91,6 +91,17 @@ private:
 public: 
     not_null<T> & operator=( T const & t ) { ptr_ = t; ensure_invariant(); return *this; }
 
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+    template< typename U, typename Dummy = 
+        typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
+    not_null<T> & operator=( not_null<U> const & other ) { ptr_ = other.get(); ensure_invariant(); return *this; }
+#elif gsl_COMPILER_MSVC_VERSION != 6
+    template< typename U > 
+    not_null<T> & operator=( not_null<U> const & other ) { ptr_ = other.get(); ensure_invariant(); return *this; }
+#else
+    // VC6 accepts it anyway.
+#endif
+
 private: 
     // Prevent compilation when someone attempts to assign a nullptr:
 #if gsl_HAVE_NULLPTR
