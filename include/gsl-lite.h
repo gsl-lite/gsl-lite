@@ -69,7 +69,7 @@ public:
 #endif
 
 private:
-    // Deleting these two prevents compilation when initialized with a nullptr or literal 0.
+    // Prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE_NULLPTR
     not_null( std::nullptr_t );
 #endif
@@ -79,7 +79,7 @@ public:
     not_null<T> & operator=( T const & t ) { ptr_ = t; ensure_invariant(); return *this; }
 
 private: 
-    // Prevents compilation when someone attempts to assign a nullptr.
+    // Prevent compilation when someone attempts to assign a nullptr:
 #if gsl_HAVE_NULLPTR
     not_null<T> & operator=( std::nullptr_t );
 #endif
