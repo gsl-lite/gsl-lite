@@ -2,7 +2,7 @@
 // gsl-lite is based on GSL: Guidelines Support Library,
 // https://github.com/microsoft/gsl
 //
-// Copyright (c) 2015 by Martin Moene
+// Copyright (c) 2015 Martin Moene
 // Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
 // 
 // This code is licensed under the MIT License (MIT). 
