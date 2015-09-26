@@ -25,7 +25,7 @@
 #include "fail_fast.h"
 #include <memory>
 
-namespace Guide {
+namespace gsl {
 
 //
 // GSL.owner: ownership pointers 
@@ -45,17 +45,17 @@ namespace Guide {
 
 #if gsl_FEATURE_HAVE_OWNER_MACRO
 # if gsl_HAVE_OWNER_TEMPLATE 
-#  define Owner(t)  ::Guide::owner<t>
+#  define Owner(t)  ::gsl::owner<t>
 # else
-#  define Owner(t)  ::Guide::owner<t>::type
+#  define Owner(t)  ::gsl::owner<t>::type
 # endif
 #endif 
 
 //
 // GSL.assert: assertions
 //
-#define Expects(x)  ::Guide::fail_fast_assert((x))
-#define Ensures(x)  ::Guide::fail_fast_assert((x))
+#define Expects(x)  ::gsl::fail_fast_assert((x))
+#define Ensures(x)  ::gsl::fail_fast_assert((x))
 
 //
 // not_null
@@ -153,7 +153,7 @@ private:
     not_null<T> & operator-=( size_t );
 };
 
-} // namespace Guide
+} // namespace gsl
 
 #endif // GSL_GSL_LITE_H_INCLUDED
 

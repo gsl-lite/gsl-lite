@@ -1,6 +1,6 @@
 #include "gsl-lite.h"
 
-using namespace Guide;
+using namespace gsl;
 
 int * use( not_null<int *> p ) 
 {

@@ -14,7 +14,7 @@
 #include "gsl-lite.h"
 #include "lest_cpp03.hpp"
 
-using namespace Guide;
+using namespace gsl;
 
 #define CASE( name ) lest_CASE( specification(), name )
 

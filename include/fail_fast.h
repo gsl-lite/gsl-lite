@@ -24,8 +24,7 @@
 #include <exception>
 #include <stdexcept>
 
-namespace Guide
-{
+namespace gsl {
 
 //
 // Having "fail fast" result in an exception makes unit testing
