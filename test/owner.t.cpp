@@ -37,13 +37,13 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 
     EXPECT( *p == 121 );
 #else
-    EXPECT( "owner<> alias template is not available." );
+    EXPECT( !!"owner<> alias template is not available." );
 #endif
 }
 
 CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
 {
-#if gsl_HAVE_OWNER_MACRO
+#if gsl_FEATURE_HAVE_OWNER_MACRO
     struct F { static void incr( int * i ) { *i += 1; } };
     
     Owner(int*) p = new int( 120 );
@@ -59,7 +59,7 @@ CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
 
     EXPECT( *p == 121 );
 #else
-    EXPECT( "Owner() macro is not available." );
+    EXPECT( !!"Owner() macro is not available." );
 #endif
 }
 

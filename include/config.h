@@ -11,6 +11,16 @@
 #ifndef GSL_CONFIG_H_INCLUDED
 #define GSL_CONFIG_H_INCLUDED
 
+#define  gsl_VERSION "0.0.0"
+
+#ifndef  gsl_FEATURE_HAVE_OWNER_MACRO
+# define gsl_FEATURE_HAVE_OWNER_MACRO  1
+#endif
+
+#ifndef  gsl_FEATURE_THROW_ON_FAILURE
+# define gsl_FEATURE_THROW_ON_FAILURE  0
+#endif
+
 #if defined(_MSC_VER)
 # define gsl_COMPILER_MSVC_VERSION   ((_MSC_VER - 600 ) / 100)
 #else

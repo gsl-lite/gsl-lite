@@ -31,11 +31,11 @@ namespace Guide
 // Having "fail fast" result in an exception makes unit testing
 // the GSL classes that rely upon it much simpler. 
 //
-#if defined(gsl_THROW_ON_FAILURE)
+#if gsl_FEATURE_THROW_ON_FAILURE
 
 struct fail_fast : public std::runtime_error 
 {
-	fail_fast() : std::runtime_error("GSL failure") {}
+	fail_fast() : std::runtime_error("GSL assertion") {}
 	explicit fail_fast(char const* const message) : std::runtime_error(message) {}
 };
 

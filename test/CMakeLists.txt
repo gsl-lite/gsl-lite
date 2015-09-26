@@ -14,7 +14,7 @@ include_directories  ( "${PROJECT_SOURCE_DIR}/../include" )
 set( SOURCES gsl-lite.t.cpp owner.t.cpp not_null.t.cpp )
 
 add_executable (   gsl-lite.t ${SOURCES} )
-add_definitions( -Dgsl_THROW_ON_FAILURE  )
+add_definitions( -Dgsl_FEATURE_THROW_ON_FAILURE  )
 
 if( ${CMAKE_GENERATOR} MATCHES "Visual" )
     add_compile_options( -W3 -EHsc )
