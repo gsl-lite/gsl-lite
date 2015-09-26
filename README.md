@@ -169,6 +169,7 @@ OS X      | ?          | ?   |
 Other GSL implementations
 -------------------------
 - Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/gsl).
+- Mattia Basaglia. CxxMiscLib [gsl.hpp](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/include/misclib/gsl.hpp), [tests](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/test/gsl.cpp).
 
 
 Notes and references
