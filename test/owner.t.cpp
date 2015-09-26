@@ -36,6 +36,8 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
     F::incr( p );
 
     EXPECT( *p == 121 );
+#else
+    EXPECT( "owner<> alias template is not available." );
 #endif
 }
 
@@ -56,6 +58,8 @@ CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
     F::incr( p );
 
     EXPECT( *p == 121 );
+#else
+    EXPECT( "Owner() macro is not available." );
 #endif
 }
 

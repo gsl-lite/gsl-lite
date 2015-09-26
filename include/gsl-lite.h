@@ -46,8 +46,8 @@ namespace Guide {
 #ifndef gsl_FEATURE_NO_OWNER_MACRO
 # if gsl_HAVE_OWNER_TEMPLATE 
 #  define Owner(t)  ::Guide::owner<t>
-#else
-# define Owner(t)  ::Guide::owner<t>::type
+# else
+#  define Owner(t)  ::Guide::owner<t>::type
 # endif
 # define gsl_HAVE_OWNER_MACRO  1
 #endif 
