@@ -21,26 +21,42 @@ namespace {
 
 CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 {
+#if gsl_HAVE_OWNER_TEMPLATE
     struct F { static void incr( int * i ) { *i += 1; } };
     
-#if gsl_HAVE_OWNER_TEMPLATE
     owner<int*> p = new int( 120 );
-#elif gsl_HAVE_OWNER_MACRO
-    Owner(int*) p = new int( 120 );
-#else
-# error Expecting one of gsl_HAVE_OWNER_TEMPLATE, gsl_HAVE_OWNER_MACRO.
-#endif
 
     EXPECT( (p != NULL) );
     EXPECT(  p != (void*)0 );
-#if gsl_HAVE_NULLPTR
+# if gsl_HAVE_NULLPTR
     EXPECT(  p != nullptr );
-#endif 
+# endif 
     EXPECT( *p == 120 );
 
     F::incr( p );
 
     EXPECT( *p == 121 );
+#endif
+}
+
+CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
+{
+#if gsl_HAVE_OWNER_MACRO
+    struct F { static void incr( int * i ) { *i += 1; } };
+    
+    Owner(int*) p = new int( 120 );
+
+    EXPECT( (p != NULL) );
+    EXPECT(  p != (void*)0 );
+# if gsl_HAVE_NULLPTR
+    EXPECT(  p != nullptr );
+# endif 
+    EXPECT( *p == 120 );
+
+    F::incr( p );
+
+    EXPECT( *p == 121 );
+#endif
 }
 
 }
