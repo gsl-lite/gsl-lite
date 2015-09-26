@@ -8,11 +8,11 @@ GSL Lite is based on the [Microsoft Guidelines Support Library (GSL)](https://gi
 - [License](#license)
 - [Dependencies](#dependencies)
 - [Installation](#installation)
-- [Building the tests](building-the-tests)
+- [Building the tests](#building-the-tests)
 - [Synopsis](#synopsis)
 - [Features](#features)
 - [Reported to work with](#reported-to-work-with)
-- [Other GSL implementations](other-gsl-implemetations)
+- [Other GSL implementations](#other-gsl-implemetations)
 - [Notes and references](#notes-and-references)
 
 
@@ -58,7 +58,7 @@ prompt>g++ -std=c++03 -Wall -I../include/ -o 01-basic.exe 01-basic.cpp && 01-bas
 
 In a nutshell
 -------------
-**gsl-lite** is a variant of the [Microsoft Guidelines Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14. 
+**gsl-lite** is a variant of Microsoft's implementation of the [Guidelines Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14. 
 
 The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). 
 
@@ -91,8 +91,8 @@ The [*lest* test framework](https://github.com/martinmoene/lest)  is included in
  
 The following steps assume that the [GSL Lite source code](https://github.com/martinmoene/gsl-lite) has been cloned into a directory named `c:\gsl-lite`.
 
-1. Create a directory for the build outputs for a particular architecture. 
-Here we use c:\GSL\build-win-x86-vc10.
+1. Create a directory for the build outputs for a particular architecture.  
+Here we use c:\gsl-lite\build-win-x86-vc10.
 
         cd c:\gsl-lite
         md build-win-x86-vc10
@@ -134,7 +134,7 @@ Feature / library      | M-GSL   | GSL-Lite | Notes |
 -----------------------|:-------:|:--------:|:------|
 **Lifetime safety**    | &nbsp;  | &nbsp;   | &nbsp; |
 owner<>                | &#10003;| &#10003; | Ownership pointers |
-Owner()                | -       | &#10003; | Macro for pre-C++11; see also [Feature selection macros](#feature-selection-macros) |
+Owner()                | -       | &#10003; | Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
 not_null<>             | &#10003;| &#10003; | Wrap any indirection and enforce non-null |
 maybe_null<>           | &#10003;| -        | &nbsp; |
 **Bounds safety**      | &nbsp;  | &nbsp;   | &nbsp; |
@@ -178,5 +178,6 @@ Notes and references
 [3] Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/gsl).  
 [4] Bjarne Stroustrup. [Writing good C++14 (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Stroustrup%20-%20CppCon%202015%20keynote.pdf) &mdash; [Video](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A). CppCon 2015.  
 [5] Herb Sutter. [Writing good C++14&hellip; By default (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Sutter%20-%20CppCon%202015%20day%202%20plenary%20.pdf) &mdash; [Video](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015.  
-[6] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling
+[6] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
+[7] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling
 I. Approach II. Informal overview and rationale](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). Version 0.9.1, 2015-09-21.
