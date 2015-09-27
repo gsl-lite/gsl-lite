@@ -140,8 +140,8 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 **1.1 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 owner<>                     | &#10003;| &#10003;| &#10003;| Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
-unique_ptr<>                | &#10003;| &#10003;| +/-     | std::unique_ptr<> |
-shared_ptr<>                | &#10003;| &#10003;| +/-     | std::shared_ptr<> |
+unique_ptr<>                | &#10003;| &#10003;| >= C++11| std::unique_ptr<> |
+shared_ptr<>                | &#10003;| &#10003;| >= C++11| std::shared_ptr<> |
 stack_array<>               | &#10003;| -       | -       | A stack-allocated array, fixed size |
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
@@ -161,16 +161,18 @@ at()                        | &#10003;| &#10003;| -       | Bounds-checked way o
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-Final_act<>                 | &#10003;| &#10003;| -       | Do something at the end of a scope |
-finally()                   | &#10003;| &#10003;| -       | Make a Final_act<> |
-Final_act                   | -       | -       | &#10003;| pre-C++11: only void(*)() |
-finally()                   | -       | -       | &#10003;| Make a Final_act |
+Final_act<>                 | &#10003;| &#10003;| >= C++11| Action at the end of a scope |
+finally()                   | &#10003;| &#10003;| >= C++11| Make a Final_act<> |
+Final_act                   | -       | -       | <  C++11| Currently only void(*)() |
+finally()                   | -       | -       | <  C++11| Make a Final_act |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
 implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
 move_owner                  | ?       | -       | -       | ... |
 **5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+
+Note: GSL Lite treats VC12 (VS2013) and VC13 (VS2015) as C++11 (gsl_CPP11_OR_GREATER is 1).
 
 
 Reported to work with
