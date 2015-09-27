@@ -29,6 +29,7 @@ int main( int argc, char * argv[] )
 }
 
 #if 0
+g++            -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
 g++ -std=c++98 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
 g++ -std=c++03 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
 g++ -std=c++0x -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
