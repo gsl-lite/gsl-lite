@@ -63,7 +63,7 @@ In a nutshell
 
 The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). 
 
-The library includes types like `owner<>`, `not_null<>` and others.
+The library includes types like `owner<>`, `not_null<>` and [others](#features).
 
 
 License
