@@ -136,11 +136,11 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite | Notes |
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 **1.1 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 owner<>                     | &#10003;| &#10003;| &#10003; | Owned raw pointers |
-Owner()                     | -       | -       | &#10003; | Macro for pre-C++11;<br>see also[Feature selection macros](#feature-selection-macros) |
-unique_ptr<>                | &#10003;| &#10003;| +/- | std::unique_ptr<> |
-shared_ptr<>                | &#10003;| &#10003;| +/- | std::shared_ptr<> |
-stack_array<>               | &#10003;| -       | -   | A stack-allocated array with fixed number of elements |
-dyn_array<>                 | ?       | -       | -   | A heap-allocated array with fixed number of elements |
+Owner()                     | -       | -       | &#10003; | Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
+unique_ptr<>                | &#10003;| &#10003;| +/-      | std::unique_ptr<> |
+shared_ptr<>                | &#10003;| &#10003;| +/-      | std::shared_ptr<> |
+stack_array<>               | &#10003;| -       | -        | A stack-allocated array, fixed size |
+dyn_array<>                 | ?       | -       | -        | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 **2.1 Views**               | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 not_null<>                  | &#10003;| &#10003;| &#10003; | Wrap any indirection and enforce non-null |
@@ -148,21 +148,21 @@ maybe_null<>                | -       | &#10003;| -        | &nbsp; |
 array_view<>                | &#10003;| &#10003;| -        | A view of contiguous T objects, replaces (*,len) |
 string_view<>               | &#10003;| &#10003;| -        | array_view&lt;char> |
 cstring_view<>              | &#10003;| &#10003;| -        | array_view&lt;const char> |
-zstring                     | &#10003;| &#10003;| -        | a char* (C-style string), a zero-terminated sequence of char or null_ptr |
-wzstring                    | -       | &#10003;| -        | a char* (C-style string), a zero-terminated sequence of char or null_ptr |
-czstring                    | &#10003;| &#10003;| -        | a const char* (C-style string), a zero-terminated sequence of const char ort null_ptr |
-cwzstring                   | -       | &#10003;| -        | a const char* (C-style string), a zero-terminated sequence of const char ort null_ptr |
+zstring                     | &#10003;| &#10003;| -        | a char* (C-style string) |
+wzstring                    | -       | &#10003;| -        | a wchar_t* (C-style string) |
+czstring                    | &#10003;| &#10003;| -        | a const char* (C-style string) |
+cwzstring                   | -       | &#10003;| -        | a const wchar_t* (C-style string) |
 **2.2 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 at()                        | &#10003;| &#10003;| -        | Bounds-checked way of accessing static arrays, std::array, std::vector |
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 Expects()                   | &#10003;| &#10003;| &#10003; | Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003; | Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
-Final_act<>                 | &#10003;| &#10003;| -        | Ensure something gets run at the end of a scope |
-finally()                   | &#10003;| &#10003;| -        | Generate a Final_act<> |
-narrow_cast<>               | &#10003;| &#10003;| -        | Searchable way to do narrowing casts of values |
-narrow()                    | &#10003;| &#10003;| -        | Checked version of narrow_cast() that throws if the cast changed the value |
-implicit                    | &#10003;| &nbsp;  | -        | *Marker* for single-argument constructors to explicitly make them non-explicit |
+Final_act<>                 | &#10003;| &#10003;| -        | Do something at the end of a scope |
+finally()                   | &#10003;| &#10003;| -        | Make a Final_act<> |
+narrow_cast<>               | &#10003;| &#10003;| -        | Searchable narrowing casts of values |
+narrow()                    | &#10003;| &#10003;| -        | Checked version of narrow_cast() |
+implicit                    | &#10003;| &nbsp;  | -        | Symmetric with explicit |
 move_owner                  | ?       | -       | -        | ... |
 **5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;   | &nbsp; |
