@@ -142,7 +142,7 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 owner<>                     | &#10003;| &#10003;| &#10003;| Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
 unique_ptr<>                | &#10003;| &#10003;| >=C++11 | std::unique_ptr<> |
-shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<><br>see also [Extract Boost smart pointers](#a-1-extract-boost-smart-pointers) |
+shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<><br>see also [Extract Boost smart pointers](#a1-extract-boost-smart-pointers) |
 stack_array<>               | &#10003;| -       | -       | A stack-allocated array, fixed size |
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
