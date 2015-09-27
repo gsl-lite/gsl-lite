@@ -58,6 +58,18 @@ namespace gsl {
 #define Ensures(x)  ::gsl::fail_fast_assert((x))
 
 //
+// GSL.util: utilities
+//
+
+#if gsl_FEATURE_HAVE_IMPLICIT_MACRO
+# define implicit
+#endif
+
+//
+// GSL.views: views
+//
+
+//
 // not_null
 //
 // Restricts a pointer or smart pointer to only hold non-null values.

@@ -13,6 +13,10 @@
 
 #define  gsl_VERSION "0.0.0"
 
+#ifndef  gsl_FEATURE_HAVE_IMPLICIT_MACRO
+# define gsl_FEATURE_HAVE_IMPLICIT_MACRO  1
+#endif
+
 #ifndef  gsl_FEATURE_HAVE_OWNER_MACRO
 # define gsl_FEATURE_HAVE_OWNER_MACRO  1
 #endif
