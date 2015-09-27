@@ -143,6 +143,11 @@ T narrow( U u )
 // GSL.views: views
 //
 
+typedef char * zstring;
+typedef wchar_t * zwstring;
+typedef const char * czstring;
+typedef const wchar_t * cwzstring;
+
 //
 // not_null
 //

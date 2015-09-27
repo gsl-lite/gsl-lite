@@ -151,10 +151,10 @@ maybe_null<>                | -       | &#10003;| -       | &nbsp; |
 array_view<>                | &#10003;| &#10003;| -       | A view of contiguous T's, replace (*,len) |
 string_view<>               | &#10003;| &#10003;| -       | array_view&lt;char> |
 cstring_view<>              | &#10003;| &#10003;| -       | array_view&lt;const char> |
-zstring                     | &#10003;| &#10003;| -       | a char* (C-style string) |
-wzstring                    | -       | &#10003;| -       | a wchar_t* (C-style string) |
-czstring                    | &#10003;| &#10003;| -       | a const char* (C-style string) |
-cwzstring                   | -       | &#10003;| -       | a const wchar_t* (C-style string) |
+zstring                     | &#10003;| &#10003;| &#10003;| a char* (C-style string) |
+wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style string) |
+czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
+cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 at()                        | &#10003;| &#10003;| -       | Bounds-checked way of accessing static arrays, std::array, std::vector |
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
