@@ -139,7 +139,7 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 ----------------------------|:-------:|:-------:|:-------:|:------|
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 **1.1 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-owner<>                     | &#10003;| &#10003;| &#10003;| Owned raw pointers |
+owner<>                     | &#10003;| &#10003;| >=C++11 | Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
 unique_ptr<>                | &#10003;| &#10003;| >=C++11 | std::unique_ptr<> |
 shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<><br>see also [Extract Boost smart pointers](#a1-extract-boost-smart-pointers) |
