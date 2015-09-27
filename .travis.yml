@@ -7,4 +7,4 @@ compiler:
 
 script:
   - cd ~/build/martinmoene/gsl-lite/test
-  - $CXX -std=c++0x -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && ./gsl-lite.t --pass
+  - $CXX -std=c++0x -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && ./gsl-lite.t --pass

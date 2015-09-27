@@ -148,7 +148,7 @@ dyn_array<>                 | ?       | -       | -       | A heap-allocated arr
 **2.1 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 not_null<>                  | &#10003;| &#10003;| &#10003;| Wrap any indirection and enforce non-null |
 maybe_null<>                | -       | &#10003;| -       | &nbsp; |
-array_view<>                | &#10003;| &#10003;| -       | A view of contiguous T objects, replaces (*,len) |
+array_view<>                | &#10003;| &#10003;| -       | A view of contiguous T's, replace (*,len) |
 string_view<>               | &#10003;| &#10003;| -       | array_view&lt;char> |
 cstring_view<>              | &#10003;| &#10003;| -       | array_view&lt;const char> |
 zstring                     | &#10003;| &#10003;| -       | a char* (C-style string) |
@@ -163,9 +163,11 @@ Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assert
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Final_act<>                 | &#10003;| &#10003;| -       | Do something at the end of a scope |
 finally()                   | &#10003;| &#10003;| -       | Make a Final_act<> |
-narrow_cast<>               | &#10003;| &#10003;| -       | Searchable narrowing casts of values |
-narrow()                    | &#10003;| &#10003;| -       | Checked version of narrow_cast() |
-implicit                    | &#10003;| &nbsp;  | &#10003;| Symmetric with explicit |
+Final_act                   | -       | -       | &#10003;| pre-C++11: only void(*)() |
+finally()                   | -       | -       | &#10003;| Make a Final_act |
+narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
+narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
+implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
 move_owner                  | ?       | -       | -       | ... |
 **5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |

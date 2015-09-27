@@ -11,7 +11,7 @@ project( test )
 
 include_directories  ( "${PROJECT_SOURCE_DIR}/../include" )
 
-set( SOURCES gsl-lite.t.cpp owner.t.cpp not_null.t.cpp )
+set( SOURCES gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp )
 
 add_executable (   gsl-lite.t ${SOURCES} )
 add_definitions( -Dgsl_FEATURE_THROW_ON_FAILURE  )

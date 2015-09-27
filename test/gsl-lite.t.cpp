@@ -29,16 +29,16 @@ int main( int argc, char * argv[] )
 }
 
 #if 0
-g++            -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
-g++ -std=c++98 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
-g++ -std=c++03 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
-g++ -std=c++0x -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
-g++ -std=c++11 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
-g++ -std=c++14 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
+g++            -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
+g++ -std=c++98 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
+g++ -std=c++03 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
+g++ -std=c++0x -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
+g++ -std=c++11 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
+g++ -std=c++14 -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -o gsl-lite.t.exe gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
 
-cl -EHsc -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
+cl -EHsc -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
 
-cl -EHsc -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -Dgsl_CONFIRM_COMPILATION_ERRORS gsl-lite.t.cpp owner.t.cpp not_null.t.cpp && gsl-lite.t.exe --pass
+cl -EHsc -I../include/ -Dgsl_FEATURE_THROW_ON_FAILURE=1 -Dgsl_CONFIRM_COMPILATION_ERRORS gsl-lite.t.cpp owner.t.cpp not_null.t.cpp util.t.cpp && gsl-lite.t.exe --pass
 #endif
 
 // end of file

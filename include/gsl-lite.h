@@ -65,6 +65,80 @@ namespace gsl {
 # define implicit
 #endif
 
+#if gsl_CPP11_OR_GREATER
+
+template< class Fn >
+class Final_act
+{
+public:
+    /*explicit*/ Final_act( Fn action ) 
+    : action_( std::move( action ) ) {}
+    
+    ~Final_act() { action_(); }
+
+private:
+    Fn action_;
+};
+
+template< class Fn >
+Final_act<Fn> finally( Fn const & action ) 
+{ 
+    return Final_act<Fn>( action ); 
+}
+
+template< class Fn >
+Final_act<Fn> finally( Fn && action )
+{ 
+    return Final_act<Fn>( std::forward<Fn>( action ) ); 
+}
+
+#else
+
+class Final_act
+{
+public:
+    typedef void (*Action)();
+
+    Final_act( Action action ) 
+    : action_( action ) {}
+
+    ~Final_act() 
+    {
+        action_();
+    }
+
+private:    
+    Action action_;
+};
+
+template< class Fn >
+Final_act finally( Fn const & f )
+{
+    return Final_act(( f ));
+}
+
+#endif
+
+template< class T, class U >
+T narrow_cast( U u ) 
+{ 
+    return static_cast<T>( u ); 
+}
+
+struct narrowing_error : public std::exception {};
+
+template< class T, class U >
+T narrow( U u ) 
+{ 
+    T t = narrow_cast<T>( u ); 
+    
+    if ( static_cast<U>( t ) != u ) 
+    {
+        throw narrowing_error(); 
+    }
+    return t; 
+}
+
 //
 // GSL.views: views
 //
