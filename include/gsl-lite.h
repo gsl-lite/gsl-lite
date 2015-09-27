@@ -25,6 +25,10 @@
 #include "fail_fast.h"
 #include <memory>
 
+#if gsl_CPP11_OR_GREATER
+# include <array>
+#endif
+
 namespace gsl {
 
 //
@@ -147,6 +151,35 @@ typedef char * zstring;
 typedef wchar_t * zwstring;
 typedef const char * czstring;
 typedef const wchar_t * cwzstring;
+
+#if gsl_COMPILER_MSVC_VERSION != 6
+
+template< class T, size_t N >
+T & at( T(&arr)[N], size_t index ) 
+{ 
+    fail_fast_assert( index < N ); 
+    return arr[index]; 
+}
+#else
+// Todo
+#endif
+
+#if gsl_CPP11_OR_GREATER
+
+template< class T, size_t N >
+T & at( std::array<T, N> & arr, size_t index ) 
+{ 
+    fail_fast_assert( index < N ); 
+    return arr[index]; 
+}
+#endif
+
+template< class Cont >
+typename Cont::value_type & at( Cont & cont, size_t index ) 
+{ 
+    fail_fast_assert( index < cont.size() ); 
+    return cont[index]; 
+}
 
 //
 // not_null
