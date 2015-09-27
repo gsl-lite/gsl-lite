@@ -14,6 +14,7 @@ GSL Lite is based on the [Microsoft Guidelines Support Library (GSL)](https://gi
 - [Reported to work with](#reported-to-work-with)
 - [Other GSL implementations](#other-gsl-implemetations)
 - [Notes and references](#notes-and-references)
+- [Appendix](#appendix)
 
 
 Example usage
@@ -140,8 +141,8 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 **1.1 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 owner<>                     | &#10003;| &#10003;| &#10003;| Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
-unique_ptr<>                | &#10003;| &#10003;| >= C++11| std::unique_ptr<> |
-shared_ptr<>                | &#10003;| &#10003;| >= C++11| std::shared_ptr<> |
+unique_ptr<>                | &#10003;| &#10003;| >=C++11 | std::unique_ptr<> |
+shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<><br>see also [Extract Boost smart pointers](#a-1-extract-boost-smart-pointers) |
 stack_array<>               | &#10003;| -       | -       | A stack-allocated array, fixed size |
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
@@ -161,10 +162,10 @@ at()                        | &#10003;| &#10003;| some    | Bounds-checked way o
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-Final_act<>                 | &#10003;| &#10003;| >= C++11| Action at the end of a scope |
-finally()                   | &#10003;| &#10003;| >= C++11| Make a Final_act<> |
-Final_act                   | -       | -       | <  C++11| Currently only void(*)() |
-finally()                   | -       | -       | <  C++11| Make a Final_act |
+Final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
+finally()                   | &#10003;| &#10003;| >=C++11 | Make a Final_act<> |
+Final_act                   | -       | -       | < C++11 | Currently only void(*)() |
+finally()                   | -       | -       | < C++11 | Make a Final_act |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
 implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
@@ -172,7 +173,7 @@ move_owner                  | ?       | -       | -       | ... |
 **5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 
-Note: GSL Lite treats VC12 (VS2013) and VC13 (VS2015) as C++11 (gsl_CPP11_OR_GREATER is 1).
+Note: GSL Lite treats VC12 (VS2013) and VC13 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
 
 
 Reported to work with
@@ -206,3 +207,14 @@ Notes and references
 [6] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
 [7] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling
 I. Approach II. Informal overview and rationale](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). Version 0.9.1, 2015-09-21.
+
+
+Appendix
+--------
+### A.1 Extract Boost smart pointers
+
+To obtain a subset of Boost only containing the smart pointers, use the [bcp command](http://www.boost.org/doc/libs/1_59_0/tools/bcp/doc/html/index.html) like:
+
+    C:\Libraries\boost\boost_1_51>bin\bcp scoped_ptr.hpp shared_ptr.hpp weak_ptr.hpp make_shared.hpp C:\Libraries\boost-shared_ptr
+
+The smart pointers of Boost 1.51 can be used with VC6.
