@@ -138,7 +138,10 @@ See also section [GSL: Guideline support library](https://github.com/isocpp/CppC
 Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 ----------------------------|:-------:|:-------:|:-------:|:------|
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-**1.1 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+**1.1 Indirection**         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+not_null<>                  | &#10003;| &#10003;| &#10003;| Wrap any indirection and enforce non-null |
+maybe_null<>                | -       | &#10003;| -       | &nbsp; |
+**1.2 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 owner<>                     | &#10003;| &#10003;| >=C++11 | Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
 unique_ptr<>                | &#10003;| &#10003;| >=C++11 | std::unique_ptr<> |
@@ -147,8 +150,6 @@ stack_array<>               | &#10003;| -       | -       | A stack-allocated ar
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 **2.1 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-not_null<>                  | &#10003;| &#10003;| &#10003;| Wrap any indirection and enforce non-null |
-maybe_null<>                | -       | &#10003;| -       | &nbsp; |
 array_view<>                | &#10003;| &#10003;| -       | A view of contiguous T's, replace (*,len) |
 string_view<>               | &#10003;| &#10003;| -       | array_view&lt;char> |
 cstring_view<>              | &#10003;| &#10003;| -       | array_view&lt;const char> |
