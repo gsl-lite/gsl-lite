@@ -157,7 +157,8 @@ wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style 
 czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
 cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-at()                        | &#10003;| &#10003;| some    | Bounds-checked way of accessing static arrays, std::array, std::vector |
+at()                        | &#10003;| &#10003;| >=C++11 | Bounds-checked way of accessing static arrays, std::array, std::vector |
+at()                        | -       | -       | < C++11 | static arrays, std::vector, maybe std::array |
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
