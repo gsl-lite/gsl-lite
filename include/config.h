@@ -11,7 +11,7 @@
 #ifndef GSL_CONFIG_H_INCLUDED
 #define GSL_CONFIG_H_INCLUDED
 
-#define  gsl_VERSION "0.0.0"
+#define  gsl_lite_VERSION "0.0.0"
 
 #ifndef  gsl_FEATURE_HAVE_IMPLICIT_MACRO
 # define gsl_FEATURE_HAVE_IMPLICIT_MACRO  1
