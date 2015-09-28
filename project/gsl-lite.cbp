@@ -32,6 +32,7 @@
 		<Unit filename="../include/fail_fast.h" />
 		<Unit filename="../include/gsl-lite.h" />
 		<Unit filename="../test/CMakeLists.txt" />
+		<Unit filename="../test/at.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.h" />
 		<Unit filename="../test/lest_cpp03.hpp" />

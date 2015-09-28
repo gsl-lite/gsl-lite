@@ -29,6 +29,8 @@
 # include <array>
 #endif
 
+#define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) ) 
+
 namespace gsl {
 
 //
@@ -96,7 +98,7 @@ Final_act<Fn> finally( Fn && action )
     return Final_act<Fn>( std::forward<Fn>( action ) ); 
 }
 
-#else
+#else // gsl_CPP11_OR_GREATER
 
 class Final_act
 {
@@ -121,7 +123,7 @@ Final_act finally( Fn const & f )
     return Final_act(( f ));
 }
 
-#endif
+#endif // gsl_CPP11_OR_GREATER
 
 template< class T, class U >
 T narrow_cast( U u ) 
@@ -160,11 +162,8 @@ T & at( T(&arr)[N], size_t index )
     fail_fast_assert( index < N ); 
     return arr[index]; 
 }
-#else
-// Todo
-#endif
 
-#if gsl_CPP11_OR_GREATER
+# if gsl_CPP11_OR_GREATER
 
 template< class T, size_t N >
 T & at( std::array<T, N> & arr, size_t index ) 
@@ -172,7 +171,7 @@ T & at( std::array<T, N> & arr, size_t index )
     fail_fast_assert( index < N ); 
     return arr[index]; 
 }
-#endif
+# endif
 
 template< class Cont >
 typename Cont::value_type & at( Cont & cont, size_t index ) 
@@ -180,6 +179,39 @@ typename Cont::value_type & at( Cont & cont, size_t index )
     fail_fast_assert( index < cont.size() ); 
     return cont[index]; 
 }
+
+#else // gsl_COMPILER_MSVC_VERSION != 6
+
+namespace detail {
+
+struct lower_precedence {};
+struct higher_precedence : lower_precedence {};
+
+template< class A, class T >
+T & at( A & arr, size_t index, T*, lower_precedence const & )
+{ 
+    fail_fast_assert( index < gsl_DIMENSION_OF( arr ) ); 
+    return arr[index]; 
+}
+
+# define gsl_MK_AT( Cont ) \
+    namespace gsl { namespace detail { \
+    template< class T > \
+    inline T & at( Cont<T> & cont, size_t index, T*, higher_precedence const & ) \
+    { \
+        fail_fast_assert( index < cont.size() ); \
+        return cont[index]; \
+    } }} 
+
+} // namespace detail
+
+template< class C >
+int & at( C & c, size_t index )
+{ 
+    return detail::at( c, index, &c[0], detail::higher_precedence() );
+}
+
+#endif // gsl_COMPILER_MSVC_VERSION != 6
 
 //
 // not_null
