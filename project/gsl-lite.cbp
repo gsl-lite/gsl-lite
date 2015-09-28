@@ -38,6 +38,7 @@
 		<Unit filename="../test/not_null.t.cpp" />
 		<Unit filename="../test/owner.t.cpp" />
 		<Unit filename="../test/t.bat" />
+		<Unit filename="../test/util.t.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
