@@ -152,8 +152,8 @@ maybe_null<>                | -       | &#10003;| -       | &nbsp; |
 owner<>                     | &#10003;| &#10003;| >=C++11 | Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
 unique_ptr<>                | &#10003;| &#10003;| >=C++11 | std::unique_ptr<> |
+unique_ptr<>                | -       | -       | < C++11 | VC10, VC11 |
 shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<> |
-unique_ptr<>                | &#10003;| &#10003;| < C++11 | VC10, VC11 |
 shared_ptr<>                | -       | -       | < C++11 | VC10, VC11<br>see also [Extract Boost smart pointers](#a1-extract-boost-smart-pointers) |
 stack_array<>               | &#10003;| -       | -       | A stack-allocated array, fixed size |
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
@@ -174,8 +174,8 @@ Expects()                   | &#10003;| &#10003;| &#10003;| Precondition asserti
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
-finally()                   | &#10003;| &#10003;| >=C++11 | Make a Final_act<> |
 Final_act                   | -       | -       | < C++11 | Currently only void(*)() |
+finally()                   | &#10003;| &#10003;| >=C++11 | Make a Final_act<> |
 finally()                   | -       | -       | < C++11 | Make a Final_act |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
