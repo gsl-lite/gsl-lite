@@ -48,13 +48,17 @@
 # define gsl_HAVE_ALIAS_TEMPLATE                 1
 #endif
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_SHARED_PTR  1
 # define gsl_HAVE_UNIQUE_PTR  1
 #endif
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_NULLPTR  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
+# define gsl_HAVE_ARRAY  1
 #endif
 
 #if gsl_COMPILER_MSVC_VERSION == 6

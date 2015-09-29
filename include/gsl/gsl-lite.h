@@ -25,7 +25,7 @@
 #include "fail_fast.h"
 #include <memory>
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_HAVE_ARRAY
 # include <array>
 #endif
 
@@ -163,7 +163,7 @@ T & at( T(&arr)[N], size_t index )
     return arr[index]; 
 }
 
-# if gsl_CPP11_OR_GREATER
+# if gsl_HAVE_ARRAY
 
 template< class T, size_t N >
 T & at( std::array<T, N> & arr, size_t index ) 

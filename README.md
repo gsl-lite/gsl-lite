@@ -152,7 +152,9 @@ maybe_null<>                | -       | &#10003;| -       | &nbsp; |
 owner<>                     | &#10003;| &#10003;| >=C++11 | Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
 unique_ptr<>                | &#10003;| &#10003;| >=C++11 | std::unique_ptr<> |
-shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<><br>see also [Extract Boost smart pointers](#a1-extract-boost-smart-pointers) |
+shared_ptr<>                | &#10003;| &#10003;| >=C++11 | std::shared_ptr<> |
+unique_ptr<>                | &#10003;| &#10003;| < C++11 | VC10, VC11 |
+shared_ptr<>                | -       | -       | < C++11 | VC10, VC11<br>see also [Extract Boost smart pointers](#a1-extract-boost-smart-pointers) |
 stack_array<>               | &#10003;| -       | -       | A stack-allocated array, fixed size |
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
@@ -166,7 +168,7 @@ czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-sty
 cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 at()                        | &#10003;| &#10003;| >=C++11 | Bounds-checked way of accessing<br>static arrays, std::array, std::vector |
-at()                        | -       | -       | < C++11 | static arrays, std::vector, maybe std::array |
+at()                        | -       | -       | < C++11 | static arrays, std::vector<br>std::array : VC11 |
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
