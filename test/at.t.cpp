@@ -17,6 +17,12 @@
 
 #include "gsl-lite.t.h"
 
+#include <vector>
+
+#if gsl_COMPILER_MSVC_VERSION == 6
+    gsl_MK_AT( std::vector )
+#endif 
+
 namespace {
 
 CASE( "at(): Allows access to existing C-array elements" )
@@ -60,16 +66,6 @@ CASE( "at(): Terminates access to non-existing std::array elements" )
     EXPECT( !!"std::array<T> is not available (no C++11)" );
 #endif
 }
-
-} // anonymous namespace
-
-#include <vector>
-
-#if gsl_COMPILER_MSVC_VERSION == 6
-    gsl_MK_AT( std::vector )
-#endif 
-
-namespace {
 
 CASE( "at(): Allows access to existing std::vector elements" )
 {
