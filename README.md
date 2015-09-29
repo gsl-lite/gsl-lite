@@ -118,7 +118,13 @@ Synopsis
 --------
 
 **Contents**  
+- [Configuration macros](#configuration-macros)
 - [Feature selection macros](#feature-selection-macros)
+
+### Configuration macros
+
+\-D<b>gsl\_CONFIG\_THROWS\_FOR\_TESTING</b>=0  
+Define this macro to 1 to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL assertion. Default is 0.
 
 ### Feature selection macros
 
@@ -128,8 +134,6 @@ Define this macro to 0 to omit the `implicit` macro. Default is 1.
 \-D<b>gsl\_FEATURE\_HAVE\_OWNER\_MACRO</b>=1  
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
 
-\-D<b>gsl\_FEATURE_THROW\_ON\_FAILURE</b>=0  
-Define this macro to 1 to throw a std::runtime_exception-derived exception `Guide::fail_fast` instead of calling `std::terminate()` on a GSL assertion. Default is 0.
 
 Features
 --------

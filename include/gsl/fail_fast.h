@@ -30,7 +30,7 @@ namespace gsl {
 // Having "fail fast" result in an exception makes unit testing
 // the GSL classes that rely upon it much simpler. 
 //
-#if gsl_FEATURE_THROW_ON_FAILURE
+#if gsl_CONFIG_THROWS_FOR_TESTING
 
 struct fail_fast : public std::runtime_error 
 {

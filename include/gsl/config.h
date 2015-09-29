@@ -21,8 +21,8 @@
 # define gsl_FEATURE_HAVE_OWNER_MACRO  1
 #endif
 
-#ifndef  gsl_FEATURE_THROW_ON_FAILURE
-# define gsl_FEATURE_THROW_ON_FAILURE  0
+#ifndef  gsl_CONFIG_THROWS_FOR_TESTING
+# define gsl_CONFIG_THROWS_FOR_TESTING  0
 #endif
 
 #if defined(_MSC_VER)
