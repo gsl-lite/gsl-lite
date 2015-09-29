@@ -63,10 +63,10 @@ CASE( "not_null<>: Disallows construction from a unique pointer to underlying ty
 
 CASE( "not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
+#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
 
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     not_null< Unrelated* > r = p;
     not_null< Unrelated* > s = reinterpret_cast< Unrelated* >( p );
 #endif
