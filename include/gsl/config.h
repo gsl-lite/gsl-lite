@@ -40,11 +40,21 @@
 # define gsl_CPP11_OR_GREATER  1
 #endif
 
+#if ( __cplusplus >= 201402L )
+# define gsl_CPP14_OR_GREATER  1
+#endif
+
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
+// Presence of C++ features:
+
 #if gsl_CPP11_OR_GREATER
 # define gsl_HAVE_EXPLICIT  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_CONSTEXPR_11  1
 #endif
 
 #if gsl_CPP11_OR_GREATER
@@ -65,11 +75,41 @@
 # define gsl_HAVE_ARRAY  1
 #endif
 
+#if gsl_CPP14_OR_GREATER
+# define gsl_HAVE_CONSTEXPR_14  1
+#endif
+
+// C++ feature usage:
+
+#if gsl_HAVE_CONSTEXPR_11
+# define gsl_constexpr constexpr
+#else
+# define gsl_constexpr /*nothing*/
+#endif
+
+#if gsl_HAVE_CONSTEXPR_14
+# define gsl_constexpr14 constexpr
+#else
+# define gsl_constexpr14 /*nothing*/
+#endif
+
+#if gsl_HAVE_EXPLICIT
+# define gsl_explicit /*explicit*/
+#else
+# define gsl_explicit /*nothing*/
+#endif
+
+#if gsl_FEATURE_HAVE_IMPLICIT_MACRO
+# define implicit
+#endif
+
 #if gsl_COMPILER_MSVC_VERSION == 6
 # define gsl_QUAL_NS_STD(name) name
 #else
 # define gsl_QUAL_NS_STD(name) std::name
 #endif
+
+#define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) ) 
 
 #endif // GSL_CONFIG_H_INCLUDED
 

@@ -29,14 +29,6 @@
 # include <array>
 #endif
 
-#if gsl_HAVE_EXPLICIT
-# define gsl_explicit /*explicit*/
-#else
-# define gsl_explicit /*nothing*/
-#endif
-
-#define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) ) 
-
 namespace gsl {
 
 //
@@ -72,10 +64,6 @@ namespace gsl {
 //
 // GSL.util: utilities
 //
-
-#if gsl_FEATURE_HAVE_IMPLICIT_MACRO
-# define implicit
-#endif
 
 #if gsl_CPP11_OR_GREATER
 
