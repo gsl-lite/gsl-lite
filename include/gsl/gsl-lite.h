@@ -213,35 +213,38 @@ int & at( Cont & cont, size_t index )
 
 #endif // gsl_COMPILER_MSVC_VERSION != 6
 
-//
-// not_null
-//
-// Restricts a pointer or smart pointer to only hold non-null values.
-// 
-// Has zero size overhead over T.
-//
-// If T is a pointer (i.e. T == U*) then 
-// - allow construction from U* or U& 
-// - disallow construction from nullptr_t
-// - disallow default construction
-// - ensure construction from U* fails with nullptr
-// - allow implicit conversion to U*
-//
 template<class T>
 class not_null
 {
 public:
     not_null( T t ) : ptr_( t ) { ensure_invariant(); }
+    not_null & operator=( T const & t ) { ptr_ = t; ensure_invariant(); return *this; }
 
     not_null( not_null const & other ) : ptr_(other.ptr_) {}
+    not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; }
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
     template< typename U, typename Dummy = 
         typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
     not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
+
+    template< typename U, typename Dummy = 
+        typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
+    not_null & operator=( not_null<U> const & other ) 
+    { 
+        ptr_ = other.get(); 
+        return *this; 
+    }
 #elif gsl_COMPILER_MSVC_VERSION != 6
     template< typename U > 
     not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
+
+    template< typename U > 
+    not_null & operator=( not_null<U> const & other ) 
+    { 
+        ptr_ = other.get(); 
+        return *this; 
+    }
 #else
     // VC6 accepts it anyway.
 #endif
@@ -250,29 +253,10 @@ private:
     // Prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE_NULLPTR
     not_null( std::nullptr_t );
+    not_null & operator=( std::nullptr_t );
 #endif
     not_null( int );
-
-public: 
-    not_null<T> & operator=( T const & t ) { ptr_ = t; ensure_invariant(); return *this; }
-
-#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
-    template< typename U, typename Dummy = 
-        typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
-    not_null<T> & operator=( not_null<U> const & other ) { ptr_ = other.get(); ensure_invariant(); return *this; }
-#elif gsl_COMPILER_MSVC_VERSION != 6
-    template< typename U > 
-    not_null<T> & operator=( not_null<U> const & other ) { ptr_ = other.get(); ensure_invariant(); return *this; }
-#else
-    // VC6 accepts it anyway.
-#endif
-
-private: 
-    // Prevent compilation when someone attempts to assign a nullptr:
-#if gsl_HAVE_NULLPTR
-    not_null<T> & operator=( std::nullptr_t );
-#endif
-	not_null<T> & operator=( int );
+	not_null & operator=( int );
 
 public:
     T get() const 
@@ -293,20 +277,16 @@ public:
 private:
     T ptr_;
 
-    // We assume that the compiler can hoist/prove away most of the checks inlined 
-    // from this function if not, we could make them optional via conditional compilation.
     void ensure_invariant() const { fail_fast_assert(ptr_ != NULL); }
 
-    // Unwanted operators: pointers only point to single objects!
-    // TODO ensure all arithmetic ops on this type are unavailable.
-    not_null<T> & operator++();
-    not_null<T> & operator--();
-    not_null<T>   operator++( int );
-    not_null<T>   operator--( int );
-    not_null<T> & operator+ ( size_t );
-    not_null<T> & operator+=( size_t );
-    not_null<T> & operator- ( size_t );
-    not_null<T> & operator-=( size_t );
+    not_null & operator++();
+    not_null & operator--();
+    not_null   operator++( int );
+    not_null   operator--( int );
+    not_null & operator+ ( size_t );
+    not_null & operator+=( size_t );
+    not_null & operator- ( size_t );
+    not_null & operator-=( size_t );
 };
 
 } // namespace gsl
