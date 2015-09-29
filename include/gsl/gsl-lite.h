@@ -29,6 +29,12 @@
 # include <array>
 #endif
 
+#if gsl_HAVE_EXPLICIT
+# define gsl_explicit explicit
+#else
+# define gsl_explicit /*nothing*/
+#endif
+
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) ) 
 
 namespace gsl {
@@ -77,7 +83,7 @@ template< class Fn >
 class Final_act
 {
 public:
-    /*explicit*/ Final_act( Fn action ) 
+    explicit Final_act( Fn action ) 
     : action_( std::move( action ) ) {}
     
     ~Final_act() { action_(); }
@@ -268,8 +274,8 @@ public:
         return ptr_;
     } 
     
-    operator  T () const { return get(); }
-    T operator->() const { return get(); }
+    gsl_explicit operator  T () const { return get(); }
+    gsl_explicit T operator->() const { return get(); }
 
 	bool operator==(T const & rhs) const { return    ptr_ == rhs; }
 	bool operator!=(T const & rhs) const { return !(*this == rhs); }

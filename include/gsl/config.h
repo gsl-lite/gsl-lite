@@ -61,6 +61,10 @@
 # define gsl_HAVE_ARRAY  1
 #endif
 
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_EXPLICIT  1
+#endif
+
 #if gsl_COMPILER_MSVC_VERSION == 6
 # define gsl_QUAL_NS_STD(name) name
 #else
