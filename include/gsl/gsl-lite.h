@@ -187,8 +187,8 @@ namespace detail {
 struct lower_precedence {};
 struct higher_precedence : lower_precedence {};
 
-template< class A, class T >
-T & at( A & arr, size_t index, T*, lower_precedence const & )
+template< class Array, class T >
+T & at( Array & arr, size_t index, T*, lower_precedence const & )
 { 
     fail_fast_assert( index < gsl_DIMENSION_OF( arr ) ); 
     return arr[index]; 
@@ -205,10 +205,10 @@ T & at( A & arr, size_t index, T*, lower_precedence const & )
 
 } // namespace detail
 
-template< class C >
-int & at( C & c, size_t index )
+template< class Cont >
+int & at( Cont & cont, size_t index )
 { 
-    return detail::at( c, index, &c[0], detail::higher_precedence() );
+    return detail::at( cont, index, &cont[0], detail::higher_precedence() );
 }
 
 #endif // gsl_COMPILER_MSVC_VERSION != 6
