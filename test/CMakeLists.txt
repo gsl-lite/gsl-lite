@@ -9,7 +9,7 @@ cmake_minimum_required( VERSION 2.8 )
 
 project( test )
 
-include_directories  ( "${PROJECT_SOURCE_DIR}/../include" )
+include_directories  ( "${PROJECT_SOURCE_DIR}/../include/gsl" )
 
 set( SOURCES gsl-lite.t.cpp at.t.cpp not_null.t.cpp owner.t.cpp util.t.cpp )
 
