@@ -39,7 +39,7 @@ CASE( "at(): Terminates access to non-existing C-array elements" )
 CASE( "at(): Allows access to existing std::array elements" )
 {
 #if gsl_HAVE_ARRAY
-    std::array<int, 4> a = { 1, 2, 3, 4 };
+    std::array<int, 4> a = {{ 1, 2, 3, 4 }};
 
     for ( int i = 0; i < 4; ++i )
     {
@@ -53,7 +53,7 @@ CASE( "at(): Allows access to existing std::array elements" )
 CASE( "at(): Terminates access to non-existing std::array elements" )
 {
 #if gsl_HAVE_ARRAY
-    std::array<int, 4> a = { 1, 2, 3, 4 };
+    std::array<int, 4> a = {{ 1, 2, 3, 4 }};
 
     EXPECT_THROWS( at(a, 4) );
 #else
