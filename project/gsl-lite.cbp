@@ -28,9 +28,9 @@
 		<Unit filename="../LICENSE" />
 		<Unit filename="../README.md" />
 		<Unit filename="../example/01-basic.cpp" />
-		<Unit filename="../include/config.h" />
-		<Unit filename="../include/fail_fast.h" />
-		<Unit filename="../include/gsl-lite.h" />
+		<Unit filename="../include/gsl/config.h" />
+		<Unit filename="../include/gsl/fail_fast.h" />
+		<Unit filename="../include/gsl/gsl-lite.h" />
 		<Unit filename="../test/CMakeLists.txt" />
 		<Unit filename="../test/at.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.cpp" />
