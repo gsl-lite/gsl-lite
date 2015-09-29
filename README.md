@@ -123,8 +123,11 @@ Synopsis
 
 ### Configuration macros
 
+\-D<b>gsl\_CONFIG\_CONFIRMS\_COMPILATION\_ERRORS</b>=0  
+Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. Default is 0.
+
 \-D<b>gsl\_CONFIG\_THROWS\_FOR\_TESTING</b>=0  
-Define this macro to 1 to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL assertion. Default is 0.
+Define this macro to 1 to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL assertion. Use for testing only. Default is 0.
 
 ### Feature selection macros
 

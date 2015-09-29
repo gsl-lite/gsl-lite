@@ -25,6 +25,10 @@
 # define gsl_CONFIG_THROWS_FOR_TESTING  0
 #endif
 
+#ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+# define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
+#endif
+
 #if defined(_MSC_VER)
 # define gsl_COMPILER_MSVC_VERSION   ((_MSC_VER - 600 ) / 100)
 #else
