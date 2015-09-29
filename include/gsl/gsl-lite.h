@@ -211,10 +211,10 @@ template<class T>
 class not_null
 {
 public:
-    not_null( T t ) : ptr_( t ) { ensure_invariant(); }
-    not_null & operator=( T const & t ) { ptr_ = t; ensure_invariant(); return *this; }
+    not_null(             T t         ) : ptr_ ( t ){ Expects( ptr_ != NULL ); }
+    not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != NULL ); return *this; }
 
-    not_null( not_null const & other ) : ptr_(other.ptr_) {}
+    not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
     not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; }
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
@@ -246,10 +246,10 @@ public:
 private:
     // Prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE_NULLPTR
-    not_null( std::nullptr_t );
+    not_null(             std::nullptr_t );
     not_null & operator=( std::nullptr_t );
 #endif
-    not_null( int );
+    not_null(             int );
 	not_null & operator=( int );
 
 public:
@@ -270,8 +270,6 @@ public:
 
 private:
     T ptr_;
-
-    void ensure_invariant() const { fail_fast_assert(ptr_ != NULL); }
 
     not_null & operator++();
     not_null & operator--();
