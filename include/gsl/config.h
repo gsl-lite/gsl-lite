@@ -44,6 +44,10 @@
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
 #if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_EXPLICIT  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
 # define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
 # define gsl_HAVE_ALIAS_TEMPLATE                 1
 #endif
@@ -59,10 +63,6 @@
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
 # define gsl_HAVE_ARRAY  1
-#endif
-
-#if gsl_CPP11_OR_GREATER
-# define gsl_HAVE_EXPLICIT  1
 #endif
 
 #if gsl_COMPILER_MSVC_VERSION == 6

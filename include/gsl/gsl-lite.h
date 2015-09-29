@@ -30,7 +30,7 @@
 #endif
 
 #if gsl_HAVE_EXPLICIT
-# define gsl_explicit explicit
+# define gsl_explicit /*explicit*/
 #else
 # define gsl_explicit /*nothing*/
 #endif
@@ -274,8 +274,8 @@ public:
         return ptr_;
     } 
     
-    gsl_explicit operator  T () const { return get(); }
-    gsl_explicit T operator->() const { return get(); }
+    gsl_explicit operator T() const { return get(); }
+    T            operator->() const { return get(); }
 
 	bool operator==(T const & rhs) const { return    ptr_ == rhs; }
 	bool operator!=(T const & rhs) const { return !(*this == rhs); }
