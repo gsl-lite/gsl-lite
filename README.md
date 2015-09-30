@@ -240,3 +240,38 @@ To obtain a subset of Boost only containing the smart pointers, use the [bcp com
     C:\Libraries\boost\boost_1_51>bin\bcp scoped_ptr.hpp shared_ptr.hpp weak_ptr.hpp make_shared.hpp C:\Libraries\boost-shared_ptr
 
 The smart pointers of Boost 1.51 can be used with VC6.
+
+### A.2 GSL Lite test specification
+
+Test listing for VC++ 11 (VS2012):
+```
+at(): Allows access to existing C-array elements
+at(): Terminates access to non-existing C-array elements
+at(): Allows access to existing std::array elements
+at(): Terminates access to non-existing std::array elements
+at(): Allows access to existing std::vector elements
+at(): Terminates access to non-existing std::vector elements
+not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+not_null<>: Terminates construction from a null pointer value
+not_null<>: Terminates construction from related pointer types for null pointer value
+not_null<>: Terminates assignment from a null pointer value
+not_null<>: Terminates assignment from related pointer types for null pointer value
+not_null<>: Allows construction from a non-null underlying pointer
+not_null<>: Allows construction from a non-null user-defined ref-counted type
+not_null<>: Allows construction from a non-null related pointer
+not_null<>: Allows construction from a not_null related pointer type
+not_null<>: Allows assignment from a not_null related pointer type
+not_null<>: Allows assignment from a non-null bare recast pointer
+not_null<>: Allows implicit conversion to underlying type
+owner<>: Allows its use as the (pointer) type it stands for
+Owner(): Allows its use as the (pointer) type it stands for
+finally: Allows lambda to run
+finally: Allows function with bind
+finally: Allows pointer to function
+narrow_cast<>: Allows narrowing without loss
+narrow_cast: Allows narrowing with loss
+narrow: Allows narrowing without loss
+narrow: Terminates when narrowing with loss```
