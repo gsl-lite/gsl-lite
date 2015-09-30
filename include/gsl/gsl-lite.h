@@ -20,8 +20,8 @@
 #ifndef GSL_GSL_LITE_H_INCLUDED
 #define GSL_GSL_LITE_H_INCLUDED
 
-//#include "array_view.h"     // array_view, strided_array_view...
-//#include "string_view.h"    // zstring, string_view, zstring_builder...
+#include "array_view.h"
+//#include "string_view.h"
 #include "fail_fast.h"
 #include <memory>
 
