@@ -20,10 +20,9 @@
 #ifndef GSL_GSL_LITE_H_INCLUDED
 #define GSL_GSL_LITE_H_INCLUDED
 
-#include "array_view.h"
-//#include "string_view.h"
 #include "fail_fast.h"
 #include <memory>
+#include <vector>
 
 #if gsl_HAVE_ARRAY
 # include <array>
@@ -282,6 +281,13 @@ private:
 };
 
 } // namespace gsl
+
+#if gsl_COMPILER_MSVC_VERSION == 6
+    gsl_MK_AT( std::vector )
+#endif 
+
+#include "array_view.h"
+//#include "string_view.h"
 
 #endif // GSL_GSL_LITE_H_INCLUDED
 

@@ -17,12 +17,6 @@
 
 #include "gsl-lite.t.h"
 
-#include <vector>
-
-#if gsl_COMPILER_MSVC_VERSION == 6
-    gsl_MK_AT( std::vector )
-#endif 
-
 namespace {
 
 CASE( "at(): Allows access to existing C-array elements" )
