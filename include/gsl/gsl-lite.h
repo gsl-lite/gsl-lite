@@ -153,7 +153,7 @@ typedef const wchar_t * cwzstring;
 template< class T, size_t N >
 T & at( T(&arr)[N], size_t index ) 
 { 
-    fail_fast_assert( index < N ); 
+    Expects( index < N ); 
     return arr[index]; 
 }
 
@@ -162,7 +162,7 @@ T & at( T(&arr)[N], size_t index )
 template< class T, size_t N >
 T & at( std::array<T, N> & arr, size_t index ) 
 { 
-    fail_fast_assert( index < N ); 
+    Expects( index < N ); 
     return arr[index]; 
 }
 # endif
@@ -170,7 +170,7 @@ T & at( std::array<T, N> & arr, size_t index )
 template< class Cont >
 typename Cont::value_type & at( Cont & cont, size_t index ) 
 { 
-    fail_fast_assert( index < cont.size() ); 
+    Expects( index < cont.size() ); 
     return cont[index]; 
 }
 
@@ -184,7 +184,7 @@ struct higher_precedence : lower_precedence {};
 template< class Array, class T >
 T & at( Array & arr, size_t index, T*, lower_precedence const & )
 { 
-    fail_fast_assert( index < gsl_DIMENSION_OF( arr ) ); 
+    Expects( index < gsl_DIMENSION_OF( arr ) ); 
     return arr[index]; 
 }
 
@@ -193,7 +193,7 @@ T & at( Array & arr, size_t index, T*, lower_precedence const & )
     template< class T > \
     inline T & at( Cont<T> & cont, size_t index, T*, higher_precedence const & ) \
     { \
-        fail_fast_assert( index < cont.size() ); \
+        Expects( index < cont.size() ); \
         return cont[index]; \
     } }} 
 
