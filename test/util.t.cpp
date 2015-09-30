@@ -81,17 +81,17 @@ CASE( "narrow_cast<>: Allows narrowing without loss" )
     EXPECT( narrow_cast<char>( 120 ) == 120 );
 }
 
-CASE( "narrow_cast: Allows narrowing with loss" )
+CASE( "narrow_cast<>: Allows narrowing with loss" )
 {
     EXPECT( narrow_cast<unsigned char>( 300 ) == 44 );
 }
 
-CASE( "narrow: Allows narrowing without loss" )
+CASE( "narrow<>(): Allows narrowing without loss" )
 {
     EXPECT( narrow<char>( 120 ) == 120 );
 }
 
-CASE( "narrow: Terminates when narrowing with loss" )
+CASE( "narrow<>(): Terminates when narrowing with loss" )
 {
     EXPECT_THROWS_AS( narrow<char>( 300 ), narrowing_error );
 }
