@@ -47,36 +47,53 @@
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
-// Presence of C++ features:
+// Presence of C++ language features:
 
 #if gsl_CPP11_OR_GREATER
-# define gsl_HAVE_EXPLICIT  1
+# define gsl_HAVE_ALIAS_TEMPLATE  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
+# define gsl_HAVE_AUTO  1
 #endif
 
 #if gsl_CPP11_OR_GREATER
 # define gsl_HAVE_CONSTEXPR_11  1
 #endif
 
-#if gsl_CPP11_OR_GREATER
-# define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
-# define gsl_HAVE_ALIAS_TEMPLATE                 1
+#if gsl_CPP14_OR_GREATER
+# define gsl_HAVE_CONSTEXPR_14  1
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
-# define gsl_HAVE_SHARED_PTR  1
-# define gsl_HAVE_UNIQUE_PTR  1
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_IS_DEFAULT_CTOR  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_EXPLICIT  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_INITIALIZER_LIST  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_NOEXCEPT  1
 #endif
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_NULLPTR  1
 #endif
 
+// Presence of C++ library features:
+
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
 # define gsl_HAVE_ARRAY  1
 #endif
 
-#if gsl_CPP14_OR_GREATER
-# define gsl_HAVE_CONSTEXPR_14  1
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
+# define gsl_HAVE_SHARED_PTR  1
+# define gsl_HAVE_UNIQUE_PTR  1
 #endif
 
 // C++ feature usage:
@@ -101,6 +118,12 @@
 
 #if gsl_FEATURE_HAVE_IMPLICIT_MACRO
 # define implicit
+#endif
+
+#if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_THROWS_FOR_TESTING
+# define gsl_noexcept /*nothing*/
+#else
+# define gsl_noexcept noexcept
 #endif
 
 #if gsl_COMPILER_MSVC_VERSION == 6
