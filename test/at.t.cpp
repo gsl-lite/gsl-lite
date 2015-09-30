@@ -52,7 +52,7 @@ CASE( "at(): Allows access to existing std::array elements" )
         EXPECT( at(a, i) == i + 1 );
     }
 #else
-    EXPECT( !!"std::array<T> is not available (no C++11)" );
+    EXPECT( !!"std::array<> is not available (no C++11)" );
 #endif
 }
 
@@ -63,7 +63,7 @@ CASE( "at(): Terminates access to non-existing std::array elements" )
 
     EXPECT_THROWS( at(a, 4) );
 #else
-    EXPECT( !!"std::array<T> is not available (no C++11)" );
+    EXPECT( !!"std::array<> is not available (no C++11)" );
 #endif
 }
 
