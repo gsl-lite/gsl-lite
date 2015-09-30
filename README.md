@@ -243,7 +243,6 @@ The smart pointers of Boost 1.51 can be used with VC6.
 
 ### A.2 GSL Lite test specification
 
-Test listing for VC++ 11 (VS2012):
 ```
 at(): Allows access to existing C-array elements
 at(): Terminates access to non-existing C-array elements
