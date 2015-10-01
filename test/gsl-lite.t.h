@@ -20,9 +20,24 @@ using namespace gsl;
 
 extern lest::tests & specification();
 
+namespace lest { 
+
 #if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 10, 12 )
-namespace lest { inline std::string to_string( nullptr_t const & ) { return "nullptr"; } }
+
+inline std::string to_string( nullptr_t const & ) 
+{ 
+    return "nullptr";
+}
 #endif 
+
+// use oparator<< instead of to_string() overload;
+// see  http://stackoverflow.com/a/10651752/437272
+inline std::ostream & operator<<( std::ostream & os, gsl::byte b )
+{
+    return os << std::hex << "0x" << static_cast<int>(b); 
+}
+
+}
 
 #endif // GSL_TEST_GSL_LITE_H_INCLUDED
 

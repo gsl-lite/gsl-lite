@@ -36,7 +36,7 @@
 # define gsl_COMPILER_NON_MSVC       1
 #endif
 
-#if ( __cplusplus >= 201103L ) || gsl_COMPILER_MSVC_VERSION >= 12
+#if ( __cplusplus >= 201103L )
 # define gsl_CPP11_OR_GREATER  1
 #endif
 
@@ -65,6 +65,10 @@
 # define gsl_HAVE_CONSTEXPR_14  1
 #endif
 
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13
+# define gsl_HAVE_ENUM_CLASS  1
+#endif
+
 #if gsl_CPP11_OR_GREATER
 # define gsl_HAVE_IS_DEFAULT_CTOR  1
 #endif
@@ -91,9 +95,20 @@
 # define gsl_HAVE_ARRAY  1
 #endif
 
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13 
+# define gsl_HAVE_SIZED_TYPES  1
+#endif
+
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_SHARED_PTR  1
 # define gsl_HAVE_UNIQUE_PTR  1
+#endif
+
+// For the rest, consider VS12, VC13 as C++11 for GSL Lite:
+
+#if gsl_COMPILER_MSVC_VERSION >= 12
+# undef  gsl_CPP11_OR_GREATER
+# define gsl_CPP11_OR_GREATER  1
 #endif
 
 // C++ feature usage:

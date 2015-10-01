@@ -159,7 +159,7 @@ stack_array<>               | &#10003;| -       | -       | A stack-allocated ar
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 **2.1 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-array_view<>                | &#10003;| &#10003;| -       | A view of contiguous T's, replace (*,len) |
+array_view<>                | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
 string_view<>               | &#10003;| &#10003;| -       | array_view&lt;char> |
 cstring_view<>              | &#10003;| &#10003;| -       | array_view&lt;const char> |
 zstring                     | &#10003;| &#10003;| &#10003;| a char* (C-style string) |
@@ -244,12 +244,52 @@ The smart pointers of Boost 1.51 can be used with VC6.
 ### A.2 GSL Lite test specification
 
 ```
-at(): Allows access to existing C-array elements
+array_view<>: Disallows ... (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+array_view<>: Terminates construction from a nullptr and a non-zero size
+array_view<>: Terminates construction from two pointers in the wrong order
+array_view<>: Terminates construction from a null pointer and a non-zero size
+array_view<>: Allows default construction
+array_view<>: Allows construction from a nullptr and a zero size
+array_view<>: Allows construction from two pointers
+array_view<>: Allows construction from a non-null pointer and a size
+array_view<>: Allows construction from a any pointer and a zero size
+array_view<>: Allows construction from a C-array
+array_view<>: Allows construction from a std::array<>
+array_view<>: Allows construction from a container (std::vector<>)
+array_view<>: Allows construction from another view of the same type
+array_view<>: Allows assignment from another view of the same type
+array_view<>: Allows forward iteration
+array_view<>: Allows const forward iteration
+array_view<>: Allows reverse iteration
+array_view<>: Allows const reverse iteration
+array_view<>: Allows conversion to bool (true if non-empty)
+array_view<>: Allows element access via array indexing
+array_view<>: Allows element access via at()
+array_view<>: Allows element access via data()
+array_view<>: Allows to compare equal to another view of the same type
+array_view<>: Allows to compare unequal to another view of the same type
+array_view<>: Allows to compare less than another view of the same type
+array_view<>: Allows to compare less than or equal to another view of the same type
+array_view<>: Allows to compare greater than another view of the same type
+array_view<>: Allows to compare greater than or equal to another view of the same type
+array_view<>: Allows to test for empty view via empty(), empty case
+array_view<>: Allows to test for empty view via empty(), non-empty case
+array_view<>: Allows to obtain number of elements via size()
+array_view<>: Allows to obtain number of elements via length()
+array_view<>: Allows to obtain number of elements via used_length()
+array_view<>: Allows to obtain number of bytes via bytes()
+array_view<>: Allows to obtain number of bytes via used_bytes()
+array_view<>: Allows to swap with another view of the same type
+array_view<>: Allows to view the elements as read-only bytes
+array_view<>: Allows to view and change the elements as writable bytes
+array_view<>: Allows to view the elements as a view of another type
+array_view<>: Allows to change the elements from a view of another type
 at(): Terminates access to non-existing C-array elements
-at(): Allows access to existing std::array elements
 at(): Terminates access to non-existing std::array elements
-at(): Allows access to existing std::vector elements
 at(): Terminates access to non-existing std::vector elements
+at(): Allows access to existing C-array elements
+at(): Allows access to existing std::array elements
+at(): Allows access to existing std::vector elements
 not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
