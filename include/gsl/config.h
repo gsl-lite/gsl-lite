@@ -3,7 +3,7 @@
 // gsl-lite is based on GSL: Guidelines Support Library,
 // https://github.com/microsoft/gsl
 //
-// This code is licensed under the MIT License (MIT). 
+// This code is licensed under the MIT License (MIT).
 //
 
 #pragma once
@@ -95,7 +95,11 @@
 # define gsl_HAVE_ARRAY  1
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13 
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 9
+# define gsl_HAVE_CONTAINER_DATA_METHOD  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13
 # define gsl_HAVE_SIZED_TYPES  1
 #endif
 
@@ -147,7 +151,7 @@
 # define gsl_QUAL_NS_STD(name) std::name
 #endif
 
-#define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) ) 
+#define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
 
 #endif // GSL_CONFIG_H_INCLUDED
 

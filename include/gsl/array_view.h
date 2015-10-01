@@ -111,8 +111,13 @@ public:
 
     template< class Cont >
     gsl_constexpr14 array_view( Cont & cont ) 
+#if gsl_HAVE_CONTAINER_DATA_METHOD
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
+#else
+        : begin_( &cont[0] )
+        , end_  ( &cont[0] + cont.size() )
+#endif
     {}
 
 #else // gsl_COMPILER_MSVC_VERSION != 6

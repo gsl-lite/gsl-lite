@@ -195,7 +195,7 @@ OS        | Compiler   | Versions |
 ---------:|:-----------|:---------|
 Windows   | Clang/LLVM | ? |
 &nbsp;    | GCC        | 4.9.2 |
-&nbsp;    | Visual C++ (Visual Studio)| 6 (6), 10 (2010), 11 (2012), 12 (2013), 13 (2015) |
+&nbsp;    | Visual C++ (Visual Studio)| 6 (6), 8 (2005), 10 (2010), 11 (2012), 12 (2013), 13 (2015) |
 GNU/Linux | Clang/LLVM | 3.4 |
 &nbsp;    | GCC        | 5.1 |
 &nbsp;    | Clang/LLVM | 3.4 |
