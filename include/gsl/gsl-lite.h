@@ -20,9 +20,154 @@
 #ifndef GSL_GSL_LITE_H_INCLUDED
 #define GSL_GSL_LITE_H_INCLUDED
 
-#include "fail_fast.h"
 #include <memory>
 #include <vector>
+
+#define  gsl_lite_VERSION "0.0.0"
+
+// Configuration:
+
+#ifndef  gsl_FEATURE_HAVE_IMPLICIT_MACRO
+# define gsl_FEATURE_HAVE_IMPLICIT_MACRO  1
+#endif
+
+#ifndef  gsl_FEATURE_HAVE_OWNER_MACRO
+# define gsl_FEATURE_HAVE_OWNER_MACRO  1
+#endif
+
+#ifndef  gsl_CONFIG_THROWS_FOR_TESTING
+# define gsl_CONFIG_THROWS_FOR_TESTING  0
+#endif
+
+#ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+# define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
+#endif
+
+// Compiler detection:
+
+#if defined(_MSC_VER)
+# define gsl_COMPILER_MSVC_VERSION   ((_MSC_VER - 600 ) / 100)
+#else
+# define gsl_COMPILER_MSVC_VERSION   0
+# define gsl_COMPILER_NON_MSVC       1
+#endif
+
+#if ( __cplusplus >= 201103L )
+# define gsl_CPP11_OR_GREATER  1
+#endif
+
+#if ( __cplusplus >= 201402L )
+# define gsl_CPP14_OR_GREATER  1
+#endif
+
+// half-open range [lo..hi):
+#define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
+
+// Presence of C++ language features:
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_ALIAS_TEMPLATE  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
+# define gsl_HAVE_AUTO  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_CONSTEXPR_11  1
+#endif
+
+#if gsl_CPP14_OR_GREATER
+# define gsl_HAVE_CONSTEXPR_14  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13
+# define gsl_HAVE_ENUM_CLASS  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_IS_DEFAULT_CTOR  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_EXPLICIT_CONVERSION  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_INITIALIZER_LIST  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+# define gsl_HAVE_NOEXCEPT  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
+# define gsl_HAVE_NULLPTR  1
+#endif
+
+// Presence of C++ library features:
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
+# define gsl_HAVE_ARRAY  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 9
+# define gsl_HAVE_CONTAINER_DATA_METHOD  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13
+# define gsl_HAVE_SIZED_TYPES  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
+# define gsl_HAVE_SHARED_PTR  1
+# define gsl_HAVE_UNIQUE_PTR  1
+#endif
+
+// For the rest, consider VS12, VC13 as C++11 for GSL Lite:
+
+#if gsl_COMPILER_MSVC_VERSION >= 12
+# undef  gsl_CPP11_OR_GREATER
+# define gsl_CPP11_OR_GREATER  1
+#endif
+
+// C++ feature usage:
+
+#if gsl_HAVE_CONSTEXPR_11
+# define gsl_constexpr constexpr
+#else
+# define gsl_constexpr /*nothing*/
+#endif
+
+#if gsl_HAVE_CONSTEXPR_14
+# define gsl_constexpr14 constexpr
+#else
+# define gsl_constexpr14 /*nothing*/
+#endif
+
+#if gsl_HAVE_EXPLICIT_CONVERSION
+# define gsl_explicit explicit
+#else
+# define gsl_explicit /*nothing*/
+#endif
+
+#if gsl_FEATURE_HAVE_IMPLICIT_MACRO
+# define implicit
+#endif
+
+#if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_THROWS_FOR_TESTING
+# define gsl_noexcept /*nothing*/
+#else
+# define gsl_noexcept noexcept
+#endif
+
+#if gsl_COMPILER_MSVC_VERSION == 6
+# define gsl_QUAL_NS_STD(name) name
+#else
+# define gsl_QUAL_NS_STD(name) std::name
+#endif
+
+#define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
 
 #if gsl_HAVE_ARRAY
 # include <array>
@@ -36,6 +181,16 @@ namespace gsl {
 #if gsl_HAVE_SHARED_PTR
   using std::unique_ptr;
   using std::shared_ptr;
+#endif
+
+#if gsl_HAVE_ENUM_CLASS
+# include <cstdint>
+  enum class byte : std::uint8_t {};
+#elif gsl_HAVE_SIZED_TYPES
+# include <cstdint>
+  typedef std::uint8_t byte;
+#else
+  typedef unsigned char byte;
 #endif
 
 #if gsl_HAVE_ALIAS_TEMPLATE
@@ -59,6 +214,45 @@ namespace gsl {
 //
 #define Expects(x)  ::gsl::fail_fast_assert((x))
 #define Ensures(x)  ::gsl::fail_fast_assert((x))
+
+#if gsl_CONFIG_THROWS_FOR_TESTING
+
+struct fail_fast : public std::runtime_error 
+{
+    fail_fast() 
+    : std::runtime_error( "GSL assertion" ) {}
+    
+    explicit fail_fast( char const * const message ) 
+    : std::runtime_error( message ) {}
+};
+
+inline void fail_fast_assert( bool cond ) 
+{ 
+    if ( !cond ) 
+        throw fail_fast(); 
+}
+
+inline void fail_fast_assert( bool cond, char const * const message ) 
+{ 
+    if ( !cond ) 
+        throw fail_fast( message ); 
+}
+
+#else
+
+inline void fail_fast_assert( bool cond ) 
+{ 
+    if ( !cond ) 
+        gsl_QUAL_NS_STD( terminate )(); 
+}
+
+inline void fail_fast_assert( bool cond, char const * const ) 
+{ 
+    if ( !cond ) 
+        gsl_QUAL_NS_STD(terminate)(); 
+}
+
+#endif // gsl_THROW_ON_FAILURE
 
 //
 // GSL.util: utilities
@@ -142,10 +336,9 @@ T narrow( U u )
 // GSL.views: views
 //
 
-typedef char * zstring;
-typedef wchar_t * zwstring;
-typedef const char * czstring;
-typedef const wchar_t * cwzstring;
+//
+// at() - Bounds-checked way of accessing static arrays, std::array, std::vector.
+//
 
 #if gsl_COMPILER_MSVC_VERSION != 6
 
@@ -187,6 +380,10 @@ T & at( Array & arr, size_t index, T*, lower_precedence const & )
     return arr[index]; 
 }
 
+} // namespace detail
+
+// VC6 - Create an at( container ) function:
+
 # define gsl_MK_AT( Cont ) \
     namespace gsl { namespace detail { \
     template< class T > \
@@ -196,8 +393,6 @@ T & at( Array & arr, size_t index, T*, lower_precedence const & )
         return cont[index]; \
     } }} 
 
-} // namespace detail
-
 template< class Cont >
 int & at( Cont & cont, size_t index )
 { 
@@ -206,6 +401,9 @@ int & at( Cont & cont, size_t index )
 
 #endif // gsl_COMPILER_MSVC_VERSION != 6
 
+//
+// not_null<> - Wrap any indirection and enforce non-null.
+//
 template<class T>
 class not_null
 {
@@ -217,6 +415,7 @@ public:
     not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; }
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+
     template< typename U, typename Dummy = 
         typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
     not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
@@ -228,7 +427,9 @@ public:
         ptr_ = other.get(); 
         return *this; 
     }
+
 #elif gsl_COMPILER_MSVC_VERSION != 6
+
     template< typename U > 
     not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
@@ -280,14 +481,380 @@ private:
     not_null & operator-=( size_t );
 };
 
+//
+// array_view<> - A 1D view of contiguous T's, replace (*,len).
+//
+template< class T >
+class array_view
+{
+public:
+    typedef size_t size_type;
+
+    typedef T value_type;
+    typedef T & reference;
+    typedef T * pointer;
+    typedef T const * const_pointer;
+
+    typedef pointer       iterator;
+    typedef const_pointer const_iterator;
+    
+#if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
+    typedef std::reverse_iterator< iterator, T >             reverse_iterator;
+    typedef std::reverse_iterator< const_iterator, const T > const_reverse_iterator;
+#else
+    typedef std::reverse_iterator< iterator >                reverse_iterator;
+    typedef std::reverse_iterator< const_iterator >          const_reverse_iterator;
+#endif
+
+#if gsl_COMPILER_MSVC_VERSION == 6
+    // Todo
+#else
+    typedef typename std::iterator_traits< iterator >::difference_type difference_type;    
+#endif
+
+    gsl_constexpr14 array_view()
+        : begin_( NULL )
+        , end_  ( NULL )
+    {
+        Expects( size() == 0 );
+    }
+
+#if gsl_HAVE_NULLPTR
+    gsl_constexpr14 array_view( std::nullptr_t, size_type size )
+        : begin_( nullptr )
+        , end_  ( nullptr )
+    {
+        Expects( size == 0 );
+    }
+#endif    
+
+    gsl_constexpr14 array_view( pointer begin, pointer end )
+        : begin_( begin )
+        , end_  ( end )
+    {
+        Expects( begin <= end );
+    }
+
+    gsl_constexpr14 array_view( pointer begin, size_type size )
+        : begin_( begin )
+        , end_  ( begin + size )
+    {
+        Expects( size == 0 || ( size > 0 && begin != NULL ) );
+    }
+
+#if gsl_COMPILER_MSVC_VERSION != 6
+
+    template< size_t N >
+    gsl_constexpr14 array_view( T (&arr)[N] )
+        : begin_( arr )
+        , end_  ( arr + N )
+    {}
+
+# if gsl_HAVE_ARRAY
+    template< size_t N >
+    gsl_constexpr14 array_view( std::array< T, N > & arr ) 
+        : begin_( arr.data() )
+        , end_  ( arr.data() + N )
+    {}
+# endif
+
+    template< class Cont >
+    gsl_constexpr14 array_view( Cont & cont ) 
+#if gsl_HAVE_CONTAINER_DATA_METHOD
+        : begin_( cont.data() )
+        , end_  ( cont.data() + cont.size() )
+#else
+        : begin_( &cont[0] )
+        , end_  ( &cont[0] + cont.size() )
+#endif
+    {}
+
+#else // gsl_COMPILER_MSVC_VERSION != 6
+
+private:
+    struct lower_precedence {};
+    struct higher_precedence : lower_precedence {};
+    
+    template< class Array >
+    array_view create( Array & arr, T*, lower_precedence const & ) const
+    { 
+        return array_view( arr, gsl_DIMENSION_OF( arr ) );
+    }
+
+    array_view create( std::vector<T> & cont, T*, higher_precedence const & ) const
+    {
+        return array_view( &cont[0], cont.size() );
+    }
+
+public:    
+    template< class Cont >
+    array_view( Cont & cont )
+    { 
+        *this = create( cont, &cont[0], higher_precedence() );
+    }
+#endif // gsl_COMPILER_MSVC_VERSION != 6
+
+
+#if gsl_HAVE_IS_DEFAULT_CTOR
+    gsl_constexpr14 array_view( array_view const & ) = default;
+#else
+    // default
+#endif
+
+#if gsl_COMPILER_MSVC_VERSION != 6
+    array_view & operator=( array_view other )
+    {
+        other.swap( *this ); 
+        return *this;
+    }
+#else
+    array_view & operator=( array_view const & other )
+    {
+        // VC6 balks at copy-swap implementation (here),
+        // so we do it the simple way:
+        begin_ = other.begin_;
+        end_   = other.end_;
+        return *this;
+    }
+#endif
+
+#if 0
+    // Converting from other array_view ?    
+    template< typename U > operator=();
+#endif
+
+    gsl_constexpr14 iterator begin() const
+    {
+        return iterator( begin_ );
+    }
+
+    gsl_constexpr14 iterator end() const
+    {
+        return iterator( end_ );
+    }
+
+    gsl_constexpr14 const_iterator cbegin() const
+    {
+        return const_iterator( begin() );
+    }
+
+    gsl_constexpr14 const_iterator cend() const
+    {
+        return const_iterator( end() );
+    }
+
+    gsl_constexpr14 reverse_iterator rbegin() const
+    {
+        return reverse_iterator( end() );
+    }
+
+    gsl_constexpr14 reverse_iterator rend() const
+    {
+        return reverse_iterator( begin() );
+    }
+
+    gsl_constexpr14 const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator( cend() );
+    }
+
+    gsl_constexpr14 const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator( cbegin() );
+    }
+
+    gsl_constexpr14 operator bool () const gsl_noexcept
+    {
+        return begin_ != NULL;
+    }
+
+    gsl_constexpr14 reference operator[]( size_t index )
+    {
+        return at( index );
+    }
+
+    gsl_constexpr14 bool operator==( array_view const & other ) const
+    {
+        return  size() == other.size() 
+            && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
+    }
+
+    gsl_constexpr14 bool operator!=( array_view const & other ) const gsl_noexcept 
+    { 
+        return !( *this == other ); 
+    }
+
+    gsl_constexpr14 bool operator< ( array_view const & other ) const gsl_noexcept
+    { 
+        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
+    }
+
+    gsl_constexpr14 bool operator<=( array_view const & other ) const gsl_noexcept
+    { 
+        return !( other < *this ); 
+    }
+
+    gsl_constexpr14 bool operator> ( array_view const & other ) const gsl_noexcept
+    { 
+        return ( other < *this ); 
+    }
+
+    gsl_constexpr14 bool operator>=( array_view const & other ) const gsl_noexcept
+    {
+        return !( *this < other );
+    }
+
+    gsl_constexpr14 reference at( size_t index )
+    {
+        Expects( index >= 0 && index < size());
+        return begin_[ index ];
+    }
+
+    gsl_constexpr14 pointer data() const gsl_noexcept
+    {
+        return begin_;
+    }
+
+    gsl_constexpr14 bool empty() const gsl_noexcept
+    {
+        return size() == 0;
+    }
+
+    gsl_constexpr14 size_type size() const gsl_noexcept
+    {
+        return std::distance( begin_, end_ );
+    }
+
+    gsl_constexpr14 size_type length() const gsl_noexcept
+    {
+        return size();
+    }
+
+    gsl_constexpr14 size_type used_length() const gsl_noexcept
+    {
+        return length();
+    }
+
+    gsl_constexpr14 size_type bytes() const gsl_noexcept
+    {
+        return sizeof( value_type ) * size();
+    }
+
+    gsl_constexpr14 size_type used_bytes() const gsl_noexcept
+    {
+        return bytes();
+    }
+
+    void swap( array_view & other ) gsl_noexcept
+    {
+        using std::swap;
+        swap( begin_, other.begin_ );
+        swap( end_  , other.end_   );
+    }
+
+    array_view< const byte > as_bytes() const gsl_noexcept
+    {
+        return array_view< const byte >( reinterpret_cast<const byte *>( data() ), bytes() );
+    }
+
+    array_view< byte > as_writeable_bytes() const gsl_noexcept
+    {
+        return array_view< byte >( reinterpret_cast<byte *>( data() ), bytes() );
+    }
+
+    template< typename U >
+#if gsl_COMPILER_MSVC_VERSION == 6
+    array_view< U > as_array_view( U u = U() ) const gsl_noexcept
+#else
+    array_view< U > as_array_view() const gsl_noexcept
+#endif
+    {
+        return array_view< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
+    }
+
+private:
+    pointer begin_;
+    pointer end_;
+};
+
+// array_view creator functions (see ctors)
+
+# if gsl_HAVE_NULLPTR
+template< typename T >
+gsl_constexpr14 array_view<T> as_array_view( std::nullptr_t, size_t size )
+{
+    return array_view<T>( nullptr, size );
+}
+#endif
+
+template< typename T >
+gsl_constexpr14 array_view<T> as_array_view( T * begin, T * end )
+{
+    return array_view<T>( begin, end );
+}
+
+template< typename T >
+gsl_constexpr14 array_view<T> as_array_view( T * begin, size_t size )
+{
+    return array_view<T>( begin, size );
+}
+
+#if gsl_COMPILER_MSVC_VERSION != 6
+
+template< typename T, size_t N >
+gsl_constexpr14 array_view<T> as_array_view( T (&arr)[N] )
+{ 
+    return array_view<T>( arr, N );
+}
+
+# if gsl_HAVE_ARRAY
+template< typename T, size_t N >
+gsl_constexpr14 array_view<T> as_array_view( std::array<T,N> & arr )
+{
+    return array_view<T>( arr );
+}
+# endif
+
+# if gsl_HAVE_AUTO
+template< class Cont >
+auto as_array_view( Cont & cont ) -> gsl_constexpr14 array_view< typename Cont::value_type > 
+{ 
+    return array_view< typename Cont::value_type >( cont );
+}
+# else
+template< class T >
+array_view<T> as_array_view( std::vector<T> & cont )
+{ 
+    return array_view<T>( cont );
+}
+#endif
+
+#else // gsl_COMPILER_MSVC_VERSION != 6
+
+template< class T >
+array_view<T> as_array_view( std::vector<T> & cont )
+{ 
+    return array_view<T>( cont );
+}
+
+#endif // gsl_COMPILER_MSVC_VERSION != 6
+
+//
+// String types:
+//
+
+typedef char * zstring;
+typedef wchar_t * zwstring;
+typedef const char * czstring;
+typedef const wchar_t * cwzstring;
+
 } // namespace gsl
+
+// at( std::vector ):
 
 #if gsl_COMPILER_MSVC_VERSION == 6
     gsl_MK_AT( std::vector )
 #endif 
-
-#include "array_view.h"
-//#include "string_view.h"
 
 #endif // GSL_GSL_LITE_H_INCLUDED
 

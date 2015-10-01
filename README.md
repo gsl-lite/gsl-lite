@@ -78,7 +78,7 @@ Dependencies
 
 Installation
 ------------
-*gsl-lite* is a multiple-file header-only library. Put `gsl-lite.h` and the supporting files in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
+*gsl-lite* is a single-file header-only library. Put `gsl-lite.h` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
 
 
 Building the tests
