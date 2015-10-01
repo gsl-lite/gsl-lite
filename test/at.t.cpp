@@ -19,6 +19,36 @@
 
 namespace {
 
+CASE( "at(): Terminates access to non-existing C-array elements" )
+{
+    int a[] = { 1, 2, 3, 4 };
+
+    EXPECT_THROWS( at(a, 4) );
+}
+
+CASE( "at(): Terminates access to non-existing std::array elements" )
+{
+#if gsl_HAVE_ARRAY
+    std::array<int, 4> a = {{ 1, 2, 3, 4 }};
+
+    EXPECT_THROWS( at(a, 4) );
+#else
+    EXPECT( !!"std::array<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "at(): Terminates access to non-existing std::vector elements" )
+{
+    std::vector<int> a; // = { 1, 2, 3, 4 };
+
+    for ( int i = 0; i < 4; ++i )
+    {
+        a.push_back( i + 1 );
+    }
+
+    EXPECT_THROWS( at(a, 4) );
+}
+
 CASE( "at(): Allows access to existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };
@@ -27,13 +57,6 @@ CASE( "at(): Allows access to existing C-array elements" )
     {
         EXPECT( at(a, i) ==  i + 1 );
     }
-}
-
-CASE( "at(): Terminates access to non-existing C-array elements" )
-{
-    int a[] = { 1, 2, 3, 4 };
-
-    EXPECT_THROWS( at(a, 4) );
 }
 
 CASE( "at(): Allows access to existing std::array elements" )
@@ -50,17 +73,6 @@ CASE( "at(): Allows access to existing std::array elements" )
 #endif
 }
 
-CASE( "at(): Terminates access to non-existing std::array elements" )
-{
-#if gsl_HAVE_ARRAY
-    std::array<int, 4> a = {{ 1, 2, 3, 4 }};
-
-    EXPECT_THROWS( at(a, 4) );
-#else
-    EXPECT( !!"std::array<> is not available (no C++11)" );
-#endif
-}
-
 CASE( "at(): Allows access to existing std::vector elements" )
 {
     std::vector<int> a; // = { 1, 2, 3, 4 };
@@ -70,18 +82,6 @@ CASE( "at(): Allows access to existing std::vector elements" )
         a.push_back( i + 1 );
         EXPECT( at(a, i) == i + 1 );
     }
-}
-
-CASE( "at(): Terminates access to non-existing std::vector elements" )
-{
-    std::vector<int> a; // = { 1, 2, 3, 4 };
-
-    for ( int i = 0; i < 4; ++i )
-    {
-        a.push_back( i + 1 );
-    }
-
-    EXPECT_THROWS( at(a, 4) );
 }
 
 }
