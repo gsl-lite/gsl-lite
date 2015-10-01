@@ -74,7 +74,7 @@
 #endif
 
 #if gsl_CPP11_OR_GREATER
-# define gsl_HAVE_EXPLICIT  1
+# define gsl_HAVE_EXPLICIT_CONVERSION  1
 #endif
 
 #if gsl_CPP11_OR_GREATER
@@ -129,8 +129,8 @@
 # define gsl_constexpr14 /*nothing*/
 #endif
 
-#if gsl_HAVE_EXPLICIT
-# define gsl_explicit /*explicit*/
+#if gsl_HAVE_EXPLICIT_CONVERSION
+# define gsl_explicit explicit
 #else
 # define gsl_explicit /*nothing*/
 #endif
