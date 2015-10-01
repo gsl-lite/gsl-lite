@@ -30,6 +30,10 @@ inline std::string to_string( nullptr_t const & )
 }
 #endif 
 
+} // namespace lest
+
+namespace gsl {
+
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
 inline std::ostream & operator<<( std::ostream & os, gsl::byte b )
@@ -37,7 +41,7 @@ inline std::ostream & operator<<( std::ostream & os, gsl::byte b )
     return os << std::hex << "0x" << static_cast<int>(b); 
 }
 
-}
+} // namespace gsl
 
 #endif // GSL_TEST_GSL_LITE_H_INCLUDED
 
