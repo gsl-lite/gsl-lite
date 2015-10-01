@@ -261,8 +261,8 @@ public:
         return ptr_;
     } 
     
-    gsl_explicit operator T() const { return get(); }
-    T            operator->() const { return get(); }
+         operator T() const { return get(); }
+    T    operator->() const { return get(); }
 
     bool operator==(T const & rhs) const { return    ptr_ == rhs; }
     bool operator!=(T const & rhs) const { return !(*this == rhs); }
