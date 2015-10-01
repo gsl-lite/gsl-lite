@@ -63,20 +63,20 @@ public:
     typedef typename std::iterator_traits< iterator >::difference_type difference_type;    
 #endif
 
-	gsl_constexpr14 array_view()
+    gsl_constexpr14 array_view()
         : begin_( NULL )
         , end_  ( NULL )
-	{
-		Expects( size() == 0 );
-	}
+    {
+        Expects( size() == 0 );
+    }
 
 #if gsl_HAVE_NULLPTR
-	gsl_constexpr14 array_view( std::nullptr_t, size_type size )
+    gsl_constexpr14 array_view( std::nullptr_t, size_type size )
         : begin_( nullptr )
         , end_  ( nullptr )
-	{
-		Expects( size == 0 );
-	}
+    {
+        Expects( size == 0 );
+    }
 #endif    
 
     gsl_constexpr14 array_view( pointer begin, pointer end )
@@ -174,86 +174,86 @@ public:
     template< typename U > operator=();
 #endif
 
-	gsl_constexpr14 iterator begin() const
-	{
-		return iterator( begin_ );
-	}
+    gsl_constexpr14 iterator begin() const
+    {
+        return iterator( begin_ );
+    }
 
-	gsl_constexpr14 iterator end() const
-	{
-		return iterator( end_ );
-	}
+    gsl_constexpr14 iterator end() const
+    {
+        return iterator( end_ );
+    }
 
-	gsl_constexpr14 const_iterator cbegin() const
-	{
-		return const_iterator( begin() );
-	}
+    gsl_constexpr14 const_iterator cbegin() const
+    {
+        return const_iterator( begin() );
+    }
 
-	gsl_constexpr14 const_iterator cend() const
-	{
-		return const_iterator( end() );
-	}
+    gsl_constexpr14 const_iterator cend() const
+    {
+        return const_iterator( end() );
+    }
 
-	gsl_constexpr14 reverse_iterator rbegin() const
-	{
-		return reverse_iterator( end() );
-	}
+    gsl_constexpr14 reverse_iterator rbegin() const
+    {
+        return reverse_iterator( end() );
+    }
 
-	gsl_constexpr14 reverse_iterator rend() const
-	{
-		return reverse_iterator( begin() );
-	}
+    gsl_constexpr14 reverse_iterator rend() const
+    {
+        return reverse_iterator( begin() );
+    }
 
-	gsl_constexpr14 const_reverse_iterator crbegin() const
-	{
-		return const_reverse_iterator( cend() );
-	}
+    gsl_constexpr14 const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator( cend() );
+    }
 
-	gsl_constexpr14 const_reverse_iterator crend() const
-	{
-		return const_reverse_iterator( cbegin() );
-	}
+    gsl_constexpr14 const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator( cbegin() );
+    }
 
-	gsl_constexpr14 operator bool () const gsl_noexcept
-	{
-		return begin_ != NULL;
-	}
+    gsl_constexpr14 operator bool () const gsl_noexcept
+    {
+        return begin_ != NULL;
+    }
 
     gsl_constexpr14 reference operator[]( size_t index )
     {
         return at( index );
     }
 
-	gsl_constexpr14 bool operator==( array_view const & other ) const
-	{
-		return  size() == other.size() 
+    gsl_constexpr14 bool operator==( array_view const & other ) const
+    {
+        return  size() == other.size() 
             && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
-	}
-
-	gsl_constexpr14 bool operator!=( array_view const & other ) const gsl_noexcept 
-	{ 
-	    return !( *this == other ); 
     }
 
-	gsl_constexpr14 bool operator< ( array_view const & other ) const gsl_noexcept
-	{ 
-	    return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
+    gsl_constexpr14 bool operator!=( array_view const & other ) const gsl_noexcept 
+    { 
+        return !( *this == other ); 
     }
 
-	gsl_constexpr14 bool operator<=( array_view const & other ) const gsl_noexcept
-	{ 
-	    return !( other < *this ); 
+    gsl_constexpr14 bool operator< ( array_view const & other ) const gsl_noexcept
+    { 
+        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
     }
 
-	gsl_constexpr14 bool operator> ( array_view const & other ) const gsl_noexcept
-	{ 
-	    return ( other < *this ); 
+    gsl_constexpr14 bool operator<=( array_view const & other ) const gsl_noexcept
+    { 
+        return !( other < *this ); 
     }
 
-	gsl_constexpr14 bool operator>=( array_view const & other ) const gsl_noexcept
-	{
-		return !( *this < other );
-	}
+    gsl_constexpr14 bool operator> ( array_view const & other ) const gsl_noexcept
+    { 
+        return ( other < *this ); 
+    }
+
+    gsl_constexpr14 bool operator>=( array_view const & other ) const gsl_noexcept
+    {
+        return !( *this < other );
+    }
 
     gsl_constexpr14 reference at( size_t index )
     {
@@ -261,40 +261,40 @@ public:
         return begin_[ index ];
     }
 
-	gsl_constexpr14 pointer data() const gsl_noexcept
-	{
-		return begin_;
-	}
+    gsl_constexpr14 pointer data() const gsl_noexcept
+    {
+        return begin_;
+    }
 
-	gsl_constexpr14 bool empty() const gsl_noexcept
-	{
-		return size() == 0;
-	}
+    gsl_constexpr14 bool empty() const gsl_noexcept
+    {
+        return size() == 0;
+    }
 
-	gsl_constexpr14 size_type size() const gsl_noexcept
-	{
-		return std::distance( begin_, end_ );
-	}
+    gsl_constexpr14 size_type size() const gsl_noexcept
+    {
+        return std::distance( begin_, end_ );
+    }
 
-	gsl_constexpr14 size_type length() const gsl_noexcept
-	{
-		return size();
-	}
+    gsl_constexpr14 size_type length() const gsl_noexcept
+    {
+        return size();
+    }
 
-	gsl_constexpr14 size_type used_length() const gsl_noexcept
-	{
-		return length();
-	}
+    gsl_constexpr14 size_type used_length() const gsl_noexcept
+    {
+        return length();
+    }
 
-	gsl_constexpr14 size_type bytes() const gsl_noexcept
-	{
-		return sizeof( value_type ) * size();
-	}
+    gsl_constexpr14 size_type bytes() const gsl_noexcept
+    {
+        return sizeof( value_type ) * size();
+    }
 
-	gsl_constexpr14 size_type used_bytes() const gsl_noexcept
-	{
-		return bytes();
-	}
+    gsl_constexpr14 size_type used_bytes() const gsl_noexcept
+    {
+        return bytes();
+    }
 
     void swap( array_view & other ) gsl_noexcept
     {
@@ -320,7 +320,7 @@ public:
     array_view< U > as_array_view() const gsl_noexcept
 #endif
     {
-		return array_view< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
+        return array_view< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
     }
 
 private:

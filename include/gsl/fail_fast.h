@@ -34,8 +34,8 @@ namespace gsl {
 
 struct fail_fast : public std::runtime_error 
 {
-	fail_fast() : std::runtime_error("GSL assertion") {}
-	explicit fail_fast(char const* const message) : std::runtime_error(message) {}
+    fail_fast() : std::runtime_error("GSL assertion") {}
+    explicit fail_fast(char const* const message) : std::runtime_error(message) {}
 };
 
 inline void fail_fast_assert(bool cond) { if (!cond) throw fail_fast(); }
