@@ -20,7 +20,11 @@
 #ifndef GSL_GSL_LITE_H_INCLUDED
 #define GSL_GSL_LITE_H_INCLUDED
 
+#include <exception>
+#include <iterator>
 #include <memory>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 #define  gsl_lite_VERSION "0.0.0"
@@ -124,6 +128,10 @@
 # define gsl_HAVE_UNIQUE_PTR  1
 #endif
 
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
+# define gsl_HAVE_TYPE_TRAITS  1
+#endif
+
 // For the rest, consider VS12, VC13 as C++11 for GSL Lite:
 
 #if gsl_COMPILER_MSVC_VERSION >= 12
@@ -171,6 +179,10 @@
 
 #if gsl_HAVE_ARRAY
 # include <array>
+#endif
+
+#if gsl_HAVE_TYPE_TRAITS
+# include <type_traits>
 #endif
 
 namespace gsl {
