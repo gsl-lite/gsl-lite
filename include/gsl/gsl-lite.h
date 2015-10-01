@@ -183,16 +183,6 @@ namespace gsl {
   using std::shared_ptr;
 #endif
 
-#if gsl_HAVE_ENUM_CLASS
-# include <cstdint>
-  enum class byte : std::uint8_t {};
-#elif gsl_HAVE_SIZED_TYPES
-# include <cstdint>
-  typedef std::uint8_t byte;
-#else
-  typedef unsigned char byte;
-#endif
-
 #if gsl_HAVE_ALIAS_TEMPLATE
   template< class T > using owner = T;
 #else
@@ -238,7 +228,7 @@ inline void fail_fast_assert( bool cond, char const * const message )
         throw fail_fast( message ); 
 }
 
-#else
+#else // gsl_CONFIG_THROWS_FOR_TESTING
 
 inline void fail_fast_assert( bool cond ) 
 { 
@@ -252,7 +242,7 @@ inline void fail_fast_assert( bool cond, char const * const )
         gsl_QUAL_NS_STD(terminate)(); 
 }
 
-#endif // gsl_THROW_ON_FAILURE
+#endif // gsl_CONFIG_THROWS_FOR_TESTING
 
 //
 // GSL.util: utilities
@@ -480,6 +470,19 @@ private:
     not_null & operator- ( size_t );
     not_null & operator-=( size_t );
 };
+
+//
+// Byte-specific type.
+//
+#if gsl_HAVE_ENUM_CLASS
+# include <cstdint>
+  enum class byte : std::uint8_t {};
+#elif gsl_HAVE_SIZED_TYPES
+# include <cstdint>
+  typedef std::uint8_t byte;
+#else
+  typedef unsigned char byte;
+#endif
 
 //
 // array_view<> - A 1D view of contiguous T's, replace (*,len).
