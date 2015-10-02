@@ -40,6 +40,7 @@
 		<Unit filename="../test/lest_cpp03.hpp" />
 		<Unit filename="../test/not_null.t.cpp" />
 		<Unit filename="../test/owner.t.cpp" />
+		<Unit filename="../test/string_view.t.cpp" />
 		<Unit filename="../test/t.bat" />
 		<Unit filename="../test/util.t.cpp" />
 		<Extensions>
