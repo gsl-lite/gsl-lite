@@ -16,7 +16,6 @@
 // THE SOFTWARE. 
 
 #include "gsl-lite.t.h"
-#include <vector>
 
 namespace {
 
