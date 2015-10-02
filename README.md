@@ -160,8 +160,10 @@ dyn_array<>                 | ?       | -       | -       | A heap-allocated arr
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 **2.1 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 array_view<>                | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
-string_view<>               | &#10003;| &#10003;| -       | array_view&lt;char> |
-cstring_view<>              | &#10003;| &#10003;| -       | array_view&lt;const char> |
+string_view<>               | &#10003;| &#10003;| &#10003;| array_view&lt;char> |
+wstring_view<>              | -       | &#10003;| &#10003;| array_view&lt;wchar_t > |
+cstring_view<>              | &#10003;| &#10003;| &#10003;| array_view&lt;const char> |
+cwstring_view<>             | -       | &#10003;| &#10003;| array_view&lt;const wchar_t > |
 zstring                     | &#10003;| &#10003;| &#10003;| a char* (C-style string) |
 wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style string) |
 czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |

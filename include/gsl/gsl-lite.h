@@ -863,6 +863,11 @@ typedef wchar_t * zwstring;
 typedef const char * czstring;
 typedef const wchar_t * cwzstring;
 
+typedef array_view< char > string_view;
+typedef array_view< const char > cstring_view;
+typedef array_view< wchar_t > wstring_view;
+typedef array_view< const wchar_t > cwstring_view;
+
 } // namespace gsl
 
 // at( std::vector ):
