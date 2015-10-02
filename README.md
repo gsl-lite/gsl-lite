@@ -198,7 +198,6 @@ Windows   | Clang/LLVM | ? |
 &nbsp;    | Visual C++<br>(Visual Studio)| 6 (6), 8 (2005), 10 (2010), 11 (2012),<br>12 (2013), 13 (2015) |
 GNU/Linux | Clang/LLVM | 3.4 |
 &nbsp;    | GCC        | 5.1 |
-&nbsp;    | Clang/LLVM | 3.4 |
 OS X      | ?          | ?   |
 
 
