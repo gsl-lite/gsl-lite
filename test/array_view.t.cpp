@@ -19,11 +19,21 @@
 
 namespace {
 
-CASE( "array_view<>: Disallows ... (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "array_view<>: Disallows construction from an C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-#else
-    EXPECT( !!"no disallow tests yet" );
+    short arr[] = { 1, 2, 3, };
+    array_view<int> v = arr;
+#endif
+}
+
+CASE( "array_view<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+{
+#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+# if gsl_HAVE_ARRAY
+    std::array<long,3> arr = {{ 1L, 2L, 3L, }};
+    array_view<int> v( arr);
+# endif
 #endif
 }
 
