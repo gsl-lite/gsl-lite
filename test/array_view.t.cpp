@@ -81,23 +81,19 @@ CASE( "array_view<>: Allows construction from a nullptr and a zero size" )
 CASE( "array_view<>: Allows construction from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+    
     array_view<int> v( arr, arr + gsl_DIMENSION_OF( arr ) );
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( v.at( i ) == arr[i] );
-    }
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
 CASE( "array_view<>: Allows construction from a non-null pointer and a size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    array_view<int> v = as_array_view( arr, gsl_DIMENSION_OF( arr ) );
+    
+    array_view<int> v( arr, gsl_DIMENSION_OF( arr ) );
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( v.at( i ) == arr[i] );
-    }
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
 CASE( "array_view<>: Allows construction from a any pointer and a zero size" )
@@ -121,10 +117,7 @@ CASE( "array_view<>: Allows construction from a C-array" )
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     array_view<int> v( arr );
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( v.at( i ) == arr[i] );
-    }
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
 CASE( "array_view<>: Allows construction from a std::array<>" )
@@ -133,10 +126,7 @@ CASE( "array_view<>: Allows construction from a std::array<>" )
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
     array_view<int> v( arr );
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( v.at( i ) == arr[i] );
-    }
+    EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
 #endif
@@ -151,10 +141,7 @@ CASE( "array_view<>: Allows construction from a container (std::vector<>)" )
 #endif
     array_view<int> v( vec );
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( v.at( i ) == vec[i] );
-    }
+    EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
 CASE( "array_view<>: Allows construction from another view of the same type" )
@@ -164,10 +151,7 @@ CASE( "array_view<>: Allows construction from another view of the same type" )
 
     array_view<int> w( v );
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( w.at( i ) == arr[i] );
-    }
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
 CASE( "array_view<>: Allows assignment from another view of the same type" )
@@ -178,10 +162,7 @@ CASE( "array_view<>: Allows assignment from another view of the same type" )
 
     w = v;
 
-    for ( int i = 0; i < v.size(); i += 4 )
-    {
-        EXPECT( w.at( i ) == arr[i] );
-    }
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
 CASE( "array_view<>: Allows forward iteration" )
@@ -561,6 +542,59 @@ CASE( "array_view<>: Allows to change the elements from a view of another type" 
     EXPECT( vb[0] == type2(0x42) );
     {for ( int i = 1; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
 }
+
+CASE( "array_view<>: Allows building from two pointers" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    array_view<int> v = as_array_view( arr, arr + gsl_DIMENSION_OF( arr ) );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+}
+
+CASE( "array_view<>: Allows building from a non-null pointer and a size" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    array_view<int> v = as_array_view( arr, gsl_DIMENSION_OF( arr ) );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+}
+
+CASE( "array_view<>: Allows building from a C-array" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    array_view<int> v = as_array_view( arr );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+}
+
+CASE( "array_view<>: Allows building from a std::array<>" )
+{
+# if gsl_HAVE_ARRAY
+    std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
+
+    array_view<int> v = as_array_view( arr );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
+#else
+    EXPECT( !!"std::array<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "array_view<>: Allows building from a container (std::vector<>)" )
+{
+# if gsl_HAVE_INITIALIZER_LIST
+    std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+#else
+    std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+#endif
+    array_view<int> v = as_array_view( vec );
+
+    EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+}
+
 
 #if 0
 CASE( "array_view_convertible" ) {}
