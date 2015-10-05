@@ -22,8 +22,10 @@
 
 #include <exception>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -372,11 +374,12 @@ typename Cont::value_type & at( Cont & cont, size_t index )
 
 namespace detail {
 
-struct lower_precedence {};
-struct higher_precedence : lower_precedence {};
+struct precedence_0 {};
+struct precedence_1 : precedence_0 {};
+struct order_precedence : precedence_1 {};
 
 template< class Array, class T >
-T & at( Array & arr, size_t index, T*, lower_precedence const & )
+T & at( Array & arr, size_t index, T*, precedence_0 const & )
 { 
     Expects( index < gsl_DIMENSION_OF( arr ) ); 
     return arr[index]; 
@@ -389,7 +392,7 @@ T & at( Array & arr, size_t index, T*, lower_precedence const & )
 # define gsl_MK_AT( Cont ) \
     namespace gsl { namespace detail { \
     template< class T > \
-    inline T & at( Cont<T> & cont, size_t index, T*, higher_precedence const & ) \
+    inline T & at( Cont<T> & cont, size_t index, T*, precedence_1 const & ) \
     { \
         Expects( index < cont.size() ); \
         return cont[index]; \
@@ -398,7 +401,7 @@ T & at( Array & arr, size_t index, T*, lower_precedence const & )
 template< class Cont >
 int & at( Cont & cont, size_t index )
 { 
-    return detail::at( cont, index, &cont[0], detail::higher_precedence() );
+    return detail::at( cont, index, &cont[0], detail::order_precedence() );
 }
 
 #endif // gsl_COMPILER_MSVC_VERSION != 6
@@ -559,15 +562,15 @@ public:
 
 #if gsl_COMPILER_MSVC_VERSION != 6
 
-    template< size_t N >
-    gsl_constexpr14 array_view( T (&arr)[N] )
+    template< class U, size_t N >
+    gsl_constexpr14 array_view( U (&arr)[N] )
         : begin_( arr )
         , end_  ( arr + N )
     {}
 
 # if gsl_HAVE_ARRAY
-    template< size_t N >
-    gsl_constexpr14 array_view( std::array< T, N > & arr ) 
+    template< class U, size_t N >
+    gsl_constexpr14 array_view( std::array< U, N > & arr ) 
         : begin_( arr.data() )
         , end_  ( arr.data() + N )
     {}
@@ -587,16 +590,18 @@ public:
 #else // gsl_COMPILER_MSVC_VERSION != 6
 
 private:
-    struct lower_precedence {};
-    struct higher_precedence : lower_precedence {};
+    struct precedence_0 {};
+    struct precedence_1 : precedence_0 {};
+    struct precedence_2 : precedence_1 {};
+    struct order_precedence : precedence_1 {};
     
-    template< class Array >
-    array_view create( Array & arr, T*, lower_precedence const & ) const
+    template< class Array, class U >
+    array_view create( Array & arr, U*, precedence_0 const & ) const
     { 
         return array_view( arr, gsl_DIMENSION_OF( arr ) );
     }
 
-    array_view create( std::vector<T> & cont, T*, higher_precedence const & ) const
+    array_view create( std::vector<T> & cont, T*, precedence_1 const & ) const
     {
         return array_view( &cont[0], cont.size() );
     }
@@ -605,7 +610,7 @@ public:
     template< class Cont >
     array_view( Cont & cont )
     { 
-        *this = create( cont, &cont[0], higher_precedence() );
+        *this = create( cont, &cont[0], order_precedence() );
     }
 #endif // gsl_COMPILER_MSVC_VERSION != 6
 
@@ -777,15 +782,28 @@ public:
         return array_view< byte >( reinterpret_cast<byte *>( data() ), bytes() );
     }
 
+#if gsl_COMPILER_MSVC_VERSION != 6
     template< typename U >
-#if gsl_COMPILER_MSVC_VERSION == 6
-    array_view< U > as_array_view( U u = U() ) const gsl_noexcept
-#else
     array_view< U > as_array_view() const gsl_noexcept
-#endif
     {
         return array_view< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
     }
+#else
+    template< class U >
+    struct mk
+    {
+        static array_view<U> view( U * data, size_t size )
+        {
+            return array_view<U>( data, size ); 
+        }
+    };
+
+    template< typename U >
+    array_view< U > as_array_view( U u = U() ) const 
+    {
+        return mk<U>::view( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
+    }
+#endif
 
 private:
     pointer begin_;
@@ -793,14 +811,6 @@ private:
 };
 
 // array_view creator functions (see ctors)
-
-# if gsl_HAVE_NULLPTR
-template< typename T >
-gsl_constexpr14 array_view<T> as_array_view( std::nullptr_t, size_t size )
-{
-    return array_view<T>( nullptr, size );
-}
-#endif
 
 template< typename T >
 gsl_constexpr14 array_view<T> as_array_view( T * begin, T * end )
@@ -846,10 +856,22 @@ array_view<T> as_array_view( std::vector<T> & cont )
 
 #else // gsl_COMPILER_MSVC_VERSION != 6
 
+namespace detail {
+    
+template< class T >
+struct mk
+{
+    static array_view<T> view( std::vector<T> & cont )
+    {
+        return array_view<T>( cont ); 
+    }
+};
+}
+
 template< class T >
 array_view<T> as_array_view( std::vector<T> & cont )
 { 
-    return array_view<T>( cont );
+    return detail::mk<T>::view( cont );
 }
 
 #endif // gsl_COMPILER_MSVC_VERSION != 6
@@ -864,9 +886,117 @@ typedef const char * czstring;
 typedef const wchar_t * cwzstring;
 
 typedef array_view< char > string_view;
-typedef array_view< const char > cstring_view;
 typedef array_view< wchar_t > wstring_view;
+typedef array_view< const char > cstring_view;
 typedef array_view< const wchar_t > cwstring_view;
+
+// to_string() allow (explicit) conversions from string_view to string
+
+inline std::string to_string( string_view const & view )
+{
+    return std::string( view.data(), view.length() );
+}
+
+inline std::string to_string( cstring_view const & view )
+{
+    return std::string( view.data(), view.length() );
+}
+
+inline std::wstring to_string( wstring_view const & view )
+{
+    return std::wstring( view.data(), view.length() );
+}
+
+inline std::wstring to_string( cwstring_view const & view )
+{
+    return std::wstring( view.data(), view.length() );
+}
+
+//
+// ensure_sentinel() 
+//
+// Provides a way to obtain an array_view from a contiguous sequence
+// that ends with a (non-inclusive) sentinel value.
+//
+// Will fail-fast if sentinel cannot be found before max elements are examined.
+//
+namespace detail {
+
+template<class T, class SizeType, const T Sentinel>
+struct ensure
+{
+//    static array_view<T> sentinel( T const * seq, SizeType max = std::numeric_limits<SizeType>::max() )
+    static array_view<T> sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
+    {
+        T const * cur = seq;
+
+        while ( ( cur - seq ) < max && *cur != Sentinel ) 
+            ++cur;
+        
+        Expects( *cur == Sentinel );
+        
+        return array_view<T>( seq, cur - seq );
+    }
+};
+} // namespace detail
+
+//
+// ensure_z - creates a string_view for a czstring or cwzstring.
+// Will fail fast if a null-terminator cannot be found before
+// the limit of size_type.
+//
+
+#if gsl_COMPILER_MSVC_VERSION != 6
+
+template< class T >
+inline array_view<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t>::max() )
+{
+    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
+}
+
+template< class T, size_t N >
+array_view<T> ensure_z( T (&sz)[N] ) 
+{ 
+    return ensure_z( &sz[0], N ); 
+}
+
+template< class Cont >
+array_view< typename std::remove_pointer<typename Cont::pointer>::type > 
+ensure_z( Cont& cont )
+{
+    return ensure_z( cont.data(), cont.length() );
+}
+
+#else // gsl_COMPILER_MSVC_VERSION
+
+template< typename T >
+array_view<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
+{ 
+    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
+//    return detail::ensure_z( cont, &cont[0], max, detail::order_precedence() );
+}
+
+#endif // gsl_COMPILER_MSVC_VERSION
+
+//inline string_view ensure_z( char * text )
+//{
+//    return string_view();
+//}
+//
+//inline cstring_view ensure_z( char const * text )
+//{
+//    return cstring_view();
+//}
+
+//inline wstring_view ensure_z( wchar_t * text )
+//{
+//    return wstring_view();
+//}
+
+//inline cwstring_view ensure_z( wchar_t const * text )
+//{
+//    return cwstring_view();
+//}
 
 } // namespace gsl
 
