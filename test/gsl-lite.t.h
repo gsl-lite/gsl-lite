@@ -30,6 +30,14 @@ inline std::string to_string( nullptr_t const & )
 }
 #endif 
 
+} // namespace lest
+
+#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
+namespace std {
+#else
+namespace lest {
+#endif
+
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text  )
 { 
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
@@ -39,7 +47,11 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text  
 #endif
 }
 
+#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
+} // namespace std
+#else
 } // namespace lest
+#endif
 
 namespace gsl {
 
