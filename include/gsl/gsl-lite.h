@@ -134,7 +134,7 @@
 # define gsl_HAVE_TYPE_TRAITS  1
 #endif
 
-// For the rest, consider VS12, VC13 as C++11 for GSL Lite:
+// For the rest, consider VC12, VC13 as C++11 for GSL Lite:
 
 #if gsl_COMPILER_MSVC_VERSION >= 12
 # undef  gsl_CPP11_OR_GREATER
