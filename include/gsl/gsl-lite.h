@@ -981,7 +981,7 @@ ensure_z( Cont& cont )
 template< typename T >
 array_view<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
 { 
-    return detail::ensure<T, size_t, '\0'>::sentinel( sz, max );
+    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
 }
 
 #endif // gsl_COMPILER_MSVC_VERSION
