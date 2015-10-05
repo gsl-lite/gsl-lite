@@ -621,6 +621,13 @@ public:
     // default
 #endif
 
+    template< typename U >
+    gsl_constexpr14 array_view( array_view<U> const & other )
+        : begin_( other.begin() )
+        , end_  ( other.end() )
+    {        
+    }
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     array_view & operator=( array_view other )
     {
@@ -925,12 +932,14 @@ namespace detail {
 template<class T, class SizeType, const T Sentinel>
 struct ensure
 {
-//    static array_view<T> sentinel( T const * seq, SizeType max = std::numeric_limits<SizeType>::max() )
     static array_view<T> sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
     {
-        T const * cur = seq;
+        typedef T * pointer;
+        typedef typename std::iterator_traits<pointer>::difference_type difference_type;
+        
+        pointer cur = seq;
 
-        while ( ( cur - seq ) < max && *cur != Sentinel ) 
+        while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel ) 
             ++cur;
         
         Expects( *cur == Sentinel );
@@ -972,31 +981,10 @@ ensure_z( Cont& cont )
 template< typename T >
 array_view<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
 { 
-    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
-//    return detail::ensure_z( cont, &cont[0], max, detail::order_precedence() );
+    return detail::ensure<T, size_t, '\0'>::sentinel( sz, max );
 }
 
 #endif // gsl_COMPILER_MSVC_VERSION
-
-//inline string_view ensure_z( char * text )
-//{
-//    return string_view();
-//}
-//
-//inline cstring_view ensure_z( char const * text )
-//{
-//    return cstring_view();
-//}
-
-//inline wstring_view ensure_z( wchar_t * text )
-//{
-//    return wstring_view();
-//}
-
-//inline cwstring_view ensure_z( wchar_t const * text )
-//{
-//    return cwstring_view();
-//}
 
 } // namespace gsl
 

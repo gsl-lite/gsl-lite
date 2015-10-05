@@ -435,7 +435,7 @@ CASE( "ensure_z(): Allows to build a string_view from a non-const C-string" )
 #else 
     string_view sv = ensure_z( &s[0] );
 #endif   
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -449,7 +449,7 @@ CASE( "ensure_z(): Allows to build a cstring_view from a non-const C-string" )
     cstring_view sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -463,7 +463,7 @@ CASE( "ensure_z(): Allows to build a cstring_view from a const C-string" )
     cstring_view sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -477,7 +477,7 @@ CASE( "ensure_z(): Allows to build a wstring_view from a non-const wide C-string
     wstring_view sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -491,7 +491,7 @@ CASE( "ensure_z(): Allows to build a cwstring_view from a non-const wide C-strin
     cwstring_view sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -505,7 +505,7 @@ CASE( "ensure_z(): Allows to build a cwstring_view from a const wide C-string" )
     cwstring_view sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -513,7 +513,7 @@ CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensur
 {
     const char * s = "hello"; // not: s[]
     
-    EXPECT_THROWS( ensure_z( s, 3 ) );
+    EXPECT_THROWS( ensure_z( s, size_t( 3 ) ) );
 }
 
 }

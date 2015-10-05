@@ -65,14 +65,14 @@ CASE( "array_view<>: Terminates construction from a null pointer and a non-zero 
 CASE( "array_view<>: Allows default construction" )
 {
     array_view<int> v;
-    EXPECT( v.size() == 0 );
+    EXPECT( v.size() == size_t( 0 ) );
 }
 
 CASE( "array_view<>: Allows construction from a nullptr and a zero size" )
 {
 #if gsl_HAVE_NULLPTR
     array_view<int> v( nullptr, 0 );
-    EXPECT( v.size() == 0 );
+    EXPECT( v.size() == size_t( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
@@ -222,7 +222,7 @@ CASE( "array_view<>: Allows element access via array indexing" )
     int arr[] = { 1, 2, 3, };
     array_view<int> v( arr );
     
-    for ( int i = 0; i < v.size(); ++i )
+    for ( size_t i = 0; i < v.size(); ++i )
     {
         EXPECT( v[i] == arr[i] );
     }
@@ -233,7 +233,7 @@ CASE( "array_view<>: Allows element access via at()" )
     int arr[] = { 1, 2, 3, };
     array_view<int> v( arr );
     
-    for ( int i = 0; i < v.size(); ++i )
+    for ( size_t i = 0; i < v.size(); ++i )
     {
         EXPECT( v.at(i) == arr[i] );
     }
@@ -246,7 +246,7 @@ CASE( "array_view<>: Allows element access via data()" )
     
     EXPECT( *v.data() == *v.begin() );
 
-    for ( int i = 0; i < v.size(); ++i )
+    for ( size_t i = 0; i < v.size(); ++i )
     {
         EXPECT( v.data()[i] == arr[i] );
     }
@@ -350,7 +350,7 @@ CASE( "array_view<>: Allows to obtain number of elements via size()" )
 
     EXPECT( va.size() == gsl_DIMENSION_OF( a ) );
     EXPECT( vb.size() == gsl_DIMENSION_OF( b ) );
-    EXPECT(  z.size() == 0 );
+    EXPECT(  z.size() == size_t( 0 ) );
 }
 
 CASE( "array_view<>: Allows to obtain number of elements via length()" ) 
@@ -364,7 +364,7 @@ CASE( "array_view<>: Allows to obtain number of elements via length()" )
 
     EXPECT( va.length() == gsl_DIMENSION_OF( a ) );
     EXPECT( vb.length() == gsl_DIMENSION_OF( b ) );
-    EXPECT(  z.length() == 0 );
+    EXPECT(  z.length() == size_t( 0 ) );
 }
 
 CASE( "array_view<>: Allows to obtain number of elements via used_length()" ) 
@@ -378,7 +378,7 @@ CASE( "array_view<>: Allows to obtain number of elements via used_length()" )
 
     EXPECT( va.used_length() == gsl_DIMENSION_OF( a ) );
     EXPECT( vb.used_length() == gsl_DIMENSION_OF( b ) );
-    EXPECT(  z.used_length() == 0 );
+    EXPECT(  z.used_length() == size_t( 0 ) );
 }
 
 CASE( "array_view<>: Allows to obtain number of bytes via bytes()" ) 
@@ -445,7 +445,7 @@ CASE( "array_view<>: Allows to view the elements as read-only bytes" )
 #endif
     typedef gsl::byte gyte;
 
-    EXPECT( sizeof( type ) == 4 );
+    EXPECT( sizeof( type ) == size_t( 4 ) );
 
     type  a[] = { 0x12345678, };
     gyte be[] = { gyte(0x12), gyte(0x34), gyte(0x56), gyte(0x78), };
@@ -471,18 +471,18 @@ CASE( "array_view<>: Allows to view and change the elements as writable bytes" )
 #endif
     typedef gsl::byte gyte;
 
-    EXPECT( sizeof(type) == 4 );
+    EXPECT( sizeof(type) == size_t( 4 ) );
 
     type  a[] = { 0x0, };
     array_view<int> va( a );
     array_view<gyte> vb( va.as_writeable_bytes() );
     
-    {for ( int i = 0; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
+    {for ( size_t i = 0; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
 
     vb[0] = gyte(0x42);
 
     EXPECT( vb[0] == gyte(0x42) );
-    {for ( int i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
+    {for ( size_t i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
 }
 
 CASE( "array_view<>: Allows to view the elements as a view of another type" ) 
@@ -494,8 +494,8 @@ CASE( "array_view<>: Allows to view the elements as a view of another type" )
     typedef int   type1;
     typedef short type2;
 #endif
-    EXPECT( sizeof( type1 ) == 4 );
-    EXPECT( sizeof( type2 ) == 2 );
+    EXPECT( sizeof( type1 ) == size_t( 4 ) );
+    EXPECT( sizeof( type2 ) == size_t( 2 ) );
 
     type1  a[] = { 0x12345678, };
     type2 be[] = { type2(0x1234), type2(0x5678), };
@@ -523,8 +523,8 @@ CASE( "array_view<>: Allows to change the elements from a view of another type" 
     typedef int   type1;
     typedef short type2;
 #endif
-    EXPECT( sizeof( type1 ) == 4 );
-    EXPECT( sizeof( type2 ) == 2 );
+    EXPECT( sizeof( type1 ) == size_t( 4 ) );
+    EXPECT( sizeof( type2 ) == size_t( 2 ) );
 
     type1  a[] = { 0x0, };
     
@@ -535,12 +535,12 @@ CASE( "array_view<>: Allows to change the elements from a view of another type" 
     array_view<type2> vb( va.as_array_view<type2>() );
 #endif    
     
-    {for ( int i = 0; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
+    {for ( size_t i = 0; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
 
     vb[0] = 0x42;
 
     EXPECT( vb[0] == type2(0x42) );
-    {for ( int i = 1; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
+    {for ( size_t i = 1; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
 }
 
 CASE( "array_view<>: Allows building from two pointers" )
