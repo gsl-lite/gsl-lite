@@ -253,7 +253,7 @@ inline void fail_fast_assert( bool cond )
 inline void fail_fast_assert( bool cond, char const * const ) 
 { 
     if ( !cond ) 
-        gsl_QUAL_NS_STD(terminate)(); 
+        gsl_QUAL_NS_STD( terminate )(); 
 }
 
 #endif // gsl_CONFIG_THROWS_FOR_TESTING
