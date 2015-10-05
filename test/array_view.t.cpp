@@ -563,11 +563,15 @@ CASE( "array_view<>: Allows building from a non-null pointer and a size" )
 
 CASE( "array_view<>: Allows building from a C-array" )
 {
+#if gsl_COMPILER_MSVC_VERSION != 6
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     array_view<int> v = as_array_view( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
+#else
+    EXPECT( !!"not available for VC6" );
+#endif
 }
 
 CASE( "array_view<>: Allows building from a std::array<>" )
