@@ -245,7 +245,8 @@ The smart pointers of Boost 1.51 can be used with VC6.
 ### A.2 GSL Lite test specification
 
 ```
-array_view<>: Disallows ... (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+array_view<>: Disallows construction from an C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+array_view<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 array_view<>: Terminates construction from a nullptr and a non-zero size
 array_view<>: Terminates construction from two pointers in the wrong order
 array_view<>: Terminates construction from a null pointer and a non-zero size
@@ -285,6 +286,11 @@ array_view<>: Allows to view the elements as read-only bytes
 array_view<>: Allows to view and change the elements as writable bytes
 array_view<>: Allows to view the elements as a view of another type
 array_view<>: Allows to change the elements from a view of another type
+array_view<>: Allows building from two pointers
+array_view<>: Allows building from a non-null pointer and a size
+array_view<>: Allows building from a C-array
+array_view<>: Allows building from a std::array<>
+array_view<>: Allows building from a container (std::vector<>)
 at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements
 at(): Terminates access to non-existing std::vector elements
@@ -308,6 +314,48 @@ not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
+string_view<>: Disallows construction of a string_view from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_view<>: ToDo: Disallows construction of a string_view from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_view<>: Allows to create a string_view from a non-const C-string and size
+string_view<>: Allows to create a string_view from a non-const C-array
+string_view<>: Allows to create a string_view from a non-const std::array
+string_view<>: Allows to create a string_view from a non-const std::vector
+string_view<>: ToDo: Allows to create a string_view from a non-const std::string
+string_view<>: Allows to create a cstring_view from a const C-string and size
+string_view<>: Allows to create a cstring_view from a const C-array
+string_view<>: Allows to create a cstring_view from a const std::array
+string_view<>: Allows to create a cstring_view from a const std::vector
+string_view<>: Allows to create a cstring_view from a const std::string
+string_view<>: Allows to create a cstring_view from a non-const C-string and size
+string_view<>: Allows to create a cstring_view from a non-const C-array
+string_view<>: Allows to create a cstring_view from a non-const std::array
+string_view<>: Allows to create a cstring_view from a non-const std::vector
+string_view<>: Allows to create a cstring_view from a non-const std::string
+string_view<>: Allows to create a wstring_view from a non-const C-string and size
+string_view<>: Allows to create a wstring_view from a non-const C-array
+string_view<>: Allows to create a wstring_view from a non-const std::array
+string_view<>: Allows to create a wstring_view from a non-const std::vector
+string_view<>: Allows to create a cwstring_view from a non-const C-string and size
+string_view<>: Allows to create a cwstring_view from a non-const C-array
+string_view<>: Allows to create a cwstring_view from a non-const std::array
+string_view<>: Allows to create a cwstring_view from a non-const std::vector
+string_view<>: Allows to create a cwstring_view from a const C-string and size
+string_view<>: Allows to create a cwstring_view from a const C-array
+string_view<>: Allows to create a cwstring_view from a const std::array
+string_view<>: Allows to create a cwstring_view from a const std::vector
+string_view<>: Allows to explicitly convert from string_view to std::string
+string_view<>: Allows to explicitly convert from cstring_view to std::string
+string_view<>: Allows to explicitly convert from wstring_view to std::wstring
+string_view<>: Allows to explicitly convert from cwstring_view to std::wstring
+ensure_z(): Disallows to build a string_view from a const C-string
+ensure_z(): Disallows to build a wstring_view from a const wide C-string
+ensure_z(): Allows to build a string_view from a non-const C-string
+ensure_z(): Allows to build a cstring_view from a non-const C-string
+ensure_z(): Allows to build a cstring_view from a const C-string
+ensure_z(): Allows to build a wstring_view from a non-const wide C-string
+ensure_z(): Allows to build a cwstring_view from a non-const wide C-string
+ensure_z(): Allows to build a cwstring_view from a const wide C-string
+ensure_z(): Allows to specify ultimate location of the sentinel and ensure its presence
 finally: Allows lambda to run
 finally: Allows function with bind
 finally: Allows pointer to function
