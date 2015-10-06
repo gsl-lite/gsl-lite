@@ -158,17 +158,19 @@ shared_ptr<>                | -       | -       | < C++11 | VC10, VC11<br>see al
 stack_array<>               | &#10003;| -       | -       | A stack-allocated array, fixed size |
 dyn_array<>                 | ?       | -       | -       | A heap-allocated array, fixed size |
 **2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-**2.1 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+**2.1 Tag Types**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+zstring                     | &#10003;| &#10003;| &#10003;| a char* (C-style string) |
+wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style string) |
+czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
+cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
+**2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 array_view<>                | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
 string_view<>               | &#10003;| &#10003;| &#10003;| array_view&lt;char> |
 wstring_view<>              | -       | &#10003;| &#10003;| array_view&lt;wchar_t > |
 cstring_view<>              | &#10003;| &#10003;| &#10003;| array_view&lt;const char> |
 cwstring_view<>             | -       | &#10003;| &#10003;| array_view&lt;const wchar_t > |
-zstring                     | &#10003;| &#10003;| &#10003;| a char* (C-style string) |
-wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style string) |
-czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
-cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
-**2.2 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_view or cwstring_view |
+**2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 at()                        | &#10003;| &#10003;| >=C++11 | Bounds-checked way of accessing<br>static arrays, std::array, std::vector |
 at()                        | -       | -       | < C++11 | static arrays, std::vector<br>std::array : VC11 |
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
