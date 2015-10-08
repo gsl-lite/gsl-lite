@@ -220,19 +220,20 @@ Notes and references
 [4] Bjarne Stroustrup. [Writing good C++14 (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Stroustrup%20-%20CppCon%202015%20keynote.pdf) &mdash; [Video](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A). CppCon 2015.  
 [5] Herb Sutter. [Writing good C++14&hellip; By default (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Sutter%20-%20CppCon%202015%20day%202%20plenary%20.pdf) &mdash; [Video](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015.  
 [6] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
-[7] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling
-I. Approach II. Informal overview and rationale](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). Version 0.9.1, 2015-09-21.
+[7] Bjarne Stroustrup et al. [A brief introduction to C++’s model for type- and resource-safety](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Introduction%20to%20type%20and%20resource%20safety.pdf).  
+[8] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling
+](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). 21 Sep 2015.
 
 ### Compiler feature testing
-[8] cppreference.com. [Feature Test Recommendations](http://en.cppreference.com/w/cpp/experimental/feature_test).  
-[9] cppreference.com. [Feature testing macros](http://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros).  
+[9] cppreference.com. [Feature Test Recommendations](http://en.cppreference.com/w/cpp/experimental/feature_test).  
+[10] cppreference.com. [Feature testing macros](http://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros).  
 
 ### C++ features in various Visual C++ compilers
-[10] Visual CPP Team. [C++0x Core Language Features In VC10: The Table](http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx). Microsoft. 6 April 2010.  
-[11] Visual CPP Team. [C++11 Features in Visual C++ 11](http://blogs.msdn.com/b/vcblog/archive/2011/09/12/10209291.aspx). Microsoft. 12 September 2011.  
-[12] Joel Coehoorn. [C++11 features in Visual Studio 2012](http://stackoverflow.com/a/7422058/437272). StackOverflow. 14 September 2011.  
-[13] Stephan T. Lavavej. [C++11/14 Features In Visual Studio 14 CTP3](http://blogs.msdn.com/b/vcblog/archive/2014/08/21/c-11-14-features-in-visual-studio-14-ctp3.aspx). Microsoft. 21 August 2014.  
-[14] Stephan T. Lavavej. [C++11/14/17 Features In VS 2015 RTM](http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx). Microsoft. 19 June 2015.  
+[11] Visual CPP Team. [C++0x Core Language Features In VC10: The Table](http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx). Microsoft. 6 April 2010.  
+[12] Visual CPP Team. [C++11 Features in Visual C++ 11](http://blogs.msdn.com/b/vcblog/archive/2011/09/12/10209291.aspx). Microsoft. 12 September 2011.  
+[13] Joel Coehoorn. [C++11 features in Visual Studio 2012](http://stackoverflow.com/a/7422058/437272). StackOverflow. 14 September 2011.  
+[14] Stephan T. Lavavej. [C++11/14 Features In Visual Studio 14 CTP3](http://blogs.msdn.com/b/vcblog/archive/2014/08/21/c-11-14-features-in-visual-studio-14-ctp3.aspx). Microsoft. 21 August 2014.  
+[15] Stephan T. Lavavej. [C++11/14/17 Features In VS 2015 RTM](http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx). Microsoft. 19 June 2015.  
 
 Appendix
 --------
