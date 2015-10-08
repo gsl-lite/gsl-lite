@@ -1143,7 +1143,7 @@ inline text compiler()
 #elif defined (__GNUC__  )
     os << "gcc " << __GNUC__ << "." << __GNUC_MINOR__ << "." << __GNUC_PATCHLEVEL__;
 #elif defined ( _MSC_VER )
-    os << "MSVC " << (_MSC_VER / 100 - 6 ) << " (" << _MSC_VER << ")";
+    os << "MSVC " << (_MSC_VER / 100 - 5 - (_MSC_VER < 1900)) << " (" << _MSC_VER << ")";
 #else
     os << "[compiler]";
 #endif

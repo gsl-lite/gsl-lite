@@ -52,7 +52,7 @@
 // Compiler detection:
 
 #if defined(_MSC_VER)
-# define gsl_COMPILER_MSVC_VERSION   ((_MSC_VER - 600 ) / 100)
+# define gsl_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
 #else
 # define gsl_COMPILER_MSVC_VERSION   0
 # define gsl_COMPILER_NON_MSVC       1
@@ -87,7 +87,7 @@
 # define gsl_HAVE_CONSTEXPR_14  1
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
 # define gsl_HAVE_ENUM_CLASS  1
 #endif
 
@@ -121,7 +121,7 @@
 # define gsl_HAVE_CONTAINER_DATA_METHOD  1
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 13
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
 # define gsl_HAVE_SIZED_TYPES  1
 #endif
 
@@ -134,7 +134,7 @@
 # define gsl_HAVE_TYPE_TRAITS  1
 #endif
 
-// For the rest, consider VC12, VC13 as C++11 for GSL Lite:
+// For the rest, consider VC12, VC14 as C++11 for GSL Lite:
 
 #if gsl_COMPILER_MSVC_VERSION >= 12
 # undef  gsl_CPP11_OR_GREATER
