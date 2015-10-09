@@ -188,7 +188,7 @@ move_owner                  | ?       | -       | -       | ... |
 **5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 
-Note: GSL Lite treats VC12 (VS2013) and VC13 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
+Note: GSL Lite treats VC12 (VS2013) and VC14 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
 
 
 Reported to work with
