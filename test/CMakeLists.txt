@@ -23,8 +23,8 @@ if( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" )
     execute_process(
         COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 
-    # command line option -std=c++14 since gcc4.8:
-    if( GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8 )
+    # command line option -std=c++14 since gcc 4.9.2:
+    if( GCC_VERSION VERSION_GREATER 4.9.2 OR GCC_VERSION VERSION_EQUAL 4.9.2 )
         set( SINGLE_TEST_PROGRAM FALSE )
     endif()
 endif()
