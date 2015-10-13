@@ -252,12 +252,14 @@ array_view<>: Disallows construction from a std::array of incompatible type (def
 array_view<>: Terminates construction from a nullptr and a non-zero size
 array_view<>: Terminates construction from two pointers in the wrong order
 array_view<>: Terminates construction from a null pointer and a non-zero size
+array_view<>: Terminates construction from a C-array with size exceeding array length
 array_view<>: Allows default construction
 array_view<>: Allows construction from a nullptr and a zero size
 array_view<>: Allows construction from two pointers
 array_view<>: Allows construction from a non-null pointer and a size
 array_view<>: Allows construction from a any pointer and a zero size
 array_view<>: Allows construction from a C-array
+array_view<>: Allows construction from a C-array with size
 array_view<>: Allows construction from a std::array<>
 array_view<>: Allows construction from a container (std::vector<>)
 array_view<>: Allows construction from another view of the same type
