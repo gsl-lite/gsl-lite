@@ -979,12 +979,15 @@ array_view<T> ensure_z( T (&sz)[N] )
     return ensure_z( &sz[0], N ); 
 }
 
+# if gsl_HAVE_TYPE_TRAITS
+
 template< class Cont >
 array_view< typename std::remove_pointer<typename Cont::pointer>::type > 
 ensure_z( Cont& cont )
 {
     return ensure_z( cont.data(), cont.length() );
 }
+# endif
 
 #else // gsl_COMPILER_MSVC_VERSION
 
