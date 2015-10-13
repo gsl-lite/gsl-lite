@@ -553,7 +553,7 @@ public:
         Expects( begin <= end );
     }
 
-    gsl_constexpr14 array_view( pointer begin, size_type size )
+    gsl_constexpr14 array_view( pointer & begin, size_type size )
         : begin_( begin )
         , end_  ( begin + size )
     {
@@ -567,6 +567,14 @@ public:
         : begin_( arr )
         , end_  ( arr + N )
     {}
+
+    template< class U, size_type N >
+    gsl_constexpr14 array_view( U (&arr)[N], size_type size )
+        : begin_( arr )
+        , end_  ( arr + size )
+    {
+        Expects( size <= N );
+    }
 
 # if gsl_HAVE_ARRAY
     template< class U, size_t N >
