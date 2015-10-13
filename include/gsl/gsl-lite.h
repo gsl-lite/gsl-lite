@@ -801,6 +801,7 @@ public:
     template< typename U >
     array_view< U > as_array_view() const gsl_noexcept
     {
+        Expects( ( this->bytes() % sizeof(U) ) == 0 );
         return array_view< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
     }
 #else
@@ -816,6 +817,7 @@ public:
     template< typename U >
     array_view< U > as_array_view( U u = U() ) const 
     {
+        Expects( ( this->bytes() % sizeof(U) ) == 0 );
         return mk<U>::view( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
     }
 #endif
