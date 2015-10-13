@@ -553,11 +553,11 @@ public:
         Expects( begin <= end );
     }
 
-    gsl_constexpr14 array_view( pointer & begin, size_type size )
-        : begin_( begin )
-        , end_  ( begin + size )
+    gsl_constexpr14 array_view( pointer & data, size_type size )
+        : begin_( data )
+        , end_  ( data + size )
     {
-        Expects( size == 0 || ( size > 0 && begin != NULL ) );
+        Expects( size == 0 || ( size > 0 && data != NULL ) );
     }
 
 #if gsl_COMPILER_MSVC_VERSION != 6
