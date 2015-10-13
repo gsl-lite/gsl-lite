@@ -857,7 +857,7 @@ gsl_constexpr14 array_view<T> as_array_view( std::array<T,N> & arr )
 
 # if gsl_HAVE_AUTO
 template< class Cont >
-auto as_array_view( Cont & cont ) -> gsl_constexpr14 array_view< typename Cont::value_type > 
+gsl_constexpr14 auto as_array_view( Cont & cont ) ->  array_view< typename Cont::value_type > 
 { 
     return array_view< typename Cont::value_type >( cont );
 }
