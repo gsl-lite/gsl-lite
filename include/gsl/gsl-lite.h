@@ -505,6 +505,10 @@ private:
 template< class T >
 class array_view
 {
+#if gsl_COMPILER_MSVC_VERSION != 6
+    template< class U > friend class array_view;
+#endif 
+   
 public:
     typedef size_t size_type;
 
@@ -553,7 +557,11 @@ public:
         Expects( begin <= end );
     }
 
+#if gsl_COMPILER_MSVC_VERSION != 6
     gsl_constexpr14 array_view( pointer & data, size_type size )
+#else
+    gsl_constexpr14 array_view( pointer   data, size_type size )
+#endif
         : begin_( data )
         , end_  ( data + size )
     {
@@ -626,15 +634,17 @@ public:
 #if gsl_HAVE_IS_DEFAULT_CTOR
     gsl_constexpr14 array_view( array_view const & ) = default;
 #else
-    // default
+    gsl_constexpr14 array_view( array_view const & other )
+        : begin_( other.begin() )
+        , end_  ( other.end() )
+    {}
 #endif
 
     template< typename U >
     gsl_constexpr14 array_view( array_view<U> const & other )
         : begin_( other.begin() )
         , end_  ( other.end() )
-    {        
-    }
+    {}
 
 #if gsl_COMPILER_MSVC_VERSION != 6
     array_view & operator=( array_view other )
@@ -821,6 +831,27 @@ public:
         return mk<U>::view( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
     }
 #endif
+
+#if gsl_COMPILER_MSVC_VERSION != 6
+
+private:
+    // helpers for member as_array_view()
+    template< typename U >
+    gsl_constexpr14 array_view( U * & data, size_type size )
+        : begin_( data )
+        , end_  ( data + size )
+    {
+        Expects( size == 0 || ( size > 0 && data != NULL ) );
+    }
+
+    template< typename U >
+    gsl_constexpr14 array_view( U * const & data, size_type size )
+        : begin_( data )
+        , end_  ( data + size )
+    {
+        Expects( size == 0 || ( size > 0 && data != NULL ) );
+    }
+#endif // gsl_COMPILER_MSVC_VERSION
 
 private:
     pointer begin_;

@@ -62,6 +62,17 @@ CASE( "array_view<>: Terminates construction from a null pointer and a non-zero 
     EXPECT_THROWS( F::blow() );
 }
 
+CASE( "array_view<>: Terminates construction from a C-array with size exceeding array length" )
+{
+#if gsl_COMPILER_MSVC_VERSION != 6
+    struct F { static void blow() { int arr[] = { 1, 2, 3, }; array_view<int> v( arr, 7 ); } };
+
+    EXPECT_THROWS( F::blow() );
+#else
+    EXPECT( !!"not available for VC6" );
+#endif
+}
+
 CASE( "array_view<>: Allows default construction" )
 {
     array_view<int> v;
@@ -118,6 +129,21 @@ CASE( "array_view<>: Allows construction from a C-array" )
     array_view<int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
+}
+
+CASE( "array_view<>: Allows construction from a C-array with size" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    array_view<int> v( arr, gsl_DIMENSION_OF(arr) );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+
+#if gsl_CPP14_OR_GREATER
+    array_view<int> w( arr, 3 );
+
+    EXPECT( std::equal( w.begin(), w.end(), arr, arr + 3 ) );
+#endif
 }
 
 CASE( "array_view<>: Allows construction from a std::array<>" )
