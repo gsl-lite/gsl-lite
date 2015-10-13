@@ -268,23 +268,23 @@ template< class Fn >
 class Final_act
 {
 public:
-    explicit Final_act( Fn action ) 
+    explicit Final_act( Fn action ) gsl_noexcept
     : action_( std::move( action ) ) {}
     
-    ~Final_act() { action_(); }
+    ~Final_act() gsl_noexcept { action_(); }
 
 private:
     Fn action_;
 };
 
 template< class Fn >
-Final_act<Fn> finally( Fn const & action ) 
+Final_act<Fn> finally( Fn const & action ) gsl_noexcept
 { 
     return Final_act<Fn>( action ); 
 }
 
 template< class Fn >
-Final_act<Fn> finally( Fn && action )
+Final_act<Fn> finally( Fn && action ) gsl_noexcept
 { 
     return Final_act<Fn>( std::forward<Fn>( action ) ); 
 }
@@ -317,7 +317,7 @@ Final_act finally( Fn const & f )
 #endif // gsl_CPP11_OR_GREATER
 
 template< class T, class U >
-T narrow_cast( U u ) 
+T narrow_cast( U u ) gsl_noexcept
 { 
     return static_cast<T>( u ); 
 }
@@ -718,7 +718,7 @@ public:
         return at( index );
     }
 
-    gsl_constexpr14 bool operator==( array_view const & other ) const
+    gsl_constexpr14 bool operator==( array_view const & other ) const gsl_noexcept
     {
         return  size() == other.size() 
             && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
