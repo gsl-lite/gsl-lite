@@ -198,7 +198,7 @@ The table below mentions the compiler versions *gsl-lite* is reported to work wi
 OS        | Compiler   | Versions |
 ---------:|:-----------|:---------|
 Windows   | Clang/LLVM | ? |
-&nbsp;    | GCC        | 4.9.2 |
+&nbsp;    | GCC        | 4.9.2, 5.2.0 |
 &nbsp;    | Visual C++<br>(Visual Studio)| 6 (6), 8 (2005), 10 (2010), 11 (2012),<br>12 (2013), 14 (2015) |
 GNU/Linux | Clang/LLVM | 3.4 |
 &nbsp;    | GCC        | 5.1 |
