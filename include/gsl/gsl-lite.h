@@ -562,7 +562,7 @@ public:
 
 #if gsl_COMPILER_MSVC_VERSION != 6
 
-    template< class U, size_t N >
+    template< class U, size_type N >
     gsl_constexpr14 array_view( U (&arr)[N] )
         : begin_( arr )
         , end_  ( arr + N )
@@ -577,7 +577,7 @@ public:
     }
 
 # if gsl_HAVE_ARRAY
-    template< class U, size_t N >
+    template< class U, size_type N >
     gsl_constexpr14 array_view( std::array< U, N > & arr ) 
         : begin_( arr.data() )
         , end_  ( arr.data() + N )
@@ -703,7 +703,7 @@ public:
         return begin_ != NULL;
     }
 
-    gsl_constexpr14 reference operator[]( size_t index )
+    gsl_constexpr14 reference operator[]( size_type index )
     {
         return at( index );
     }
@@ -739,7 +739,7 @@ public:
         return !( *this < other );
     }
 
-    gsl_constexpr14 reference at( size_t index )
+    gsl_constexpr14 reference at( size_type index )
     {
         Expects( index >= 0 && index < size());
         return begin_[ index ];
@@ -807,7 +807,7 @@ public:
     template< class U >
     struct mk
     {
-        static array_view<U> view( U * data, size_t size )
+        static array_view<U> view( U * data, size_type size )
         {
             return array_view<U>( data, size ); 
         }
