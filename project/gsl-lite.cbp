@@ -28,6 +28,7 @@
 		<Unit filename="../LICENSE" />
 		<Unit filename="../README.md" />
 		<Unit filename="../example/01-basic.cpp" />
+		<Unit filename="../example/02-array_view.cpp" />
 		<Unit filename="../include/gsl/array_view.h" />
 		<Unit filename="../include/gsl/config.h" />
 		<Unit filename="../include/gsl/fail_fast.h" />
