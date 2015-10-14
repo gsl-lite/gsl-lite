@@ -878,12 +878,6 @@ ensure_z( Cont& cont )
 
 } // namespace gsl
 
-// at( std::vector ):
-
-#if gsl_COMPILER_MSVC_VERSION == 6
-    gsl_MK_AT( std::vector )
-#endif 
-
 #endif // GSL_GSL_LITE_H_INCLUDED
 
 // end of file
