@@ -829,23 +829,20 @@ inline std::wstring to_string( cwstring_view const & view )
 namespace detail {
 
 template<class T, class SizeType, const T Sentinel>
-struct ensure
+static array_view<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
 {
-    static array_view<T> sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
-    {
-        typedef T * pointer;
-        typedef typename std::iterator_traits<pointer>::difference_type difference_type;
-        
-        pointer cur = seq;
+    typedef T * pointer;
+    typedef typename std::iterator_traits<pointer>::difference_type difference_type;
+    
+    pointer cur = seq;
 
-        while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel ) 
-            ++cur;
-        
-        Expects( *cur == Sentinel );
-        
-        return array_view<T>( seq, cur - seq );
-    }
-};
+    while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel ) 
+        ++cur;
+    
+    Expects( *cur == Sentinel );
+    
+    return array_view<T>( seq, cur - seq );
+}
 } // namespace detail
 
 //
@@ -857,7 +854,8 @@ struct ensure
 template< class T >
 inline array_view<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t>::max() )
 {
-    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
+    return detail::ensure_sentinel<T, size_t, 0>( sz, max );
+//    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
 }
 
 template< class T, size_t N >
