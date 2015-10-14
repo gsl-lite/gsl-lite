@@ -11,7 +11,12 @@
 #ifndef GSL_TEST_GSL_LITE_H_INCLUDED
 #define GSL_TEST_GSL_LITE_H_INCLUDED
 
-#include "gsl-lite.h"
+#if defined(_MSC_VER) && _MSC_VER < 1300
+# include "gsl-lite-vc6.h"
+#else
+# include "gsl-lite.h"
+#endif
+
 #include "lest_cpp03.hpp"
 
 using namespace gsl;
