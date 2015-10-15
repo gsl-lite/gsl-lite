@@ -19,7 +19,7 @@
 
 namespace {
 
-CASE( "array_view<>: Disallows construction from an C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "array_view<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     short arr[] = { 1, 2, 3, };

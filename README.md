@@ -247,7 +247,7 @@ The smart pointers of Boost 1.51 can be used with VC6.
 ### A.2 GSL Lite test specification
 
 ```
-array_view<>: Disallows construction from an C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+array_view<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 array_view<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 array_view<>: Terminates construction from a nullptr and a non-zero size
 array_view<>: Terminates construction from two pointers in the wrong order
