@@ -313,10 +313,10 @@ private:
 typedef unsigned char byte;
 
 //
-// array_view<> - A 1D view of contiguous T's, replace (*,len).
+// span<> - A 1D view of contiguous T's, replace (*,len).
 //
 template< class T >
-class array_view
+class span
 {
 public:
     typedef size_t size_type;
@@ -335,21 +335,21 @@ public:
     // Todo:
     // typedef typename std::iterator_traits< iterator >::difference_type difference_type;    
 
-    array_view()
+    span()
         : begin_( NULL )
         , end_  ( NULL )
     {
         Expects( size() == 0 );
     }
 
-    array_view( pointer begin, pointer end )
+    span( pointer begin, pointer end )
         : begin_( begin )
         , end_  ( end )
     {
         Expects( begin <= end );
     }
 
-    array_view( pointer data, size_type size )
+    span( pointer data, size_type size )
         : begin_( data )
         , end_  ( data + size )
     {
@@ -363,32 +363,32 @@ private:
     struct order_precedence : precedence_1 {};
     
     template< class Array, class U >
-    array_view create( Array & arr, U*, precedence_0 const & ) const
+    span create( Array & arr, U*, precedence_0 const & ) const
     { 
-        return array_view( arr, gsl_DIMENSION_OF( arr ) );
+        return span( arr, gsl_DIMENSION_OF( arr ) );
     }
 
-    array_view create( std::vector<T> & cont, T*, precedence_1 const & ) const
+    span create( std::vector<T> & cont, T*, precedence_1 const & ) const
     {
-        return array_view( &cont[0], cont.size() );
+        return span( &cont[0], cont.size() );
     }
 
 public:    
     template< class Cont >
-    array_view( Cont & cont )
+    span( Cont & cont )
     { 
         *this = create( cont, &cont[0], order_precedence() );
     }
 
 #if 0
     // =default constructor
-    array_view( array_view const & other )
+    span( span const & other )
         : begin_( other.begin() )
         , end_  ( other.end() )
     {}
 #endif
 
-    array_view & operator=( array_view const & other )
+    span & operator=( span const & other )
     {
         // VC6 balks at copy-swap implementation (here),
         // so we do it the simple way:
@@ -398,7 +398,7 @@ public:
     }
 
 #if 0
-    // Converting from other array_view ?    
+    // Converting from other span ?    
     template< typename U > operator=();
 #endif
 
@@ -452,33 +452,33 @@ public:
         return at( index );
     }
 
-    bool operator==( array_view const & other ) const
+    bool operator==( span const & other ) const
     {
         return  size() == other.size() 
             && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
     }
 
-    bool operator!=( array_view const & other ) const 
+    bool operator!=( span const & other ) const 
     { 
         return !( *this == other ); 
     }
 
-    bool operator< ( array_view const & other ) const
+    bool operator< ( span const & other ) const
     { 
         return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
     }
 
-    bool operator<=( array_view const & other ) const
+    bool operator<=( span const & other ) const
     { 
         return !( other < *this ); 
     }
 
-    bool operator> ( array_view const & other ) const
+    bool operator> ( span const & other ) const
     { 
         return ( other < *this ); 
     }
 
-    bool operator>=( array_view const & other ) const
+    bool operator>=( span const & other ) const
     {
         return !( *this < other );
     }
@@ -524,34 +524,34 @@ public:
         return bytes();
     }
 
-    void swap( array_view & other )
+    void swap( span & other )
     {
         using std::swap;
         swap( begin_, other.begin_ );
         swap( end_  , other.end_   );
     }
 
-    array_view< const byte > as_bytes() const
+    span< const byte > as_bytes() const
     {
-        return array_view< const byte >( reinterpret_cast<const byte *>( data() ), bytes() );
+        return span< const byte >( reinterpret_cast<const byte *>( data() ), bytes() );
     }
 
-    array_view< byte > as_writeable_bytes() const
+    span< byte > as_writeable_bytes() const
     {
-        return array_view< byte >( reinterpret_cast<byte *>( data() ), bytes() );
+        return span< byte >( reinterpret_cast<byte *>( data() ), bytes() );
     }
 
     template< class U >
     struct mk
     {
-        static array_view<U> view( U * data, size_type size )
+        static span<U> view( U * data, size_type size )
         {
-            return array_view<U>( data, size ); 
+            return span<U>( data, size ); 
         }
     };
 
     template< typename U >
-    array_view< U > as_array_view( U u = U() ) const 
+    span< U > as_span( U u = U() ) const 
     {
         Expects( ( this->bytes() % sizeof(U) ) == 0 );
         return mk<U>::view( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
@@ -562,18 +562,18 @@ private:
     pointer end_;
 };
 
-// array_view creator functions (see ctors)
+// span creator functions (see ctors)
 
 template< typename T >
-array_view<T> as_array_view( T * begin, T * end )
+span<T> as_span( T * begin, T * end )
 {
-    return array_view<T>( begin, end );
+    return span<T>( begin, end );
 }
 
 template< typename T >
-array_view<T> as_array_view( T * begin, size_t size )
+span<T> as_span( T * begin, size_t size )
 {
-    return array_view<T>( begin, size );
+    return span<T>( begin, size );
 }
 
 namespace detail {
@@ -581,15 +581,15 @@ namespace detail {
 template< class T >
 struct mk
 {
-    static array_view<T> view( std::vector<T> & cont )
+    static span<T> view( std::vector<T> & cont )
     {
-        return array_view<T>( cont ); 
+        return span<T>( cont ); 
     }
 };
 }
 
 template< class T >
-array_view<T> as_array_view( std::vector<T> & cont )
+span<T> as_span( std::vector<T> & cont )
 { 
     return detail::mk<T>::view( cont );
 }
@@ -603,29 +603,29 @@ typedef wchar_t * zwstring;
 typedef const char * czstring;
 typedef const wchar_t * cwzstring;
 
-typedef array_view< char > string_view;
-typedef array_view< wchar_t > wstring_view;
-typedef array_view< const char > cstring_view;
-typedef array_view< const wchar_t > cwstring_view;
+typedef span< char > string_span;
+typedef span< wchar_t > wstring_span;
+typedef span< const char > cstring_span;
+typedef span< const wchar_t > cwstring_span;
 
-// to_string() allow (explicit) conversions from string_view to string
+// to_string() allow (explicit) conversions from string_span to string
 
-inline std::string to_string( string_view const & view )
+inline std::string to_string( string_span const & view )
 {
     return std::string( view.data(), view.length() );
 }
 
-inline std::string to_string( cstring_view const & view )
+inline std::string to_string( cstring_span const & view )
 {
     return std::string( view.data(), view.length() );
 }
 
-inline std::wstring to_string( wstring_view const & view )
+inline std::wstring to_string( wstring_span const & view )
 {
     return std::wstring( view.data(), view.length() );
 }
 
-inline std::wstring to_string( cwstring_view const & view )
+inline std::wstring to_string( cwstring_span const & view )
 {
     return std::wstring( view.data(), view.length() );
 }
@@ -633,7 +633,7 @@ inline std::wstring to_string( cwstring_view const & view )
 //
 // ensure_sentinel() 
 //
-// Provides a way to obtain an array_view from a contiguous sequence
+// Provides a way to obtain a span from a contiguous sequence
 // that ends with a (non-inclusive) sentinel value.
 //
 // Will fail-fast if sentinel cannot be found before max elements are examined.
@@ -643,7 +643,7 @@ namespace detail {
 template<class T, class SizeType, const T Sentinel>
 struct ensure
 {
-    static array_view<T> sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
+    static span<T> sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
     {
         typedef T * pointer;
         typedef typename std::iterator_traits<pointer>::difference_type difference_type;
@@ -655,19 +655,19 @@ struct ensure
         
         Expects( *cur == Sentinel );
         
-        return array_view<T>( seq, cur - seq );
+        return span<T>( seq, cur - seq );
     }
 };
 } // namespace detail
 
 //
-// ensure_z - creates a string_view for a czstring or cwzstring.
+// ensure_z - creates a string_span for a czstring or cwzstring.
 // Will fail fast if a null-terminator cannot be found before
 // the limit of size_type.
 //
 
 template< typename T >
-array_view<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
+span<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
 { 
     return detail::ensure<T, size_t, 0>::sentinel( sz, max );
 }

@@ -454,12 +454,12 @@ private:
 #endif
 
 //
-// array_view<> - A 1D view of contiguous T's, replace (*,len).
+// span<> - A 1D view of contiguous T's, replace (*,len).
 //
 template< class T >
-class array_view
+class span
 {
-    template< class U > friend class array_view;
+    template< class U > friend class span;
    
 public:
     typedef size_t size_type;
@@ -482,7 +482,7 @@ public:
 
     typedef typename std::iterator_traits< iterator >::difference_type difference_type;    
 
-    gsl_constexpr14 array_view()
+    gsl_constexpr14 span()
         : begin_( NULL )
         , end_  ( NULL )
     {
@@ -490,7 +490,7 @@ public:
     }
 
 #if gsl_HAVE_NULLPTR
-    gsl_constexpr14 array_view( std::nullptr_t, size_type size )
+    gsl_constexpr14 span( std::nullptr_t, size_type size )
         : begin_( nullptr )
         , end_  ( nullptr )
     {
@@ -498,14 +498,14 @@ public:
     }
 #endif    
 
-    gsl_constexpr14 array_view( pointer begin, pointer end )
+    gsl_constexpr14 span( pointer begin, pointer end )
         : begin_( begin )
         , end_  ( end )
     {
         Expects( begin <= end );
     }
 
-    gsl_constexpr14 array_view( pointer & data, size_type size )
+    gsl_constexpr14 span( pointer & data, size_type size )
         : begin_( data )
         , end_  ( data + size )
     {
@@ -513,13 +513,13 @@ public:
     }
 
     template< class U, size_t N >
-    gsl_constexpr14 array_view( U (&arr)[N] )
+    gsl_constexpr14 span( U (&arr)[N] )
         : begin_( arr )
         , end_  ( arr + N )
     {}
 
     template< class U, size_t N >
-    gsl_constexpr14 array_view( U (&arr)[N], size_type size )
+    gsl_constexpr14 span( U (&arr)[N], size_type size )
         : begin_( arr )
         , end_  ( arr + size )
     {
@@ -528,14 +528,14 @@ public:
 
 #if gsl_HAVE_ARRAY
     template< class U, size_t N >
-    gsl_constexpr14 array_view( std::array< U, N > & arr ) 
+    gsl_constexpr14 span( std::array< U, N > & arr ) 
         : begin_( arr.data() )
         , end_  ( arr.data() + N )
     {}
 #endif
 
     template< class Cont >
-    gsl_constexpr14 array_view( Cont & cont ) 
+    gsl_constexpr14 span( Cont & cont ) 
 #if gsl_HAVE_CONTAINER_DATA_METHOD
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
@@ -546,28 +546,28 @@ public:
     {}
 
 #if gsl_HAVE_IS_DEFAULT_CTOR
-    gsl_constexpr14 array_view( array_view const & ) = default;
+    gsl_constexpr14 span( span const & ) = default;
 #else
-    gsl_constexpr14 array_view( array_view const & other )
+    gsl_constexpr14 span( span const & other )
         : begin_( other.begin() )
         , end_  ( other.end() )
     {}
 #endif
 
     template< typename U >
-    gsl_constexpr14 array_view( array_view<U> const & other )
+    gsl_constexpr14 span( span<U> const & other )
         : begin_( other.begin() )
         , end_  ( other.end() )
     {}
 
-    array_view & operator=( array_view other )
+    span & operator=( span other )
     {
         other.swap( *this ); 
         return *this;
     }
 
 #if 0
-    // Converting from other array_view ?    
+    // Converting from other span ?    
     template< typename U > operator=();
 #endif
 
@@ -621,33 +621,33 @@ public:
         return at( index );
     }
 
-    gsl_constexpr14 bool operator==( array_view const & other ) const gsl_noexcept
+    gsl_constexpr14 bool operator==( span const & other ) const gsl_noexcept
     {
         return  size() == other.size() 
             && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
     }
 
-    gsl_constexpr14 bool operator!=( array_view const & other ) const gsl_noexcept 
+    gsl_constexpr14 bool operator!=( span const & other ) const gsl_noexcept 
     { 
         return !( *this == other ); 
     }
 
-    gsl_constexpr14 bool operator< ( array_view const & other ) const gsl_noexcept
+    gsl_constexpr14 bool operator< ( span const & other ) const gsl_noexcept
     { 
         return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
     }
 
-    gsl_constexpr14 bool operator<=( array_view const & other ) const gsl_noexcept
+    gsl_constexpr14 bool operator<=( span const & other ) const gsl_noexcept
     { 
         return !( other < *this ); 
     }
 
-    gsl_constexpr14 bool operator> ( array_view const & other ) const gsl_noexcept
+    gsl_constexpr14 bool operator> ( span const & other ) const gsl_noexcept
     { 
         return ( other < *this ); 
     }
 
-    gsl_constexpr14 bool operator>=( array_view const & other ) const gsl_noexcept
+    gsl_constexpr14 bool operator>=( span const & other ) const gsl_noexcept
     {
         return !( *this < other );
     }
@@ -693,34 +693,34 @@ public:
         return bytes();
     }
 
-    void swap( array_view & other ) gsl_noexcept
+    void swap( span & other ) gsl_noexcept
     {
         using std::swap;
         swap( begin_, other.begin_ );
         swap( end_  , other.end_   );
     }
 
-    array_view< const byte > as_bytes() const gsl_noexcept
+    span< const byte > as_bytes() const gsl_noexcept
     {
-        return array_view< const byte >( reinterpret_cast<const byte *>( data() ), bytes() );
+        return span< const byte >( reinterpret_cast<const byte *>( data() ), bytes() );
     }
 
-    array_view< byte > as_writeable_bytes() const gsl_noexcept
+    span< byte > as_writeable_bytes() const gsl_noexcept
     {
-        return array_view< byte >( reinterpret_cast<byte *>( data() ), bytes() );
+        return span< byte >( reinterpret_cast<byte *>( data() ), bytes() );
     }
 
     template< typename U >
-    array_view< U > as_array_view() const gsl_noexcept
+    span< U > as_span() const gsl_noexcept
     {
         Expects( ( this->bytes() % sizeof(U) ) == 0 );
-        return array_view< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
+        return span< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
     }
 
 private:
-    // helpers for member as_array_view()
+    // helpers for member as_span()
     template< typename U >
-    gsl_constexpr14 array_view( U * & data, size_type size )
+    gsl_constexpr14 span( U * & data, size_type size )
         : begin_( data )
         , end_  ( data + size )
     {
@@ -728,7 +728,7 @@ private:
     }
 
     template< typename U >
-    gsl_constexpr14 array_view( U * const & data, size_type size )
+    gsl_constexpr14 span( U * const & data, size_type size )
         : begin_( data )
         , end_  ( data + size )
     {
@@ -740,45 +740,45 @@ private:
     pointer end_;
 };
 
-// array_view creator functions (see ctors)
+// span creator functions (see ctors)
 
 template< typename T >
-gsl_constexpr14 array_view<T> as_array_view( T * begin, T * end )
+gsl_constexpr14 span<T> as_span( T * begin, T * end )
 {
-    return array_view<T>( begin, end );
+    return span<T>( begin, end );
 }
 
 template< typename T >
-gsl_constexpr14 array_view<T> as_array_view( T * begin, size_t size )
+gsl_constexpr14 span<T> as_span( T * begin, size_t size )
 {
-    return array_view<T>( begin, size );
+    return span<T>( begin, size );
 }
 
 template< typename T, size_t N >
-gsl_constexpr14 array_view<T> as_array_view( T (&arr)[N] )
+gsl_constexpr14 span<T> as_span( T (&arr)[N] )
 { 
-    return array_view<T>( arr, N );
+    return span<T>( arr, N );
 }
 
 #if gsl_HAVE_ARRAY
 template< typename T, size_t N >
-gsl_constexpr14 array_view<T> as_array_view( std::array<T,N> & arr )
+gsl_constexpr14 span<T> as_span( std::array<T,N> & arr )
 {
-    return array_view<T>( arr );
+    return span<T>( arr );
 }
 #endif
 
 #if gsl_HAVE_AUTO
 template< class Cont >
-gsl_constexpr14 auto as_array_view( Cont & cont ) ->  array_view< typename Cont::value_type > 
+gsl_constexpr14 auto as_span( Cont & cont ) ->  span< typename Cont::value_type > 
 { 
-    return array_view< typename Cont::value_type >( cont );
+    return span< typename Cont::value_type >( cont );
 }
 #else
 template< class T >
-array_view<T> as_array_view( std::vector<T> & cont )
+span<T> as_span( std::vector<T> & cont )
 { 
-    return array_view<T>( cont );
+    return span<T>( cont );
 }
 #endif
 
@@ -791,29 +791,29 @@ typedef wchar_t * zwstring;
 typedef const char * czstring;
 typedef const wchar_t * cwzstring;
 
-typedef array_view< char > string_view;
-typedef array_view< wchar_t > wstring_view;
-typedef array_view< const char > cstring_view;
-typedef array_view< const wchar_t > cwstring_view;
+typedef span< char > string_span;
+typedef span< wchar_t > wstring_span;
+typedef span< const char > cstring_span;
+typedef span< const wchar_t > cwstring_span;
 
-// to_string() allow (explicit) conversions from string_view to string
+// to_string() allow (explicit) conversions from string_span to string
 
-inline std::string to_string( string_view const & view )
+inline std::string to_string( string_span const & view )
 {
     return std::string( view.data(), view.length() );
 }
 
-inline std::string to_string( cstring_view const & view )
+inline std::string to_string( cstring_span const & view )
 {
     return std::string( view.data(), view.length() );
 }
 
-inline std::wstring to_string( wstring_view const & view )
+inline std::wstring to_string( wstring_span const & view )
 {
     return std::wstring( view.data(), view.length() );
 }
 
-inline std::wstring to_string( cwstring_view const & view )
+inline std::wstring to_string( cwstring_span const & view )
 {
     return std::wstring( view.data(), view.length() );
 }
@@ -821,7 +821,7 @@ inline std::wstring to_string( cwstring_view const & view )
 //
 // ensure_sentinel() 
 //
-// Provides a way to obtain an array_view from a contiguous sequence
+// Provides a way to obtain a span from a contiguous sequence
 // that ends with a (non-inclusive) sentinel value.
 //
 // Will fail-fast if sentinel cannot be found before max elements are examined.
@@ -829,7 +829,7 @@ inline std::wstring to_string( cwstring_view const & view )
 namespace detail {
 
 template<class T, class SizeType, const T Sentinel>
-static array_view<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
+static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
 {
     typedef T * pointer;
     typedef typename std::iterator_traits<pointer>::difference_type difference_type;
@@ -841,24 +841,24 @@ static array_view<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limit
     
     Expects( *cur == Sentinel );
     
-    return array_view<T>( seq, cur - seq );
+    return span<T>( seq, cur - seq );
 }
 } // namespace detail
 
 //
-// ensure_z - creates a string_view for a czstring or cwzstring.
+// ensure_z - creates a string_span for a czstring or cwzstring.
 // Will fail fast if a null-terminator cannot be found before
 // the limit of size_type.
 //
 
 template< class T >
-inline array_view<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t>::max() )
+inline span<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t>::max() )
 {
     return detail::ensure_sentinel<T, size_t, 0>( sz, max );
 }
 
 template< class T, size_t N >
-array_view<T> ensure_z( T (&sz)[N] ) 
+span<T> ensure_z( T (&sz)[N] ) 
 { 
     return ensure_z( &sz[0], N ); 
 }
@@ -866,7 +866,7 @@ array_view<T> ensure_z( T (&sz)[N] )
 # if gsl_HAVE_TYPE_TRAITS
 
 template< class Cont >
-array_view< typename std::remove_pointer<typename Cont::pointer>::type > 
+span< typename std::remove_pointer<typename Cont::pointer>::type > 
 ensure_z( Cont& cont )
 {
     return ensure_z( cont.data(), cont.length() );

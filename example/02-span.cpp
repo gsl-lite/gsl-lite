@@ -1,4 +1,4 @@
-// Use array_view
+// Use span
 
 #include "gsl-lite.h"
 #include <iostream>
@@ -13,7 +13,7 @@ void bad( int * arr, size_t num )
     }
 }
 
-void good( array_view<int> arr )
+void good( span<int> arr )
 {
     for ( size_t i = 0; i != arr.size(); ++i )
     {
@@ -35,12 +35,12 @@ int main()
     good( { arr, 3 } );                 // fine
     good( { arr, 7 } );                 // run-time error, terminate
 #else
-    good( array_view<int>( arr, 3 ) );  // fine
-    good( array_view<int>( arr, 7 ) );  // run-time error, terminate
+    good( span<int>( arr, 3 ) );  // fine
+    good( span<int>( arr, 7 ) );  // run-time error, terminate
 #endif
 }
 
 #if 0
-cl -EHsc -I../include/gsl 02-array_view.cpp && 02-array_view.exe
-g++ -std=c++03 -Wall -I../include/gsl -o 02-array_view.exe 02-array_view.cpp && 02-array_view.exe
+cl -EHsc -I../include/gsl 02-span.cpp && 02-span.exe
+g++ -std=c++03 -Wall -I../include/gsl -o 02-span.exe 02-span.cpp && 02-span.exe
 #endif 

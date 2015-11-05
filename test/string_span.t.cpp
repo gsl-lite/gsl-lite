@@ -19,52 +19,52 @@
 
 namespace {
 
-CASE( "string_view<>: Disallows construction of a string_view from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "string_span<>: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     char s[] = "hello";
-    cstring_view sv = s;
+    cstring_span sv = s;
     
-    string_view v2 = sv;
-    string_view v3 = "Hello";
+    string_span v2 = sv;
+    string_span v3 = "Hello";
 #endif
 }
 
-CASE( "string_view<>: ToDo: Disallows construction of a string_view from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "string_span<>: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     const std::string s = "hello, world";
 
-    string_view sv( s );
+    string_span sv( s );
     
     EXPECT( std::string( sv.data() ) == s );
 #endif
 }
 
-CASE( "string_view<>: Allows to create a string_view from a non-const C-string and size" )
+CASE( "string_span<>: Allows to create a string_span from a non-const C-string and size" )
 {
     char s[] = "hello";
 
-    string_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    string_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "string_view<>: Allows to create a string_view from a non-const C-array" )
+CASE( "string_span<>: Allows to create a string_span from a non-const C-array" )
 {
     char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
-    string_view sv( s );
+    string_span sv( s );
     
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_view<>: Allows to create a string_view from a non-const std::array" )
+CASE( "string_span<>: Allows to create a string_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
-    string_view sv( arr );
+    string_span sv( arr );
     
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
@@ -72,7 +72,7 @@ CASE( "string_view<>: Allows to create a string_view from a non-const std::array
 #endif
 }
 
-CASE( "string_view<>: Allows to create a string_view from a non-const std::vector" )
+CASE( "string_span<>: Allows to create a string_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -80,7 +80,7 @@ CASE( "string_view<>: Allows to create a string_view from a non-const std::vecto
 #else
     std::vector<char> vec( 'w', 5 );
 #endif
-    string_view sv( vec );
+    string_span sv( vec );
     
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
@@ -88,13 +88,13 @@ CASE( "string_view<>: Allows to create a string_view from a non-const std::vecto
 #endif
 }
 
-CASE( "string_view<>: ToDo: Allows to create a string_view from a non-const std::string" )
+CASE( "string_span<>: ToDo: Allows to create a string_span from a non-const std::string" )
 {
 #if 0
 #if gsl_COMPILER_MSVC_VERSION != 6
     std::string s = "hello, world";
 
-    string_view sv( s );
+    string_span sv( s );
     
     EXPECT( std::string( sv.data() ) == s );
 #else
@@ -103,30 +103,30 @@ CASE( "string_view<>: ToDo: Allows to create a string_view from a non-const std:
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a const C-string and size" )
+CASE( "string_span<>: Allows to create a cstring_span from a const C-string and size" )
 {
     const char s[] = "hello";
 
-    cstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a const C-array" )
+CASE( "string_span<>: Allows to create a cstring_span from a const C-array" )
 {
     const char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
-    cstring_view sv( s );
+    cstring_span sv( s );
     
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a const std::array" )
+CASE( "string_span<>: Allows to create a cstring_span from a const std::array" )
 {
 #if gsl_HAVE_ARRAY
     const std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
-    cstring_view sv( arr );
+    cstring_span sv( arr );
     
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
@@ -134,7 +134,7 @@ CASE( "string_view<>: Allows to create a cstring_view from a const std::array" )
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a const std::vector" )
+CASE( "string_span<>: Allows to create a cstring_span from a const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -142,7 +142,7 @@ CASE( "string_view<>: Allows to create a cstring_view from a const std::vector" 
 #else
     const std::vector<char> vec( 'w', 5 );
 #endif
-    cstring_view sv( vec );
+    cstring_span sv( vec );
     
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
@@ -150,12 +150,12 @@ CASE( "string_view<>: Allows to create a cstring_view from a const std::vector" 
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a const std::string" )
+CASE( "string_span<>: Allows to create a cstring_span from a const std::string" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
     const std::string s = "hello, world";
 
-    cstring_view sv( s );
+    cstring_span sv( s );
     
     EXPECT( std::string( sv.data() ) == s );
 #else
@@ -163,30 +163,30 @@ CASE( "string_view<>: Allows to create a cstring_view from a const std::string" 
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a non-const C-string and size" )
+CASE( "string_span<>: Allows to create a cstring_span from a non-const C-string and size" )
 {
     char s[] = "hello";
 
-    cstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a non-const C-array" )
+CASE( "string_span<>: Allows to create a cstring_span from a non-const C-array" )
 {
     char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
-    cstring_view sv( s );
+    cstring_span sv( s );
     
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a non-const std::array" )
+CASE( "string_span<>: Allows to create a cstring_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
-    cstring_view sv( arr );
+    cstring_span sv( arr );
     
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
@@ -194,7 +194,7 @@ CASE( "string_view<>: Allows to create a cstring_view from a non-const std::arra
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a non-const std::vector" )
+CASE( "string_span<>: Allows to create a cstring_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -202,7 +202,7 @@ CASE( "string_view<>: Allows to create a cstring_view from a non-const std::vect
 #else
     std::vector<char> vec( 'w', 5 );
 #endif
-    cstring_view sv( vec );
+    cstring_span sv( vec );
     
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
@@ -210,12 +210,12 @@ CASE( "string_view<>: Allows to create a cstring_view from a non-const std::vect
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cstring_view from a non-const std::string" )
+CASE( "string_span<>: Allows to create a cstring_span from a non-const std::string" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
     std::string s = "hello, world";
 
-    cstring_view sv( s );
+    cstring_span sv( s );
     
     EXPECT( std::string( sv.data() ) == s );
 #else
@@ -223,30 +223,30 @@ CASE( "string_view<>: Allows to create a cstring_view from a non-const std::stri
 #endif
 }
 
-CASE( "string_view<>: Allows to create a wstring_view from a non-const C-string and size" )
+CASE( "string_span<>: Allows to create a wstring_span from a non-const C-string and size" )
 {
     wchar_t s[] = L"hello";
 
-    wstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    wstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
 
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_view<>: Allows to create a wstring_view from a non-const C-array" )
+CASE( "string_span<>: Allows to create a wstring_span from a non-const C-array" )
 {
     wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
-    wstring_view sv( s );
+    wstring_span sv( s );
     
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_view<>: Allows to create a wstring_view from a non-const std::array" )
+CASE( "string_span<>: Allows to create a wstring_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
-    wstring_view sv( arr );
+    wstring_span sv( arr );
     
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
@@ -254,7 +254,7 @@ CASE( "string_view<>: Allows to create a wstring_view from a non-const std::arra
 #endif
 }
 
-CASE( "string_view<>: Allows to create a wstring_view from a non-const std::vector" )
+CASE( "string_span<>: Allows to create a wstring_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -262,7 +262,7 @@ CASE( "string_view<>: Allows to create a wstring_view from a non-const std::vect
 #else
     std::vector<wchar_t> vec( 'w', 5 );
 #endif
-    wstring_view sv( vec );
+    wstring_span sv( vec );
     
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
@@ -270,30 +270,30 @@ CASE( "string_view<>: Allows to create a wstring_view from a non-const std::vect
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a non-const C-string and size" )
+CASE( "string_span<>: Allows to create a cwstring_span from a non-const C-string and size" )
 {
     wchar_t s[] = L"hello";
 
-    cwstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    cwstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a non-const C-array" )
+CASE( "string_span<>: Allows to create a cwstring_span from a non-const C-array" )
 {
     wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
-    cwstring_view sv( s );
+    cwstring_span sv( s );
     
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a non-const std::array" )
+CASE( "string_span<>: Allows to create a cwstring_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
-    cwstring_view sv( arr );
+    cwstring_span sv( arr );
     
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
@@ -301,7 +301,7 @@ CASE( "string_view<>: Allows to create a cwstring_view from a non-const std::arr
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a non-const std::vector" )
+CASE( "string_span<>: Allows to create a cwstring_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -309,7 +309,7 @@ CASE( "string_view<>: Allows to create a cwstring_view from a non-const std::vec
 #else
     std::vector<wchar_t> vec( 'w', 5 );
 #endif
-    cwstring_view sv( vec );
+    cwstring_span sv( vec );
     
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
@@ -317,30 +317,30 @@ CASE( "string_view<>: Allows to create a cwstring_view from a non-const std::vec
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a const C-string and size" )
+CASE( "string_span<>: Allows to create a cwstring_span from a const C-string and size" )
 {
     const wchar_t s[] = L"hello";
 
-    cwstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    cwstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a const C-array" )
+CASE( "string_span<>: Allows to create a cwstring_span from a const C-array" )
 {
     const wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
-    cwstring_view sv( s );
+    cwstring_span sv( s );
     
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a const std::array" )
+CASE( "string_span<>: Allows to create a cwstring_span from a const std::array" )
 {
 #if gsl_HAVE_ARRAY
     const std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
-    cwstring_view sv( arr );
+    cwstring_span sv( arr );
     
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
@@ -348,7 +348,7 @@ CASE( "string_view<>: Allows to create a cwstring_view from a const std::array" 
 #endif
 }
 
-CASE( "string_view<>: Allows to create a cwstring_view from a const std::vector" )
+CASE( "string_span<>: Allows to create a cwstring_span from a const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -356,7 +356,7 @@ CASE( "string_view<>: Allows to create a cwstring_view from a const std::vector"
 #else
     const std::vector<wchar_t> vec( 'w', 5 );
 #endif
-    cwstring_view sv( vec );
+    cwstring_span sv( vec );
     
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
@@ -364,145 +364,145 @@ CASE( "string_view<>: Allows to create a cwstring_view from a const std::vector"
 #endif
 }
 
-CASE( "string_view<>: Allows to explicitly convert from string_view to std::string" )
+CASE( "string_span<>: Allows to explicitly convert from string_span to std::string" )
 {
     char s[] = "hello";
 
-    string_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    string_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( to_string( sv ) == s );
 }
 
-CASE( "string_view<>: Allows to explicitly convert from cstring_view to std::string" )
+CASE( "string_span<>: Allows to explicitly convert from cstring_span to std::string" )
 {
     const char s[] = "hello";
 
-    cstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
     EXPECT( to_string( sv ) == s );
 }
 
-CASE( "string_view<>: Allows to explicitly convert from wstring_view to std::wstring" )
+CASE( "string_span<>: Allows to explicitly convert from wstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
 
-    wstring_view sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    wstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     
-    std::wstring ws( to_string( wstring_view( s, gsl_DIMENSION_OF( s ) - 1 ) ) );
+    std::wstring ws( to_string( wstring_span( s, gsl_DIMENSION_OF( s ) - 1 ) ) );
     
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
-CASE( "string_view<>: Allows to explicitly convert from cwstring_view to std::wstring" )
+CASE( "string_span<>: Allows to explicitly convert from cwstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
 
-    std::wstring ws( to_string( cwstring_view( s, gsl_DIMENSION_OF( s ) - 1 ) ) );
+    std::wstring ws( to_string( cwstring_span( s, gsl_DIMENSION_OF( s ) - 1 ) ) );
     
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
-CASE( "ensure_z(): Disallows to build a string_view from a const C-string" )
+CASE( "ensure_z(): Disallows to build a string_span from a const C-string" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     const char s[] = "hello";
     
-    string_view sv = ensure_z( s );
+    string_span sv = ensure_z( s );
     
     EXPECT( sv.length() == 5 );
     EXPECT( std::string( sv.data() ) == s );
 #endif
 }
 
-CASE( "ensure_z(): Disallows to build a wstring_view from a const wide C-string" )
+CASE( "ensure_z(): Disallows to build a wstring_span from a const wide C-string" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     const wchar_t s[] = L"hello";
     
-    wstring_view sv = ensure_z( s );
+    wstring_span sv = ensure_z( s );
     
     EXPECT( sv.length() == 5 );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 #endif
 }
 
-CASE( "ensure_z(): Allows to build a string_view from a non-const C-string" )
+CASE( "ensure_z(): Allows to build a string_span from a non-const C-string" )
 {
     char s[] = "hello";
     
 #if gsl_COMPILER_MSVC_VERSION != 6
-    string_view sv = ensure_z( s );
+    string_span sv = ensure_z( s );
 #else 
-    string_view sv = ensure_z( &s[0] );
+    string_span sv = ensure_z( &s[0] );
 #endif   
     EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "ensure_z(): Allows to build a cstring_view from a non-const C-string" )
+CASE( "ensure_z(): Allows to build a cstring_span from a non-const C-string" )
 {
     char s[] = "hello";
     
 #if gsl_COMPILER_MSVC_VERSION != 6
-    cstring_view sv = ensure_z( s );
+    cstring_span sv = ensure_z( s );
 #else
-    cstring_view sv = ensure_z( &s[0] );
+    cstring_span sv = ensure_z( &s[0] );
 #endif
     
     EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "ensure_z(): Allows to build a cstring_view from a const C-string" )
+CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
 {
     const char s[] = "hello";
     
 #if gsl_COMPILER_MSVC_VERSION != 6
-    cstring_view sv = ensure_z( s );
+    cstring_span sv = ensure_z( s );
 #else
-    cstring_view sv = ensure_z( &s[0] );
+    cstring_span sv = ensure_z( &s[0] );
 #endif
     
     EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "ensure_z(): Allows to build a wstring_view from a non-const wide C-string" )
+CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string" )
 {
     wchar_t s[] = L"hello";
     
 #if gsl_COMPILER_MSVC_VERSION != 6
-    wstring_view sv = ensure_z( s );
+    wstring_span sv = ensure_z( s );
 #else
-    wstring_view sv = ensure_z( &s[0] );
+    wstring_span sv = ensure_z( &s[0] );
 #endif
     
     EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "ensure_z(): Allows to build a cwstring_view from a non-const wide C-string" )
+CASE( "ensure_z(): Allows to build a cwstring_span from a non-const wide C-string" )
 {
     wchar_t s[] = L"hello";
     
 #if gsl_COMPILER_MSVC_VERSION != 6
-    cwstring_view sv = ensure_z( s );
+    cwstring_span sv = ensure_z( s );
 #else
-    cwstring_view sv = ensure_z( &s[0] );
+    cwstring_span sv = ensure_z( &s[0] );
 #endif
     
     EXPECT( sv.length() == size_t( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "ensure_z(): Allows to build a cwstring_view from a const wide C-string" )
+CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
 {
     const wchar_t s[] = L"hello";
     
 #if gsl_COMPILER_MSVC_VERSION != 6
-    cwstring_view sv = ensure_z( s );
+    cwstring_span sv = ensure_z( s );
 #else
-    cwstring_view sv = ensure_z( &s[0] );
+    cwstring_span sv = ensure_z( &s[0] );
 #endif
     
     EXPECT( sv.length() == size_t( 5 ) );

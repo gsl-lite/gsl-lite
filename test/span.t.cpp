@@ -19,28 +19,28 @@
 
 namespace {
 
-CASE( "array_view<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "span<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     short arr[] = { 1, 2, 3, };
-    array_view<int> v = arr;
+    span<int> v = arr;
 #endif
 }
 
-CASE( "array_view<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "span<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # if gsl_HAVE_ARRAY
     std::array<long,3> arr = {{ 1L, 2L, 3L, }};
-    array_view<int> v( arr);
+    span<int> v( arr);
 # endif
 #endif
 }
 
-CASE( "array_view<>: Terminates construction from a nullptr and a non-zero size" )
+CASE( "span<>: Terminates construction from a nullptr and a non-zero size" )
 {
 #if gsl_HAVE_NULLPTR
-    struct F { static void blow() { array_view<int> v( nullptr, 42 ); } };
+    struct F { static void blow() { span<int> v( nullptr, 42 ); } };
     
     EXPECT_THROWS( F::blow() );
 #else
@@ -48,24 +48,24 @@ CASE( "array_view<>: Terminates construction from a nullptr and a non-zero size"
 #endif
 }
 
-CASE( "array_view<>: Terminates construction from two pointers in the wrong order" )
+CASE( "span<>: Terminates construction from two pointers in the wrong order" )
 {
-    struct F { static void blow() { int a[2]; array_view<int> v( &a[1], &a[0] ); } };
+    struct F { static void blow() { int a[2]; span<int> v( &a[1], &a[0] ); } };
     
     EXPECT_THROWS( F::blow() );
 }
 
-CASE( "array_view<>: Terminates construction from a null pointer and a non-zero size" )
+CASE( "span<>: Terminates construction from a null pointer and a non-zero size" )
 {
-    struct F { static void blow() { int * p = NULL; array_view<int> v( p, 42 ); } };
+    struct F { static void blow() { int * p = NULL; span<int> v( p, 42 ); } };
     
     EXPECT_THROWS( F::blow() );
 }
 
-CASE( "array_view<>: Terminates construction from a C-array with size exceeding array length" )
+CASE( "span<>: Terminates construction from a C-array with size exceeding array length" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
-    struct F { static void blow() { int arr[] = { 1, 2, 3, }; array_view<int> v( arr, 7 ); } };
+    struct F { static void blow() { int arr[] = { 1, 2, 3, }; span<int> v( arr, 7 ); } };
 
     EXPECT_THROWS( F::blow() );
 #else
@@ -73,49 +73,49 @@ CASE( "array_view<>: Terminates construction from a C-array with size exceeding 
 #endif
 }
 
-CASE( "array_view<>: Allows default construction" )
+CASE( "span<>: Allows default construction" )
 {
-    array_view<int> v;
+    span<int> v;
     EXPECT( v.size() == size_t( 0 ) );
 }
 
-CASE( "array_view<>: Allows construction from a nullptr and a zero size" )
+CASE( "span<>: Allows construction from a nullptr and a zero size" )
 {
 #if gsl_HAVE_NULLPTR
-    array_view<int> v( nullptr, 0 );
+    span<int> v( nullptr, 0 );
     EXPECT( v.size() == size_t( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
 }
 
-CASE( "array_view<>: Allows construction from two pointers" )
+CASE( "span<>: Allows construction from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     
-    array_view<int> v( arr, arr + gsl_DIMENSION_OF( arr ) );
+    span<int> v( arr, arr + gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows construction from a non-null pointer and a size" )
+CASE( "span<>: Allows construction from a non-null pointer and a size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     
-    array_view<int> v( arr, gsl_DIMENSION_OF( arr ) );
+    span<int> v( arr, gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows construction from a any pointer and a zero size" )
+CASE( "span<>: Allows construction from a any pointer and a zero size" )
 {
     struct F { 
-        typedef array_view<int>::size_type size_type;
+        typedef span<int>::size_type size_type;
         static void null() { 
-            int * p = NULL; array_view<int> v( p, (size_type)0 ); 
+            int * p = NULL; span<int> v( p, (size_type)0 ); 
         } 
         static void nonnull() { 
-            int i = 7; int * p = &i; array_view<int> v( p, (size_type)0 ); 
+            int i = 7; int * p = &i; span<int> v( p, (size_type)0 ); 
         } 
     };
     
@@ -123,34 +123,34 @@ CASE( "array_view<>: Allows construction from a any pointer and a zero size" )
     EXPECT_NO_THROW( F::nonnull() );
 }
 
-CASE( "array_view<>: Allows construction from a C-array" )
+CASE( "span<>: Allows construction from a C-array" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    array_view<int> v( arr );
+    span<int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows construction from a C-array with size" )
+CASE( "span<>: Allows construction from a C-array with size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    array_view<int> v( arr, gsl_DIMENSION_OF(arr) );
+    span<int> v( arr, gsl_DIMENSION_OF(arr) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 
 #if gsl_CPP14_OR_GREATER
-    array_view<int> w( arr, 3 );
+    span<int> w( arr, 3 );
 
     EXPECT( std::equal( w.begin(), w.end(), arr, arr + 3 ) );
 #endif
 }
 
-CASE( "array_view<>: Allows construction from a std::array<>" )
+CASE( "span<>: Allows construction from a std::array<>" )
 {
 # if gsl_HAVE_ARRAY
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
-    array_view<int> v( arr );
+    span<int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
@@ -158,95 +158,95 @@ CASE( "array_view<>: Allows construction from a std::array<>" )
 #endif
 }
 
-CASE( "array_view<>: Allows construction from a container (std::vector<>)" )
+CASE( "span<>: Allows construction from a container (std::vector<>)" )
 {
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
     std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
-    array_view<int> v( vec );
+    span<int> v( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-CASE( "array_view<>: Allows construction from another view of the same type" )
+CASE( "span<>: Allows construction from another view of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    array_view<int> v( arr );
+    span<int> v( arr );
 
-    array_view<int> w( v );
+    span<int> w( v );
 
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows assignment from another view of the same type" )
+CASE( "span<>: Allows assignment from another view of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    array_view<int> v( arr );
-    array_view<int> w;
+    span<int> v( arr );
+    span<int> w;
 
     w = v;
 
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows forward iteration" )
+CASE( "span<>: Allows forward iteration" )
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
-    for ( array_view<int>::iterator pos = v.begin(); pos != v.end(); ++pos )
+    for ( span<int>::iterator pos = v.begin(); pos != v.end(); ++pos )
     {
         EXPECT( *pos == arr[ std::distance( v.begin(), pos )] );
     }
 }
 
-CASE( "array_view<>: Allows const forward iteration" )
+CASE( "span<>: Allows const forward iteration" )
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
-    for ( array_view<int>::const_iterator pos = v.cbegin(); pos != v.cend(); ++pos )
+    for ( span<int>::const_iterator pos = v.cbegin(); pos != v.cend(); ++pos )
     {
         EXPECT( *pos == arr[ std::distance( v.cbegin(), pos )] );
     }
 }
 
-CASE( "array_view<>: Allows reverse iteration" )
+CASE( "span<>: Allows reverse iteration" )
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
-    for ( array_view<int>::reverse_iterator pos = v.rbegin(); pos != v.rend(); ++pos )
+    for ( span<int>::reverse_iterator pos = v.rbegin(); pos != v.rend(); ++pos )
     {
         EXPECT( *pos == arr[ v.size() - 1 - std::distance(v.rbegin(), pos)] );
     }
 }
 
-CASE( "array_view<>: Allows const reverse iteration" )
+CASE( "span<>: Allows const reverse iteration" )
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
-    for ( array_view<int>::const_reverse_iterator pos = v.crbegin(); pos != v.crend(); ++pos )
+    for ( span<int>::const_reverse_iterator pos = v.crbegin(); pos != v.crend(); ++pos )
     {
         EXPECT( *pos == arr[ v.size() - 1 - std::distance(v.crbegin(), pos)] );
     }
 }
 
-CASE( "array_view<>: Allows conversion to bool (true if non-empty)" )
+CASE( "span<>: Allows conversion to bool (true if non-empty)" )
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
     EXPECT( !!v );
 }
 
-CASE( "array_view<>: Allows element access via array indexing" )
+CASE( "span<>: Allows element access via array indexing" )
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
     for ( size_t i = 0; i < v.size(); ++i )
     {
@@ -254,10 +254,10 @@ CASE( "array_view<>: Allows element access via array indexing" )
     }
 }
 
-CASE( "array_view<>: Allows element access via at()" ) 
+CASE( "span<>: Allows element access via at()" ) 
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
     for ( size_t i = 0; i < v.size(); ++i )
     {
@@ -265,10 +265,10 @@ CASE( "array_view<>: Allows element access via at()" )
     }
 }
 
-CASE( "array_view<>: Allows element access via data()" ) 
+CASE( "span<>: Allows element access via data()" ) 
 {
     int arr[] = { 1, 2, 3, };
-    array_view<int> v( arr );
+    span<int> v( arr );
     
     EXPECT( *v.data() == *v.begin() );
 
@@ -278,172 +278,172 @@ CASE( "array_view<>: Allows element access via data()" )
     }
 }
 
-CASE( "array_view<>: Allows to compare equal to another view of the same type" )
+CASE( "span<>: Allows to compare equal to another view of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
-    array_view<int> va( a );
-    array_view<int> vb( b );
-    array_view<int> vc( c );
+    span<int> va( a );
+    span<int> vb( b );
+    span<int> vc( c );
     
     EXPECT(     (va == va) );
     EXPECT_NOT( (vb == va) );
     EXPECT_NOT( (vc == va) );
 }
 
-CASE( "array_view<>: Allows to compare unequal to another view of the same type" )
+CASE( "span<>: Allows to compare unequal to another view of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
-    array_view<int> va( a );
-    array_view<int> vb( b );
-    array_view<int> vc( c );
+    span<int> va( a );
+    span<int> vb( b );
+    span<int> vc( c );
     
     EXPECT_NOT( (va != va) );
     EXPECT(     (vb != va) );
     EXPECT(     (vc != va) );
 }
 
-CASE( "array_view<>: Allows to compare less than another view of the same type" )
+CASE( "span<>: Allows to compare less than another view of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
-    array_view<int> va( a );
-    array_view<int> vb( b );
-    array_view<int> vc( c );
+    span<int> va( a );
+    span<int> vb( b );
+    span<int> vc( c );
     
     EXPECT_NOT( (va < va) );
     EXPECT(     (va < vb) );
     EXPECT(     (va < vc) );
 }
 
-CASE( "array_view<>: Allows to compare less than or equal to another view of the same type" )
+CASE( "span<>: Allows to compare less than or equal to another view of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
-    array_view<int> va( a );
-    array_view<int> vb( b );
-    array_view<int> vc( c );
+    span<int> va( a );
+    span<int> vb( b );
+    span<int> vc( c );
     
     EXPECT_NOT( (vb <= va) );
     EXPECT(     (va <= vb) );
     EXPECT(     (va <= vc) );
 }
 
-CASE( "array_view<>: Allows to compare greater than another view of the same type" )
+CASE( "span<>: Allows to compare greater than another view of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
-    array_view<int> va( a );
-    array_view<int> vb( b );
-    array_view<int> vc( c );
+    span<int> va( a );
+    span<int> vb( b );
+    span<int> vc( c );
     
     EXPECT_NOT( (va > va) );
     EXPECT(     (vb > va) );
     EXPECT(     (vc > va) );
 }
 
-CASE( "array_view<>: Allows to compare greater than or equal to another view of the same type" )
+CASE( "span<>: Allows to compare greater than or equal to another view of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
-    array_view<int> va( a );
-    array_view<int> vb( b );
-    array_view<int> vc( c );
+    span<int> va( a );
+    span<int> vb( b );
+    span<int> vc( c );
     
     EXPECT_NOT( (va >= vb) );
     EXPECT(     (vb >= va) );
     EXPECT(     (vc >= va) );
 }
 
-CASE( "array_view<>: Allows to test for empty view via empty(), empty case" ) 
+CASE( "span<>: Allows to test for empty view via empty(), empty case" ) 
 {
-    array_view<int> v;
+    span<int> v;
 
     EXPECT( v.empty() );
 }
 
-CASE( "array_view<>: Allows to test for empty view via empty(), non-empty case" ) 
+CASE( "span<>: Allows to test for empty view via empty(), non-empty case" ) 
 {
     int a[] = { 1 };
-    array_view<int> v( a );
+    span<int> v( a );
 
     EXPECT_NOT( v.empty() );
 }
 
-CASE( "array_view<>: Allows to obtain number of elements via size()" ) 
+CASE( "span<>: Allows to obtain number of elements via size()" ) 
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
-    array_view<int> z;
-    array_view<int> va( a );
-    array_view<int> vb( b );
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
 
     EXPECT( va.size() == gsl_DIMENSION_OF( a ) );
     EXPECT( vb.size() == gsl_DIMENSION_OF( b ) );
     EXPECT(  z.size() == size_t( 0 ) );
 }
 
-CASE( "array_view<>: Allows to obtain number of elements via length()" ) 
+CASE( "span<>: Allows to obtain number of elements via length()" ) 
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
-    array_view<int> z;
-    array_view<int> va( a );
-    array_view<int> vb( b );
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
 
     EXPECT( va.length() == gsl_DIMENSION_OF( a ) );
     EXPECT( vb.length() == gsl_DIMENSION_OF( b ) );
     EXPECT(  z.length() == size_t( 0 ) );
 }
 
-CASE( "array_view<>: Allows to obtain number of elements via used_length()" ) 
+CASE( "span<>: Allows to obtain number of elements via used_length()" ) 
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
-    array_view<int> z;
-    array_view<int> va( a );
-    array_view<int> vb( b );
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
 
     EXPECT( va.used_length() == gsl_DIMENSION_OF( a ) );
     EXPECT( vb.used_length() == gsl_DIMENSION_OF( b ) );
     EXPECT(  z.used_length() == size_t( 0 ) );
 }
 
-CASE( "array_view<>: Allows to obtain number of bytes via bytes()" ) 
+CASE( "span<>: Allows to obtain number of bytes via bytes()" ) 
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
-    array_view<int> z;
-    array_view<int> va( a );
-    array_view<int> vb( b );
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
 
     EXPECT( va.bytes() == gsl_DIMENSION_OF( a ) * sizeof(int) );
     EXPECT( vb.bytes() == gsl_DIMENSION_OF( b ) * sizeof(int) );
     EXPECT(  z.bytes() == 0 * sizeof(int) );
 }
 
-CASE( "array_view<>: Allows to obtain number of bytes via used_bytes()" ) 
+CASE( "span<>: Allows to obtain number of bytes via used_bytes()" ) 
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
-    array_view<int> z;
-    array_view<int> va( a );
-    array_view<int> vb( b );
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
 
     EXPECT( va.used_bytes() == gsl_DIMENSION_OF( a ) * sizeof(int) );
     EXPECT( vb.used_bytes() == gsl_DIMENSION_OF( b ) * sizeof(int) );
     EXPECT(  z.used_bytes() == 0 * sizeof(int) );
 }
 
-CASE( "array_view<>: Allows to swap with another view of the same type" )
+CASE( "span<>: Allows to swap with another view of the same type" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
-    array_view<int> va0( a );
-    array_view<int> vb0( b );
-    array_view<int> va( a );
-    array_view<int> vb( b );
+    span<int> va0( a );
+    span<int> vb0( b );
+    span<int> va( a );
+    span<int> vb( b );
 
     va.swap( vb );
     
@@ -462,7 +462,7 @@ static bool is_little_endian()
     return 1 != U().c[ sizeof(int) - 1 ];
 }
 
-CASE( "array_view<>: Allows to view the elements as read-only bytes" )
+CASE( "span<>: Allows to view the elements as read-only bytes" )
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type;
@@ -479,8 +479,8 @@ CASE( "array_view<>: Allows to view the elements as read-only bytes" )
 
     gyte * b = is_little_endian() ? le : be;
     
-    array_view<int> va( a );
-    array_view<const gyte> vb( va.as_bytes() );
+    span<int> va( a );
+    span<const gyte> vb( va.as_bytes() );
     
     EXPECT( vb[0] == b[0] );
     EXPECT( vb[1] == b[1] );
@@ -488,7 +488,7 @@ CASE( "array_view<>: Allows to view the elements as read-only bytes" )
     EXPECT( vb[3] == b[3] );
 }
 
-CASE( "array_view<>: Allows to view and change the elements as writable bytes" )
+CASE( "span<>: Allows to view and change the elements as writable bytes" )
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type;
@@ -500,8 +500,8 @@ CASE( "array_view<>: Allows to view and change the elements as writable bytes" )
     EXPECT( sizeof(type) == size_t( 4 ) );
 
     type  a[] = { 0x0, };
-    array_view<int> va( a );
-    array_view<gyte> vb( va.as_writeable_bytes() );
+    span<int> va( a );
+    span<gyte> vb( va.as_writeable_bytes() );
     
     {for ( size_t i = 0; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
 
@@ -511,7 +511,7 @@ CASE( "array_view<>: Allows to view and change the elements as writable bytes" )
     {for ( size_t i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
 }
 
-CASE( "array_view<>: Allows to view the elements as a view of another type" ) 
+CASE( "span<>: Allows to view the elements as a view of another type" ) 
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type1;
@@ -529,18 +529,18 @@ CASE( "array_view<>: Allows to view the elements as a view of another type" )
 
     type2 * b = is_little_endian() ? le : be;
     
-    array_view<type1> va( a );
+    span<type1> va( a );
 #if gsl_COMPILER_MSVC_VERSION == 6
-    array_view<type2> vb( va.as_array_view( type2() ) );
+    span<type2> vb( va.as_span( type2() ) );
 #else
-    array_view<type2> vb( va.as_array_view<type2>() );
+    span<type2> vb( va.as_span<type2>() );
 #endif    
     
     EXPECT( vb[0] == b[0] );
     EXPECT( vb[1] == b[1] );
 }
 
-CASE( "array_view<>: Allows to change the elements from a view of another type" ) 
+CASE( "span<>: Allows to change the elements from a view of another type" ) 
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type1;
@@ -554,11 +554,11 @@ CASE( "array_view<>: Allows to change the elements from a view of another type" 
 
     type1  a[] = { 0x0, };
     
-    array_view<type1> va( a );
+    span<type1> va( a );
 #if gsl_COMPILER_MSVC_VERSION == 6
-    array_view<type2> vb( va.as_array_view( type2() ) );
+    span<type2> vb( va.as_span( type2() ) );
 #else
-    array_view<type2> vb( va.as_array_view<type2>() );
+    span<type2> vb( va.as_span<type2>() );
 #endif    
     
     {for ( size_t i = 0; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
@@ -569,30 +569,30 @@ CASE( "array_view<>: Allows to change the elements from a view of another type" 
     {for ( size_t i = 1; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
 }
 
-CASE( "array_view<>: Allows building from two pointers" )
+CASE( "span<>: Allows building from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    array_view<int> v = as_array_view( arr, arr + gsl_DIMENSION_OF( arr ) );
+    span<int> v = as_span( arr, arr + gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows building from a non-null pointer and a size" )
+CASE( "span<>: Allows building from a non-null pointer and a size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    array_view<int> v = as_array_view( arr, gsl_DIMENSION_OF( arr ) );
+    span<int> v = as_span( arr, gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "array_view<>: Allows building from a C-array" )
+CASE( "span<>: Allows building from a C-array" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    array_view<int> v = as_array_view( arr );
+    span<int> v = as_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 #else
@@ -600,12 +600,12 @@ CASE( "array_view<>: Allows building from a C-array" )
 #endif
 }
 
-CASE( "array_view<>: Allows building from a std::array<>" )
+CASE( "span<>: Allows building from a std::array<>" )
 {
 # if gsl_HAVE_ARRAY
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
-    array_view<int> v = as_array_view( arr );
+    span<int> v = as_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
@@ -613,49 +613,49 @@ CASE( "array_view<>: Allows building from a std::array<>" )
 #endif
 }
 
-CASE( "array_view<>: Allows building from a container (std::vector<>)" )
+CASE( "span<>: Allows building from a container (std::vector<>)" )
 {
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
     std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
-    array_view<int> v = as_array_view( vec );
+    span<int> v = as_span( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
 
 #if 0
-CASE( "array_view_convertible" ) {}
+CASE( "span_convertible" ) {}
 CASE( "boundary_checks" ) {}
-CASE( "array_view_parameter_test" ) {}
+CASE( "span_parameter_test" ) {}
 CASE( "md_access" ) {}
-CASE( "array_view_factory_test" ) {}
-CASE( "array_view_reshape_test" ) {}
-CASE( "array_view_section_test" ) {}
-CASE( "array_view_section" ) {}
-CASE( "strided_array_view_constructors" ) {}
-CASE( "strided_array_view_slice" ) {}
-CASE( "strided_array_view_column_major" ) {}
-CASE( "strided_array_view_bounds" ) {}
-CASE( "strided_array_view_type_conversion" ) {}
+CASE( "span_factory_test" ) {}
+CASE( "span_reshape_test" ) {}
+CASE( "span_section_test" ) {}
+CASE( "span_section" ) {}
+CASE( "strided_span_constructors" ) {}
+CASE( "strided_span_slice" ) {}
+CASE( "strided_span_column_major" ) {}
+CASE( "strided_span_bounds" ) {}
+CASE( "strided_span_type_conversion" ) {}
 CASE( "empty_arrays" ) {}
 CASE( "index_constructor" ) {}
 CASE( "index_operations" ) {}
-CASE( "array_view_section_iteration" ) {}
-CASE( "dynamic_array_view_section_iteration" ) {}
-CASE( "strided_array_view_section_iteration" ) {}
-CASE( "dynamic_strided_array_view_section_iteration" ) {}
-CASE( "strided_array_view_section_iteration_3d" ) {}
-CASE( "dynamic_strided_array_view_section_iteration_3d" ) {}
-CASE( "strided_array_view_conversion" ) {}
+CASE( "span_section_iteration" ) {}
+CASE( "dynamic_span_section_iteration" ) {}
+CASE( "strided_span_section_iteration" ) {}
+CASE( "dynamic_strided_span_section_iteration" ) {}
+CASE( "strided_span_section_iteration_3d" ) {}
+CASE( "dynamic_strided_span_section_iteration_3d" ) {}
+CASE( "strided_span_conversion" ) {}
 CASE( "constructors" ) {}
 CASE( "copyandassignment" ) {}
-CASE( "array_view_first" ) {}
-CASE( "array_view_last" ) {}
-CASE( "custmized_array_view_size" ) {}
-CASE( "array_view_sub" ) {}
+CASE( "span_first" ) {}
+CASE( "span_last" ) {}
+CASE( "custmized_span_size" ) {}
+CASE( "span_sub" ) {}
 CASE( "TestNullConstruction" ) {}
 CASE( "ArrayConstruction" ) {}
 CASE( "NonConstConstConversions" ) {}

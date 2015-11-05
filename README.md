@@ -164,12 +164,12 @@ wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style 
 czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
 cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-array_view<>                | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
-string_view<>               | &#10003;| &#10003;| &#10003;| array_view&lt;char> |
-wstring_view<>              | -       | &#10003;| &#10003;| array_view&lt;wchar_t > |
-cstring_view<>              | &#10003;| &#10003;| &#10003;| array_view&lt;const char> |
-cwstring_view<>             | -       | &#10003;| &#10003;| array_view&lt;const wchar_t > |
-ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_view or cwstring_view |
+span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
+string_span<>               | &#10003;| &#10003;| &#10003;| span&lt;char> |
+wstring_span<>              | -       | &#10003;| &#10003;| span&lt;wchar_t > |
+cstring_span<>              | &#10003;| &#10003;| &#10003;| span&lt;const char> |
+cwstring_span<>             | -       | &#10003;| &#10003;| span&lt;const wchar_t > |
+ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_span or cwstring_span |
 **2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 at()                        | &#10003;| &#10003;| >=C++11 | Bounds-checked way of accessing<br>static arrays, std::array, std::vector |
 at()                        | -       | -       | < C++11 | static arrays, std::vector<br>std::array : VC11 |
@@ -247,54 +247,6 @@ The smart pointers of Boost 1.51 can be used with VC6.
 ### A.2 GSL Lite test specification
 
 ```
-array_view<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-array_view<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-array_view<>: Terminates construction from a nullptr and a non-zero size
-array_view<>: Terminates construction from two pointers in the wrong order
-array_view<>: Terminates construction from a null pointer and a non-zero size
-array_view<>: Terminates construction from a C-array with size exceeding array length
-array_view<>: Allows default construction
-array_view<>: Allows construction from a nullptr and a zero size
-array_view<>: Allows construction from two pointers
-array_view<>: Allows construction from a non-null pointer and a size
-array_view<>: Allows construction from a any pointer and a zero size
-array_view<>: Allows construction from a C-array
-array_view<>: Allows construction from a C-array with size
-array_view<>: Allows construction from a std::array<>
-array_view<>: Allows construction from a container (std::vector<>)
-array_view<>: Allows construction from another view of the same type
-array_view<>: Allows assignment from another view of the same type
-array_view<>: Allows forward iteration
-array_view<>: Allows const forward iteration
-array_view<>: Allows reverse iteration
-array_view<>: Allows const reverse iteration
-array_view<>: Allows conversion to bool (true if non-empty)
-array_view<>: Allows element access via array indexing
-array_view<>: Allows element access via at()
-array_view<>: Allows element access via data()
-array_view<>: Allows to compare equal to another view of the same type
-array_view<>: Allows to compare unequal to another view of the same type
-array_view<>: Allows to compare less than another view of the same type
-array_view<>: Allows to compare less than or equal to another view of the same type
-array_view<>: Allows to compare greater than another view of the same type
-array_view<>: Allows to compare greater than or equal to another view of the same type
-array_view<>: Allows to test for empty view via empty(), empty case
-array_view<>: Allows to test for empty view via empty(), non-empty case
-array_view<>: Allows to obtain number of elements via size()
-array_view<>: Allows to obtain number of elements via length()
-array_view<>: Allows to obtain number of elements via used_length()
-array_view<>: Allows to obtain number of bytes via bytes()
-array_view<>: Allows to obtain number of bytes via used_bytes()
-array_view<>: Allows to swap with another view of the same type
-array_view<>: Allows to view the elements as read-only bytes
-array_view<>: Allows to view and change the elements as writable bytes
-array_view<>: Allows to view the elements as a view of another type
-array_view<>: Allows to change the elements from a view of another type
-array_view<>: Allows building from two pointers
-array_view<>: Allows building from a non-null pointer and a size
-array_view<>: Allows building from a C-array
-array_view<>: Allows building from a std::array<>
-array_view<>: Allows building from a container (std::vector<>)
 at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements
 at(): Terminates access to non-existing std::vector elements
@@ -318,47 +270,95 @@ not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
-string_view<>: Disallows construction of a string_view from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-string_view<>: ToDo: Disallows construction of a string_view from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-string_view<>: Allows to create a string_view from a non-const C-string and size
-string_view<>: Allows to create a string_view from a non-const C-array
-string_view<>: Allows to create a string_view from a non-const std::array
-string_view<>: Allows to create a string_view from a non-const std::vector
-string_view<>: ToDo: Allows to create a string_view from a non-const std::string
-string_view<>: Allows to create a cstring_view from a const C-string and size
-string_view<>: Allows to create a cstring_view from a const C-array
-string_view<>: Allows to create a cstring_view from a const std::array
-string_view<>: Allows to create a cstring_view from a const std::vector
-string_view<>: Allows to create a cstring_view from a const std::string
-string_view<>: Allows to create a cstring_view from a non-const C-string and size
-string_view<>: Allows to create a cstring_view from a non-const C-array
-string_view<>: Allows to create a cstring_view from a non-const std::array
-string_view<>: Allows to create a cstring_view from a non-const std::vector
-string_view<>: Allows to create a cstring_view from a non-const std::string
-string_view<>: Allows to create a wstring_view from a non-const C-string and size
-string_view<>: Allows to create a wstring_view from a non-const C-array
-string_view<>: Allows to create a wstring_view from a non-const std::array
-string_view<>: Allows to create a wstring_view from a non-const std::vector
-string_view<>: Allows to create a cwstring_view from a non-const C-string and size
-string_view<>: Allows to create a cwstring_view from a non-const C-array
-string_view<>: Allows to create a cwstring_view from a non-const std::array
-string_view<>: Allows to create a cwstring_view from a non-const std::vector
-string_view<>: Allows to create a cwstring_view from a const C-string and size
-string_view<>: Allows to create a cwstring_view from a const C-array
-string_view<>: Allows to create a cwstring_view from a const std::array
-string_view<>: Allows to create a cwstring_view from a const std::vector
-string_view<>: Allows to explicitly convert from string_view to std::string
-string_view<>: Allows to explicitly convert from cstring_view to std::string
-string_view<>: Allows to explicitly convert from wstring_view to std::wstring
-string_view<>: Allows to explicitly convert from cwstring_view to std::wstring
-ensure_z(): Disallows to build a string_view from a const C-string
-ensure_z(): Disallows to build a wstring_view from a const wide C-string
-ensure_z(): Allows to build a string_view from a non-const C-string
-ensure_z(): Allows to build a cstring_view from a non-const C-string
-ensure_z(): Allows to build a cstring_view from a const C-string
-ensure_z(): Allows to build a wstring_view from a non-const wide C-string
-ensure_z(): Allows to build a cwstring_view from a non-const wide C-string
-ensure_z(): Allows to build a cwstring_view from a const wide C-string
+span<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+span<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+span<>: Terminates construction from a nullptr and a non-zero size
+span<>: Terminates construction from two pointers in the wrong order
+span<>: Terminates construction from a null pointer and a non-zero size
+span<>: Terminates construction from a C-array with size exceeding array length
+span<>: Allows default construction
+span<>: Allows construction from a nullptr and a zero size
+span<>: Allows construction from two pointers
+span<>: Allows construction from a non-null pointer and a size
+span<>: Allows construction from a any pointer and a zero size
+span<>: Allows construction from a C-array
+span<>: Allows construction from a C-array with size
+span<>: Allows construction from a std::array<>
+span<>: Allows construction from a container (std::vector<>)
+span<>: Allows construction from another view of the same type
+span<>: Allows assignment from another view of the same type
+span<>: Allows forward iteration
+span<>: Allows const forward iteration
+span<>: Allows reverse iteration
+span<>: Allows const reverse iteration
+span<>: Allows conversion to bool (true if non-empty)
+span<>: Allows element access via array indexing
+span<>: Allows element access via at()
+span<>: Allows element access via data()
+span<>: Allows to compare equal to another view of the same type
+span<>: Allows to compare unequal to another view of the same type
+span<>: Allows to compare less than another view of the same type
+span<>: Allows to compare less than or equal to another view of the same type
+span<>: Allows to compare greater than another view of the same type
+span<>: Allows to compare greater than or equal to another view of the same type
+span<>: Allows to test for empty view via empty(), empty case
+span<>: Allows to test for empty view via empty(), non-empty case
+span<>: Allows to obtain number of elements via size()
+span<>: Allows to obtain number of elements via length()
+span<>: Allows to obtain number of elements via used_length()
+span<>: Allows to obtain number of bytes via bytes()
+span<>: Allows to obtain number of bytes via used_bytes()
+span<>: Allows to swap with another view of the same type
+span<>: Allows to view the elements as read-only bytes
+span<>: Allows to view and change the elements as writable bytes
+span<>: Allows to view the elements as a view of another type
+span<>: Allows to change the elements from a view of another type
+span<>: Allows building from two pointers
+span<>: Allows building from a non-null pointer and a size
+span<>: Allows building from a C-array
+span<>: Allows building from a std::array<>
+span<>: Allows building from a container (std::vector<>)
+string_span<>: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_span<>: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_span<>: Allows to create a string_span from a non-const C-string and size
+string_span<>: Allows to create a string_span from a non-const C-array
+string_span<>: Allows to create a string_span from a non-const std::array
+string_span<>: Allows to create a string_span from a non-const std::vector
+string_span<>: ToDo: Allows to create a string_span from a non-const std::string
+string_span<>: Allows to create a cstring_span from a const C-string and size
+string_span<>: Allows to create a cstring_span from a const C-array
+string_span<>: Allows to create a cstring_span from a const std::array
+string_span<>: Allows to create a cstring_span from a const std::vector
+string_span<>: Allows to create a cstring_span from a const std::string
+string_span<>: Allows to create a cstring_span from a non-const C-string and size
+string_span<>: Allows to create a cstring_span from a non-const C-array
+string_span<>: Allows to create a cstring_span from a non-const std::array
+string_span<>: Allows to create a cstring_span from a non-const std::vector
+string_span<>: Allows to create a cstring_span from a non-const std::string
+string_span<>: Allows to create a wstring_span from a non-const C-string and size
+string_span<>: Allows to create a wstring_span from a non-const C-array
+string_span<>: Allows to create a wstring_span from a non-const std::array
+string_span<>: Allows to create a wstring_span from a non-const std::vector
+string_span<>: Allows to create a cwstring_span from a non-const C-string and size
+string_span<>: Allows to create a cwstring_span from a non-const C-array
+string_span<>: Allows to create a cwstring_span from a non-const std::array
+string_span<>: Allows to create a cwstring_span from a non-const std::vector
+string_span<>: Allows to create a cwstring_span from a const C-string and size
+string_span<>: Allows to create a cwstring_span from a const C-array
+string_span<>: Allows to create a cwstring_span from a const std::array
+string_span<>: Allows to create a cwstring_span from a const std::vector
+string_span<>: Allows to explicitly convert from string_span to std::string
+string_span<>: Allows to explicitly convert from cstring_span to std::string
+string_span<>: Allows to explicitly convert from wstring_span to std::wstring
+string_span<>: Allows to explicitly convert from cwstring_span to std::wstring
+ensure_z(): Disallows to build a string_span from a const C-string
+ensure_z(): Disallows to build a wstring_span from a const wide C-string
+ensure_z(): Allows to build a string_span from a non-const C-string
+ensure_z(): Allows to build a cstring_span from a non-const C-string
+ensure_z(): Allows to build a cstring_span from a const C-string
+ensure_z(): Allows to build a wstring_span from a non-const wide C-string
+ensure_z(): Allows to build a cwstring_span from a non-const wide C-string
+ensure_z(): Allows to build a cwstring_span from a const wide C-string
 ensure_z(): Allows to specify ultimate location of the sentinel and ensure its presence
 finally: Allows lambda to run
 finally: Allows function with bind

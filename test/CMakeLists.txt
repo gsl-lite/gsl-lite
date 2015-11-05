@@ -11,7 +11,7 @@ project( test )
 
 include_directories  ( "${PROJECT_SOURCE_DIR}/../include/gsl" )
 
-set( SOURCES gsl-lite.t.cpp array_view.t.cpp at.t.cpp not_null.t.cpp owner.t.cpp string_view.t.cpp util.t.cpp )
+set( SOURCES gsl-lite.t.cpp at.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
 
 add_executable (   gsl-lite.t ${SOURCES} )
 add_definitions( -Dgsl_CONFIG_THROWS_FOR_TESTING )
