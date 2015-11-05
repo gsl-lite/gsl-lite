@@ -855,7 +855,6 @@ template< class T >
 inline array_view<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t>::max() )
 {
     return detail::ensure_sentinel<T, size_t, 0>( sz, max );
-//    return detail::ensure<T, size_t, 0>::sentinel( sz, max );
 }
 
 template< class T, size_t N >
