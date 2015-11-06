@@ -63,7 +63,7 @@ In a nutshell
 
 The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). 
 
-The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span<>` and [others](#features).
+The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
 
 
 License
@@ -166,10 +166,10 @@ cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-
 **2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
 as_span()                   | -       | &#10003;| &#10003;| Create a span |
-string_span<>               | &#10003;| &#10003;| &#10003;| span&lt;char> |
-wstring_span<>              | -       | &#10003;| &#10003;| span&lt;wchar_t > |
-cstring_span<>              | &#10003;| &#10003;| &#10003;| span&lt;const char> |
-cwstring_span<>             | -       | &#10003;| &#10003;| span&lt;const wchar_t > |
+string_span                 | &#10003;| &#10003;| &#10003;| span&lt;char> |
+wstring_span                | -       | &#10003;| &#10003;| span&lt;wchar_t > |
+cstring_span                | &#10003;| &#10003;| &#10003;| span&lt;const char> |
+cwstring_span               | -       | &#10003;| &#10003;| span&lt;const wchar_t > |
 ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_span or cwstring_span |
 to_string()                 | -       | &#10003;| &#10003;| Convert a string_span to std::string or std::wstring |
 **2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
