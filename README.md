@@ -252,7 +252,8 @@ The smart pointers of Boost 1.51 can be used with VC6.
 Expects(): Allows a true expression
 Ensures(): Allows a true expression
 Expects(): Terminates on a false expression
-Ensures(): Terminates on a false expressionat(): Terminates access to non-existing C-array elements
+Ensures(): Terminates on a false expression
+at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements
 at(): Terminates access to non-existing std::vector elements
 at(): Allows access to existing C-array elements
