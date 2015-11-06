@@ -19,7 +19,7 @@
 
 namespace {
 
-CASE( "string_span<>: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     char s[] = "hello";
@@ -30,7 +30,7 @@ CASE( "string_span<>: Disallows construction of a string_span from a const C-str
 #endif
 }
 
-CASE( "string_span<>: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "string_span: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     const std::string s = "hello, world";
@@ -41,7 +41,7 @@ CASE( "string_span<>: ToDo: Disallows construction of a string_span from a const
 #endif
 }
 
-CASE( "string_span<>: Allows to create a string_span from a non-const C-string and size" )
+CASE( "string_span: Allows to create a string_span from a non-const C-string and size" )
 {
     char s[] = "hello";
 
@@ -50,7 +50,7 @@ CASE( "string_span<>: Allows to create a string_span from a non-const C-string a
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "string_span<>: Allows to create a string_span from a non-const C-array" )
+CASE( "string_span: Allows to create a string_span from a non-const C-array" )
 {
     char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
@@ -59,7 +59,7 @@ CASE( "string_span<>: Allows to create a string_span from a non-const C-array" )
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_span<>: Allows to create a string_span from a non-const std::array" )
+CASE( "string_span: Allows to create a string_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -72,7 +72,7 @@ CASE( "string_span<>: Allows to create a string_span from a non-const std::array
 #endif
 }
 
-CASE( "string_span<>: Allows to create a string_span from a non-const std::vector" )
+CASE( "string_span: Allows to create a string_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -88,7 +88,7 @@ CASE( "string_span<>: Allows to create a string_span from a non-const std::vecto
 #endif
 }
 
-CASE( "string_span<>: ToDo: Allows to create a string_span from a non-const std::string" )
+CASE( "string_span: ToDo: Allows to create a string_span from a non-const std::string" )
 {
 #if 0
 #if gsl_COMPILER_MSVC_VERSION != 6
@@ -103,7 +103,7 @@ CASE( "string_span<>: ToDo: Allows to create a string_span from a non-const std:
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a const C-string and size" )
+CASE( "string_span: Allows to create a cstring_span from a const C-string and size" )
 {
     const char s[] = "hello";
 
@@ -112,7 +112,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a const C-string and 
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a const C-array" )
+CASE( "string_span: Allows to create a cstring_span from a const C-array" )
 {
     const char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
@@ -121,7 +121,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a const C-array" )
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a const std::array" )
+CASE( "string_span: Allows to create a cstring_span from a const std::array" )
 {
 #if gsl_HAVE_ARRAY
     const std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -134,7 +134,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a const std::array" )
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a const std::vector" )
+CASE( "string_span: Allows to create a cstring_span from a const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -150,7 +150,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a const std::vector" 
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a const std::string" )
+CASE( "string_span: Allows to create a cstring_span from a const std::string" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
     const std::string s = "hello, world";
@@ -163,7 +163,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a const std::string" 
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a non-const C-string and size" )
+CASE( "string_span: Allows to create a cstring_span from a non-const C-string and size" )
 {
     char s[] = "hello";
 
@@ -172,7 +172,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a non-const C-string 
     EXPECT( std::string( sv.data() ) == s );
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a non-const C-array" )
+CASE( "string_span: Allows to create a cstring_span from a non-const C-array" )
 {
     char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
@@ -181,7 +181,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a non-const C-array" 
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a non-const std::array" )
+CASE( "string_span: Allows to create a cstring_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -194,7 +194,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a non-const std::arra
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a non-const std::vector" )
+CASE( "string_span: Allows to create a cstring_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -210,7 +210,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a non-const std::vect
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cstring_span from a non-const std::string" )
+CASE( "string_span: Allows to create a cstring_span from a non-const std::string" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
     std::string s = "hello, world";
@@ -223,7 +223,7 @@ CASE( "string_span<>: Allows to create a cstring_span from a non-const std::stri
 #endif
 }
 
-CASE( "string_span<>: Allows to create a wstring_span from a non-const C-string and size" )
+CASE( "string_span: Allows to create a wstring_span from a non-const C-string and size" )
 {
     wchar_t s[] = L"hello";
 
@@ -232,7 +232,7 @@ CASE( "string_span<>: Allows to create a wstring_span from a non-const C-string 
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span<>: Allows to create a wstring_span from a non-const C-array" )
+CASE( "string_span: Allows to create a wstring_span from a non-const C-array" )
 {
     wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
@@ -241,7 +241,7 @@ CASE( "string_span<>: Allows to create a wstring_span from a non-const C-array" 
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span<>: Allows to create a wstring_span from a non-const std::array" )
+CASE( "string_span: Allows to create a wstring_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -254,7 +254,7 @@ CASE( "string_span<>: Allows to create a wstring_span from a non-const std::arra
 #endif
 }
 
-CASE( "string_span<>: Allows to create a wstring_span from a non-const std::vector" )
+CASE( "string_span: Allows to create a wstring_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -270,7 +270,7 @@ CASE( "string_span<>: Allows to create a wstring_span from a non-const std::vect
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a non-const C-string and size" )
+CASE( "string_span: Allows to create a cwstring_span from a non-const C-string and size" )
 {
     wchar_t s[] = L"hello";
 
@@ -279,7 +279,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a non-const C-string
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a non-const C-array" )
+CASE( "string_span: Allows to create a cwstring_span from a non-const C-array" )
 {
     wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
@@ -288,7 +288,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a non-const C-array"
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a non-const std::array" )
+CASE( "string_span: Allows to create a cwstring_span from a non-const std::array" )
 {
 #if gsl_HAVE_ARRAY
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -301,7 +301,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a non-const std::arr
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a non-const std::vector" )
+CASE( "string_span: Allows to create a cwstring_span from a non-const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -317,7 +317,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a non-const std::vec
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a const C-string and size" )
+CASE( "string_span: Allows to create a cwstring_span from a const C-string and size" )
 {
     const wchar_t s[] = L"hello";
 
@@ -326,7 +326,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a const C-string and
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a const C-array" )
+CASE( "string_span: Allows to create a cwstring_span from a const C-array" )
 {
     const wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
@@ -335,7 +335,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a const C-array" )
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a const std::array" )
+CASE( "string_span: Allows to create a cwstring_span from a const std::array" )
 {
 #if gsl_HAVE_ARRAY
     const std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -348,7 +348,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a const std::array" 
 #endif
 }
 
-CASE( "string_span<>: Allows to create a cwstring_span from a const std::vector" )
+CASE( "string_span: Allows to create a cwstring_span from a const std::vector" )
 {
 #if gsl_COMPILER_MSVC_VERSION != 6
 #if gsl_HAVE_INITIALIZER_LIST
@@ -364,7 +364,7 @@ CASE( "string_span<>: Allows to create a cwstring_span from a const std::vector"
 #endif
 }
 
-CASE( "string_span<>: Allows to explicitly convert from string_span to std::string" )
+CASE( "string_span: Allows to explicitly convert from string_span to std::string" )
 {
     char s[] = "hello";
 
@@ -373,7 +373,7 @@ CASE( "string_span<>: Allows to explicitly convert from string_span to std::stri
     EXPECT( to_string( sv ) == s );
 }
 
-CASE( "string_span<>: Allows to explicitly convert from cstring_span to std::string" )
+CASE( "string_span: Allows to explicitly convert from cstring_span to std::string" )
 {
     const char s[] = "hello";
 
@@ -382,7 +382,7 @@ CASE( "string_span<>: Allows to explicitly convert from cstring_span to std::str
     EXPECT( to_string( sv ) == s );
 }
 
-CASE( "string_span<>: Allows to explicitly convert from wstring_span to std::wstring" )
+CASE( "string_span: Allows to explicitly convert from wstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
 
@@ -393,7 +393,7 @@ CASE( "string_span<>: Allows to explicitly convert from wstring_span to std::wst
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
-CASE( "string_span<>: Allows to explicitly convert from cwstring_span to std::wstring" )
+CASE( "string_span: Allows to explicitly convert from cwstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
 
