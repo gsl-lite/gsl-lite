@@ -32,6 +32,7 @@
 		<Unit filename="../include/gsl/gsl-lite-vc6.h" />
 		<Unit filename="../include/gsl/gsl-lite.h" />
 		<Unit filename="../test/CMakeLists.txt" />
+		<Unit filename="../test/assert.t..cpp" />
 		<Unit filename="../test/at.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.h" />
