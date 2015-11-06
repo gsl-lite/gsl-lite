@@ -165,6 +165,7 @@ czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-sty
 cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
+as_span()                   | -       | &#10003;| &#10003;| Create a span |
 string_span<>               | &#10003;| &#10003;| &#10003;| span&lt;char> |
 wstring_span<>              | -       | &#10003;| &#10003;| span&lt;wchar_t > |
 cstring_span<>              | &#10003;| &#10003;| &#10003;| span&lt;const char> |
