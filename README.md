@@ -140,7 +140,7 @@ At default macro `Owner()` is defined for all C++ versions. This may be useful t
 
 Features
 --------
-See also section [GSL: Guideline support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#gsl-guideline-support-library) of the C++ Core Guidelines [2]. 
+See also section [GSL: Guideline support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines [2]. 
 
 Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 ----------------------------|:-------:|:-------:|:-------:|:------|
