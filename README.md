@@ -324,39 +324,39 @@ span<>: Allows building from a non-null pointer and a size
 span<>: Allows building from a C-array
 span<>: Allows building from a std::array<>
 span<>: Allows building from a container (std::vector<>)
-string_span<>: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-string_span<>: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-string_span<>: Allows to create a string_span from a non-const C-string and size
-string_span<>: Allows to create a string_span from a non-const C-array
-string_span<>: Allows to create a string_span from a non-const std::array
-string_span<>: Allows to create a string_span from a non-const std::vector
-string_span<>: ToDo: Allows to create a string_span from a non-const std::string
-string_span<>: Allows to create a cstring_span from a const C-string and size
-string_span<>: Allows to create a cstring_span from a const C-array
-string_span<>: Allows to create a cstring_span from a const std::array
-string_span<>: Allows to create a cstring_span from a const std::vector
-string_span<>: Allows to create a cstring_span from a const std::string
-string_span<>: Allows to create a cstring_span from a non-const C-string and size
-string_span<>: Allows to create a cstring_span from a non-const C-array
-string_span<>: Allows to create a cstring_span from a non-const std::array
-string_span<>: Allows to create a cstring_span from a non-const std::vector
-string_span<>: Allows to create a cstring_span from a non-const std::string
-string_span<>: Allows to create a wstring_span from a non-const C-string and size
-string_span<>: Allows to create a wstring_span from a non-const C-array
-string_span<>: Allows to create a wstring_span from a non-const std::array
-string_span<>: Allows to create a wstring_span from a non-const std::vector
-string_span<>: Allows to create a cwstring_span from a non-const C-string and size
-string_span<>: Allows to create a cwstring_span from a non-const C-array
-string_span<>: Allows to create a cwstring_span from a non-const std::array
-string_span<>: Allows to create a cwstring_span from a non-const std::vector
-string_span<>: Allows to create a cwstring_span from a const C-string and size
-string_span<>: Allows to create a cwstring_span from a const C-array
-string_span<>: Allows to create a cwstring_span from a const std::array
-string_span<>: Allows to create a cwstring_span from a const std::vector
-string_span<>: Allows to explicitly convert from string_span to std::string
-string_span<>: Allows to explicitly convert from cstring_span to std::string
-string_span<>: Allows to explicitly convert from wstring_span to std::wstring
-string_span<>: Allows to explicitly convert from cwstring_span to std::wstring
+string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_span: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_span: Allows to create a string_span from a non-const C-string and size
+string_span: Allows to create a string_span from a non-const C-array
+string_span: Allows to create a string_span from a non-const std::array
+string_span: Allows to create a string_span from a non-const std::vector
+string_span: ToDo: Allows to create a string_span from a non-const std::string
+string_span: Allows to create a cstring_span from a const C-string and size
+string_span: Allows to create a cstring_span from a const C-array
+string_span: Allows to create a cstring_span from a const std::array
+string_span: Allows to create a cstring_span from a const std::vector
+string_span: Allows to create a cstring_span from a const std::string
+string_span: Allows to create a cstring_span from a non-const C-string and size
+string_span: Allows to create a cstring_span from a non-const C-array
+string_span: Allows to create a cstring_span from a non-const std::array
+string_span: Allows to create a cstring_span from a non-const std::vector
+string_span: Allows to create a cstring_span from a non-const std::string
+string_span: Allows to create a wstring_span from a non-const C-string and size
+string_span: Allows to create a wstring_span from a non-const C-array
+string_span: Allows to create a wstring_span from a non-const std::array
+string_span: Allows to create a wstring_span from a non-const std::vector
+string_span: Allows to create a cwstring_span from a non-const C-string and size
+string_span: Allows to create a cwstring_span from a non-const C-array
+string_span: Allows to create a cwstring_span from a non-const std::array
+string_span: Allows to create a cwstring_span from a non-const std::vector
+string_span: Allows to create a cwstring_span from a const C-string and size
+string_span: Allows to create a cwstring_span from a const C-array
+string_span: Allows to create a cwstring_span from a const std::array
+string_span: Allows to create a cwstring_span from a const std::vector
+to_string(): Allows to explicitly convert from string_span to std::string
+to_string(): Allows to explicitly convert from cstring_span to std::string
+to_string(): Allows to explicitly convert from wstring_span to std::wstring
+to_string(): Allows to explicitly convert from cwstring_span to std::wstring
 ensure_z(): Disallows to build a string_span from a const C-string
 ensure_z(): Disallows to build a wstring_span from a const wide C-string
 ensure_z(): Allows to build a string_span from a non-const C-string
