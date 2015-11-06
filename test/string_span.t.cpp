@@ -364,7 +364,7 @@ CASE( "string_span: Allows to create a cwstring_span from a const std::vector" )
 #endif
 }
 
-CASE( "string_span: Allows to explicitly convert from string_span to std::string" )
+CASE( "to_string(): Allows to explicitly convert from string_span to std::string" )
 {
     char s[] = "hello";
 
@@ -373,7 +373,7 @@ CASE( "string_span: Allows to explicitly convert from string_span to std::string
     EXPECT( to_string( sv ) == s );
 }
 
-CASE( "string_span: Allows to explicitly convert from cstring_span to std::string" )
+CASE( "to_string(): Allows to explicitly convert from cstring_span to std::string" )
 {
     const char s[] = "hello";
 
@@ -382,7 +382,7 @@ CASE( "string_span: Allows to explicitly convert from cstring_span to std::strin
     EXPECT( to_string( sv ) == s );
 }
 
-CASE( "string_span: Allows to explicitly convert from wstring_span to std::wstring" )
+CASE( "to_string(): Allows to explicitly convert from wstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
 
@@ -393,7 +393,7 @@ CASE( "string_span: Allows to explicitly convert from wstring_span to std::wstri
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
-CASE( "string_span: Allows to explicitly convert from cwstring_span to std::wstring" )
+CASE( "to_string(): Allows to explicitly convert from cwstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
 
