@@ -117,7 +117,7 @@
 # define gsl_HAVE_ARRAY  1
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 9
+#if gsl_CPP11_OR_GREATER || (gsl_COMPILER_MSVC_VERSION >= 9 && _HAS_CPP0X)
 # define gsl_HAVE_CONTAINER_DATA_METHOD  1
 #endif
 
@@ -125,7 +125,7 @@
 # define gsl_HAVE_SIZED_TYPES  1
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
+#if gsl_CPP11_OR_GREATER || (gsl_COMPILER_MSVC_VERSION >= 10 && _HAS_CPP0X)
 # define gsl_HAVE_SHARED_PTR  1
 # define gsl_HAVE_UNIQUE_PTR  1
 #endif
