@@ -1,4 +1,4 @@
-// Copyright 2013, 2014 by Martin Moene
+// Copyright 2013, 2014, 2015 by Martin Moene
 //
 // lest is based on ideas by Kevlin Henney, see video at
 // http://skillsmatter.com/podcast/agile-testing/kevlin-henney-rethinking-unit-testing-in-c-plus-plus
@@ -28,13 +28,15 @@
 #include <ctime>
 
 #ifdef __clang__
+# pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
 # pragma clang diagnostic ignored "-Woverloaded-shift-op-parentheses"
+# pragma clang diagnostic ignored "-Wunused-comparison"
 # pragma clang diagnostic ignored "-Wunused-value"
 #elif defined __GNUC__
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.24.1"
+#define  lest_VERSION "1.24.3"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -81,14 +83,14 @@
 #endif
 
 #if lest_COMPILER_MSVC_VERSION == 6
-# define lest_COMPILER_IS_MSVC6
+# define lest_COMPILER_IS_MSVC6  1
 #endif
 
 #if ( __cplusplus >= 201103L ) || lest_COMPILER_MSVC_VERSION >= 12
-# define lest_CPP11_OR_GREATER
+# define lest_CPP11_OR_GREATER  1
 #endif
 
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER
 
 # include <cstdint>
 # include <random>
@@ -100,6 +102,11 @@ namespace lest
 }
 
 #else
+
+# if !defined(__clang__) && defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Weffc++"
+# endif
 
 namespace lest
 {
@@ -129,6 +136,11 @@ namespace lest
     {
       return Tie<T1, T2>( first, second );
     }
+
+# if !defined(__clang__) && defined(__GNUC__)
+#  pragma GCC diagnostic pop
+# endif
+
 }
 #endif // lest_CPP11_OR_GREATER
 
@@ -490,7 +502,7 @@ inline void inform( location where, text expr )
 
 // Expression decomposition:
 
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 inline std::string to_string( std::nullptr_t const &      ) { return "nullptr"; }
 #endif
 inline std::string to_string( std::string    const & text ) { return "\"" + text + "\"" ; }
@@ -516,7 +528,7 @@ std::string to_string( std::pair<T1,T2> const & pair )
     return oss.str();
 }
 
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER
 
 template<typename TU, std::size_t N>
 struct make_tuple_string
@@ -756,7 +768,7 @@ struct env
     text testing;
 
     env( std::ostream & os, bool pass )
-    : os( os ), pass( pass ) {}
+    : os( os ), pass( pass ), testing() {}
 
     env & operator()( text test )
     {
@@ -806,7 +818,7 @@ struct ptags : action
 {
     std::set<text> result;
 
-    ptags( std::ostream & os ) : action( os ) {}
+    ptags( std::ostream & os ) : action( os ), result() {}
 
     ptags & operator()( test testing )
     {
@@ -840,13 +852,13 @@ struct count : action
 #if lest_FEATURE_TIME
 
 #if lest_PLATFORM_IS_WINDOWS
-# ifdef lest_COMPILER_IS_MSVC6
+# if lest_COMPILER_IS_MSVC6
     typedef /*un*/signed __int64 uint64_t;
 # else
     typedef unsigned long long uint64_t;
 # endif
 #else
-# ifndef lest_CPP11_OR_GREATER
+# if ! lest_CPP11_OR_GREATER
     typedef unsigned long long uint64_t;
 # endif
 #endif
@@ -1006,7 +1018,7 @@ struct rng { int operator()( int n ) { return lest::rand() % n; } };
 
 inline void shuffle( tests & specification, options option )
 {
-#ifdef lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER
     std::shuffle( specification.begin(), specification.end(), std::mt19937( option.seed ) );
 #else
     lest::srand( option.seed );
