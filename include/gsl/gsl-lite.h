@@ -468,6 +468,7 @@ public:
     typedef T & reference;
     typedef T * pointer;
     typedef T const * const_pointer;
+    typedef T const & const_reference;
 
     typedef pointer       iterator;
     typedef const_pointer const_iterator;
@@ -621,6 +622,11 @@ public:
         return at( index );
     }
 
+    gsl_constexpr14 const_reference operator[]( size_type index ) const
+    {
+       return at( index );
+    }
+
     gsl_constexpr14 bool operator==( span const & other ) const gsl_noexcept
     {
         return  size() == other.size() 
@@ -656,6 +662,12 @@ public:
     {
         Expects( index >= 0 && index < size());
         return begin_[ index ];
+    }
+
+    gsl_constexpr14 const_reference at( size_type index ) const
+    {
+       Expects(index >= 0 && index < size());
+       return begin_[ index ];
     }
 
     gsl_constexpr14 pointer data() const gsl_noexcept
