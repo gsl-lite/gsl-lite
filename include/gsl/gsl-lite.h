@@ -666,7 +666,7 @@ public:
 
     gsl_constexpr14 const_reference at( size_type index ) const
     {
-       Expects(index >= 0 && index < size());
+       Expects( index >= 0 && index < size() );
        return begin_[ index ];
     }
 
