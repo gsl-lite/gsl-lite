@@ -3,17 +3,17 @@
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene
-// Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
-// 
-// This code is licensed under the MIT License (MIT). 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
-// THE SOFTWARE. 
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #pragma once
 
@@ -184,7 +184,7 @@
 namespace gsl {
 
 //
-// GSL.owner: ownership pointers 
+// GSL.owner: ownership pointers
 //
 #if gsl_HAVE_SHARED_PTR
   using std::unique_ptr;
@@ -200,12 +200,12 @@ namespace gsl {
 #define gsl_HAVE_OWNER_TEMPLATE  gsl_HAVE_ALIAS_TEMPLATE
 
 #if gsl_FEATURE_HAVE_OWNER_MACRO
-# if gsl_HAVE_OWNER_TEMPLATE 
+# if gsl_HAVE_OWNER_TEMPLATE
 #  define Owner(t)  ::gsl::owner<t>
 # else
 #  define Owner(t)  ::gsl::owner<t>::type
 # endif
-#endif 
+#endif
 
 //
 // GSL.assert: assertions
@@ -215,39 +215,39 @@ namespace gsl {
 
 #if gsl_CONFIG_THROWS_FOR_TESTING
 
-struct fail_fast : public std::runtime_error 
+struct fail_fast : public std::runtime_error
 {
-    fail_fast() 
+    fail_fast()
     : std::runtime_error( "GSL assertion" ) {}
-    
-    explicit fail_fast( char const * const message ) 
+
+    explicit fail_fast( char const * const message )
     : std::runtime_error( message ) {}
 };
 
-inline void fail_fast_assert( bool cond ) 
-{ 
-    if ( !cond ) 
-        throw fail_fast(); 
+inline void fail_fast_assert( bool cond )
+{
+    if ( !cond )
+        throw fail_fast();
 }
 
-inline void fail_fast_assert( bool cond, char const * const message ) 
-{ 
-    if ( !cond ) 
-        throw fail_fast( message ); 
+inline void fail_fast_assert( bool cond, char const * const message )
+{
+    if ( !cond )
+        throw fail_fast( message );
 }
 
 #else // gsl_CONFIG_THROWS_FOR_TESTING
 
-inline void fail_fast_assert( bool cond ) 
-{ 
-    if ( !cond ) 
-        std::terminate(); 
+inline void fail_fast_assert( bool cond )
+{
+    if ( !cond )
+        std::terminate();
 }
 
-inline void fail_fast_assert( bool cond, char const * const ) 
-{ 
-    if ( !cond ) 
-        std::terminate(); 
+inline void fail_fast_assert( bool cond, char const * const )
+{
+    if ( !cond )
+        std::terminate();
 }
 
 #endif // gsl_CONFIG_THROWS_FOR_TESTING
@@ -264,7 +264,7 @@ class Final_act
 public:
     explicit Final_act( Fn action ) gsl_noexcept
     : action_( std::move( action ) ) {}
-    
+
     ~Final_act() gsl_noexcept { action_(); }
 
 private:
@@ -273,14 +273,14 @@ private:
 
 template< class Fn >
 Final_act<Fn> finally( Fn const & action ) gsl_noexcept
-{ 
-    return Final_act<Fn>( action ); 
+{
+    return Final_act<Fn>( action );
 }
 
 template< class Fn >
 Final_act<Fn> finally( Fn && action ) gsl_noexcept
-{ 
-    return Final_act<Fn>( std::forward<Fn>( action ) ); 
+{
+    return Final_act<Fn>( std::forward<Fn>( action ) );
 }
 
 #else // gsl_CPP11_OR_GREATER
@@ -290,15 +290,15 @@ class Final_act
 public:
     typedef void (*Action)();
 
-    Final_act( Action action ) 
+    Final_act( Action action )
     : action_( action ) {}
 
-    ~Final_act() 
+    ~Final_act()
     {
         action_();
     }
 
-private:    
+private:
     Action action_;
 };
 
@@ -312,22 +312,22 @@ Final_act finally( Fn const & f )
 
 template< class T, class U >
 T narrow_cast( U u ) gsl_noexcept
-{ 
-    return static_cast<T>( u ); 
+{
+    return static_cast<T>( u );
 }
 
 struct narrowing_error : public std::exception {};
 
 template< class T, class U >
-T narrow( U u ) 
-{ 
-    T t = narrow_cast<T>( u ); 
-    
-    if ( static_cast<U>( t ) != u ) 
+T narrow( U u )
+{
+    T t = narrow_cast<T>( u );
+
+    if ( static_cast<U>( t ) != u )
     {
-        throw narrowing_error(); 
+        throw narrowing_error();
     }
-    return t; 
+    return t;
 }
 
 //
@@ -339,27 +339,27 @@ T narrow( U u )
 //
 
 template< class T, size_t N >
-T & at( T(&arr)[N], size_t index ) 
-{ 
-    Expects( index < N ); 
-    return arr[index]; 
+T & at( T(&arr)[N], size_t index )
+{
+    Expects( index < N );
+    return arr[index];
 }
 
 #if gsl_HAVE_ARRAY
 
 template< class T, size_t N >
-T & at( std::array<T, N> & arr, size_t index ) 
-{ 
-    Expects( index < N ); 
-    return arr[index]; 
+T & at( std::array<T, N> & arr, size_t index )
+{
+    Expects( index < N );
+    return arr[index];
 }
 #endif
 
 template< class Cont >
-typename Cont::value_type & at( Cont & cont, size_t index ) 
-{ 
-    Expects( index < cont.size() ); 
-    return cont[index]; 
+typename Cont::value_type & at( Cont & cont, size_t index )
+{
+    Expects( index < cont.size() );
+    return cont[index];
 }
 
 //
@@ -377,28 +377,28 @@ public:
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
-    template< typename U, typename Dummy = 
-        typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
+    template< typename U, typename Dummy =
+        typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
     not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
-    template< typename U, typename Dummy = 
-        typename std::enable_if<std::is_convertible<U, T>::value, void>::type > 
-    not_null & operator=( not_null<U> const & other ) 
-    { 
-        ptr_ = other.get(); 
-        return *this; 
+    template< typename U, typename Dummy =
+        typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
+    not_null & operator=( not_null<U> const & other )
+    {
+        ptr_ = other.get();
+        return *this;
     }
 
 #else
 
-    template< typename U > 
+    template< typename U >
     not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
-    template< typename U > 
-    not_null & operator=( not_null<U> const & other ) 
-    { 
-        ptr_ = other.get(); 
-        return *this; 
+    template< typename U >
+    not_null & operator=( not_null<U> const & other )
+    {
+        ptr_ = other.get();
+        return *this;
     }
 #endif
 
@@ -412,15 +412,15 @@ private:
     not_null & operator=( int );
 
 public:
-    T get() const 
+    T get() const
     {
 #if gsl_HAVE_NULLPTR && gsl_COMPILER_MSVC_VERSION > 0
         // The assume() should help the optimizer:
         __assume( ptr_ != nullptr );
 #endif
         return ptr_;
-    } 
-    
+    }
+
          operator T() const { return get(); }
     T    operator->() const { return get(); }
 
@@ -460,7 +460,7 @@ template< class T >
 class span
 {
     template< class U > friend class span;
-   
+
 public:
     typedef size_t size_type;
 
@@ -468,10 +468,11 @@ public:
     typedef T & reference;
     typedef T * pointer;
     typedef T const * const_pointer;
+    typedef T const & const_reference;
 
     typedef pointer       iterator;
     typedef const_pointer const_iterator;
-    
+
 #if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
     typedef std::reverse_iterator< iterator, T >             reverse_iterator;
     typedef std::reverse_iterator< const_iterator, const T > const_reverse_iterator;
@@ -480,7 +481,7 @@ public:
     typedef std::reverse_iterator< const_iterator >          const_reverse_iterator;
 #endif
 
-    typedef typename std::iterator_traits< iterator >::difference_type difference_type;    
+    typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
     gsl_constexpr14 span()
         : begin_( NULL )
@@ -496,7 +497,7 @@ public:
     {
         Expects( size == 0 );
     }
-#endif    
+#endif
 
     gsl_constexpr14 span( pointer begin, pointer end )
         : begin_( begin )
@@ -528,14 +529,14 @@ public:
 
 #if gsl_HAVE_ARRAY
     template< class U, size_t N >
-    gsl_constexpr14 span( std::array< U, N > & arr ) 
+    gsl_constexpr14 span( std::array< U, N > & arr )
         : begin_( arr.data() )
         , end_  ( arr.data() + N )
     {}
 #endif
 
     template< class Cont >
-    gsl_constexpr14 span( Cont & cont ) 
+    gsl_constexpr14 span( Cont & cont )
 #if gsl_HAVE_CONTAINER_DATA_METHOD
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
@@ -562,12 +563,12 @@ public:
 
     span & operator=( span other )
     {
-        other.swap( *this ); 
+        other.swap( *this );
         return *this;
     }
 
 #if 0
-    // Converting from other span ?    
+    // Converting from other span ?
     template< typename U > operator=();
 #endif
 
@@ -621,30 +622,35 @@ public:
         return at( index );
     }
 
-    gsl_constexpr14 bool operator==( span const & other ) const gsl_noexcept
+    gsl_constexpr14 const_reference operator[]( size_type index ) const
     {
-        return  size() == other.size() 
-            && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
+       return at( index );
     }
 
-    gsl_constexpr14 bool operator!=( span const & other ) const gsl_noexcept 
-    { 
-        return !( *this == other ); 
+    gsl_constexpr14 bool operator==( span const & other ) const gsl_noexcept
+    {
+        return  size() == other.size()
+            && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );
+    }
+
+    gsl_constexpr14 bool operator!=( span const & other ) const gsl_noexcept
+    {
+        return !( *this == other );
     }
 
     gsl_constexpr14 bool operator< ( span const & other ) const gsl_noexcept
-    { 
-        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
+    {
+        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() );
     }
 
     gsl_constexpr14 bool operator<=( span const & other ) const gsl_noexcept
-    { 
-        return !( other < *this ); 
+    {
+        return !( other < *this );
     }
 
     gsl_constexpr14 bool operator> ( span const & other ) const gsl_noexcept
-    { 
-        return ( other < *this ); 
+    {
+        return ( other < *this );
     }
 
     gsl_constexpr14 bool operator>=( span const & other ) const gsl_noexcept
@@ -656,6 +662,12 @@ public:
     {
         Expects( index >= 0 && index < size());
         return begin_[ index ];
+    }
+
+    gsl_constexpr14 const_reference at( size_type index ) const
+    {
+       Expects(index >= 0 && index < size());
+       return begin_[ index ];
     }
 
     gsl_constexpr14 pointer data() const gsl_noexcept
@@ -756,7 +768,7 @@ gsl_constexpr14 span<T> as_span( T * begin, size_t size )
 
 template< typename T, size_t N >
 gsl_constexpr14 span<T> as_span( T (&arr)[N] )
-{ 
+{
     return span<T>( arr, N );
 }
 
@@ -770,14 +782,14 @@ gsl_constexpr14 span<T> as_span( std::array<T,N> & arr )
 
 #if gsl_HAVE_AUTO
 template< class Cont >
-gsl_constexpr14 auto as_span( Cont & cont ) ->  span< typename Cont::value_type > 
-{ 
+gsl_constexpr14 auto as_span( Cont & cont ) ->  span< typename Cont::value_type >
+{
     return span< typename Cont::value_type >( cont );
 }
 #else
 template< class T >
 span<T> as_span( std::vector<T> & cont )
-{ 
+{
     return span<T>( cont );
 }
 #endif
@@ -819,7 +831,7 @@ inline std::wstring to_string( cwstring_span const & view )
 }
 
 //
-// ensure_sentinel() 
+// ensure_sentinel()
 //
 // Provides a way to obtain a span from a contiguous sequence
 // that ends with a (non-inclusive) sentinel value.
@@ -833,14 +845,14 @@ static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<Size
 {
     typedef T * pointer;
     typedef typename std::iterator_traits<pointer>::difference_type difference_type;
-    
+
     pointer cur = seq;
 
-    while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel ) 
+    while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel )
         ++cur;
-    
+
     Expects( *cur == Sentinel );
-    
+
     return span<T>( seq, cur - seq );
 }
 } // namespace detail
@@ -858,15 +870,15 @@ inline span<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t
 }
 
 template< class T, size_t N >
-span<T> ensure_z( T (&sz)[N] ) 
-{ 
-    return ensure_z( &sz[0], N ); 
+span<T> ensure_z( T (&sz)[N] )
+{
+    return ensure_z( &sz[0], N );
 }
 
 # if gsl_HAVE_TYPE_TRAITS
 
 template< class Cont >
-span< typename std::remove_pointer<typename Cont::pointer>::type > 
+span< typename std::remove_pointer<typename Cont::pointer>::type >
 ensure_z( Cont& cont )
 {
     return ensure_z( cont.data(), cont.length() );
