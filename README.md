@@ -293,6 +293,8 @@ span<>: Allows construction from a std::array<>
 span<>: Allows construction from a container (std::vector<>)
 span<>: Allows construction from another view of the same type
 span<>: Allows assignment from another view of the same type
+span<>: Allows move-construction from another view of the same type
+span<>: Allows move-assignment from another view of the same type
 span<>: Allows forward iteration
 span<>: Allows const forward iteration
 span<>: Allows reverse iteration

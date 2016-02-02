@@ -1,5 +1,10 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03
 
+version 0.1.0 2016-02-02
+
+Added move-construction and move-assignment to span<>.
+
+
 version 0.0 2015-09-25
 
 Initial release.

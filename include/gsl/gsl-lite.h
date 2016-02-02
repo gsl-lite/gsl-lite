@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.0.0"
+#define  gsl_lite_VERSION "0.1.0"
 
 // Configuration:
 
@@ -92,7 +92,7 @@
 #endif
 
 #if gsl_CPP11_OR_GREATER
-# define gsl_HAVE_IS_DEFAULT_CTOR  1
+# define gsl_HAVE_IS_DEFAULT  1
 #endif
 
 #if gsl_CPP11_OR_GREATER
@@ -546,7 +546,8 @@ public:
 #endif
     {}
 
-#if gsl_HAVE_IS_DEFAULT_CTOR
+#if gsl_HAVE_IS_DEFAULT
+    gsl_constexpr14 span( span && ) = default;
     gsl_constexpr14 span( span const & ) = default;
 #else
     gsl_constexpr14 span( span const & other )
@@ -561,11 +562,16 @@ public:
         , end_  ( other.end() )
     {}
 
+#if gsl_HAVE_IS_DEFAULT
+    span & operator=( span && ) = default;
+    span & operator=( span const & ) = default;
+#else
     span & operator=( span other )
     {
         other.swap( *this );
         return *this;
     }
+#endif
 
 #if 0
     // Converting from other span ?
