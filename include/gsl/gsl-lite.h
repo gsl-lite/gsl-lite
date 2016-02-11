@@ -505,7 +505,7 @@ public:
         Expects( begin <= end );
     }
 
-    gsl_constexpr14 span( pointer & data, size_type size )
+    gsl_constexpr14 span( pointer data, size_type size )
         : begin_( data )
         , end_  ( data + size )
     {
