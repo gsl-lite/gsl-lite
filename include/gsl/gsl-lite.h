@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.1.0"
+#define  gsl_lite_VERSION "0.2.0"
 
 // Configuration:
 
