@@ -287,7 +287,8 @@ span<>: Allows construction from a nullptr and a zero size (C++11)
 span<>: Allows construction from a l-value (C++11)
 span<>: Allows construction from two pointers
 span<>: Allows construction from a non-null pointer and a size
-span<>: Allows construction from a any pointer and a zero size
+span<>: Allows construction from a temporary pointer and a size
+span<>: Allows construction from any pointer and a zero size
 span<>: Allows construction from a C-array
 span<>: Allows construction from a C-array with size
 span<>: Allows construction from a std::array<> (C++11)

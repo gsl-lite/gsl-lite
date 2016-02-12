@@ -116,7 +116,16 @@ CASE( "span<>: Allows construction from a non-null pointer and a size" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows construction from a any pointer and a zero size" )
+CASE( "span<>: Allows construction from a temporary pointer and a size" )
+{
+    int x = 42;
+
+    span<int> v( &x, 1 );
+
+    EXPECT( std::equal( v.begin(), v.end(), &x ) );
+}
+
+CASE( "span<>: Allows construction from any pointer and a zero size" )
 {
     struct F {
         typedef span<int>::size_type size_type;
