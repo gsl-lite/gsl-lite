@@ -19,6 +19,15 @@
 
 namespace {
 
+CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+{
+#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+# if gsl_HAVE_IS_DELETE
+    span<int> v = 42;
+# endif
+#endif
+}
+
 CASE( "span<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -68,13 +77,24 @@ CASE( "span<>: Allows default construction" )
     EXPECT( v.size() == size_t( 0 ) );
 }
 
-CASE( "span<>: Allows construction from a nullptr and a zero size" )
+CASE( "span<>: Allows construction from a nullptr and a zero size (C++11)" )
 {
 #if gsl_HAVE_NULLPTR
     span<int> v( nullptr, 0 );
     EXPECT( v.size() == size_t( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
+#endif
+}
+
+CASE( "span<>: Allows construction from a l-value (C++11)" )
+{
+#if gsl_HAVE_IS_DELETE
+    int x;
+    span<int> v( x );
+    EXPECT( v.size() == size_t( 1 ) );
+#else
+    EXPECT( !!"=delete is not available (no C++11)" );
 #endif
 }
 
@@ -135,7 +155,7 @@ CASE( "span<>: Allows construction from a C-array with size" )
 #endif
 }
 
-CASE( "span<>: Allows construction from a std::array<>" )
+CASE( "span<>: Allows construction from a std::array<> (C++11)" )
 {
 # if gsl_HAVE_ARRAY
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
@@ -182,7 +202,7 @@ CASE( "span<>: Allows assignment from another view of the same type" )
 
 #if gsl_CPP11_OR_GREATER
 
-CASE( "span<>: Allows move-construction from another view of the same type" )
+CASE( "span<>: Allows move-construction from another view of the same type (C++11)" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -191,7 +211,7 @@ CASE( "span<>: Allows move-construction from another view of the same type" )
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
-CASE( "span<>: Allows move-assignment from another view of the same type" )
+CASE( "span<>: Allows move-assignment from another view of the same type (C++11)" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<int> w;
@@ -611,7 +631,7 @@ CASE( "span<>: Allows building from a C-array" )
 #endif
 }
 
-CASE( "span<>: Allows building from a std::array<>" )
+CASE( "span<>: Allows building from a std::array<> (C++11)" )
 {
 # if gsl_HAVE_ARRAY
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};

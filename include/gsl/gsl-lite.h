@@ -77,6 +77,8 @@
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
 # define gsl_HAVE_ENUM_CLASS  1
+# define gsl_HAVE_IS_DEFAULT  1
+# define gsl_HAVE_IS_DELETE  1
 #endif
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
@@ -88,7 +90,6 @@
 # define gsl_HAVE_CONSTEXPR_11  1
 # define gsl_HAVE_EXPLICIT_CONVERSION  1
 # define gsl_HAVE_INITIALIZER_LIST  1
-# define gsl_HAVE_IS_DEFAULT  1
 # define gsl_HAVE_NOEXCEPT  1
 #endif
 
@@ -484,6 +485,14 @@ public:
     {
         Expects( size == 0 );
     }
+#endif
+
+#if gsl_HAVE_IS_DELETE
+    gsl_constexpr14 span( reference data )
+        : span( &data, 1 )
+    {}
+
+    gsl_constexpr14 span( value_type && ) = delete;
 #endif
 
     gsl_constexpr14 span( pointer begin, pointer end )

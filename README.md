@@ -276,24 +276,26 @@ not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
+span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 span<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 span<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 span<>: Terminates construction from a nullptr and a non-zero size
 span<>: Terminates construction from two pointers in the wrong order
 span<>: Terminates construction from a null pointer and a non-zero size
 span<>: Allows default construction
-span<>: Allows construction from a nullptr and a zero size
+span<>: Allows construction from a nullptr and a zero size (C++11)
+span<>: Allows construction from a l-value (C++11)
 span<>: Allows construction from two pointers
 span<>: Allows construction from a non-null pointer and a size
 span<>: Allows construction from a any pointer and a zero size
 span<>: Allows construction from a C-array
 span<>: Allows construction from a C-array with size
-span<>: Allows construction from a std::array<>
+span<>: Allows construction from a std::array<> (C++11)
 span<>: Allows construction from a container (std::vector<>)
 span<>: Allows construction from another view of the same type
 span<>: Allows assignment from another view of the same type
-span<>: Allows move-construction from another view of the same type
-span<>: Allows move-assignment from another view of the same type
+span<>: Allows move-construction from another view of the same type (C++11)
+span<>: Allows move-assignment from another view of the same type (C++11)
 span<>: Allows forward iteration
 span<>: Allows const forward iteration
 span<>: Allows reverse iteration
@@ -323,7 +325,7 @@ span<>: Allows to change the elements from a view of another type
 span<>: Allows building from two pointers
 span<>: Allows building from a non-null pointer and a size
 span<>: Allows building from a C-array
-span<>: Allows building from a std::array<>
+span<>: Allows building from a std::array<> (C++11)
 span<>: Allows building from a container (std::vector<>)
 string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
