@@ -149,7 +149,7 @@ CASE( "span<>: Allows construction from a C-array" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows construction from a C-array with size" )
+CASE( "span<>: Allows construction from a C-array with size via decay to pointer (potentially dangerous)" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 

@@ -290,7 +290,7 @@ span<>: Allows construction from a non-null pointer and a size
 span<>: Allows construction from a temporary pointer and a size
 span<>: Allows construction from any pointer and a zero size
 span<>: Allows construction from a C-array
-span<>: Allows construction from a C-array with size
+span<>: Allows construction from a C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows construction from a std::array<> (C++11)
 span<>: Allows construction from a container (std::vector<>)
 span<>: Allows construction from another view of the same type
