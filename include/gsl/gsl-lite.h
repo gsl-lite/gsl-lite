@@ -51,23 +51,18 @@
 
 // Compiler detection:
 
+#define gsl_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
+#define gsl_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
+
+// half-open range [lo..hi):
+#define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
+
 #if defined(_MSC_VER)
 # define gsl_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
 #else
 # define gsl_COMPILER_MSVC_VERSION   0
 # define gsl_COMPILER_NON_MSVC       1
 #endif
-
-#if ( __cplusplus >= 201103L )
-# define gsl_CPP11_OR_GREATER  1
-#endif
-
-#if ( __cplusplus >= 201402L )
-# define gsl_CPP14_OR_GREATER  1
-#endif
-
-// half-open range [lo..hi):
-#define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
 // Presence of C++11 language features:
 
