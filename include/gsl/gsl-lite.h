@@ -506,7 +506,7 @@ public:
         Expects( begin <= end );
     }
 
-    gsl_constexpr14 span( pointer & data, size_type size )
+    gsl_constexpr14 span( pointer data, size_type size )
         : begin_( data )
         , end_  ( data + size )
     {
@@ -518,14 +518,6 @@ public:
         : begin_( arr )
         , end_  ( arr + N )
     {}
-
-    template< class U, size_t N >
-    gsl_constexpr14 span( U (&arr)[N], size_type size )
-        : begin_( arr )
-        , end_  ( arr + size )
-    {
-        Expects( size <= N );
-    }
 
 #if gsl_HAVE_ARRAY
     template< class U, size_t N >

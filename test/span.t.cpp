@@ -62,17 +62,6 @@ CASE( "span<>: Terminates construction from a null pointer and a non-zero size" 
     EXPECT_THROWS( F::blow() );
 }
 
-CASE( "span<>: Terminates construction from a C-array with size exceeding array length" )
-{
-#if gsl_COMPILER_MSVC_VERSION != 6
-    struct F { static void blow() { int arr[] = { 1, 2, 3, }; span<int> v( arr, 7 ); } };
-
-    EXPECT_THROWS( F::blow() );
-#else
-    EXPECT( !!"not available for VC6" );
-#endif
-}
-
 CASE( "span<>: Allows default construction" )
 {
     span<int> v;
