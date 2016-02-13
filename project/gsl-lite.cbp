@@ -45,6 +45,8 @@
 		<Unit filename="../test/span.t.cpp" />
 		<Unit filename="../test/string_span.t.cpp" />
 		<Unit filename="../test/t.bat" />
+		<Unit filename="../test/tg-all.bat" />
+		<Unit filename="../test/tg.bat" />
 		<Unit filename="../test/util.t.cpp" />
 		<Extensions>
 			<code_completion />
