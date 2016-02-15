@@ -68,24 +68,22 @@
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_AUTO  1
-#endif
-
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
-# define gsl_HAVE_ENUM_CLASS  1
-# define gsl_HAVE_IS_DEFAULT  1
-# define gsl_HAVE_IS_DELETE  1
-#endif
-
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_NULLPTR  1
 #endif
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
 # define gsl_HAVE_ALIAS_TEMPLATE  1
 # define gsl_HAVE_CONSTEXPR_11  1
+# define gsl_HAVE_ENUM_CLASS  1
 # define gsl_HAVE_EXPLICIT_CONVERSION  1
 # define gsl_HAVE_INITIALIZER_LIST  1
+# define gsl_HAVE_IS_DEFAULT  1
+# define gsl_HAVE_IS_DELETE  1
 # define gsl_HAVE_NOEXCEPT  1
+#endif
+
+#if gsl_CPP11_OR_GREATER
+// see above
 #endif
 
 // Presence of C++14 language features:
