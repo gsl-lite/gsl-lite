@@ -1,10 +1,15 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03
 
+version 0.2.0 2016-02-02
+
+- Removed constructor span( U (&arr)[N], size_type size ), not part of M-GSL and in favour of:
+- Changed constructor to span( pointer data, size_type size ), removing & from pointer & data (Thanks to @realzhtw).
+- Added construction from an l-value for C++11 onwards.
+
 version 0.1.0 2016-02-02
 
-Added move-construction and move-assignment to span<>.
-
+- Added move-construction and move-assignment to span<>.
 
 version 0.0 2015-09-25
 
-Initial release.
+- Initial release.
