@@ -3,17 +3,17 @@
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene
-// Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
-// 
-// This code is licensed under the MIT License (MIT). 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
-// THE SOFTWARE. 
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #include "gsl-lite.t.h"
 #include <functional>
@@ -76,24 +76,29 @@ CASE( "finally: Allows pointer to function" )
 #endif
 }
 
-CASE( "narrow_cast<>: Allows narrowing without loss" )
+CASE( "narrow_cast<>: Allows narrowing without value loss" )
 {
     EXPECT( narrow_cast<char>( 120 ) == 120 );
 }
 
-CASE( "narrow_cast<>: Allows narrowing with loss" )
+CASE( "narrow_cast<>: Allows narrowing with value loss" )
 {
     EXPECT( narrow_cast<unsigned char>( 300 ) == 44 );
 }
 
-CASE( "narrow<>(): Allows narrowing without loss" )
+CASE( "narrow<>(): Allows narrowing without value loss" )
 {
     EXPECT( narrow<char>( 120 ) == 120 );
 }
 
-CASE( "narrow<>(): Terminates when narrowing with loss" )
+CASE( "narrow<>(): Terminates when narrowing with value loss" )
 {
     EXPECT_THROWS_AS( narrow<char>( 300 ), narrowing_error );
+}
+
+CASE( "narrow<>(): Terminates when narrowing with sign loss" )
+{
+    EXPECT_THROWS_AS( narrow<unsigned>( -42 ), narrowing_error );
 }
 
 }

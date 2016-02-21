@@ -374,8 +374,9 @@ ensure_z(): Allows to specify ultimate location of the sentinel and ensure its p
 finally: Allows lambda to run
 finally: Allows function with bind
 finally: Allows pointer to function
-narrow_cast<>: Allows narrowing without loss
-narrow_cast<>: Allows narrowing with loss
-narrow<>(): Allows narrowing without loss
-narrow<>(): Terminates when narrowing with loss
+narrow_cast<>: Allows narrowing without value loss
+narrow_cast<>: Allows narrowing with value loss
+narrow<>(): Allows narrowing without value loss
+narrow<>(): Terminates when narrowing with value loss
+narrow<>(): Terminates when narrowing with sign loss
 ```

@@ -299,12 +299,32 @@ T narrow_cast( U u ) gsl_noexcept
 
 struct narrowing_error : public std::exception {};
 
+#if gsl_HAVE_TYPE_TRAITS
+
+namespace details
+{
+    template< class T, class U >
+    struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value>
+    {};
+}
+#endif
+
 template< class T, class U >
 T narrow( U u )
 {
     T t = narrow_cast<T>( u );
 
     if ( static_cast<U>( t ) != u )
+    {
+        throw narrowing_error();
+    }
+
+#if gsl_HAVE_TYPE_TRAITS
+    if ( ! details::is_same_signedness<T, U>::value && ( ( t < T{} ) != ( u < U{} ) ) )
+#else
+    // Don't assume T() works:
+    if ( ( t < 0 ) != ( u < 0 ) )
+#endif
     {
         throw narrowing_error();
     }
