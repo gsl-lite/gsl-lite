@@ -25,18 +25,6 @@ using namespace gsl;
 
 extern lest::tests & specification();
 
-namespace lest { 
-
-#if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 10, 12 )
-
-inline std::string to_string( nullptr_t const & ) 
-{ 
-    return "nullptr";
-}
-#endif 
-
-} // namespace lest
-
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
 namespace std {
 #else

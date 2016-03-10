@@ -22,6 +22,8 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="../.gitattributes" />
+		<Unit filename="../.gitignore" />
 		<Unit filename="../.travis.yml" />
 		<Unit filename="../CHANGES.txt" />
 		<Unit filename="../CMakeLists.txt" />
@@ -29,10 +31,11 @@
 		<Unit filename="../README.md" />
 		<Unit filename="../example/01-basic.cpp" />
 		<Unit filename="../example/02-span.cpp" />
+		<Unit filename="../include/gsl.h" />
 		<Unit filename="../include/gsl/gsl-lite-vc6.h" />
 		<Unit filename="../include/gsl/gsl-lite.h" />
 		<Unit filename="../test/CMakeLists.txt" />
-		<Unit filename="../test/assert.t..cpp" />
+		<Unit filename="../test/assert.t.cpp" />
 		<Unit filename="../test/at.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.h" />
@@ -42,6 +45,8 @@
 		<Unit filename="../test/span.t.cpp" />
 		<Unit filename="../test/string_span.t.cpp" />
 		<Unit filename="../test/t.bat" />
+		<Unit filename="../test/tg-all.bat" />
+		<Unit filename="../test/tg.bat" />
 		<Unit filename="../test/util.t.cpp" />
 		<Extensions>
 			<code_completion />
