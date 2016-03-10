@@ -542,8 +542,8 @@ public:
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
 #else
-        : begin_( cont.empty() ? NULL : &cont[0] )
-        , end_  ( cont.empty() ? NULL : &cont[0] + cont.size() )
+        : begin_( cont.size() == 0 ? NULL : &cont[0] )
+        , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
 #endif
     {}
 
