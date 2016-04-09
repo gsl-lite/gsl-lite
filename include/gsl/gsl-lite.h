@@ -57,7 +57,7 @@
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 # define gsl_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
 #else
 # define gsl_COMPILER_MSVC_VERSION   0
@@ -536,12 +536,15 @@ public:
     {}
 #endif
 
-    template< class Cont >
-    gsl_constexpr14 span( Cont & cont )
 #if gsl_HAVE_CONTAINER_DATA_METHOD
+    // SFINAE enable only if Cont has a data() member function
+    template< class Cont, typename = decltype(std::declval<Cont>().data()) >
+    gsl_constexpr14 span( Cont & cont )
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
 #else
+    template< class Cont >
+    gsl_constexpr14 span( Cont & cont )
         : begin_( cont.size() == 0 ? NULL : &cont[0] )
         , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
 #endif
