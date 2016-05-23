@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.2.1"
+#define  gsl_lite_VERSION "0.2.2"
 
 // Configuration:
 
@@ -378,7 +378,7 @@ public:
     not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != NULL ); return *this; }
 
     not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
-    not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; }
+    not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
