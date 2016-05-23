@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.2.0"
+#define  gsl_lite_VERSION "0.2.1"
 
 // Configuration:
 
@@ -69,6 +69,10 @@
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
 # define gsl_HAVE_AUTO  1
 # define gsl_HAVE_NULLPTR  1
+#endif
+
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
+# define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
 #endif
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
@@ -536,7 +540,7 @@ public:
     {}
 #endif
 
-#if gsl_HAVE_CONTAINER_DATA_METHOD
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD
     // SFINAE enable only if Cont has a data() member function
     template< class Cont, typename = decltype(std::declval<Cont>().data()) >
     gsl_constexpr14 span( Cont & cont )
