@@ -1,5 +1,13 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03
 
+version 0.2.1 2016-05-23
+
+- Added several tests.
+- Added definition of gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG.
+- Prevented using default function template argument in span for pre-VS2013 (VC12).
+- Fixed compile error with clang targeting MSVC, PR #17 (Thanks to @ned14).
+- Fixed data access of empty container, PR #16 (Thanks to @realzhtw).
+
 version 0.2.0 2016-02-02
 
 - Removed constructor span( U (&arr)[N], size_type size ), not part of M-GSL and in favour of:
