@@ -1,5 +1,9 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03
 
+version 0.2.2 2016-05-23
+
+- Fixed missing return in not_null copy-assignment (thanks to PVS-Studio). 
+
 version 0.2.1 2016-05-23
 
 - Added several tests.
