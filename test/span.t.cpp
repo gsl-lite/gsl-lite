@@ -248,6 +248,16 @@ CASE( "span<>: Allows construction from another view of the same type" )
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
+CASE( "span<>: Allows construction from another view of a compatible type" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+    span<int> v( arr );
+
+    span<const volatile int> w( v );
+
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+}
+
 CASE( "span<>: Allows assignment from another view of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };

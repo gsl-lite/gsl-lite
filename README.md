@@ -298,6 +298,7 @@ span<>: Allows construction from a C-array with size via decay to pointer (poten
 span<>: Allows construction from a std::array<> (C++11)
 span<>: Allows construction from a container (std::vector<>)
 span<>: Allows construction from another view of the same type
+span<>: Allows construction from another view of a compatible type
 span<>: Allows assignment from another view of the same type
 span<>: Allows creation of a sub span of the first n elements
 span<>: Allows creation of a sub span of the last n elements
