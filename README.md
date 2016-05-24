@@ -297,9 +297,9 @@ span<>: Allows construction from a C-array
 span<>: Allows construction from a C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows construction from a std::array<> (C++11)
 span<>: Allows construction from a container (std::vector<>)
-span<>: Allows construction from another view of the same type
-span<>: Allows construction from another view of a compatible type
-span<>: Allows assignment from another view of the same type
+span<>: Allows construction from another span of the same type
+span<>: Allows construction from another span of a compatible type
+span<>: Allows assignment from another span of the same type
 span<>: Allows creation of a sub span of the first n elements
 span<>: Allows creation of a sub span of the last n elements
 span<>: Allows creation of a sub span starting at a given offset
@@ -312,24 +312,24 @@ span<>: Allows conversion to bool (true if non-empty)
 span<>: Allows element access via array indexing
 span<>: Allows element access via at()
 span<>: Allows element access via data()
-span<>: Allows to compare equal to another view of the same type
-span<>: Allows to compare unequal to another view of the same type
-span<>: Allows to compare less than another view of the same type
-span<>: Allows to compare less than or equal to another view of the same type
-span<>: Allows to compare greater than another view of the same type
-span<>: Allows to compare greater than or equal to another view of the same type
-span<>: Allows to test for empty view via empty(), empty case
-span<>: Allows to test for empty view via empty(), non-empty case
+span<>: Allows to compare equal to another span of the same type
+span<>: Allows to compare unequal to another span of the same type
+span<>: Allows to compare less than another span of the same type
+span<>: Allows to compare less than or equal to another span of the same type
+span<>: Allows to compare greater than another span of the same type
+span<>: Allows to compare greater than or equal to another span of the same type
+span<>: Allows to test for empty span via empty(), empty case
+span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain number of elements via size()
 span<>: Allows to obtain number of elements via length()
 span<>: Allows to obtain number of elements via used_length()
 span<>: Allows to obtain number of bytes via bytes()
 span<>: Allows to obtain number of bytes via used_bytes()
-span<>: Allows to swap with another view of the same type
+span<>: Allows to swap with another span of the same type
 span<>: Allows to view the elements as read-only bytes
 span<>: Allows to view and change the elements as writable bytes
-span<>: Allows to view the elements as a view of another type
-span<>: Allows to change the elements from a view of another type
+span<>: Allows to view the elements as a span of another type
+span<>: Allows to change the elements from a span of another type
 span<>: Allows building from two pointers
 span<>: Allows building from a non-null pointer and a size
 span<>: Allows building from a C-array

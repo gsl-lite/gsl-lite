@@ -238,7 +238,7 @@ CASE( "span<>: Allows construction from a container (std::vector<>)" )
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-CASE( "span<>: Allows construction from another view of the same type" )
+CASE( "span<>: Allows construction from another span of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<int> v( arr );
@@ -248,7 +248,7 @@ CASE( "span<>: Allows construction from another view of the same type" )
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
-CASE( "span<>: Allows construction from another view of a compatible type" )
+CASE( "span<>: Allows construction from another span of a compatible type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<int> v( arr );
@@ -258,7 +258,7 @@ CASE( "span<>: Allows construction from another view of a compatible type" )
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
-CASE( "span<>: Allows assignment from another view of the same type" )
+CASE( "span<>: Allows assignment from another span of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<int> v( arr );
@@ -271,7 +271,7 @@ CASE( "span<>: Allows assignment from another view of the same type" )
 
 #if gsl_CPP11_OR_GREATER
 
-CASE( "span<>: Allows move-construction from another view of the same type (C++11)" )
+CASE( "span<>: Allows move-construction from another span of the same type (C++11)" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -280,7 +280,7 @@ CASE( "span<>: Allows move-construction from another view of the same type (C++1
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 
-CASE( "span<>: Allows move-assignment from another view of the same type (C++11)" )
+CASE( "span<>: Allows move-assignment from another span of the same type (C++11)" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<int> w;
@@ -427,7 +427,7 @@ CASE( "span<>: Allows element access via data()" )
     }
 }
 
-CASE( "span<>: Allows to compare equal to another view of the same type" )
+CASE( "span<>: Allows to compare equal to another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
     span<int> va( a );
@@ -439,7 +439,7 @@ CASE( "span<>: Allows to compare equal to another view of the same type" )
     EXPECT_NOT( (vc == va) );
 }
 
-CASE( "span<>: Allows to compare unequal to another view of the same type" )
+CASE( "span<>: Allows to compare unequal to another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
     span<int> va( a );
@@ -451,7 +451,7 @@ CASE( "span<>: Allows to compare unequal to another view of the same type" )
     EXPECT(     (vc != va) );
 }
 
-CASE( "span<>: Allows to compare less than another view of the same type" )
+CASE( "span<>: Allows to compare less than another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
     span<int> va( a );
@@ -463,7 +463,7 @@ CASE( "span<>: Allows to compare less than another view of the same type" )
     EXPECT(     (va < vc) );
 }
 
-CASE( "span<>: Allows to compare less than or equal to another view of the same type" )
+CASE( "span<>: Allows to compare less than or equal to another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
     span<int> va( a );
@@ -475,7 +475,7 @@ CASE( "span<>: Allows to compare less than or equal to another view of the same 
     EXPECT(     (va <= vc) );
 }
 
-CASE( "span<>: Allows to compare greater than another view of the same type" )
+CASE( "span<>: Allows to compare greater than another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
     span<int> va( a );
@@ -487,7 +487,7 @@ CASE( "span<>: Allows to compare greater than another view of the same type" )
     EXPECT(     (vc > va) );
 }
 
-CASE( "span<>: Allows to compare greater than or equal to another view of the same type" )
+CASE( "span<>: Allows to compare greater than or equal to another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
     span<int> va( a );
@@ -499,14 +499,14 @@ CASE( "span<>: Allows to compare greater than or equal to another view of the sa
     EXPECT(     (vc >= va) );
 }
 
-CASE( "span<>: Allows to test for empty view via empty(), empty case" )
+CASE( "span<>: Allows to test for empty span via empty(), empty case" )
 {
     span<int> v;
 
     EXPECT( v.empty() );
 }
 
-CASE( "span<>: Allows to test for empty view via empty(), non-empty case" )
+CASE( "span<>: Allows to test for empty span via empty(), non-empty case" )
 {
     int a[] = { 1 };
     span<int> v( a );
@@ -584,7 +584,7 @@ CASE( "span<>: Allows to obtain number of bytes via used_bytes()" )
     EXPECT(  z.used_bytes() == 0 * sizeof(int) );
 }
 
-CASE( "span<>: Allows to swap with another view of the same type" )
+CASE( "span<>: Allows to swap with another span of the same type" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
@@ -660,7 +660,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes" )
     {for ( size_t i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
 }
 
-CASE( "span<>: Allows to view the elements as a view of another type" )
+CASE( "span<>: Allows to view the elements as a span of another type" )
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type1;
@@ -689,7 +689,7 @@ CASE( "span<>: Allows to view the elements as a view of another type" )
     EXPECT( vb[1] == b[1] );
 }
 
-CASE( "span<>: Allows to change the elements from a view of another type" )
+CASE( "span<>: Allows to change the elements from a span of another type" )
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type1;
