@@ -71,6 +71,28 @@ CASE( "span<>: Terminates construction from a null pointer and a non-zero size" 
     EXPECT_THROWS( F::blow() );
 }
 
+CASE( "span<>: Terminates creation of a sub span outside the span" )
+{
+    struct F { 
+    static void blow_offset() 
+    { 
+        int arr[] = { 1, 2, 3, };
+        span<int> v( arr );
+
+        (void) v.subspan( 3 );
+    }
+    static void blow_count() 
+    { 
+        int arr[] = { 1, 2, 3, };
+        span<int> v( arr );
+
+        (void) v.subspan( 1, 3 );
+    }};
+
+    EXPECT_THROWS( F::blow_offset() );
+    EXPECT_THROWS( F::blow_count()  );
+}
+
 CASE( "span<>: Allows default construction" )
 {
     span<int> v;
@@ -230,6 +252,31 @@ CASE( "span<>: Allows move-assignment from another view of the same type (C++11)
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 #endif
+
+CASE( "span<>: Allows creation of a sub span starting at a given offset" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int> v( arr );
+    size_t offset = 1;
+
+    span<int> s = v.subspan( offset );
+
+    EXPECT( s.size() == v.size() - offset );
+    EXPECT( std::equal( s.begin(), s.end(), arr + offset ) );
+}
+
+CASE( "span<>: Allows creation of a sub span starting at a given offset with a given length" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int> v( arr );
+    size_t offset = 1;
+    size_t length = 1;
+
+    span<int> s = v.subspan( offset, length );
+
+    EXPECT( s.size() == length );
+    EXPECT( std::equal( s.begin(), s.end(), arr + offset ) );
+}
 
 CASE( "span<>: Allows forward iteration" )
 {
