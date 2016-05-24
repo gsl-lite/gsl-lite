@@ -71,7 +71,7 @@ CASE( "span<>: Terminates construction from a null pointer and a non-zero size" 
     EXPECT_THROWS( F::blow() );
 }
 
-CASE( "span<>: Terminates creation of the first n elements for n exceeding the span" )
+CASE( "span<>: Terminates creation of a sub span of the first n elements for n exceeding the span" )
 {
     struct F { 
     static void blow() 
@@ -85,7 +85,7 @@ CASE( "span<>: Terminates creation of the first n elements for n exceeding the s
     EXPECT_THROWS( F::blow() );
 }
 
-CASE( "span<>: Terminates creation of the last n elements for n exceeding the span" )
+CASE( "span<>: Terminates creation of a sub span of the last n elements for n exceeding the span" )
 {
     struct F { 
     static void blow() 
