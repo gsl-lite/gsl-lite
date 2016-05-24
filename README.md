@@ -283,6 +283,8 @@ span<>: Disallows construction from a std::array of incompatible type (define gs
 span<>: Terminates construction from a nullptr and a non-zero size
 span<>: Terminates construction from two pointers in the wrong order
 span<>: Terminates construction from a null pointer and a non-zero size
+span<>: Terminates creation of the first n elements for n exceeding the span
+span<>: Terminates creation of the last n elements for n exceeding the span
 span<>: Terminates creation of a sub span outside the span
 span<>: Allows default construction
 span<>: Allows construction from a nullptr and a zero size (C++11)
@@ -297,6 +299,8 @@ span<>: Allows construction from a std::array<> (C++11)
 span<>: Allows construction from a container (std::vector<>)
 span<>: Allows construction from another view of the same type
 span<>: Allows assignment from another view of the same type
+span<>: Allows creation of a sub span of the first n elements
+span<>: Allows creation of a sub span of the last n elements
 span<>: Allows creation of a sub span starting at a given offset
 span<>: Allows creation of a sub span starting at a given offset with a given length
 span<>: Allows forward iteration

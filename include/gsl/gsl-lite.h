@@ -586,6 +586,18 @@ public:
     template< typename U > operator=();
 #endif
 
+    gsl_constexpr14 span< value_type > first( size_type count ) const gsl_noexcept
+    {
+        Expects( count <= this->size() );
+        return span( this->data(), count );
+    }
+
+    gsl_constexpr14 span< value_type > last( size_type count ) const gsl_noexcept
+    {
+        Expects( count <= this->size() );
+        return span( this->data() + this->size() - count, count );
+    }
+
     gsl_constexpr14 span< value_type > subspan( size_type offset ) const gsl_noexcept
     {
         Expects( offset >= 0 && offset < this->size() );

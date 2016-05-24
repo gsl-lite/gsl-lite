@@ -71,6 +71,34 @@ CASE( "span<>: Terminates construction from a null pointer and a non-zero size" 
     EXPECT_THROWS( F::blow() );
 }
 
+CASE( "span<>: Terminates creation of the first n elements for n exceeding the span" )
+{
+    struct F { 
+    static void blow() 
+    { 
+        int arr[] = { 1, 2, 3, };
+        span<int> v( arr );
+
+        (void) v.first( 4 );
+    }};
+
+    EXPECT_THROWS( F::blow() );
+}
+
+CASE( "span<>: Terminates creation of the last n elements for n exceeding the span" )
+{
+    struct F { 
+    static void blow() 
+    { 
+        int arr[] = { 1, 2, 3, };
+        span<int> v( arr );
+
+        (void) v.last( 4 );
+    }};
+
+    EXPECT_THROWS( F::blow() );
+}
+
 CASE( "span<>: Terminates creation of a sub span outside the span" )
 {
     struct F { 
@@ -252,6 +280,30 @@ CASE( "span<>: Allows move-assignment from another view of the same type (C++11)
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 #endif
+
+CASE( "span<>: Allows creation of a sub span of the first n elements" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, };
+    span<int> v( arr );
+    size_t count = 3;
+
+    span<int> s = v.first( count );
+
+    EXPECT( s.size() == count );
+    EXPECT( std::equal( s.begin(), s.end(), arr ) );
+}
+
+CASE( "span<>: Allows creation of a sub span of the last n elements" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, };
+    span<int> v( arr );
+    size_t count = 3;
+
+    span<int> s = v.last( count );
+
+    EXPECT( s.size() == count );
+    EXPECT( std::equal( s.begin(), s.end(), arr + v.size() - count ) );
+}
 
 CASE( "span<>: Allows creation of a sub span starting at a given offset" )
 {
