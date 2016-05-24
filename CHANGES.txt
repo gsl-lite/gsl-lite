@@ -1,4 +1,8 @@
-Changes for GSL Lite – Guidelines Support Library for C++98/03
+Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
+
+version 0.3.0 2016-05-24
+
+- Added first(), last() and subspan().
 
 version 0.2.2 2016-05-23
 
