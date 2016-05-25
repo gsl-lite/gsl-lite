@@ -36,7 +36,7 @@ CASE( "span<>: Disallows construction from a C-array of incompatible type (defin
 #endif
 }
 
-CASE( "span<>: Disallows construction from a std::array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "span<>: Disallows construction from a std::array of incompatible type (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # if gsl_HAVE_ARRAY
@@ -46,7 +46,7 @@ CASE( "span<>: Disallows construction from a std::array of incompatible type (de
 #endif
 }
 
-CASE( "span<>: Terminates construction from a nullptr and a non-zero size" )
+CASE( "span<>: Terminates construction from a nullptr and a non-zero size (C++11)" )
 {
 #if gsl_HAVE_NULLPTR
     struct F { static void blow() { span<int> v( nullptr, 42 ); } };

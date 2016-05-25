@@ -59,7 +59,7 @@ CASE( "string_span: Allows to create a string_span from a non-const C-array" )
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_span: Allows to create a string_span from a non-const std::array" )
+CASE( "string_span: Allows to create a string_span from a non-const std::array (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -121,7 +121,7 @@ CASE( "string_span: Allows to create a cstring_span from a const C-array" )
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_span: Allows to create a cstring_span from a const std::array" )
+CASE( "string_span: Allows to create a cstring_span from a const std::array (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     const std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -181,7 +181,7 @@ CASE( "string_span: Allows to create a cstring_span from a non-const C-array" )
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
-CASE( "string_span: Allows to create a cstring_span from a non-const std::array" )
+CASE( "string_span: Allows to create a cstring_span from a non-const std::array (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -241,7 +241,7 @@ CASE( "string_span: Allows to create a wstring_span from a non-const C-array" )
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span: Allows to create a wstring_span from a non-const std::array" )
+CASE( "string_span: Allows to create a wstring_span from a non-const std::array (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -288,7 +288,7 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const C-array" )
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span: Allows to create a cwstring_span from a non-const std::array" )
+CASE( "string_span: Allows to create a cwstring_span from a non-const std::array (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
@@ -335,7 +335,7 @@ CASE( "string_span: Allows to create a cwstring_span from a const C-array" )
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
-CASE( "string_span: Allows to create a cwstring_span from a const std::array" )
+CASE( "string_span: Allows to create a cwstring_span from a const std::array (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     const std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};

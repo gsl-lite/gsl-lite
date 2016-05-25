@@ -26,7 +26,7 @@ CASE( "at(): Terminates access to non-existing C-array elements" )
     EXPECT_THROWS( at(a, 4) );
 }
 
-CASE( "at(): Terminates access to non-existing std::array elements" )
+CASE( "at(): Terminates access to non-existing std::array elements (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<int, 4> a = {{ 1, 2, 3, 4 }};
@@ -59,7 +59,7 @@ CASE( "at(): Allows access to existing C-array elements" )
     }
 }
 
-CASE( "at(): Allows access to existing std::array elements" )
+CASE( "at(): Allows access to existing std::array elements (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<int, 4> a = {{ 1, 2, 3, 4 }};
