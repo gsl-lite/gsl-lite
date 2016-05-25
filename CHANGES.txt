@@ -1,5 +1,10 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.3.1 2016-05-25
+
+- Added test for construction of a span from another span of a compatible type.
+- Changed view to span in specification.
+
 version 0.3.0 2016-05-24
 
 - Added first(), last() and subspan().
