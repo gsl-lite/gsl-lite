@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.2.2"
+#define  gsl_lite_VERSION "0.3.2"
 
 // Configuration:
 
@@ -324,7 +324,7 @@ T narrow( U u )
     }
 
 #if gsl_HAVE_TYPE_TRAITS
-    if ( ! details::is_same_signedness<T, U>::value && ( ( t < T{} ) != ( u < U{} ) ) )
+    if ( ! details::is_same_signedness<T, U>::value && ( ( t < T() ) != ( u < U() ) ) )
 #else
     // Don't assume T() works:
     if ( ( t < 0 ) != ( u < 0 ) )
