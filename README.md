@@ -65,6 +65,8 @@ The Guidelines Support Library (GSL) contains functions and types that are sugge
 
 The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
 
+*gsl-lite* recognizes when it is compiled for the CUDA platform and decorates functions (methods) with `__host__` and `__device__`. See also section [API macro](#api-macro).
+
 
 License
 -------
@@ -118,8 +120,14 @@ Synopsis
 --------
 
 **Contents**  
+- [API macro](#api-macro)
 - [Configuration macros](#configuration-macros)
 - [Feature selection macros](#feature-selection-macros)
+
+### API macro
+
+\-D<b>gsl\_api</b>=""  
+Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform. Define this macro to specify your own function decoration. 
 
 ### Configuration macros
 
