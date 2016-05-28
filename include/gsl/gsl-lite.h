@@ -610,13 +610,13 @@ public:
 
     gsl_api gsl_constexpr14 span< value_type > subspan( size_type offset ) const gsl_noexcept
     {
-        Expects( offset >= 0 && offset < this->size() );
+        Expects( offset < this->size() );
         return span( this->data() + offset, this->length() - offset ); 
     }
 	
     gsl_api gsl_constexpr14 span< value_type > subspan( size_type offset, size_type count ) const gsl_noexcept
     {
-        Expects( offset >= 0 && offset < this->size() && count <= this->size() - offset );
+        Expects( offset < this->size() && count <= this->size() - offset );
         return span( this->data() + offset, count ); 
     }
 	
@@ -708,13 +708,13 @@ public:
 
     gsl_api gsl_constexpr14 reference at( size_type index )
     {
-        Expects( index >= 0 && index < size());
+        Expects( index < size());
         return begin_[ index ];
     }
 
     gsl_api gsl_constexpr14 const_reference at( size_type index ) const
     {
-       Expects( index >= 0 && index < size() );
+       Expects( index < size() );
        return begin_[ index ];
     }
 
