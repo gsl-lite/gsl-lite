@@ -131,19 +131,19 @@
 #if gsl_HAVE_CONSTEXPR_11
 # define gsl_constexpr constexpr
 #else
-# define gsl_constexpr /*nothing*/
+# define gsl_constexpr /*constexpr*/
 #endif
 
 #if gsl_HAVE_CONSTEXPR_14
 # define gsl_constexpr14 constexpr
 #else
-# define gsl_constexpr14 /*nothing*/
+# define gsl_constexpr14 /*constexpr*/
 #endif
 
 #if gsl_HAVE_EXPLICIT_CONVERSION
 # define gsl_explicit explicit
 #else
-# define gsl_explicit /*nothing*/
+# define gsl_explicit /*explicit*/
 #endif
 
 #if gsl_FEATURE_HAVE_IMPLICIT_MACRO
@@ -151,7 +151,7 @@
 #endif
 
 #if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_THROWS_FOR_TESTING
-# define gsl_noexcept /*nothing*/
+# define gsl_noexcept /*noexcept*/
 #else
 # define gsl_noexcept noexcept
 #endif
@@ -166,7 +166,7 @@
 # include <type_traits>
 #endif
 
-// CUDA platform usage:
+// GSL API (e.g. for CUDA platform):
 
 #ifndef   gsl_api
 # ifdef   __CUDACC__
