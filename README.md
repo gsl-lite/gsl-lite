@@ -131,6 +131,9 @@ Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is define
 
 ### Configuration macros
 
+\-D<b>gsl\_CONFIG\_ALLOWS\_SPAN\_CONTAINER\_CTOR</b>=1  
+Define this macro to 0 to omit the span constructor for containers for pre-C++11 compilers. This constructor may prove too greedy and interfere with other constructors. Default is 1.
+
 \-D<b>gsl\_CONFIG\_CONFIRMS\_COMPILATION\_ERRORS</b>=0  
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. Default is 0.
 

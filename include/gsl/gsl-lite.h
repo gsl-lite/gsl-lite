@@ -49,6 +49,10 @@
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
 
+#ifndef  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
+# define gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR  1
+#endif
+
 // Compiler detection:
 
 #define gsl_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
@@ -165,6 +169,12 @@
 #if gsl_HAVE_TYPE_TRAITS
 # include <type_traits>
 #endif
+
+// Other features:
+
+// Note: !defined(__NVCC__) doesn't work with nvcc here:
+#define gsl_HAVE_SPAN_CONTAINER_CTOR  \
+    ( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
 
 // GSL API (e.g. for CUDA platform):
 
@@ -556,13 +566,14 @@ public:
     gsl_api gsl_constexpr14 span( Cont & cont )
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
-#else
+    {}
+#elif gsl_HAVE_SPAN_CONTAINER_CTOR
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
         : begin_( cont.size() == 0 ? NULL : &cont[0] )
         , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
-#endif
     {}
+#endif
 
 #if gsl_HAVE_IS_DEFAULT
     gsl_api gsl_constexpr14 span( span && ) = default;
