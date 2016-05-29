@@ -730,7 +730,7 @@ public:
 
     gsl_api gsl_constexpr14 size_type size() const gsl_noexcept
     {
-        return std::distance( begin_, end_ );
+        return end_ - begin_;
     }
 
     gsl_api gsl_constexpr14 size_type length() const gsl_noexcept
