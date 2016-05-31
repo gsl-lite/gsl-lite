@@ -903,11 +903,10 @@ template<class T, class SizeType, const T Sentinel>
 gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
 {
     typedef T * pointer;
-    typedef typename std::iterator_traits<pointer>::difference_type difference_type;
 
     pointer cur = seq;
 
-    while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel )
+    while ( static_cast<SizeType>(std::distance( seq, cur )) < max && *cur != Sentinel )
         ++cur;
 
     Expects( *cur == Sentinel );
