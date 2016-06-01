@@ -906,7 +906,7 @@ gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_lim
 
     pointer cur = seq;
 
-    while ( static_cast<SizeType>(std::distance( seq, cur )) < max && *cur != Sentinel )
+    while ( static_cast<SizeType>( cur - seq ) < max && *cur != Sentinel )
         ++cur;
 
     Expects( *cur == Sentinel );
