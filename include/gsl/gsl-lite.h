@@ -516,34 +516,34 @@ public:
     }
 
 #if gsl_HAVE_NULLPTR
-    gsl_api gsl_constexpr14 span( std::nullptr_t, size_type size )
+    gsl_api gsl_constexpr14 span( std::nullptr_t, size_type size_in )
         : begin_( nullptr )
         , end_  ( nullptr )
     {
-        Expects( size == 0 );
+        Expects( size_in == 0 );
     }
 #endif
 
 #if gsl_HAVE_IS_DELETE
-    gsl_api gsl_constexpr14 span( reference data )
-        : span( &data, 1 )
+    gsl_api gsl_constexpr14 span( reference data_in )
+        : span( &data_in, 1 )
     {}
 
     gsl_api gsl_constexpr14 span( value_type && ) = delete;
 #endif
 
-    gsl_api gsl_constexpr14 span( pointer begin, pointer end )
-        : begin_( begin )
-        , end_  ( end )
+    gsl_api gsl_constexpr14 span( pointer begin_in, pointer end_in )
+        : begin_( begin_in )
+        , end_  ( end_in )
     {
-        Expects( begin <= end );
+        Expects( begin_in <= end_in );
     }
 
-    gsl_api gsl_constexpr14 span( pointer data, size_type size )
-        : begin_( data )
-        , end_  ( data + size )
+    gsl_api gsl_constexpr14 span( pointer data_in, size_type size_in )
+        : begin_( data_in )
+        , end_  ( data_in + size_in )
     {
-        Expects( size == 0 || ( size > 0 && data != NULL ) );
+        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
     }
 
     template< class U, size_t N >
@@ -791,19 +791,19 @@ public:
 private:
     // helpers for member as_span()
     template< typename U >
-    gsl_api gsl_constexpr14 span( U * & data, size_type size )
-        : begin_( data )
-        , end_  ( data + size )
+    gsl_api gsl_constexpr14 span( U * & data_in, size_type size_in )
+        : begin_( data_in )
+        , end_  ( data_in + size_in )
     {
-        Expects( size == 0 || ( size > 0 && data != NULL ) );
+        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
     }
 
     template< typename U >
-    gsl_api gsl_constexpr14 span( U * const & data, size_type size )
-        : begin_( data )
-        , end_  ( data + size )
+    gsl_api gsl_constexpr14 span( U * const & data_in, size_type size_in )
+        : begin_( data_in )
+        , end_  ( data_in + size_in )
     {
-        Expects( size == 0 || ( size > 0 && data != NULL ) );
+        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
     }
 
 private:
