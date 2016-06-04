@@ -15,7 +15,7 @@ GSL Lite is based on the [Microsoft Guidelines Support Library (GSL)](https://gi
 - [Synopsis](#synopsis)
 - [Features](#features)
 - [Reported to work with](#reported-to-work-with)
-- [Other GSL implementations](#other-gsl-implemetations)
+- [Other GSL implementations](#other-gsl-implementations)
 - [Notes and references](#notes-and-references)
 - [Appendix](#appendix)
 
