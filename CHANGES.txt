@@ -1,5 +1,10 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.5.0 2016-05-24
+
+- Added compatibility with MS GSL symbolic names for contract violation response control.
+- Added contract violation response control as suggested in N4415, Simple Contracts for C++.
+
 version 0.4.1 2016-05-23
 
 - Added gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR for pre-C++11 (default: 1).
