@@ -122,24 +122,15 @@ Synopsis
 
 **Contents**  
 - [API macro](#api-macro)
-- [Configuration macros](#configuration-macros)
 - [Feature selection macros](#feature-selection-macros)
+- [Contract violation response macros](#contract-violation-response-macros)
+- [Microsoft GSL compatibility macros](#microsoft-gsl-compatibility-macros)
+- [Other configuration macros](#other-configuration-macros)
 
 ### API macro
 
 \-D<b>gsl\_api</b>=""  
 Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform. Define this macro to specify your own function decoration. 
-
-### Configuration macros
-
-\-D<b>gsl\_CONFIG\_ALLOWS\_SPAN\_CONTAINER\_CTOR</b>=1  
-Define this macro to 0 to omit the span constructor for containers for pre-C++11 compilers. This constructor may prove too greedy and interfere with other constructors. Default is 1.
-
-\-D<b>gsl\_CONFIG\_CONFIRMS\_COMPILATION\_ERRORS</b>=0  
-Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. Default is 0.
-
-\-D<b>gsl\_CONFIG\_THROWS\_FOR\_TESTING</b>=0  
-Define this macro to 1 to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL assertion. Use for testing only. Default is 0.
 
 ### Feature selection macros
 
@@ -148,6 +139,50 @@ Define this macro to 0 to omit the `implicit` macro. Default is 1.
 
 \-D<b>gsl\_FEATURE\_HAVE\_OWNER\_MACRO</b>=1  
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
+
+### Contract violation response macros
+
+*gsl-lite* provides contract violation response control as suggested in proposal [N4415](http://wg21.link/n4415).
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ON</b>  
+Define this macro to include both `Expects` and `Ensures` in the code. This is the default case.
+ 
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_OFF</b>  
+Define this macro to exclude both `Expects` and `Ensures` from the code.
+
+\-D<b>gsl\_CONFIG_CONTRACT\_LEVEL\_EXPECTS\_ONLY</b>  
+Define this macro to include `Expects` in the code and exclude `Ensures` from the code.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ENSURES\_ONLY</b>  
+Define this macro to exclude `Expects` from the code and include `Ensures` in the code.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
+Define this macro to call `std::terminate()` on a GSL contract violation. This is the default case.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation.
+
+\-D<b>gsl\_CONFIG\_THROWS\_FOR\_TESTING</b>=1&ensp;(deprecated)  
+For *gsl-lite* backward compatibilty. Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>.
+
+### Microsoft GSL compatibility macros
+
+\-D<b>GSL_UNENFORCED_ON_CONTRACT_VIOLATION</b>  
+Equivalent to -Dgsl_CONFIG_CONTRACT_LEVEL_OFF.
+
+\-D<b>GSL\_THROW\_ON\_CONTRACT\_VIOLATION</b>  
+Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS.
+
+\-D<b>GSL\_TERMINATE\_ON\_CONTRACT\_VIOLATION</b>  
+Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
+
+### Other configuration macros
+
+\-D<b>gsl\_CONFIG\_ALLOWS\_SPAN\_CONTAINER\_CTOR</b>=1  
+Define this macro to 0 to omit the span constructor for containers for pre-C++11 compilers. This constructor may prove too greedy and interfere with other constructors. Default is 1.
+
+\-D<b>gsl\_CONFIG\_CONFIRMS\_COMPILATION\_ERRORS</b>=0  
+Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. Default is 0.
 
 
 Features
