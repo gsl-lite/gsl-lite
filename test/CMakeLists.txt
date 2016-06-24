@@ -14,7 +14,7 @@ include_directories  ( "${PROJECT_SOURCE_DIR}/../include/gsl" )
 set( SOURCES gsl-lite.t.cpp assert.t.cpp at.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
 
 add_executable (   gsl-lite.t ${SOURCES} )
-add_definitions( -Dgsl_CONFIG_THROWS_FOR_TESTING )
+add_definitions( -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 
 set( SINGLE_TEST_PROGRAM TRUE )
 
@@ -30,7 +30,7 @@ if( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" )
 endif()
 
 if( ${CMAKE_CXX_COMPILER_ID} MATCHES "MSVC" )
-    add_compile_options( -W3 -EHsc )
+    add_compile_options( -W3 -EHsc -D_SCL_SECURE_NO_WARNINGS )
 
 elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" OR
         ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" )
