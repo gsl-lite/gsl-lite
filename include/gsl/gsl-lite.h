@@ -29,7 +29,26 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.4.1"
+#define  gsl_lite_VERSION "0.5.0"
+
+// M-GSL and gsl-lite backward compatibility:
+
+#if ( gsl_CONFIG_THROWS_FOR_TESTING != 0 )
+# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
+# pragma message ("gsl_CONFIG_THROWS_FOR_TESTING is deprecated since gsl-lite 0.5.0; replace with gsl_CONFIG_CONTRACT_VIOLATION_THROWS.")
+#endif
+
+#if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
+# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
+#endif
+
+#if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
+# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  0
+#endif
+
+#if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
+# define gsl_CONFIG_CONTRACT_LEVEL_OFF  1
+#endif
 
 // Configuration:
 
@@ -41,16 +60,37 @@
 # define gsl_FEATURE_HAVE_OWNER_MACRO  1
 #endif
 
-#ifndef  gsl_CONFIG_THROWS_FOR_TESTING
-# define gsl_CONFIG_THROWS_FOR_TESTING  0
-#endif
-
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR  1
+#endif
+
+#if    defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x00
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x01
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x10
+#else
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
+#endif
+
+#if   !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS     ) && \
+      !defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
+#elif  defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS     ) && \
+      !defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
+#elif !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS     ) && \
+       defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
+#else
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS and gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES may be defined.
 #endif
 
 // Compiler detection:
@@ -154,7 +194,7 @@
 # define implicit
 #endif
 
-#if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_THROWS_FOR_TESTING
+#if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 # define gsl_noexcept /*noexcept*/
 #else
 # define gsl_noexcept noexcept
@@ -215,25 +255,36 @@ namespace gsl {
 //
 // GSL.assert: assertions
 //
-#define Expects(x)  ::gsl::fail_fast_assert((x))
-#define Ensures(x)  ::gsl::fail_fast_assert((x))
 
-#if gsl_CONFIG_THROWS_FOR_TESTING
+#define gsl_ELIDE_CONTRACT_EXPECTS  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
+#define gsl_ELIDE_CONTRACT_ENSURES  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
+
+#if gsl_ELIDE_CONTRACT_EXPECTS
+# define Expects( x )  /* Expects elided */
+#elif gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ": " gsl_STRINGIFY(__LINE__) );
+#else
+# define Expects( x )  ::gsl::fail_fast_assert( (x) )
+#endif
+
+#if gsl_ELIDE_CONTRACT_ENSURES
+# define Ensures( x )  /* Ensures elided */
+#elif gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ": " gsl_STRINGIFY(__LINE__) );
+#else
+# define Ensures( x )  ::gsl::fail_fast_assert( (x) )
+#endif
+
+#define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
+#define gsl_STRINGIFY_( x )  #x
 
 struct fail_fast : public std::runtime_error
 {
-    gsl_api fail_fast()
-    : std::runtime_error( "GSL assertion" ) {}
-
     gsl_api explicit fail_fast( char const * const message )
     : std::runtime_error( message ) {}
 };
 
-gsl_api inline void fail_fast_assert( bool cond )
-{
-    if ( !cond )
-        throw fail_fast();
-}
+#if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
 gsl_api inline void fail_fast_assert( bool cond, char const * const message )
 {
@@ -241,7 +292,7 @@ gsl_api inline void fail_fast_assert( bool cond, char const * const message )
         throw fail_fast( message );
 }
 
-#else // gsl_CONFIG_THROWS_FOR_TESTING
+#else // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
 gsl_api inline void fail_fast_assert( bool cond )
 {
@@ -249,13 +300,7 @@ gsl_api inline void fail_fast_assert( bool cond )
         std::terminate();
 }
 
-gsl_api inline void fail_fast_assert( bool cond, char const * const )
-{
-    if ( !cond )
-        std::terminate();
-}
-
-#endif // gsl_CONFIG_THROWS_FOR_TESTING
+#endif // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
 //
 // GSL.util: utilities
