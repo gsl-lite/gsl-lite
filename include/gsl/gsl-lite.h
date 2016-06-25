@@ -308,29 +308,29 @@ gsl_api inline void fail_fast_assert( bool cond )
 
 #if gsl_CPP11_OR_GREATER
 
-template< class Fn >
+template< class F >
 class final_act
 {
 public:
-    gsl_api explicit final_act( Fn action ) gsl_noexcept
+    gsl_api explicit final_act( F action ) gsl_noexcept
     : action_( std::move( action ) ) {}
 
     gsl_api ~final_act() gsl_noexcept { action_(); }
 
 private:
-    Fn action_;
+    F action_;
 };
 
-template< class Fn >
-gsl_api final_act<Fn> finally( Fn const & action ) gsl_noexcept
+template< class F >
+gsl_api final_act<F> finally( F const & action ) gsl_noexcept
 {
-    return final_act<Fn>( action );
+    return final_act<F>( action );
 }
 
-template< class Fn >
-gsl_api final_act<Fn> finally( Fn && action ) gsl_noexcept
+template< class F >
+gsl_api final_act<F> finally( F && action ) gsl_noexcept
 {
-    return final_act<Fn>( std::forward<Fn>( action ) );
+    return final_act<F>( std::forward<F>( action ) );
 }
 
 #else // gsl_CPP11_OR_GREATER
@@ -352,8 +352,8 @@ private:
     Action action_;
 };
 
-template< class Fn >
-gsl_api final_act finally( Fn const & f )
+template< class F >
+gsl_api final_act finally( F const & f )
 {
     return final_act(( f ));
 }
