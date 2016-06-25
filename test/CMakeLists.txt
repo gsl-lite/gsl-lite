@@ -39,7 +39,7 @@ elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" OR
     add_executable( gsl-lite-cpp11.t ${SOURCES} )
     add_executable( gsl-lite-cpp14.t ${SOURCES} )
 
-    add_compile_options( -Wall -Wno-missing-braces )
+    add_compile_options( -Wall -Wno-missing-braces -fno-elide-constructors )
 
     target_compile_options( gsl-lite-cpp98.t  PUBLIC -std=c++98 )
     target_compile_options( gsl-lite-cpp03.t  PUBLIC -std=c++03 )
