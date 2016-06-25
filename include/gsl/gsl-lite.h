@@ -309,41 +309,41 @@ gsl_api inline void fail_fast_assert( bool cond )
 #if gsl_CPP11_OR_GREATER
 
 template< class Fn >
-class Final_act
+class final_act
 {
 public:
-    gsl_api explicit Final_act( Fn action ) gsl_noexcept
+    gsl_api explicit final_act( Fn action ) gsl_noexcept
     : action_( std::move( action ) ) {}
 
-    gsl_api ~Final_act() gsl_noexcept { action_(); }
+    gsl_api ~final_act() gsl_noexcept { action_(); }
 
 private:
     Fn action_;
 };
 
 template< class Fn >
-gsl_api Final_act<Fn> finally( Fn const & action ) gsl_noexcept
+gsl_api final_act<Fn> finally( Fn const & action ) gsl_noexcept
 {
-    return Final_act<Fn>( action );
+    return final_act<Fn>( action );
 }
 
 template< class Fn >
-gsl_api Final_act<Fn> finally( Fn && action ) gsl_noexcept
+gsl_api final_act<Fn> finally( Fn && action ) gsl_noexcept
 {
-    return Final_act<Fn>( std::forward<Fn>( action ) );
+    return final_act<Fn>( std::forward<Fn>( action ) );
 }
 
 #else // gsl_CPP11_OR_GREATER
 
-class Final_act
+class final_act
 {
 public:
     typedef void (*Action)();
 
-    gsl_api Final_act( Action action )
+    gsl_api final_act( Action action )
     : action_( action ) {}
 
-    gsl_api ~Final_act()
+    gsl_api ~final_act()
     {
         action_();
     }
@@ -353,9 +353,9 @@ private:
 };
 
 template< class Fn >
-gsl_api Final_act finally( Fn const & f )
+gsl_api final_act finally( Fn const & f )
 {
-    return Final_act(( f ));
+    return final_act(( f ));
 }
 
 #endif // gsl_CPP11_OR_GREATER

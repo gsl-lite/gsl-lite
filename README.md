@@ -227,10 +227,10 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-Final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
-Final_act                   | -       | -       | < C++11 | Currently only void(*)() |
-finally()                   | &#10003;| &#10003;| >=C++11 | Make a Final_act<> |
-finally()                   | -       | -       | < C++11 | Make a Final_act |
+final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
+final_act                   | -       | -       | < C++11 | Currently only void(*)() |
+finally()                   | &#10003;| &#10003;| >=C++11 | Make a final_act<> |
+finally()                   | -       | -       | < C++11 | Make a final_act |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
 implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |

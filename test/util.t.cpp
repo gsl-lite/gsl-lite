@@ -69,7 +69,7 @@ CASE( "finally: Allows pointer to function" )
 #else
     g_i = 0;
     {
-        Final_act _ = finally( &F::incr );
+        final_act _ = finally( &F::incr );
         EXPECT( g_i == 0 );
     }
     EXPECT( g_i == 1 );

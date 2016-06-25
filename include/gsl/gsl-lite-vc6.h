@@ -177,15 +177,15 @@ inline void fail_fast_assert( bool cond, char const * const )
 // GSL.util: utilities
 //
 
-class Final_act
+class final_act
 {
 public:
     typedef void (*Action)();
 
-    Final_act( Action action ) 
+    final_act( Action action ) 
     : action_( action ) {}
 
-    ~Final_act() 
+    ~final_act() 
     {
         action_();
     }
@@ -195,9 +195,9 @@ private:
 };
 
 template< class Fn >
-Final_act finally( Fn const & f )
+final_act finally( Fn const & f )
 {
-    return Final_act(( f ));
+    return final_act(( f ));
 }
 
 template< class T, class U >
