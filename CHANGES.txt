@@ -1,5 +1,10 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.6.0 2016-05-25
+
+- Renamed Final_act to final_act to follow standard library conventions.
+- Fixed final_act to also work without copy-elision optimization, issue #19 (thanks to Marco Arena).
+
 version 0.5.0 2016-05-24
 
 - Added compatibility with MS GSL symbolic names for contract violation response control.
