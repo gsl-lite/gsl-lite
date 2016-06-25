@@ -324,8 +324,8 @@ public:
         other.invoke_ = false;
     }
 
-    final_act( final_act const  & ) = delete;
-    final_act & operator=( final_act const & ) = delete;
+    gsl_api final_act( final_act const  & ) = delete;
+    gsl_api final_act & operator=( final_act const & ) = delete;
 
     gsl_api ~final_act() gsl_noexcept 
     { 
