@@ -318,8 +318,8 @@ public:
     {}
 
     gsl_api final_act( final_act && other ) gsl_noexcept
-        : action_( std::move( other.action_) )
-        , invoke_( other.invoke_) 
+        : action_( std::move( other.action_ ) )
+        , invoke_( other.invoke_ ) 
     {
         other.invoke_ = false;
     }
@@ -329,7 +329,7 @@ public:
 
     gsl_api ~final_act() gsl_noexcept 
     { 
-        if ( invoke_) 
+        if ( invoke_ ) 
             action_(); 
     }
 
@@ -358,15 +358,29 @@ public:
     typedef void (*Action)();
 
     gsl_api final_act( Action action )
-    : action_( action ) {}
+    : action_( action ) 
+    , invoke_( true )
+    {}
+
+    gsl_api final_act( final_act const & other ) gsl_noexcept
+        : action_( other.action_ )
+        , invoke_( other.invoke_ ) 
+    {
+        other.invoke_ = false;
+    }
 
     gsl_api ~final_act()
     {
-        action_();
+        if ( invoke_ ) 
+            action_();
     }
 
 private:
+    gsl_api final_act & operator=( final_act const & );
+    
+private:
     Action action_;
+    mutable bool invoke_;
 };
 
 template< class F >
