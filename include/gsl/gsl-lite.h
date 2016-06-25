@@ -313,12 +313,29 @@ class final_act
 {
 public:
     gsl_api explicit final_act( F action ) gsl_noexcept
-    : action_( std::move( action ) ) {}
+        : action_( std::move( action ) )
+        , invoke_( true ) 
+    {}
 
-    gsl_api ~final_act() gsl_noexcept { action_(); }
+    gsl_api final_act( final_act && other ) gsl_noexcept
+        : action_( std::move( other.action_) )
+        , invoke_( other.invoke_) 
+    {
+        other.invoke_ = false;
+    }
+
+    final_act( final_act const  & ) = delete;
+    final_act & operator=( final_act const & ) = delete;
+
+    gsl_api ~final_act() gsl_noexcept 
+    { 
+        if ( invoke_) 
+            action_(); 
+    }
 
 private:
     F action_;
+    bool invoke_;
 };
 
 template< class F >
