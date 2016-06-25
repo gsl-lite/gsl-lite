@@ -36,6 +36,31 @@ CASE( "finally: Allows lambda to run" )
 #endif
 }
 
+CASE( "finally: Allows to move final_act" )
+{
+#if gsl_CPP11_OR_GREATER
+    struct F { static void incr( int & i ) { i += 1; } };
+
+    int i = 0;
+    {
+        auto _1 = finally( [&]() { F::incr( i ); } );
+        {
+            auto _2 = std::move( _1 );
+            EXPECT( i == 0 );
+        }
+        EXPECT( i == 1 );
+        {
+            auto _2 = std::move( _1 );
+            EXPECT( i == 1 );
+        }
+        EXPECT( i == 1 );
+    }
+    EXPECT( i == 1 );
+#else
+    EXPECT( !!"lambda is not available (no C++11)" );
+#endif
+}
+
 CASE( "finally: Allows function with bind" )
 {
 #if gsl_CPP11_OR_GREATER
