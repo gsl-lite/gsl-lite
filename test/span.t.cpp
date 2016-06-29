@@ -17,8 +17,6 @@
 
 #include "gsl-lite.t.h"
 
-namespace {
-
 CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -812,7 +810,5 @@ CASE( "FixedSizeConversions" ) {}
 CASE( "AsWriteableBytes" ) {}
 CASE( "ArrayViewComparison" ) {}
 #endif
-
-}
 
 // end of file

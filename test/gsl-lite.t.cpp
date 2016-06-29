@@ -14,13 +14,9 @@ lest::tests & specification()
     return tests; 
 }
 
-namespace {
-
 CASE( "__cplusplus" )
 {
     EXPECT( __cplusplus > 0L );
-}
-
 }
 
 int main( int argc, char * argv[] )

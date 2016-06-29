@@ -18,8 +18,6 @@
 #include "gsl-lite.t.h"
 #include <functional>
 
-namespace {
-
 CASE( "finally: Allows lambda to run" )
 {
 #if gsl_CPP11_OR_GREATER
@@ -117,6 +115,31 @@ CASE( "finally: Allows to move final_act" )
 #endif
 }
 
+CASE( "finally: Allows moving final_act to throw" "[.]")
+{
+#if gsl_CPP11_OR_GREATER
+    struct action
+    {
+        int & i_;
+        void operator()(){ i_ += 1; }     
+        action( int & i ) : i_( i ) {}
+        action( action && other ) : i_( other.i_) { throw std::runtime_error("action move-ctor"); }   
+    };
+
+    int i = 0;
+    {
+        {
+            EXPECT_THROWS( finally( action( i ) ) );
+        }
+        EXPECT( i == 1 );
+    }
+
+    // ... 
+#else
+    EXPECT( !!"lambda is not available (no C++11)" );
+#endif
+}
+
 CASE( "narrow_cast<>: Allows narrowing without value loss" )
 {
     EXPECT( narrow_cast<char>( 120 ) == 120 );
@@ -140,8 +163,6 @@ CASE( "narrow<>(): Terminates when narrowing with value loss" )
 CASE( "narrow<>(): Terminates when narrowing with sign loss" )
 {
     EXPECT_THROWS_AS( narrow<unsigned>( -42 ), narrowing_error );
-}
-
 }
 
 // end of file

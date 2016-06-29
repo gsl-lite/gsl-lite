@@ -1,4 +1,4 @@
-// Copyright 2013, 2014, 2015 by Martin Moene
+// Copyright 2013, 2014, 2015, 2016 by Martin Moene
 //
 // lest is based on ideas by Kevlin Henney, see video at
 // http://skillsmatter.com/podcast/agile-testing/kevlin-henney-rethinking-unit-testing-in-c-plus-plus
@@ -6,8 +6,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef LEST_LEST_H_INCLUDED
-#define LEST_LEST_H_INCLUDED
+#ifndef LEST_LEST_HPP_INCLUDED
+#define LEST_LEST_HPP_INCLUDED
 
 #include <algorithm>
 #include <iomanip>
@@ -28,7 +28,6 @@
 #include <ctime>
 
 #ifdef __clang__
-# pragma clang diagnostic ignored "-Wdollar-in-identifier-extension"
 # pragma clang diagnostic ignored "-Woverloaded-shift-op-parentheses"
 # pragma clang diagnostic ignored "-Wunused-comparison"
 # pragma clang diagnostic ignored "-Wunused-value"
@@ -36,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.24.3"
+#define  lest_VERSION "1.27.0"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -90,7 +89,7 @@
 # define lest_CPP11_OR_GREATER  1
 #endif
 
-#if lest_CPP11_OR_GREATER
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 
 # include <cstdint>
 # include <random>
@@ -154,10 +153,10 @@ namespace lest
     inline double abs( double x ) { return ::fabs( x ); }
 
     template< typename T >
-    T const & (max)(T const & a, T const & b) { return a >= b ? a : b; }
+    T const & (min)(T const & a, T const & b) { return a <= b ? a : b; }
 #else
     using std::abs;
-    using std::max;
+    using std::min;
     using std::strtol;
     using std::rand;
     using std::srand;
@@ -193,20 +192,20 @@ namespace lest
     lest_CASE
 
 #define lest_CASE( specification, proposition ) \
-    void lest_FUNCTION( lest::env & ); \
+    static void lest_FUNCTION( lest::env & ); \
     namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
-    void lest_FUNCTION( lest::env & $ )
+    static void lest_FUNCTION( lest::env & lest_env )
 
 #define lest_ADD_TEST( specification, test ) \
     specification.push_back( test )
 
 #define lest_SETUP( context ) \
-    for ( int $section = 0, $count = 1; $section < $count; $count -= 0==$section++ )
+    for ( int lest__section = 0, lest__count = 1; lest__section < lest__count; lest__count -= 0==lest__section++ )
 
 #define lest_SECTION( proposition ) \
     static int lest_UNIQUE( id ) = 0; \
-    if ( lest::guard( lest_UNIQUE( id ), $section, $count ) ) \
-        for ( int $section = 0, $count = 1; $section < $count; $count -= 0==$section++ )
+    if ( lest::guard( lest_UNIQUE( id ), lest__section, lest__count ) ) \
+        for ( int lest__section = 0, lest__count = 1; lest__section < lest__count; lest__count -= 0==lest__section++ )
 
 #define lest_EXPECT( expr ) \
     do { \
@@ -214,8 +213,8 @@ namespace lest
         { \
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
                 throw lest::failure( lest_LOCATION, #expr, score.decomposition ); \
-            else if ( $.pass ) \
-                lest::report( $.os, lest::passing( lest_LOCATION, #expr, score.decomposition ), $.testing ); \
+            else if ( lest_env.pass ) \
+                lest::report( lest_env.os, lest::passing( lest_LOCATION, #expr, score.decomposition ), lest_env.testing ); \
         } \
         catch(...) \
         { \
@@ -229,8 +228,8 @@ namespace lest
         { \
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
             { \
-                if ( $.pass ) \
-                    lest::report( $.os, lest::passing( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ), $.testing ); \
+                if ( lest_env.pass ) \
+                    lest::report( lest_env.os, lest::passing( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ), lest_env.testing ); \
             } \
             else \
                 throw lest::failure( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ); \
@@ -246,8 +245,8 @@ namespace lest
     { \
         try { expr; } \
         catch (...) { lest::inform( lest_LOCATION, #expr ); } \
-        if ( $.pass ) \
-            lest::report( $.os, lest::got_none( lest_LOCATION, #expr ), $.testing ); \
+        if ( lest_env.pass ) \
+            lest::report( lest_env.os, lest::got_none( lest_LOCATION, #expr ), lest_env.testing ); \
     } while ( lest::is_false() )
 
 #define lest_EXPECT_THROWS( expr ) \
@@ -259,8 +258,8 @@ namespace lest
         } \
         catch (...) \
         { \
-            if ( $.pass ) \
-                lest::report( $.os, lest::got( lest_LOCATION, #expr ), $.testing ); \
+            if ( lest_env.pass ) \
+                lest::report( lest_env.os, lest::got( lest_LOCATION, #expr ), lest_env.testing ); \
             break; \
         } \
         throw lest::expected( lest_LOCATION, #expr ); \
@@ -276,8 +275,8 @@ namespace lest
         }  \
         catch ( excpt & ) \
         { \
-            if ( $.pass ) \
-                lest::report( $.os, lest::got( lest_LOCATION, #expr, lest::of_type( #excpt ) ), $.testing ); \
+            if ( lest_env.pass ) \
+                lest::report( lest_env.os, lest::got( lest_LOCATION, #expr, lest::of_type( #excpt ) ), lest_env.testing ); \
             break; \
         } \
         catch (...) {} \
@@ -449,7 +448,7 @@ public:
     friend bool operator == ( double lhs, approx const & rhs )
     {
         // Thanks to Richard Harris for his help refining this formula.
-        return lest::abs( lhs - rhs.magnitude_ ) < rhs.epsilon_ * ( rhs.scale_ + (lest::max)( lest::abs( lhs ), lest::abs( rhs.magnitude_ ) ) );
+        return lest::abs( lhs - rhs.magnitude_ ) < rhs.epsilon_ * ( rhs.scale_ + (lest::min)( lest::abs( lhs ), lest::abs( rhs.magnitude_ ) ) );
     }
 
     friend bool operator == ( approx const & lhs, double rhs ) { return  operator==( rhs, lhs ); }
@@ -535,7 +534,7 @@ struct make_tuple_string
 {
     static std::string make( TU const & tuple )
     {
-        std::ostringstream os; 
+        std::ostringstream os;
         os << to_string( std::get<N - 1>( tuple ) ) << ( N < std::tuple_size<TU>::value ? ", ": " ");
         return make_tuple_string<TU, N - 1>::make( tuple ) + os.str();
     }
@@ -567,7 +566,7 @@ struct expression_lhs
 
     expression_lhs( L lhs ) : lhs( lhs ) {}
 
-    operator result() { return result( lhs, to_string( lhs ) ); }
+    operator result() { return result( !!lhs, to_string( lhs ) ); }
 
     template <typename R> result operator==( R const & rhs ) { return result( lhs == rhs, to_string( lhs, "==", rhs ) ); }
     template <typename R> result operator!=( R const & rhs ) { return result( lhs != rhs, to_string( lhs, "!=", rhs ) ); }
@@ -635,7 +634,7 @@ inline std::ostream & operator<<( std::ostream & os, colourise words ) { return 
 inline text colourise( text words ) { return words; }
 #endif
 
-inline text pluralise( int n, text word )
+inline text pluralise( text word,int n )
 {
     return n == 1 ? word : word + "s";
 }
@@ -845,7 +844,7 @@ struct count : action
 
     ~count()
     {
-        os << n << " selected " << pluralise(n, "test") << "\n";
+        os << n << " selected " << pluralise("test", n) << "\n";
     }
 };
 
@@ -973,11 +972,11 @@ struct confirm : action
     {
         if ( failures > 0 )
         {
-            os << failures << " out of " << selected << " selected " << pluralise(selected, "test") << " " << colourise( "failed.\n" );
+            os << failures << " out of " << selected << " selected " << pluralise("test", selected) << " " << colourise( "failed.\n" );
         }
         else if ( option.pass )
         {
-            os << "All " << selected << " selected " << pluralise(selected, "test") << " " << colourise( "passed.\n" );
+            os << "All " << selected << " selected " << pluralise("test", selected) << " " << colourise( "passed.\n" );
         }
     }
 };
@@ -1260,4 +1259,4 @@ int run(  C const & specification, std::ostream & os = std::cout )
 
 } // namespace lest
 
-#endif // LEST_LEST_H_INCLUDED
+#endif // LEST_LEST_HPP_INCLUDED

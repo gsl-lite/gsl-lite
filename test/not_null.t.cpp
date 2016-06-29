@@ -33,6 +33,8 @@ struct RefCounted
     T * p_;
 };
 
+}
+
 CASE( "not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -187,8 +189,6 @@ CASE( "not_null<>: Allows implicit conversion to underlying type" )
 
     EXPECT( *p == i );
     EXPECT( F::helper( p ) );
-}
-
 }
 
 // end of file

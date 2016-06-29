@@ -17,8 +17,6 @@
 
 #include "gsl-lite.t.h"
 
-namespace {
-
 CASE( "at(): Terminates access to non-existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };
@@ -82,8 +80,6 @@ CASE( "at(): Allows access to existing std::vector elements" )
         a.push_back( i + 1 );
         EXPECT( at(a, i) == i + 1 );
     }
-}
-
 }
 
 // end of file

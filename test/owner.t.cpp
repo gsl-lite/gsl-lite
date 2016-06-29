@@ -17,8 +17,6 @@
 
 #include "gsl-lite.t.h"
 
-namespace {
-
 CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 {
 #if gsl_HAVE_OWNER_TEMPLATE
@@ -61,8 +59,6 @@ CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
 #else
     EXPECT( !!"Owner() macro is not available." );
 #endif
-}
-
 }
 
 // end of file

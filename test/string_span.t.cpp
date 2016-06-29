@@ -17,8 +17,6 @@
 
 #include "gsl-lite.t.h"
 
-namespace {
-
 CASE( "string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -514,8 +512,6 @@ CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensur
     const char * s = "hello"; // not: s[]
     
     EXPECT_THROWS( ensure_z( s, size_t( 3 ) ) );
-}
-
 }
 
 // end of file

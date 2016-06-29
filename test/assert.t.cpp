@@ -22,6 +22,8 @@ namespace {
 bool expects( bool x ) { Expects( x ); return x; } 
 bool ensures( bool x ) { Ensures( x ); return x; }
     
+}
+
 CASE( "Expects(): Allows a true expression" )
 {
     EXPECT( expects( true  ) );
@@ -40,8 +42,6 @@ CASE( "Expects(): Terminates on a false expression" )
 CASE( "Ensures(): Terminates on a false expression" )
 {
     EXPECT_THROWS( ensures( false ) );
-}
-
 }
 
 // end of file
