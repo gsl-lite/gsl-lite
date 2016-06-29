@@ -20,9 +20,9 @@ lest::tests & specification()
     return tests; 
 }
 
-CASE( "__cplusplus" )
+CASE( "__cplusplus" "[.stdc++]" )
 {
-    EXPECT( __cplusplus > 0L );
+    gsl_PRESENT( __cplusplus );
 }
 
 CASE( "Presence of C++ language features" "[.stdlanguage]" )
