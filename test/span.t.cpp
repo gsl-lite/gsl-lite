@@ -236,6 +236,18 @@ CASE( "span<>: Allows construction from a container (std::vector<>)" )
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
+CASE( "span<>: Allows tagged construction from a container (std::vector<>)" )
+{
+# if gsl_HAVE_INITIALIZER_LIST
+    std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+#else
+    std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+#endif
+    span<int> v( with_container, vec );
+
+    EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+}
+
 CASE( "span<>: Allows construction from another span of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };

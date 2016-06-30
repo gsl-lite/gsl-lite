@@ -181,6 +181,8 @@ Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
 \-D<b>gsl\_CONFIG\_ALLOWS\_SPAN\_CONTAINER\_CTOR</b>=1  
 Define this macro to 0 to omit the span constructor for containers for pre-C++11 compilers. This constructor may prove too greedy and interfere with other constructors. Default is 1.
 
+Note: an alternative is to use the constructor tagged `with_container`: span&lt;_value_type_> *s*(with_container, *cont*). 
+
 \-D<b>gsl\_CONFIG\_CONFIRMS\_COMPILATION\_ERRORS</b>=0  
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. Default is 0.
 
@@ -344,6 +346,7 @@ span<>: Allows construction from a C-array
 span<>: Allows construction from a C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows construction from a std::array<> (C++11)
 span<>: Allows construction from a container (std::vector<>)
+span<>: Allows tagged construction from a container (std::vector<>)
 span<>: Allows construction from another span of the same type
 span<>: Allows construction from another span of a compatible type
 span<>: Allows assignment from another span of the same type

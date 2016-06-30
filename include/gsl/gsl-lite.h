@@ -554,6 +554,10 @@ private:
   typedef unsigned char byte;
 #endif
 
+// tag to select span constructor taking a container
+struct with_container_t{};
+const with_container_t with_container;
+
 //
 // span<> - A 1D view of contiguous T's, replace (*,len).
 //
@@ -650,6 +654,12 @@ public:
         , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
     {}
 #endif
+
+    template< class Cont >
+    gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
+        : begin_( cont.size() == 0 ? NULL : &cont[0] )
+        , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
+    {}
 
 #if gsl_HAVE_IS_DEFAULT
     gsl_api gsl_constexpr14 span( span && ) = default;

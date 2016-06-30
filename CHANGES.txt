@@ -1,5 +1,9 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.7.x 2016-05-30
+
+- Added tagged construction from a container to span.
+
 version 0.6.1 2016-05-29
 
 - Fixed library for the removal of _HAS_CPP0X in VS2015 Update 3 (Issue #21, thanks to @exjam)
