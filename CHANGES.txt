@@ -3,6 +3,7 @@ Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 version 0.7.x 2016-05-30
 
 - Added tagged construction from a container to span.
+- Replaced gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 
 version 0.6.1 2016-05-29
 

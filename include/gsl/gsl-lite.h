@@ -29,14 +29,21 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.6.0"
+#define  gsl_lite_VERSION "0.7.x"
 
-// M-GSL and gsl-lite backward compatibility:
+// gsl-lite backward compatibility:
 
 #if ( gsl_CONFIG_THROWS_FOR_TESTING != 0 )
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
 # pragma message ("gsl_CONFIG_THROWS_FOR_TESTING is deprecated since gsl-lite 0.5.0; replace with gsl_CONFIG_CONTRACT_VIOLATION_THROWS.")
 #endif
+
+#ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
+# define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
+# pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+#endif
+
+// M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
@@ -64,8 +71,8 @@
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
 
-#ifndef  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
-# define gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR  1
+#ifndef  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
+# define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  1
 #endif
 
 #if    defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
@@ -213,8 +220,8 @@
 // Other features:
 
 // Note: !defined(__NVCC__) doesn't work with nvcc here:
-#define gsl_HAVE_SPAN_CONTAINER_CTOR  \
-    ( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
+#define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR  \
+    ( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
 
 // GSL API (e.g. for CUDA platform):
 
@@ -641,13 +648,17 @@ public:
 #endif
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD
+# define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR  1
+#endif
+
+#if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
     // SFINAE enable only if Cont has a data() member function
     template< class Cont, typename = decltype(std::declval<Cont>().data()) >
     gsl_api gsl_constexpr14 span( Cont & cont )
         : begin_( cont.data() )
         , end_  ( cont.data() + cont.size() )
     {}
-#elif gsl_HAVE_SPAN_CONTAINER_CTOR
+#elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
         : begin_( cont.size() == 0 ? NULL : &cont[0] )
@@ -925,9 +936,9 @@ gsl_api gsl_constexpr14 span<T> as_span( std::array<T,N> & arr )
 }
 #endif
 
-#if gsl_HAVE_AUTO
+#if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR && gsl_HAVE_AUTO
 template< class Cont >
-gsl_api gsl_constexpr14 auto as_span( Cont & cont ) ->  span< typename Cont::value_type >
+gsl_api gsl_constexpr14 auto as_span( Cont & cont ) -> span< typename Cont::value_type >
 {
     return span< typename Cont::value_type >( cont );
 }
@@ -935,7 +946,7 @@ gsl_api gsl_constexpr14 auto as_span( Cont & cont ) ->  span< typename Cont::val
 template< class T >
 gsl_api span<T> as_span( std::vector<T> & cont )
 {
-    return span<T>( cont );
+    return span<T>( with_container, cont );
 }
 #endif
 

@@ -178,8 +178,8 @@ Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
 
 ### Other configuration macros
 
-\-D<b>gsl\_CONFIG\_ALLOWS\_SPAN\_CONTAINER\_CTOR</b>=1  
-Define this macro to 0 to omit the span constructor for containers for pre-C++11 compilers. This constructor may prove too greedy and interfere with other constructors. Default is 1.
+\-D<b>gsl\_CONFIG\_ALLOWS\_UNCONSTRAINED\_SPAN\_CONTAINER\_CTOR</b>=1  
+Define this macro to 0 to omit the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. Default is 1.
 
 Note: an alternative is to use the constructor tagged `with_container`: span&lt;_value_type_> *s*(with_container, *cont*). 
 

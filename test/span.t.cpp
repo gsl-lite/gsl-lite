@@ -231,9 +231,14 @@ CASE( "span<>: Allows construction from a container (std::vector<>)" )
 #else
     std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
+
+#if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     span<int> v( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+#else
+    EXPECT( !!"(un)constrained construction from container is not available" );
+#endif
 }
 
 CASE( "span<>: Allows tagged construction from a container (std::vector<>)" )
