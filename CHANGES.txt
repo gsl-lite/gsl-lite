@@ -1,5 +1,12 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.6.1 2016-05-29
+
+- Fixed library for the removal of _HAS_CPP0X in VS2015 Update 3 (Issue #21, thanks to @exjam)
+- Added tests tagged [.stdlangauge], [.stdlibrary] to inspect various gsl_HAVE_... macros.
+- Added tag [.stdc++] to test to inspect __cplusplus.
+- Updated lest test framework to version 1.27.0.
+
 version 0.6.0 2016-05-25
 
 - Renamed Final_act to final_act to follow standard library conventions.
