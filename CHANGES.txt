@@ -1,28 +1,28 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
-version 0.7.x 2016-05-30
+version 0.7.0 2016-06-30
 
 - Added tagged construction from a container to span.
 - Replaced gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 
-version 0.6.1 2016-05-29
+version 0.6.1 2016-06-29
 
 - Fixed library for the removal of _HAS_CPP0X in VS2015 Update 3 (Issue #21, thanks to @exjam)
 - Added tests tagged [.stdlangauge], [.stdlibrary] to inspect various gsl_HAVE_... macros.
 - Added tag [.stdc++] to test to inspect __cplusplus.
 - Updated lest test framework to version 1.27.0.
 
-version 0.6.0 2016-05-25
+version 0.6.0 2016-06-25
 
 - Renamed Final_act to final_act to follow standard library conventions.
 - Fixed final_act to also work without copy-elision optimization, issue #19 (thanks to Marco Arena).
 
-version 0.5.0 2016-05-24
+version 0.5.0 2016-06-24
 
 - Added compatibility with MS GSL symbolic names for contract violation response control.
 - Added contract violation response control as suggested in N4415, Simple Contracts for C++.
 
-version 0.4.1 2016-05-23
+version 0.4.1 2016-06-23
 
 - Added gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR for pre-C++11 (default: 1).
 - Avoided std::distance() to support CUDA.
