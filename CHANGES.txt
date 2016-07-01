@@ -1,5 +1,9 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.7.1 2016-07-01
+
+- Fix with_container_t to be literal type (thanks to Dave Tallman).
+
 version 0.7.0 2016-06-30
 
 - Added tagged construction from a container to span.
