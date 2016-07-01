@@ -562,7 +562,7 @@ private:
 #endif
 
 // tag to select span constructor taking a container
-struct with_container_t{ with_container_t(){} };
+struct with_container_t{ gsl_constexpr14 with_container_t(){} };
 const with_container_t with_container;
 
 //
