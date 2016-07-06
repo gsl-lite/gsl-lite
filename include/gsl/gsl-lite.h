@@ -929,24 +929,46 @@ gsl_api gsl_constexpr14 span<T> as_span( T (&arr)[N] )
 }
 
 #if gsl_HAVE_ARRAY
+
 template< typename T, size_t N >
 gsl_api gsl_constexpr14 span<T> as_span( std::array<T,N> & arr )
 {
     return span<T>( arr );
 }
+
+template< typename T, size_t N >
+gsl_api gsl_constexpr14 span<const T> as_span( std::array<T,N> const & arr )
+{
+    return span<const T>( arr );
+}
 #endif
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR && gsl_HAVE_AUTO
+
 template< class Cont >
 gsl_api gsl_constexpr14 auto as_span( Cont & cont ) -> span< typename Cont::value_type >
 {
     return span< typename Cont::value_type >( cont );
 }
+
+template< class Cont >
+gsl_api gsl_constexpr14 auto as_span( Cont const & cont ) -> span< const typename Cont::value_type >
+{
+    return span< const typename Cont::value_type >( cont );
+}
+
 #else
+
 template< class T >
 gsl_api span<T> as_span( std::vector<T> & cont )
 {
     return span<T>( with_container, cont );
+}
+
+template< class T >
+gsl_api span<const T> as_span( std::vector<T> const & cont )
+{
+    return span<const T>( with_container, cont );
 }
 #endif
 

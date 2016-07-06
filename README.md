@@ -383,10 +383,15 @@ span<>: Allows to view and change the elements as writable bytes
 span<>: Allows to view the elements as a span of another type
 span<>: Allows to change the elements from a span of another type
 span<>: Allows building from two pointers
+span<>: Allows building from two const pointers
 span<>: Allows building from a non-null pointer and a size
+span<>: Allows building from a non-null const pointer and a size
 span<>: Allows building from a C-array
+span<>: Allows building from a const C-array
 span<>: Allows building from a std::array<> (C++11)
+span<>: Allows building from a const std::array<> (C++11)
 span<>: Allows building from a container (std::vector<>)
+span<>: Allows building from a const container (std::vector<>)
 string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Allows to create a string_span from a non-const C-string and size
