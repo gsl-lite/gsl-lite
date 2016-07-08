@@ -633,6 +633,22 @@ public:
         Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
     }
 
+    template< typename U >
+    gsl_api gsl_constexpr14 span( U * & data_in, size_type size_in )
+        : begin_( data_in )
+        , end_  ( data_in + size_in )
+    {
+        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
+    }
+
+    template< typename U >
+    gsl_api gsl_constexpr14 span( U * const & data_in, size_type size_in )
+        : begin_( data_in )
+        , end_  ( data_in + size_in )
+    {
+        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
+    }
+
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( U (&arr)[N] )
         : begin_( arr )
@@ -883,24 +899,6 @@ public:
     {
         Expects( ( this->bytes() % sizeof(U) ) == 0 );
         return span< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
-    }
-
-private:
-    // helpers for member as_span()
-    template< typename U >
-    gsl_api gsl_constexpr14 span( U * & data_in, size_type size_in )
-        : begin_( data_in )
-        , end_  ( data_in + size_in )
-    {
-        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
-    }
-
-    template< typename U >
-    gsl_api gsl_constexpr14 span( U * const & data_in, size_type size_in )
-        : begin_( data_in )
-        , end_  ( data_in + size_in )
-    {
-        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
     }
 
 private:

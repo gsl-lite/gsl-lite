@@ -122,14 +122,18 @@ CASE( "span<>: Terminates creation of a sub span outside the span" )
 CASE( "span<>: Allows default construction" )
 {
     span<int> v;
+    
     EXPECT( v.size() == size_t( 0 ) );
 }
 
 CASE( "span<>: Allows construction from a nullptr and a zero size (C++11)" )
 {
 #if gsl_HAVE_NULLPTR
-    span<int> v( nullptr, 0 );
+    span<      int> v( nullptr, 0 );
+    span<const int> w( nullptr, 0 );
+
     EXPECT( v.size() == size_t( 0 ) );
+    EXPECT( w.size() == size_t( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
@@ -138,8 +142,25 @@ CASE( "span<>: Allows construction from a nullptr and a zero size (C++11)" )
 CASE( "span<>: Allows construction from a l-value (C++11)" )
 {
 #if gsl_HAVE_IS_DELETE
-    int x;
-    span<int> v( x );
+    int x = 0;
+
+    span<      int> v( x );
+    span<const int> w( x );
+
+    EXPECT( v.size() == size_t( 1 ) );
+    EXPECT( w.size() == size_t( 1 ) );
+#else
+    EXPECT( !!"=delete is not available (no C++11)" );
+#endif
+}
+
+CASE( "span<>: Allows construction from a const l-value (C++11)" )
+{
+#if gsl_HAVE_IS_DELETE
+    const int x = 0;
+
+    span<const int> v( x );
+
     EXPECT( v.size() == size_t( 1 ) );
 #else
     EXPECT( !!"=delete is not available (no C++11)" );
@@ -150,7 +171,18 @@ CASE( "span<>: Allows construction from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> v( arr, arr + gsl_DIMENSION_OF( arr ) );
+    span<      int> v( arr, arr + gsl_DIMENSION_OF( arr ) );
+    span<const int> w( arr, arr + gsl_DIMENSION_OF( arr ) );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+}
+
+CASE( "span<>: Allows construction from two pointers to const" )
+{
+    const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    span<const int> v( arr, arr + gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
@@ -159,7 +191,18 @@ CASE( "span<>: Allows construction from a non-null pointer and a size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> v( arr, gsl_DIMENSION_OF( arr ) );
+    span<      int> v( arr, gsl_DIMENSION_OF( arr ) );
+    span<const int> w( arr, gsl_DIMENSION_OF( arr ) );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+}
+
+CASE( "span<>: Allows construction from a non-null pointer to const and a size" )
+{
+    const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    span<const int> v( arr, gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
@@ -168,7 +211,18 @@ CASE( "span<>: Allows construction from a temporary pointer and a size" )
 {
     int x = 42;
 
-    span<int> v( &x, 1 );
+    span<      int> v( &x, 1 );
+    span<const int> w( &x, 1 );
+
+    EXPECT( std::equal( v.begin(), v.end(), &x ) );
+    EXPECT( std::equal( w.begin(), w.end(), &x ) );
+}
+
+CASE( "span<>: Allows construction from a temporary pointer to const and a size" )
+{
+    const int x = 42;
+
+    span<const int> v( &x, 1 );
 
     EXPECT( std::equal( v.begin(), v.end(), &x ) );
 }
@@ -192,7 +246,19 @@ CASE( "span<>: Allows construction from any pointer and a zero size" )
 CASE( "span<>: Allows construction from a C-array" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    span<int> v( arr );
+    
+    span<      int> v( arr );
+    span<const int> w( arr );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+}
+
+CASE( "span<>: Allows construction from a const C-array" )
+{
+    const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+    
+    span<const int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
@@ -201,14 +267,43 @@ CASE( "span<>: Allows construction from a C-array with size via decay to pointer
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> v( arr, gsl_DIMENSION_OF(arr) );
+    {
+    span<      int> v( arr, gsl_DIMENSION_OF(arr) );
+    span<const int> w( arr, gsl_DIMENSION_OF(arr) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
+    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+    }
 
 #if gsl_CPP14_OR_GREATER
-    span<int> w( arr, 3 );
+    {
+    span<      int> v( arr, 3 );
+    span<const int> w( arr, 3 );
 
+    EXPECT( std::equal( v.begin(), v.end(), arr, arr + 3 ) );
     EXPECT( std::equal( w.begin(), w.end(), arr, arr + 3 ) );
+    }
+#endif
+}
+
+CASE( "span<>: Allows construction from a const C-array with size via decay to pointer (potentially dangerous)" )
+{
+    const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    {
+    span<const int> v( arr, gsl_DIMENSION_OF(arr) );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+    }
+
+#if gsl_CPP14_OR_GREATER
+    {
+    span<      int> v( arr, 3 );    // Beware: compiles!
+    span<const int> w( arr, 3 );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr, arr + 3 ) );
+    EXPECT( std::equal( w.begin(), w.end(), arr, arr + 3 ) );
+    }
 #endif
 }
 
@@ -216,7 +311,23 @@ CASE( "span<>: Allows construction from a std::array<> (C++11)" )
 {
 # if gsl_HAVE_ARRAY
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
-    span<int> v( arr );
+
+    span<      int> v( arr );
+    span<const int> w( arr );
+
+    EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
+    EXPECT( std::equal( w.begin(), w.end(), arr.begin() ) );
+#else
+    EXPECT( !!"std::array<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "span<>: Allows construction from a std::array<> with const data (C++11)" )
+{
+# if gsl_HAVE_ARRAY
+    std::array<const int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
+
+    span<const int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
@@ -233,9 +344,11 @@ CASE( "span<>: Allows construction from a container (std::vector<>)" )
 #endif
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
-    span<int> v( vec );
+    span<      int> v( vec );
+    span<const int> w( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+    EXPECT( std::equal( w.begin(), w.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
 #endif
@@ -248,40 +361,51 @@ CASE( "span<>: Allows tagged construction from a container (std::vector<>)" )
 #else
     std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
-    span<int> v( with_container, vec );
+    span<      int> v( with_container, vec );
+    span<const int> w( with_container, vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+    EXPECT( std::equal( w.begin(), w.end(), vec.begin() ) );
 }
 
 CASE( "span<>: Allows construction from another span of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    span<int> v( arr );
+    span<      int> v( arr );
+    span<const int> w( arr );
 
-    span<int> w( v );
+    span<      int> x( v );
+    span<const int> y( w );
 
-    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+    EXPECT( std::equal( x.begin(), x.end(), arr ) );
+    EXPECT( std::equal( y.begin(), y.end(), arr ) );
 }
 
 CASE( "span<>: Allows construction from another span of a compatible type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    span<int> v( arr );
+    span<      int> v( arr );
+    span<const int> w( arr );
 
-    span<const volatile int> w( v );
+    span<const volatile int> x( v );
+    span<const volatile int> y( v );
 
-    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+    EXPECT( std::equal( x.begin(), x.end(), arr ) );
+    EXPECT( std::equal( y.begin(), y.end(), arr ) );
 }
 
 CASE( "span<>: Allows assignment from another span of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    span<int> v( arr );
-    span<int> w;
+    span<      int> v( arr );
+    span<      int> s;
+    span<const int> t;
 
-    w = v;
+    s = v;
+    t = v;
 
-    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+    EXPECT( std::equal( s.begin(), s.end(), arr ) );
+    EXPECT( std::equal( t.begin(), t.end(), arr ) );
 }
 
 #if gsl_CPP11_OR_GREATER
@@ -290,18 +414,26 @@ CASE( "span<>: Allows move-construction from another span of the same type (C++1
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> w(( span<int>( arr ) ));
+    span<      int> v(( span<      int>( arr ) ));
+//  span<      int> w(( span<const int>( arr ) ));
+    span<const int> x(( span<      int>( arr ) ));
+    span<const int> y(( span<const int>( arr ) ));
 
-    EXPECT( std::equal( w.begin(), w.end(), arr ) );
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
+    EXPECT( std::equal( x.begin(), x.end(), arr ) );
+    EXPECT( std::equal( y.begin(), y.end(), arr ) );
 }
 
 CASE( "span<>: Allows move-assignment from another span of the same type (C++11)" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    span<int> w;
+    span<      int> v;
+    span<const int> w;
 
+    v = span<int>( arr );
     w = span<int>( arr );
 
+    EXPECT( std::equal( v.begin(), v.end(), arr ) );
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
 }
 #endif
@@ -312,10 +444,13 @@ CASE( "span<>: Allows creation of a sub span of the first n elements" )
     span<int> v( arr );
     size_t count = 3;
 
-    span<int> s = v.first( count );
+    span<      int> s = v.first( count );
+    span<const int> t = v.first( count );
 
     EXPECT( s.size() == count );
+    EXPECT( t.size() == count );
     EXPECT( std::equal( s.begin(), s.end(), arr ) );
+    EXPECT( std::equal( t.begin(), t.end(), arr ) );
 }
 
 CASE( "span<>: Allows creation of a sub span of the last n elements" )
@@ -324,10 +459,13 @@ CASE( "span<>: Allows creation of a sub span of the last n elements" )
     span<int> v( arr );
     size_t count = 3;
 
-    span<int> s = v.last( count );
+    span<      int> s = v.last( count );
+    span<const int> t = v.last( count );
 
     EXPECT( s.size() == count );
+    EXPECT( t.size() == count );
     EXPECT( std::equal( s.begin(), s.end(), arr + v.size() - count ) );
+    EXPECT( std::equal( t.begin(), t.end(), arr + v.size() - count ) );
 }
 
 CASE( "span<>: Allows creation of a sub span starting at a given offset" )
@@ -336,10 +474,13 @@ CASE( "span<>: Allows creation of a sub span starting at a given offset" )
     span<int> v( arr );
     size_t offset = 1;
 
-    span<int> s = v.subspan( offset );
+    span<      int> s = v.subspan( offset );
+    span<const int> t = v.subspan( offset );
 
     EXPECT( s.size() == v.size() - offset );
+    EXPECT( t.size() == v.size() - offset );
     EXPECT( std::equal( s.begin(), s.end(), arr + offset ) );
+    EXPECT( std::equal( t.begin(), t.end(), arr + offset ) );
 }
 
 CASE( "span<>: Allows creation of a sub span starting at a given offset with a given length" )
@@ -349,10 +490,13 @@ CASE( "span<>: Allows creation of a sub span starting at a given offset with a g
     size_t offset = 1;
     size_t length = 1;
 
-    span<int> s = v.subspan( offset, length );
+    span<      int> s = v.subspan( offset, length );
+    span<const int> t = v.subspan( offset, length );
 
     EXPECT( s.size() == length );
+    EXPECT( t.size() == length );
     EXPECT( std::equal( s.begin(), s.end(), arr + offset ) );
+    EXPECT( std::equal( t.begin(), t.end(), arr + offset ) );
 }
 
 CASE( "span<>: Allows forward iteration" )

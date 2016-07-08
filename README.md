@@ -338,13 +338,20 @@ span<>: Terminates creation of a sub span outside the span
 span<>: Allows default construction
 span<>: Allows construction from a nullptr and a zero size (C++11)
 span<>: Allows construction from a l-value (C++11)
+span<>: Allows construction from a const l-value (C++11)
 span<>: Allows construction from two pointers
+span<>: Allows construction from two pointers to const
 span<>: Allows construction from a non-null pointer and a size
+span<>: Allows construction from a non-null pointer to const and a size
 span<>: Allows construction from a temporary pointer and a size
+span<>: Allows construction from a temporary pointer to const and a size
 span<>: Allows construction from any pointer and a zero size
 span<>: Allows construction from a C-array
+span<>: Allows construction from a const C-array
 span<>: Allows construction from a C-array with size via decay to pointer (potentially dangerous)
+span<>: Allows construction from a const C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows construction from a std::array<> (C++11)
+span<>: Allows construction from a std::array<> with const data (C++11)
 span<>: Allows construction from a container (std::vector<>)
 span<>: Allows tagged construction from a container (std::vector<>)
 span<>: Allows construction from another span of the same type
