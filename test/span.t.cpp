@@ -535,7 +535,7 @@ CASE( "span<>: Allows reverse iteration" )
 CASE( "span<>: Allows const reverse iteration" )
 {
     int arr[] = { 1, 2, 3, };
-    span<int> v( arr );
+    const span<int> v( arr );
 
     for ( span<int>::const_reverse_iterator pos = v.crbegin(); pos != v.crend(); ++pos )
     {
@@ -546,44 +546,93 @@ CASE( "span<>: Allows const reverse iteration" )
 CASE( "span<>: Allows conversion to bool (true if non-empty)" )
 {
     int arr[] = { 1, 2, 3, };
-    span<int> v( arr );
+    span<int>       v( arr );
+    span<int> const w( arr );
 
     EXPECT( !!v );
+    EXPECT( !!w );
 }
 
-CASE( "span<>: Allows element access via array indexing" )
+CASE( "span<>: Allows to observe element via array indexing" )
 {
     int arr[] = { 1, 2, 3, };
-    span<int> v( arr );
+    span<int>       v( arr );
+    span<int> const w( arr );
 
     for ( size_t i = 0; i < v.size(); ++i )
     {
         EXPECT( v[i] == arr[i] );
+        EXPECT( w[i] == arr[i] );
     }
 }
 
-CASE( "span<>: Allows element access via at()" )
+CASE( "span<>: Allows to change element via array indexing" )
 {
     int arr[] = { 1, 2, 3, };
-    span<int> v( arr );
+    span<int>       v( arr );
+    span<int> const w( arr );
+    
+    v[1] = 22;
+    w[2] = 33;
+
+    EXPECT( 22 == arr[1] );
+    EXPECT( 33 == arr[2] );
+}
+
+CASE( "span<>: Allows to observe element via at()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
 
     for ( size_t i = 0; i < v.size(); ++i )
     {
         EXPECT( v.at(i) == arr[i] );
+        EXPECT( w.at(i) == arr[i] );
     }
 }
 
-CASE( "span<>: Allows element access via data()" )
+CASE( "span<>: Allows to change element via at()" )
 {
     int arr[] = { 1, 2, 3, };
-    span<int> v( arr );
+    span<int>       v( arr );
+    span<int> const w( arr );
+    
+    v.at(1) = 22;
+    w.at(2) = 33;
+
+    EXPECT( 22 == arr[1] );
+    EXPECT( 33 == arr[2] );
+}
+
+CASE( "span<>: Allows to observe element via data()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
 
     EXPECT( *v.data() == *v.begin() );
+    EXPECT( *w.data() == *v.begin() );
 
     for ( size_t i = 0; i < v.size(); ++i )
     {
         EXPECT( v.data()[i] == arr[i] );
+        EXPECT( w.data()[i] == arr[i] );
     }
+}
+
+CASE( "span<>: Allows to change element via data()" )
+{
+    int arr[] = { 1, 2, 3, };
+
+    span<int> v( arr );
+    span<int> const w( arr );
+
+    *v.data() = 22;
+    EXPECT( 22 == *v.data() );
+      
+    *w.data() = 33;
+    EXPECT( 33 == *w.data() );
 }
 
 CASE( "span<>: Allows to compare equal to another span of the same type" )
@@ -988,6 +1037,21 @@ CASE( "span<>: Allows building from a const container (std::vector<>)" )
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
+
+CASE( "span<>: issue 23" )
+{
+    int x = 0;
+    int * p = &x;
+    size_t n = 1;
+
+          span<int> s(p, n);
+    const span<int> t(p, n);
+
+    s[0] = 42;
+    t[0] = 42; // doesn't compile
+}
+
+// Terminates out-of-bounds at()
 
 
 #if 0

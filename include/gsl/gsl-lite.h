@@ -794,7 +794,7 @@ public:
         return at( index );
     }
 
-    gsl_api gsl_constexpr14 const_reference operator[]( size_type index ) const
+    gsl_api gsl_constexpr14 reference operator[]( size_type index ) const
     {
        return at( index );
     }
@@ -836,7 +836,7 @@ public:
         return begin_[ index ];
     }
 
-    gsl_api gsl_constexpr14 const_reference at( size_type index ) const
+    gsl_api gsl_constexpr14 reference at( size_type index ) const
     {
        Expects( index < size() );
        return begin_[ index ];

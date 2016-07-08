@@ -368,9 +368,12 @@ span<>: Allows const forward iteration
 span<>: Allows reverse iteration
 span<>: Allows const reverse iteration
 span<>: Allows conversion to bool (true if non-empty)
-span<>: Allows element access via array indexing
-span<>: Allows element access via at()
-span<>: Allows element access via data()
+span<>: Allows to observe element via array indexing
+span<>: Allows to change element via array indexing
+span<>: Allows to observe element via at()
+span<>: Allows to change element via at()
+span<>: Allows to observe element via data()
+span<>: Allows to change element via data()
 span<>: Allows to compare equal to another span of the same type
 span<>: Allows to compare unequal to another span of the same type
 span<>: Allows to compare less than another span of the same type
@@ -399,6 +402,7 @@ span<>: Allows building from a std::array<> (C++11)
 span<>: Allows building from a const std::array<> (C++11)
 span<>: Allows building from a container (std::vector<>)
 span<>: Allows building from a const container (std::vector<>)
+span<>: issue 23
 string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Allows to create a string_span from a non-const C-string and size
