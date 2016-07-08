@@ -1,5 +1,11 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.7.3 2016-07-08
+
+- Removed boundary check from operator[]()
+- Changed indexing to return non-const reference and make it STL compliant (issue #23, thanks to @marton78)
+- Made converting constructors public (issue #22, thanks to @marton78).
+
 version 0.7.2 2016-07-06
 
 - Fixed as_span() for const arguments (thanks to Dave Tallman).
