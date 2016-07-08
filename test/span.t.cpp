@@ -298,10 +298,8 @@ CASE( "span<>: Allows construction from a const C-array with size via decay to p
 
 #if gsl_CPP14_OR_GREATER
     {
-    span<      int> v( arr, 3 );    // Beware: compiles!
     span<const int> w( arr, 3 );
 
-    EXPECT( std::equal( v.begin(), v.end(), arr, arr + 3 ) );
     EXPECT( std::equal( w.begin(), w.end(), arr, arr + 3 ) );
     }
 #endif
