@@ -1049,21 +1049,6 @@ CASE( "span<>: Allows building from a const container (std::vector<>)" )
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-CASE( "span<>: issue 23" )
-{
-    int x = 0;
-    int * p = &x;
-    size_t n = 1;
-
-          span<int> s(p, n);
-    const span<int> t(p, n);
-
-    s[0] = 42;
-    t[0] = 42; // doesn't compile
-}
-
-// Terminates out-of-bounds at()
-
 
 #if 0
 CASE( "span_convertible" ) {}
