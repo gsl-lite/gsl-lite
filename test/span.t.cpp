@@ -119,6 +119,19 @@ CASE( "span<>: Terminates creation of a sub span outside the span" )
     EXPECT_THROWS( F::blow_count()  );
 }
 
+CASE( "span<>: Terminates access outside the span" )
+{
+    struct F { 
+        static void blow_ix(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; } 
+        static void blow_at(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); } 
+    };
+
+    EXPECT_NO_THROW( F::blow_ix(2) );
+    EXPECT_NO_THROW( F::blow_at(2) );
+    EXPECT_THROWS(   F::blow_ix(3) );
+    EXPECT_THROWS(   F::blow_at(3) );
+}
+
 CASE( "span<>: Allows default construction" )
 {
     span<int> v;

@@ -335,6 +335,7 @@ span<>: Terminates construction from a null pointer and a non-zero size
 span<>: Terminates creation of a sub span of the first n elements for n exceeding the span
 span<>: Terminates creation of a sub span of the last n elements for n exceeding the span
 span<>: Terminates creation of a sub span outside the span
+span<>: Terminates access outside the span
 span<>: Allows default construction
 span<>: Allows construction from a nullptr and a zero size (C++11)
 span<>: Allows construction from a l-value (C++11)
