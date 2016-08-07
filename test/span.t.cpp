@@ -105,7 +105,7 @@ CASE( "span<>: Terminates creation of a sub span outside the span" )
         int arr[] = { 1, 2, 3, };
         span<int> v( arr );
 
-        (void) v.subspan( 3 );
+        (void) v.subspan( 4 );
     }
     static void blow_count() 
     { 
@@ -508,6 +508,33 @@ CASE( "span<>: Allows creation of a sub span starting at a given offset with a g
     EXPECT( t.size() == length );
     EXPECT( std::equal( s.begin(), s.end(), arr + offset ) );
     EXPECT( std::equal( t.begin(), t.end(), arr + offset ) );
+}
+
+CASE( "span<>: Allows creation of empty sub span starting at size" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int> v( arr );
+    size_t offset = v.size();
+
+    span<      int> s = v.subspan( offset );
+    span<const int> t = v.subspan( offset );
+
+    EXPECT( s.empty() );
+    EXPECT( t.empty() );
+}
+
+CASE( "span<>: Allows creation of empty sub span starting at full offset with zero length" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int> v( arr );
+    size_t offset = v.size();
+    size_t length = 0;
+
+    span<      int> s = v.subspan( offset, length );
+    span<const int> t = v.subspan( offset, length );
+
+    EXPECT( s.empty() );
+    EXPECT( t.empty() );
 }
 
 CASE( "span<>: Allows forward iteration" )
