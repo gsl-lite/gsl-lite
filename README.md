@@ -364,6 +364,8 @@ span<>: Allows creation of a sub span of the first n elements
 span<>: Allows creation of a sub span of the last n elements
 span<>: Allows creation of a sub span starting at a given offset
 span<>: Allows creation of a sub span starting at a given offset with a given length
+span<>: Allows creation of an empty sub span at full offset
+span<>: Allows creation of an empty sub span at full offset with zero length
 span<>: Allows forward iteration
 span<>: Allows const forward iteration
 span<>: Allows reverse iteration

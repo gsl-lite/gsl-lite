@@ -510,7 +510,7 @@ CASE( "span<>: Allows creation of a sub span starting at a given offset with a g
     EXPECT( std::equal( t.begin(), t.end(), arr + offset ) );
 }
 
-CASE( "span<>: Allows creation of empty sub span starting at size" )
+CASE( "span<>: Allows creation of an empty sub span at full offset" )
 {
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
@@ -523,7 +523,7 @@ CASE( "span<>: Allows creation of empty sub span starting at size" )
     EXPECT( t.empty() );
 }
 
-CASE( "span<>: Allows creation of empty sub span starting at full offset with zero length" )
+CASE( "span<>: Allows creation of an empty sub span at full offset with zero length" )
 {
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
