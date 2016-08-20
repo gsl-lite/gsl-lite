@@ -594,7 +594,7 @@ gsl_api inline gsl_constexpr14 unsigned char to_uchar( byte b ) gsl_noexcept
 }
 
 #if ! gsl_HAVE_ENUM_CLASS
-inline gsl_constexpr14 bool operator==( gsl::byte a, gsl::byte b )
+inline gsl_constexpr14 bool operator==( byte a, byte b )
 {
     return a.v == b.v;
 }
