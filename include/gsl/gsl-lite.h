@@ -562,10 +562,10 @@ private:
 #endif
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
-#define gsl_ENABLE_IF_INTEGRAL_T(T)  \
+# define gsl_ENABLE_IF_INTEGRAL_T(T)  \
     , class = typename std::enable_if<std::is_integral<T>::value>::type
 #else
-#define gsl_ENABLE_IF_INTEGRAL_T(T)
+# define gsl_ENABLE_IF_INTEGRAL_T(T)
 #endif
 
 template< class  T >
