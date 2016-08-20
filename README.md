@@ -309,6 +309,20 @@ at(): Terminates access to non-existing std::vector elements
 at(): Allows access to existing C-array elements
 at(): Allows access to existing std::array elements (C++11)
 at(): Allows access to existing std::vector elements
+byte: Allows construction from integral via static cast (C++11)
+byte: Allows construction from integral via byte() (C++11)
+byte: Allows construction from integral via to_byte()
+byte: Allows conversion to integral via to_integer()
+byte: Allows bitwise or operation
+byte: Allows bitwise and operation
+byte: Allows bitwise x-or operation
+byte: Allows bitwise or assignment
+byte: Allows bitwise and assignment
+byte: Allows bitwise x-or assignment
+byte: Allows shift-left operation
+byte: Allows shift-right operation
+byte: Allows shift-left assignment
+byte: Allows shift-right assignment
 not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)

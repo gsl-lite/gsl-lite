@@ -31,7 +31,7 @@ namespace std {
 namespace lest {
 #endif
 
-inline std::ostream & operator<<( std::ostream & os, std::wstring const & text  )
+inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 { 
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
     return os << std::string( text.begin(), text.end() );
@@ -50,9 +50,9 @@ namespace gsl {
 
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
-inline std::ostream & operator<<( std::ostream & os, gsl::byte b )
+inline std::ostream & operator<<( std::ostream & os, byte b )
 {
-    return os << std::hex << "0x" << static_cast<int>(b); 
+    return os << std::hex << "0x" << to_integer<int>(b); 
 }
 
 } // namespace gsl

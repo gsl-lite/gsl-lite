@@ -37,6 +37,7 @@
 		<Unit filename="../test/CMakeLists.txt" />
 		<Unit filename="../test/assert.t.cpp" />
 		<Unit filename="../test/at.t.cpp" />
+		<Unit filename="../test/byte.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.h" />
 		<Unit filename="../test/lest_cpp03.hpp" />

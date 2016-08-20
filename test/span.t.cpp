@@ -869,8 +869,8 @@ CASE( "span<>: Allows to view the elements as read-only bytes" )
     EXPECT( sizeof( type ) == size_t( 4 ) );
 
     type  a[] = { 0x12345678, };
-    gyte be[] = { gyte(0x12), gyte(0x34), gyte(0x56), gyte(0x78), };
-    gyte le[] = { gyte(0x78), gyte(0x56), gyte(0x34), gyte(0x12), };
+    gyte be[] = { to_byte(0x12), to_byte(0x34), to_byte(0x56), to_byte(0x78), };
+    gyte le[] = { to_byte(0x78), to_byte(0x56), to_byte(0x34), to_byte(0x12), };
 
     gyte * b = is_little_endian() ? le : be;
 
@@ -898,12 +898,12 @@ CASE( "span<>: Allows to view and change the elements as writable bytes" )
     span<int> va( a );
     span<gyte> vb( va.as_writeable_bytes() );
 
-    {for ( size_t i = 0; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
+    {for ( size_t i = 0; i < sizeof(type); ++i ) EXPECT( vb[i] == to_byte(0) ); }
 
-    vb[0] = gyte(0x42);
+    vb[0] = to_byte(0x42);
 
-    EXPECT( vb[0] == gyte(0x42) );
-    {for ( size_t i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == gyte(0) ); }
+    EXPECT( vb[0] == to_byte(0x42) );
+    {for ( size_t i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == to_byte(0) ); }
 }
 
 CASE( "span<>: Allows to view the elements as a span of another type" )

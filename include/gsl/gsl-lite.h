@@ -556,10 +556,108 @@ private:
   enum class byte : std::uint8_t {};
 #elif gsl_HAVE_SIZED_TYPES
 # include <cstdint>
-  typedef std::uint8_t byte;
+  struct byte { typedef std::uint8_t type; type v; };
 #else
-  typedef unsigned char byte;
+  struct byte { typedef unsigned char type; type v; };
 #endif
+
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+#define gsl_ENABLE_IF_INTEGRAL_T(T)  \
+    , class = typename std::enable_if<std::is_integral<T>::value>::type
+#else
+#define gsl_ENABLE_IF_INTEGRAL_T(T)
+#endif
+
+template< class  T >
+gsl_api inline gsl_constexpr14 byte to_byte( T v ) gsl_noexcept
+{
+#if gsl_HAVE_ENUM_CLASS
+    return static_cast<byte>( v );
+#else
+    byte b = { static_cast<typename byte::type>( v ) }; return b;
+#endif
+}
+
+template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
+gsl_api inline gsl_constexpr14 IntegerType to_integer( byte b ) gsl_noexcept
+{
+#if gsl_HAVE_ENUM_CLASS
+    return static_cast<IntegerType>( b );
+#else
+    return b.v;
+#endif
+}
+
+gsl_api inline gsl_constexpr14 unsigned char to_uchar( byte b ) gsl_noexcept
+{
+    return to_integer<unsigned char>( b );
+}
+
+#if ! gsl_HAVE_ENUM_CLASS
+inline gsl_constexpr14 bool operator==( gsl::byte a, gsl::byte b )
+{
+    return a.v == b.v;
+}
+#endif
+
+template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
+gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
+{
+    return b = to_byte( to_uchar( b ) << shift );
+}
+
+template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
+gsl_api inline gsl_constexpr14 byte operator<<( byte b, IntegerType shift ) gsl_noexcept
+{
+    return to_byte( to_uchar( b ) << shift );
+}
+
+template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
+gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
+{
+    return b = to_byte( to_uchar( b ) >> shift );
+}
+
+template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
+gsl_api inline gsl_constexpr14 byte operator>>( byte b, IntegerType shift ) gsl_noexcept
+{
+    return to_byte( to_uchar( b ) >> shift );
+}
+
+gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcept
+{
+    return l = to_byte( to_uchar( l ) | to_uchar( r ) );
+}
+
+gsl_api inline gsl_constexpr14 byte operator|( byte l, byte r ) gsl_noexcept
+{
+    return to_byte( to_uchar( l ) | to_uchar( r ) );
+}
+
+gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcept
+{
+    return l = to_byte( to_uchar( l ) & to_uchar( r ) );
+}
+
+gsl_api inline gsl_constexpr14 byte operator&( byte l, byte r ) gsl_noexcept
+{
+    return to_byte( to_uchar( l ) & to_uchar( r ) );
+}
+
+gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcept
+{
+    return l = to_byte( to_uchar( l ) ^ to_uchar (r ) );
+}
+
+gsl_api inline gsl_constexpr14 byte operator^( byte l, byte r ) gsl_noexcept
+{
+    return to_byte( to_uchar( l ) ^ to_uchar( r ) );
+}
+
+gsl_api inline gsl_constexpr14 byte operator~( byte b ) gsl_noexcept 
+{ 
+    return to_byte( ~to_uchar( b ) ); 
+}
 
 // tag to select span constructor taking a container
 struct with_container_t{ gsl_constexpr14 with_container_t(){} };
