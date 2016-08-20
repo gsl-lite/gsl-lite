@@ -1,5 +1,9 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.8.0 2016-08-20
+
+- Add operations for byte type.
+
 version 0.7.5 2016-08-08
 
 - Fix to create empty subspan, enabling slicing off data until span is empty (PR #26, thanks to Janusz Chorko).
