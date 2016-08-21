@@ -18,7 +18,7 @@
 #include "gsl-lite.t.h"
 
 // Use gsl::byte instead of plain byte to prevent collisions with 
-// other byte declarations, such as in rpcndr.h (Windws kit).
+// other byte declarations, such as in rpcndr.h (Windows kit).
 
 // We have a chicken & egg problem here: 
 //   verifying operations via to_integer() that has yet to verified itself...
