@@ -32,6 +32,7 @@
 		<Unit filename="../example/01-basic.cpp" />
 		<Unit filename="../example/02-span.cpp" />
 		<Unit filename="../include/gsl.h" />
+		<Unit filename="../include/gsl/gsl" />
 		<Unit filename="../include/gsl/gsl-lite-vc6.h" />
 		<Unit filename="../include/gsl/gsl-lite.h" />
 		<Unit filename="../test/CMakeLists.txt" />
