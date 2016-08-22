@@ -470,6 +470,16 @@ gsl_api typename Cont::value_type & at( Cont & cont, size_t index )
     return cont[index];
 }
 
+#if gsl_HAVE_INITIALIZER_LIST
+
+template< class T >
+gsl_api const T & at( std::initializer_list<T> cont, size_t index )
+{
+    Expects( index < cont.size() );
+    return *( cont.begin() + index );
+}
+#endif
+
 //
 // not_null<> - Wrap any indirection and enforce non-null.
 //

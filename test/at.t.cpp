@@ -47,6 +47,13 @@ CASE( "at(): Terminates access to non-existing std::vector elements" )
     EXPECT_THROWS( at(a, 4) );
 }
 
+CASE( "at(): Terminates access to non-existing std::initializer_list elements" )
+{
+    std::initializer_list<int> a = { 1, 2, 3, 4 };
+
+    EXPECT_THROWS( at(a, 4) );
+}
+
 CASE( "at(): Allows access to existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };
@@ -80,6 +87,20 @@ CASE( "at(): Allows access to existing std::vector elements" )
         a.push_back( i + 1 );
         EXPECT( at(a, i) == i + 1 );
     }
+}
+
+CASE( "at(): Allows access to std::initializer_list elements (C++11)" )
+{
+#if gsl_HAVE_INITIALIZER_LIST
+    std::initializer_list<int> a = { 1, 2, 3, 4 };
+
+    for ( int i = 0; i < 4; ++i )
+    {
+        EXPECT( at(a, i) == i + 1 );
+    }
+#else
+    EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
+#endif
 }
 
 // end of file
