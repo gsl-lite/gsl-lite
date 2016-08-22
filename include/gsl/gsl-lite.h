@@ -693,7 +693,8 @@ class span
 public:
     typedef size_t size_type;
 
-    typedef T value_type;
+    typedef T value_type;       // deprecated since version 0.9.0
+    typedef T element_type;
     typedef T & reference;
     typedef T * pointer;
     typedef T const * const_pointer;
@@ -733,7 +734,7 @@ public:
         : span( &data_in, 1 )
     {}
 
-    gsl_api gsl_constexpr14 span( value_type && ) = delete;
+    gsl_api gsl_constexpr14 span( element_type && ) = delete;
 #endif
 
     gsl_api gsl_constexpr14 span( pointer begin_in, pointer end_in )
@@ -837,25 +838,25 @@ public:
     template< typename U > operator=();
 #endif
 
-    gsl_api gsl_constexpr14 span< value_type > first( size_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span first( size_type count ) const gsl_noexcept
     {
         Expects( count <= this->size() );
         return span( this->data(), count );
     }
 
-    gsl_api gsl_constexpr14 span< value_type > last( size_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span last( size_type count ) const gsl_noexcept
     {
         Expects( count <= this->size() );
         return span( this->data() + this->size() - count, count );
     }
 
-    gsl_api gsl_constexpr14 span< value_type > subspan( size_type offset ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( size_type offset ) const gsl_noexcept
     {
         Expects( offset <= this->size() );
         return span( this->data() + offset, this->length() - offset ); 
     }
 	
-    gsl_api gsl_constexpr14 span< value_type > subspan( size_type offset, size_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( size_type offset, size_type count ) const gsl_noexcept
     {
         Expects( offset <= this->size() && count <= this->size() - offset );
         return span( this->data() + offset, count ); 
@@ -975,7 +976,7 @@ public:
 
     gsl_api gsl_constexpr14 size_type bytes() const gsl_noexcept
     {
-        return sizeof( value_type ) * size();
+        return sizeof( element_type ) * size();
     }
 
     gsl_api gsl_constexpr14 size_type used_bytes() const gsl_noexcept
