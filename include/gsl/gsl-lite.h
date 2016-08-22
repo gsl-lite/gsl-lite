@@ -887,11 +887,6 @@ public:
         return begin_ != NULL;
     }
 
-    gsl_api gsl_constexpr14 reference operator[]( size_type index )
-    {
-        return at( index );
-    }
-
     gsl_api gsl_constexpr14 reference operator[]( size_type index ) const
     {
        return at( index );
@@ -926,12 +921,6 @@ public:
     gsl_api gsl_constexpr14 bool operator>=( span const & other ) const gsl_noexcept
     {
         return !( *this < other );
-    }
-
-    gsl_api gsl_constexpr14 reference at( size_type index )
-    {
-        Expects( index < size());
-        return begin_[ index ];
     }
 
     gsl_api gsl_constexpr14 reference at( size_type index ) const
