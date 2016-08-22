@@ -47,7 +47,7 @@ CASE( "at(): Terminates access to non-existing std::vector elements" )
     EXPECT_THROWS( at(a, 4) );
 }
 
-CASE( "at(): Terminates access to non-existing std::initializer_list elements" )
+CASE( "at(): Terminates access to non-existing std::initializer_list elements (C++11)" )
 {
 // Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
 

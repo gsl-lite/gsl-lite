@@ -306,9 +306,13 @@ Ensures(): Terminates on a false expression
 at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements (C++11)
 at(): Terminates access to non-existing std::vector elements
+at(): Terminates access to non-existing std::initializer_list elements (C++11)
+at(): Terminates access to non-existing gsl::span elements
 at(): Allows access to existing C-array elements
 at(): Allows access to existing std::array elements (C++11)
 at(): Allows access to existing std::vector elements
+at(): Allows access to std::initializer_list elements (C++11)
+at(): Allows access to gsl::span elements
 byte: Allows construction from integral via static cast (C++11)
 byte: Allows construction from integral via byte() (C++11)
 byte: Allows construction from integral via to_byte()
