@@ -49,9 +49,13 @@ CASE( "at(): Terminates access to non-existing std::vector elements" )
 
 CASE( "at(): Terminates access to non-existing std::initializer_list elements" )
 {
+#if gsl_HAVE_INITIALIZER_LIST
     std::initializer_list<int> a = { 1, 2, 3, 4 };
 
     EXPECT_THROWS( at(a, 4) );
+#else
+    EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
+#endif
 }
 
 CASE( "at(): Terminates access to non-existing gsl::span elements" )
