@@ -476,6 +476,15 @@ gsl_api const T & at( std::initializer_list<T> cont, size_t index )
 }
 #endif
 
+template< class T >
+class span;
+
+template< class T >
+gsl_api T & at( span<T> s, size_t index )
+{
+    return s.at( index );
+}
+
 //
 // GSL.views: views
 //

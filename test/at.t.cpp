@@ -54,6 +54,14 @@ CASE( "at(): Terminates access to non-existing std::initializer_list elements" )
     EXPECT_THROWS( at(a, 4) );
 }
 
+CASE( "at(): Terminates access to non-existing gsl::span elements" )
+{
+    int arr[] = { 1, 2, 3, 4 };
+    span<int> a( arr );
+
+    EXPECT_THROWS( at(a, 4) );
+}
+
 CASE( "at(): Allows access to existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };
@@ -101,6 +109,17 @@ CASE( "at(): Allows access to std::initializer_list elements (C++11)" )
 #else
     EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
 #endif
+}
+
+CASE( "at(): Allows access to gsl::span elements" )
+{
+    int arr[] = { 1, 2, 3, 4 };
+    span<int> a( arr );
+
+    for ( int i = 0; i < 4; ++i )
+    {
+        EXPECT( at(a, i) == i + 1 );
+    }
 }
 
 // end of file
