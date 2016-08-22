@@ -439,10 +439,6 @@ gsl_api T narrow( U u )
 }
 
 //
-// GSL.views: views
-//
-
-//
 // at() - Bounds-checked way of accessing static arrays, std::array, std::vector.
 //
 
@@ -479,6 +475,10 @@ gsl_api const T & at( std::initializer_list<T> cont, size_t index )
     return *( cont.begin() + index );
 }
 #endif
+
+//
+// GSL.views: views
+//
 
 //
 // not_null<> - Wrap any indirection and enforce non-null.
