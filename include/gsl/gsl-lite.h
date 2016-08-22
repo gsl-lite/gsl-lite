@@ -115,6 +115,13 @@
 # define gsl_COMPILER_NON_MSVC       1
 #endif
 
+// Note: simplistic version computation; works for GCC versions on http://godbolt.org/
+#if defined(__GNUC__) && !defined(__clang__)
+# define gsl_COMPILER_GCC_VERSION  ( 10 * (10 *__GNUC__ + __GNUC_MINOR__) + __GNUC_PATCHLEVEL__)
+#else
+# define gsl_COMPILER_GCC_VERSION  0
+#endif
+
 // Presence of C++11 language features:
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10

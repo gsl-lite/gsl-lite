@@ -49,7 +49,9 @@ CASE( "at(): Terminates access to non-existing std::vector elements" )
 
 CASE( "at(): Terminates access to non-existing std::initializer_list elements" )
 {
-#if gsl_HAVE_INITIALIZER_LIST
+// Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
+
+#if gsl_HAVE_INITIALIZER_LIST && ( !gsl_COMPILER_GCC_VERSION || gsl_COMPILER_GCC_VERSION >= 473 )
     std::initializer_list<int> a = { 1, 2, 3, 4 };
 
     EXPECT_THROWS( at(a, 4) );
@@ -103,7 +105,9 @@ CASE( "at(): Allows access to existing std::vector elements" )
 
 CASE( "at(): Allows access to std::initializer_list elements (C++11)" )
 {
-#if gsl_HAVE_INITIALIZER_LIST
+// Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
+
+#if gsl_HAVE_INITIALIZER_LIST && ( !gsl_COMPILER_GCC_VERSION || gsl_COMPILER_GCC_VERSION >= 473 )
     std::initializer_list<int> a = { 1, 2, 3, 4 };
 
     for ( int i = 0; i < 4; ++i )
