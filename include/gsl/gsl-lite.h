@@ -869,42 +869,42 @@ public:
         return span( this->data() + offset, count ); 
     }
 	
-    gsl_api gsl_constexpr14 iterator begin() const
+    gsl_api gsl_constexpr14 iterator begin() const gsl_noexcept
     {
         return iterator( begin_ );
     }
 
-    gsl_api gsl_constexpr14 iterator end() const
+    gsl_api gsl_constexpr14 iterator end() const gsl_noexcept
     {
         return iterator( end_ );
     }
 
-    gsl_api gsl_constexpr14 const_iterator cbegin() const
+    gsl_api gsl_constexpr14 const_iterator cbegin() const gsl_noexcept
     {
         return const_iterator( begin() );
     }
 
-    gsl_api gsl_constexpr14 const_iterator cend() const
+    gsl_api gsl_constexpr14 const_iterator cend() const gsl_noexcept
     {
         return const_iterator( end() );
     }
 
-    gsl_api gsl_constexpr14 reverse_iterator rbegin() const
+    gsl_api gsl_constexpr14 reverse_iterator rbegin() const gsl_noexcept
     {
         return reverse_iterator( end() );
     }
 
-    gsl_api gsl_constexpr14 reverse_iterator rend() const
+    gsl_api gsl_constexpr14 reverse_iterator rend() const gsl_noexcept
     {
         return reverse_iterator( begin() );
     }
 
-    gsl_api gsl_constexpr14 const_reverse_iterator crbegin() const
+    gsl_api gsl_constexpr14 const_reverse_iterator crbegin() const gsl_noexcept
     {
         return const_reverse_iterator( cend() );
     }
 
-    gsl_api gsl_constexpr14 const_reverse_iterator crend() const
+    gsl_api gsl_constexpr14 const_reverse_iterator crend() const gsl_noexcept
     {
         return const_reverse_iterator( cbegin() );
     }
