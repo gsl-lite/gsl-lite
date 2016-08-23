@@ -699,8 +699,9 @@ class span
 
 public:
     typedef size_t size_type;
+    typedef size_type index_type;   // p0122r3 uses std::ptrdiff_t
 
-    typedef T value_type;       // deprecated since version 0.9.0
+    typedef T value_type;           // deprecated since version 0.9.0
     typedef T element_type;
     typedef T & reference;
     typedef T * pointer;
