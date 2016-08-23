@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.h"
 
+typedef span<int>::size_type size_type;
+
 CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -136,7 +138,7 @@ CASE( "span<>: Allows default construction" )
 {
     span<int> v;
     
-    EXPECT( v.size() == size_t( 0 ) );
+    EXPECT( v.size() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows construction from a nullptr and a zero size (C++11)" )
@@ -145,8 +147,8 @@ CASE( "span<>: Allows construction from a nullptr and a zero size (C++11)" )
     span<      int> v( nullptr, 0 );
     span<const int> w( nullptr, 0 );
 
-    EXPECT( v.size() == size_t( 0 ) );
-    EXPECT( w.size() == size_t( 0 ) );
+    EXPECT( v.size() == size_type( 0 ) );
+    EXPECT( w.size() == size_type( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
@@ -160,8 +162,8 @@ CASE( "span<>: Allows construction from a l-value (C++11)" )
     span<      int> v( x );
     span<const int> w( x );
 
-    EXPECT( v.size() == size_t( 1 ) );
-    EXPECT( w.size() == size_t( 1 ) );
+    EXPECT( v.size() == size_type( 1 ) );
+    EXPECT( w.size() == size_type( 1 ) );
 #else
     EXPECT( !!"=delete is not available (no C++11)" );
 #endif
@@ -174,7 +176,7 @@ CASE( "span<>: Allows construction from a const l-value (C++11)" )
 
     span<const int> v( x );
 
-    EXPECT( v.size() == size_t( 1 ) );
+    EXPECT( v.size() == size_type( 1 ) );
 #else
     EXPECT( !!"=delete is not available (no C++11)" );
 #endif
@@ -243,12 +245,11 @@ CASE( "span<>: Allows construction from a temporary pointer to const and a size"
 CASE( "span<>: Allows construction from any pointer and a zero size" )
 {
     struct F {
-        typedef span<int>::size_type size_type;
         static void null() {
-            int * p = NULL; span<int> v( p, (size_type)0 );
+            int * p = NULL; span<int> v( p, size_type( 0 ) );
         }
         static void nonnull() {
-            int i = 7; int * p = &i; span<int> v( p, (size_type)0 );
+            int i = 7; int * p = &i; span<int> v( p, size_type( 0 ) );
         }
     };
 
@@ -453,7 +454,7 @@ CASE( "span<>: Allows creation of a sub span of the first n elements" )
 {
     int arr[] = { 1, 2, 3, 4, 5, };
     span<int> v( arr );
-    size_t count = 3;
+    size_type count = 3;
 
     span<      int> s = v.first( count );
     span<const int> t = v.first( count );
@@ -468,7 +469,7 @@ CASE( "span<>: Allows creation of a sub span of the last n elements" )
 {
     int arr[] = { 1, 2, 3, 4, 5, };
     span<int> v( arr );
-    size_t count = 3;
+    size_type count = 3;
 
     span<      int> s = v.last( count );
     span<const int> t = v.last( count );
@@ -483,7 +484,7 @@ CASE( "span<>: Allows creation of a sub span starting at a given offset" )
 {
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
-    size_t offset = 1;
+    size_type offset = 1;
 
     span<      int> s = v.subspan( offset );
     span<const int> t = v.subspan( offset );
@@ -498,8 +499,8 @@ CASE( "span<>: Allows creation of a sub span starting at a given offset with a g
 {
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
-    size_t offset = 1;
-    size_t length = 1;
+    size_type offset = 1;
+    size_type length = 1;
 
     span<      int> s = v.subspan( offset, length );
     span<const int> t = v.subspan( offset, length );
@@ -514,7 +515,7 @@ CASE( "span<>: Allows creation of an empty sub span at full offset" )
 {
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
-    size_t offset = v.size();
+    size_type offset = v.size();
 
     span<      int> s = v.subspan( offset );
     span<const int> t = v.subspan( offset );
@@ -527,8 +528,8 @@ CASE( "span<>: Allows creation of an empty sub span at full offset with zero len
 {
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
-    size_t offset = v.size();
-    size_t length = 0;
+    size_type offset = v.size();
+    size_type length = 0;
 
     span<      int> s = v.subspan( offset, length );
     span<const int> t = v.subspan( offset, length );
@@ -597,7 +598,7 @@ CASE( "span<>: Allows to observe element via array indexing" )
     span<int>       v( arr );
     span<int> const w( arr );
 
-    for ( size_t i = 0; i < v.size(); ++i )
+    for ( size_type i = 0; i < v.size(); ++i )
     {
         EXPECT( v[i] == arr[i] );
         EXPECT( w[i] == arr[i] );
@@ -623,7 +624,7 @@ CASE( "span<>: Allows to observe element via at()" )
     span<int>       v( arr );
     span<int> const w( arr );
 
-    for ( size_t i = 0; i < v.size(); ++i )
+    for ( size_type i = 0; i < v.size(); ++i )
     {
         EXPECT( v.at(i) == arr[i] );
         EXPECT( w.at(i) == arr[i] );
@@ -652,7 +653,7 @@ CASE( "span<>: Allows to observe element via data()" )
     EXPECT( *v.data() == *v.begin() );
     EXPECT( *w.data() == *v.begin() );
 
-    for ( size_t i = 0; i < v.size(); ++i )
+    for ( size_type i = 0; i < v.size(); ++i )
     {
         EXPECT( v.data()[i] == arr[i] );
         EXPECT( w.data()[i] == arr[i] );
@@ -751,7 +752,7 @@ CASE( "span<>: Allows to compare empty spans as equal" )
 
     span<int> p;
     span<int> q;
-    span<int> r( &a, size_t( 0 ) );
+    span<int> r( &a, size_type( 0 ) );
 
     EXPECT( (p == q) );
     EXPECT( (p == r) );    
@@ -790,9 +791,9 @@ CASE( "span<>: Allows to obtain number of elements via size()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.size() == gsl_DIMENSION_OF( a ) );
-    EXPECT( vb.size() == gsl_DIMENSION_OF( b ) );
-    EXPECT(  z.size() == size_t( 0 ) );
+    EXPECT( va.size() == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( vb.size() == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT(  z.size() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows to obtain number of elements via length()" )
@@ -804,9 +805,9 @@ CASE( "span<>: Allows to obtain number of elements via length()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.length() == gsl_DIMENSION_OF( a ) );
-    EXPECT( vb.length() == gsl_DIMENSION_OF( b ) );
-    EXPECT(  z.length() == size_t( 0 ) );
+    EXPECT( va.length() == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( vb.length() == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT(  z.length() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows to obtain number of elements via used_length()" )
@@ -818,9 +819,9 @@ CASE( "span<>: Allows to obtain number of elements via used_length()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.used_length() == gsl_DIMENSION_OF( a ) );
-    EXPECT( vb.used_length() == gsl_DIMENSION_OF( b ) );
-    EXPECT(  z.used_length() == size_t( 0 ) );
+    EXPECT( va.used_length() == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( vb.used_length() == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT(  z.used_length() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows to obtain number of bytes via bytes()" )
@@ -832,9 +833,9 @@ CASE( "span<>: Allows to obtain number of bytes via bytes()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.bytes() == gsl_DIMENSION_OF( a ) * sizeof(int) );
-    EXPECT( vb.bytes() == gsl_DIMENSION_OF( b ) * sizeof(int) );
-    EXPECT(  z.bytes() == 0 * sizeof(int) );
+    EXPECT( va.bytes() == size_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
+    EXPECT( vb.bytes() == size_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
+    EXPECT(  z.bytes() == size_type( 0 * sizeof(int) ) );
 }
 
 CASE( "span<>: Allows to obtain number of bytes via used_bytes()" )
@@ -846,9 +847,9 @@ CASE( "span<>: Allows to obtain number of bytes via used_bytes()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.used_bytes() == gsl_DIMENSION_OF( a ) * sizeof(int) );
-    EXPECT( vb.used_bytes() == gsl_DIMENSION_OF( b ) * sizeof(int) );
-    EXPECT(  z.used_bytes() == 0 * sizeof(int) );
+    EXPECT( va.used_bytes() == size_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
+    EXPECT( vb.used_bytes() == size_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
+    EXPECT(  z.used_bytes() == size_type( 0 * sizeof(int) ) );
 }
 
 CASE( "span<>: Allows to swap with another span of the same type" )

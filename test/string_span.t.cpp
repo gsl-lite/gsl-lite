@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.h"
 
+typedef string_span::size_type size_type;
+
 CASE( "string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -465,7 +467,7 @@ CASE( "ensure_z(): Allows to build a string_span from a non-const C-string" )
 #else 
     string_span sv = ensure_z( &s[0] );
 #endif   
-    EXPECT( sv.length() == size_t( 5 ) );
+    EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -479,7 +481,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a non-const C-string" )
     cstring_span sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == size_t( 5 ) );
+    EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -493,7 +495,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
     cstring_span sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == size_t( 5 ) );
+    EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -507,7 +509,7 @@ CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string
     wstring_span sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == size_t( 5 ) );
+    EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -521,7 +523,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a non-const wide C-strin
     cwstring_span sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == size_t( 5 ) );
+    EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -535,7 +537,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
     cwstring_span sv = ensure_z( &s[0] );
 #endif
     
-    EXPECT( sv.length() == size_t( 5 ) );
+    EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -543,7 +545,7 @@ CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensur
 {
     const char * s = "hello"; // not: s[]
     
-    EXPECT_THROWS( ensure_z( s, size_t( 3 ) ) );
+    EXPECT_THROWS( ensure_z( s, size_type( 3 ) ) );
 }
 
 // end of file
