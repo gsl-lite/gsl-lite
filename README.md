@@ -390,10 +390,12 @@ span<>: Allows reverse iteration
 span<>: Allows const reverse iteration
 span<>: Allows conversion to bool (true if non-empty)
 span<>: Allows to observe element via array indexing
-span<>: Allows to change element via array indexing
+span<>: Allows to observe element via call indexing
 span<>: Allows to observe element via at()
-span<>: Allows to change element via at()
 span<>: Allows to observe element via data()
+span<>: Allows to change element via array indexing
+span<>: Allows to change element via call indexing
+span<>: Allows to change element via at()
 span<>: Allows to change element via data()
 span<>: Allows to compare equal to another span of the same type
 span<>: Allows to compare unequal to another span of the same type

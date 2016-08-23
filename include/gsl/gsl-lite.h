@@ -920,6 +920,11 @@ public:
        return at( index );
     }
 
+    gsl_api gsl_constexpr14 reference operator()( size_type index ) const
+    {
+       return at( index );
+    }
+
     gsl_api gsl_constexpr14 reference at( size_type index ) const
     {
        Expects( index < size() );

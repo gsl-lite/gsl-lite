@@ -125,12 +125,15 @@ CASE( "span<>: Terminates access outside the span" )
 {
     struct F { 
         static void blow_ix(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; } 
+        static void blow_iv(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v(i); } 
         static void blow_at(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); } 
     };
 
     EXPECT_NO_THROW( F::blow_ix(2) );
+    EXPECT_NO_THROW( F::blow_iv(2) );
     EXPECT_NO_THROW( F::blow_at(2) );
     EXPECT_THROWS(   F::blow_ix(3) );
+    EXPECT_THROWS(   F::blow_iv(3) );
     EXPECT_THROWS(   F::blow_at(3) );
 }
 
@@ -605,17 +608,17 @@ CASE( "span<>: Allows to observe element via array indexing" )
     }
 }
 
-CASE( "span<>: Allows to change element via array indexing" )
+CASE( "span<>: Allows to observe element via call indexing" )
 {
     int arr[] = { 1, 2, 3, };
     span<int>       v( arr );
     span<int> const w( arr );
-    
-    v[1] = 22;
-    w[2] = 33;
 
-    EXPECT( 22 == arr[1] );
-    EXPECT( 33 == arr[2] );
+    for ( size_type i = 0; i < v.size(); ++i )
+    {
+        EXPECT( v(i) == arr[i] );
+        EXPECT( w(i) == arr[i] );
+    }
 }
 
 CASE( "span<>: Allows to observe element via at()" )
@@ -629,19 +632,6 @@ CASE( "span<>: Allows to observe element via at()" )
         EXPECT( v.at(i) == arr[i] );
         EXPECT( w.at(i) == arr[i] );
     }
-}
-
-CASE( "span<>: Allows to change element via at()" )
-{
-    int arr[] = { 1, 2, 3, };
-    span<int>       v( arr );
-    span<int> const w( arr );
-    
-    v.at(1) = 22;
-    w.at(2) = 33;
-
-    EXPECT( 22 == arr[1] );
-    EXPECT( 33 == arr[2] );
 }
 
 CASE( "span<>: Allows to observe element via data()" )
@@ -658,6 +648,45 @@ CASE( "span<>: Allows to observe element via data()" )
         EXPECT( v.data()[i] == arr[i] );
         EXPECT( w.data()[i] == arr[i] );
     }
+}
+
+CASE( "span<>: Allows to change element via array indexing" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+    
+    v[1] = 22;
+    w[2] = 33;
+
+    EXPECT( 22 == arr[1] );
+    EXPECT( 33 == arr[2] );
+}
+
+CASE( "span<>: Allows to change element via call indexing" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+    
+    v(1) = 22;
+    w(2) = 33;
+
+    EXPECT( 22 == arr[1] );
+    EXPECT( 33 == arr[2] );
+}
+
+CASE( "span<>: Allows to change element via at()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+    
+    v.at(1) = 22;
+    w.at(2) = 33;
+
+    EXPECT( 22 == arr[1] );
+    EXPECT( 33 == arr[2] );
 }
 
 CASE( "span<>: Allows to change element via data()" )
