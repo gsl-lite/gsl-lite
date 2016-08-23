@@ -1,5 +1,20 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.9.0 2016-08-23
+
+- Provide gsl/gsl header for compatibility with M-GSL.
+- Add index_type to span while keeping size_type.
+- Add gsl_noexcept to iterator creators begin() etc.
+- Add at(std::initializer_list<T>, index).
+- Add at(span<T>, index).
+- Add call operator to span for element access as per p0122r3.
+- Add test: empty spans compare equal as per p0122r3.
+- Use span's size_type.
+- Move at() to section utilities.
+- Move comparison functions outside span.
+- Deprecate span::value_type, use span::element_type per M-GSL, p0122r3.
+- Remove non-const index operator, at().
+
 version 0.8.0 2016-08-20
 
 - Add operations for byte type.
