@@ -919,37 +919,6 @@ public:
        return at( index );
     }
 
-    gsl_api gsl_constexpr14 bool operator==( span const & other ) const gsl_noexcept
-    {
-        return  size() == other.size()
-            && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );
-    }
-
-    gsl_api gsl_constexpr14 bool operator!=( span const & other ) const gsl_noexcept
-    {
-        return !( *this == other );
-    }
-
-    gsl_api gsl_constexpr14 bool operator< ( span const & other ) const gsl_noexcept
-    {
-        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() );
-    }
-
-    gsl_api gsl_constexpr14 bool operator<=( span const & other ) const gsl_noexcept
-    {
-        return !( other < *this );
-    }
-
-    gsl_api gsl_constexpr14 bool operator> ( span const & other ) const gsl_noexcept
-    {
-        return ( other < *this );
-    }
-
-    gsl_api gsl_constexpr14 bool operator>=( span const & other ) const gsl_noexcept
-    {
-        return !( *this < other );
-    }
-
     gsl_api gsl_constexpr14 reference at( size_type index ) const
     {
        Expects( index < size() );
@@ -1019,6 +988,45 @@ private:
     pointer begin_;
     pointer end_;
 };
+
+// span comparison functions
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator==( span<T> const & l, span<T> const & r )
+{
+    return  l.size()  == r.size()
+        && (l.begin() == r.begin() || std::equal( l.begin(), l.end(), r.begin() ) );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator!=( span<T> const & l, span<T> const & r )
+{
+    return !( l == r );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator< ( span<T> const & l, span<T> const & r )
+{
+    return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator<=( span<T> const & l, span<T> const & r )
+{
+    return !( r < l );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator> ( span<T> const & l, span<T> const & r )
+{
+    return ( r < l );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator>=( span<T> const & l, span<T> const & r )
+{
+    return !( l < r );
+}
 
 // span creator functions (see ctors)
 
