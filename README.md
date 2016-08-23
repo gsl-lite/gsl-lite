@@ -401,6 +401,7 @@ span<>: Allows to compare less than another span of the same type
 span<>: Allows to compare less than or equal to another span of the same type
 span<>: Allows to compare greater than another span of the same type
 span<>: Allows to compare greater than or equal to another span of the same type
+span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain number of elements via size()
