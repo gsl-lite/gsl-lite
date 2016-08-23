@@ -747,17 +747,22 @@ CASE( "span<>: Allows to compare greater than or equal to another span of the sa
 
 CASE( "span<>: Allows to compare empty spans as equal" )
 {
-    span<int> v;
-    span<int> w;
+    int a;
 
-    EXPECT( (v == w) );
+    span<int> p;
+    span<int> q;
+    span<int> r( &a, size_t( 0 ) );
+
+    EXPECT( (p == q) );
+    EXPECT( (p == r) );    
 
 #if gsl_HAVE_NULLPTR
-    span<int> x( nullptr, 0 );
-    span<int> y( nullptr, 0 );
+    span<int> s( nullptr, 0 );
+    span<int> t( nullptr, 0 );
 
-    EXPECT( (x == y) );
-    EXPECT( (x == v) );
+    EXPECT( (s == p) );
+    EXPECT( (s == r) );
+    EXPECT( (s == t) );
 #endif
 }
 
