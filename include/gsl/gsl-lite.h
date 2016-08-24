@@ -224,6 +224,10 @@
 # include <type_traits>
 #endif
 
+#if gsl_HAVE_SIZED_TYPES
+# include <cstdint>
+#endif
+
 // Other features:
 
 // Note: !defined(__NVCC__) doesn't work with nvcc here:
@@ -578,10 +582,8 @@ private:
 // Byte-specific type.
 //
 #if gsl_HAVE_ENUM_CLASS
-# include <cstdint>
   enum class byte : std::uint8_t {};
 #elif gsl_HAVE_SIZED_TYPES
-# include <cstdint>
   struct byte { typedef std::uint8_t type; type v; };
 #else
   struct byte { typedef unsigned char type; type v; };
