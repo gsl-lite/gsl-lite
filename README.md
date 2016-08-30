@@ -388,7 +388,6 @@ span<>: Allows forward iteration
 span<>: Allows const forward iteration
 span<>: Allows reverse iteration
 span<>: Allows const reverse iteration
-span<>: Allows conversion to bool (true if non-empty)
 span<>: Allows to observe element via array indexing
 span<>: Allows to observe element via call indexing
 span<>: Allows to observe element via at()

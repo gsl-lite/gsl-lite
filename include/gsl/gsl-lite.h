@@ -912,11 +912,6 @@ public:
         return const_reverse_iterator( cbegin() );
     }
 
-    gsl_api gsl_constexpr14 operator bool () const gsl_noexcept
-    {
-        return begin_ != NULL;
-    }
-
     gsl_api gsl_constexpr14 reference operator[]( size_type index ) const
     {
        return at( index );

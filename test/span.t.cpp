@@ -585,16 +585,6 @@ CASE( "span<>: Allows const reverse iteration" )
     }
 }
 
-CASE( "span<>: Allows conversion to bool (true if non-empty)" )
-{
-    int arr[] = { 1, 2, 3, };
-    span<int>       v( arr );
-    span<int> const w( arr );
-
-    EXPECT( !!v );
-    EXPECT( !!w );
-}
-
 CASE( "span<>: Allows to observe element via array indexing" )
 {
     int arr[] = { 1, 2, 3, };
