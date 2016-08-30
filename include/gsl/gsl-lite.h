@@ -994,39 +994,39 @@ private:
 
 // span comparison functions
 
-template< class T >
-gsl_api gsl_constexpr14 bool operator==( span<T> const & l, span<T> const & r )
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator==( span<T> const & l, span<U> const & r )
 {
     return  l.size()  == r.size()
         && (l.begin() == r.begin() || std::equal( l.begin(), l.end(), r.begin() ) );
 }
 
-template< class T >
-gsl_api gsl_constexpr14 bool operator!=( span<T> const & l, span<T> const & r )
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator!=( span<T> const & l, span<U> const & r )
 {
     return !( l == r );
 }
 
-template< class T >
-gsl_api gsl_constexpr14 bool operator< ( span<T> const & l, span<T> const & r )
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator< ( span<T> const & l, span<U> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-template< class T >
-gsl_api gsl_constexpr14 bool operator<=( span<T> const & l, span<T> const & r )
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator<=( span<T> const & l, span<U> const & r )
 {
     return !( r < l );
 }
 
-template< class T >
-gsl_api gsl_constexpr14 bool operator> ( span<T> const & l, span<T> const & r )
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator> ( span<T> const & l, span<U> const & r )
 {
     return ( r < l );
 }
 
-template< class T >
-gsl_api gsl_constexpr14 bool operator>=( span<T> const & l, span<T> const & r )
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator>=( span<T> const & l, span<U> const & r )
 {
     return !( l < r );
 }

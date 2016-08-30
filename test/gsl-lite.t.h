@@ -55,6 +55,12 @@ inline std::ostream & operator<<( std::ostream & os, byte b )
     return os << std::hex << "0x" << to_integer<int>(b); 
 }
 
+template< typename T >
+inline std::ostream & operator<<( std::ostream & os, span<T> s )
+{
+    std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os) ); return os;
+}
+
 } // namespace gsl
 
 #endif // GSL_TEST_GSL_LITE_H_INCLUDED
