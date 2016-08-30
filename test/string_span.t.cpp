@@ -396,6 +396,16 @@ CASE( "string_span: Allows to create a cwstring_span from a const std::vector" )
 #endif
 }
 
+CASE( "string_span: Allows to compare a string_span with a cstring_span" )
+{
+    char s[] = "hello";
+
+    string_span   sv( s, gsl_DIMENSION_OF( s ) - 1 );
+    cstring_span csv( s, gsl_DIMENSION_OF( s ) - 1 );
+    
+    EXPECT( sv == csv );
+}
+
 CASE( "to_string(): Allows to explicitly convert from string_span to std::string" )
 {
     char s[] = "hello";
