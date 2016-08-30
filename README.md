@@ -455,6 +455,7 @@ string_span: Allows to create a cwstring_span from a const C-string and size
 string_span: Allows to create a cwstring_span from a const C-array
 string_span: Allows to create a cwstring_span from a const std::array (C++11)
 string_span: Allows to create a cwstring_span from a const std::vector
+string_span: Allows to compare a string_span with another string_span
 string_span: Allows to compare a string_span with a cstring_span
 to_string(): Allows to explicitly convert from string_span to std::string
 to_string(): Allows to explicitly convert from cstring_span to std::string
