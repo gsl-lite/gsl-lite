@@ -700,9 +700,9 @@ CASE( "span<>: Allows to compare equal to another span of the same type" )
     span<int> vb( b );
     span<int> vc( c );
 
-    EXPECT(     (va == va) );
-    EXPECT_NOT( (vb == va) );
-    EXPECT_NOT( (vc == va) );
+    EXPECT(     va == va );
+    EXPECT_NOT( vb == va );
+    EXPECT_NOT( vc == va );
 }
 
 CASE( "span<>: Allows to compare unequal to another span of the same type" )
@@ -712,9 +712,9 @@ CASE( "span<>: Allows to compare unequal to another span of the same type" )
     span<int> vb( b );
     span<int> vc( c );
 
-    EXPECT_NOT( (va != va) );
-    EXPECT(     (vb != va) );
-    EXPECT(     (vc != va) );
+    EXPECT_NOT( va != va );
+    EXPECT(     vb != va );
+    EXPECT(     vc != va );
 }
 
 CASE( "span<>: Allows to compare less than another span of the same type" )
@@ -724,9 +724,9 @@ CASE( "span<>: Allows to compare less than another span of the same type" )
     span<int> vb( b );
     span<int> vc( c );
 
-    EXPECT_NOT( (va < va) );
-    EXPECT(     (va < vb) );
-    EXPECT(     (va < vc) );
+    EXPECT_NOT( va < va );
+    EXPECT(     va < vb );
+    EXPECT(     va < vc );
 }
 
 CASE( "span<>: Allows to compare less than or equal to another span of the same type" )
@@ -736,9 +736,9 @@ CASE( "span<>: Allows to compare less than or equal to another span of the same 
     span<int> vb( b );
     span<int> vc( c );
 
-    EXPECT_NOT( (vb <= va) );
-    EXPECT(     (va <= vb) );
-    EXPECT(     (va <= vc) );
+    EXPECT_NOT( vb <= va );
+    EXPECT(     va <= vb );
+    EXPECT(     va <= vc );
 }
 
 CASE( "span<>: Allows to compare greater than another span of the same type" )
@@ -748,9 +748,9 @@ CASE( "span<>: Allows to compare greater than another span of the same type" )
     span<int> vb( b );
     span<int> vc( c );
 
-    EXPECT_NOT( (va > va) );
-    EXPECT(     (vb > va) );
-    EXPECT(     (vc > va) );
+    EXPECT_NOT( va > va );
+    EXPECT(     vb > va );
+    EXPECT(     vc > va );
 }
 
 CASE( "span<>: Allows to compare greater than or equal to another span of the same type" )
@@ -760,9 +760,13 @@ CASE( "span<>: Allows to compare greater than or equal to another span of the sa
     span<int> vb( b );
     span<int> vc( c );
 
-    EXPECT_NOT( (va >= vb) );
-    EXPECT(     (vb >= va) );
-    EXPECT(     (vc >= va) );
+    EXPECT_NOT( va >= vb );
+    EXPECT(     vb >= va );
+    EXPECT(     vc >= va );
+}
+
+CASE( "span<>: Allows to compare to another span of the same type and different cv-ness" )
+{
 }
 
 CASE( "span<>: Allows to compare empty spans as equal" )
@@ -773,16 +777,16 @@ CASE( "span<>: Allows to compare empty spans as equal" )
     span<int> q;
     span<int> r( &a, size_type( 0 ) );
 
-    EXPECT( (p == q) );
-    EXPECT( (p == r) );    
+    EXPECT( p == q );
+    EXPECT( p == r );    
 
 #if gsl_HAVE_NULLPTR
     span<int> s( nullptr, 0 );
     span<int> t( nullptr, 0 );
 
-    EXPECT( (s == p) );
-    EXPECT( (s == r) );
-    EXPECT( (s == t) );
+    EXPECT( s == p );
+    EXPECT( s == r );
+    EXPECT( s == t );
 #endif
 }
 
