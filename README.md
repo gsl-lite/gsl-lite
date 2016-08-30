@@ -402,6 +402,7 @@ span<>: Allows to compare less than another span of the same type
 span<>: Allows to compare less than or equal to another span of the same type
 span<>: Allows to compare greater than another span of the same type
 span<>: Allows to compare greater than or equal to another span of the same type
+span<>: Allows to compare to another span of the same type and different cv-ness (non-standard)
 span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
@@ -454,6 +455,7 @@ string_span: Allows to create a cwstring_span from a const C-string and size
 string_span: Allows to create a cwstring_span from a const C-array
 string_span: Allows to create a cwstring_span from a const std::array (C++11)
 string_span: Allows to create a cwstring_span from a const std::vector
+string_span: Allows to compare a string_span with a cstring_span
 to_string(): Allows to explicitly convert from string_span to std::string
 to_string(): Allows to explicitly convert from cstring_span to std::string
 to_string(): Allows to explicitly convert from wstring_span to std::wstring

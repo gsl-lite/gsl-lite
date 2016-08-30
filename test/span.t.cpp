@@ -765,8 +765,24 @@ CASE( "span<>: Allows to compare greater than or equal to another span of the sa
     EXPECT(     vc >= va );
 }
 
-CASE( "span<>: Allows to compare to another span of the same type and different cv-ness" )
+CASE( "span<>: Allows to compare to another span of the same type and different cv-ness (non-standard)" )
 {
+    int aa[] = { 1 }, bb[] = { 2 };
+    span<         int>  a( aa );
+    span<   const int> ca( aa );
+    span<volatile int> va( aa );
+    span<         int>  b( bb );
+    span<   const int> cb( bb );
+    
+    EXPECT( va == ca );
+    EXPECT(  a == va );
+
+    EXPECT(  a == ca );
+    EXPECT(  a != cb );
+    EXPECT(  a <= cb );
+    EXPECT(  a <  cb );
+    EXPECT(  b >= ca );
+    EXPECT(  b >  ca );
 }
 
 CASE( "span<>: Allows to compare empty spans as equal" )
