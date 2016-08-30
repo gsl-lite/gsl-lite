@@ -1121,43 +1121,4 @@ CASE( "span<>: Allows building from a const container (std::vector<>)" )
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-
-#if 0
-CASE( "span_convertible" ) {}
-CASE( "boundary_checks" ) {}
-CASE( "span_parameter_test" ) {}
-CASE( "md_access" ) {}
-CASE( "span_factory_test" ) {}
-CASE( "span_reshape_test" ) {}
-CASE( "span_section_test" ) {}
-CASE( "span_section" ) {}
-CASE( "strided_span_constructors" ) {}
-CASE( "strided_span_slice" ) {}
-CASE( "strided_span_column_major" ) {}
-CASE( "strided_span_bounds" ) {}
-CASE( "strided_span_type_conversion" ) {}
-CASE( "empty_arrays" ) {}
-CASE( "index_constructor" ) {}
-CASE( "index_operations" ) {}
-CASE( "span_section_iteration" ) {}
-CASE( "dynamic_span_section_iteration" ) {}
-CASE( "strided_span_section_iteration" ) {}
-CASE( "dynamic_strided_span_section_iteration" ) {}
-CASE( "strided_span_section_iteration_3d" ) {}
-CASE( "dynamic_strided_span_section_iteration_3d" ) {}
-CASE( "strided_span_conversion" ) {}
-CASE( "constructors" ) {}
-CASE( "copyandassignment" ) {}
-CASE( "span_first" ) {}
-CASE( "span_last" ) {}
-CASE( "custmized_span_size" ) {}
-CASE( "span_sub" ) {}
-CASE( "TestNullConstruction" ) {}
-CASE( "ArrayConstruction" ) {}
-CASE( "NonConstConstConversions" ) {}
-CASE( "FixedSizeConversions" ) {}
-CASE( "AsWriteableBytes" ) {}
-CASE( "ArrayViewComparison" ) {}
-#endif
-
 // end of file
