@@ -162,9 +162,6 @@ Define this macro to call `std::terminate()` on a GSL contract violation. This i
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
 Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation.
 
-\-D<b>gsl\_CONFIG\_THROWS\_FOR\_TESTING</b>=1&ensp;(deprecated)  
-For *gsl-lite* backward compatibilty. Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>.
-
 ### Microsoft GSL compatibility macros
 
 \-D<b>GSL_UNENFORCED_ON_CONTRACT_VIOLATION</b>  

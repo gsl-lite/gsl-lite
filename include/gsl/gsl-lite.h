@@ -33,11 +33,6 @@
 
 // gsl-lite backward compatibility:
 
-#if ( gsl_CONFIG_THROWS_FOR_TESTING != 0 )
-# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
-# pragma message ("gsl_CONFIG_THROWS_FOR_TESTING is deprecated since gsl-lite 0.5.0; replace with gsl_CONFIG_CONTRACT_VIOLATION_THROWS.")
-#endif
-
 #ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
