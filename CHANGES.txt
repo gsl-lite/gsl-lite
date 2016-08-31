@@ -1,5 +1,13 @@
 Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
+version 0.10.0 2016-08-31
+
+- Remove operator bool() per issue #33.
+- Remove deprecated gsl_CONFIG_THROWS_FOR_TESTING.
+- Remove parentheses and allow lest to decompose span comparison expressions.
+- Allow comparison of spans with a different element type or const-volatile-ness.
+- Add gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON for span comparison configuration.
+
 version 0.9.1 2016-08-25
 
 - Move conditional inclusion of cstdint out of namespace gsl.

@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.9.1"
+#define  gsl_lite_VERSION "0.10.0"
 
 // gsl-lite backward compatibility:
 
