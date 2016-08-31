@@ -767,6 +767,7 @@ CASE( "span<>: Allows to compare greater than or equal to another span of the sa
 
 CASE( "span<>: Allows to compare to another span of the same type and different cv-ness (non-standard)" )
 {
+#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
     int aa[] = { 1 }, bb[] = { 2 };
     span<         int>  a( aa );
     span<   const int> ca( aa );
@@ -783,6 +784,9 @@ CASE( "span<>: Allows to compare to another span of the same type and different 
     EXPECT(  a <  cb );
     EXPECT(  b >= ca );
     EXPECT(  b >  ca );
+#else
+    EXPECT( !!"span<>: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
+#endif
 }
 
 CASE( "span<>: Allows to compare empty spans as equal" )

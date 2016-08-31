@@ -71,6 +71,10 @@
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
 
+#ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1
+#endif
+
 #ifndef  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  1
 #endif
@@ -994,6 +998,8 @@ private:
 
 // span comparison functions
 
+#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+
 template< class T, class U >
 gsl_api gsl_constexpr14 bool operator==( span<T> const & l, span<U> const & r )
 {
@@ -1002,15 +1008,31 @@ gsl_api gsl_constexpr14 bool operator==( span<T> const & l, span<U> const & r )
 }
 
 template< class T, class U >
-gsl_api gsl_constexpr14 bool operator!=( span<T> const & l, span<U> const & r )
-{
-    return !( l == r );
-}
-
-template< class T, class U >
 gsl_api gsl_constexpr14 bool operator< ( span<T> const & l, span<U> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+}
+
+#else
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator==( span<T> const & l, span<T> const & r )
+{
+    return  l.size()  == r.size()
+        && (l.begin() == r.begin() || std::equal( l.begin(), l.end(), r.begin() ) );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator< ( span<T> const & l, span<T> const & r )
+{
+    return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+}
+#endif
+
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator!=( span<T> const & l, span<U> const & r )
+{
+    return !( l == r );
 }
 
 template< class T, class U >
