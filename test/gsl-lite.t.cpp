@@ -57,10 +57,22 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
     gsl_ABSENT(  gsl_HAVE_CONSTEXPR_11 );
 #endif
 
+#if gsl_HAVE_CONSTEXPR_14
+    gsl_PRESENT( gsl_HAVE_CONSTEXPR_14 );
+#else    
+    gsl_ABSENT(  gsl_HAVE_CONSTEXPR_14 );
+#endif
+
 #if gsl_HAVE_ENUM_CLASS 
     gsl_PRESENT( gsl_HAVE_ENUM_CLASS );
 #else    
     gsl_ABSENT(  gsl_HAVE_ENUM_CLASS );
+#endif
+
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE 
+    gsl_PRESENT( gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE );
+#else    
+    gsl_ABSENT(  gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE );
 #endif
 
 #if gsl_HAVE_EXPLICIT_CONVERSION 

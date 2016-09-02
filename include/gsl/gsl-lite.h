@@ -99,10 +99,11 @@
 # error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS and gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES may be defined.
 #endif
 
-// Compiler detection:
+// Compiler detection (C++17 is speculative):
 
 #define gsl_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
 #define gsl_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
+#define gsl_CPP17_OR_GREATER  ( __cplusplus >= 201700L )
 
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
@@ -151,6 +152,12 @@
 
 #if gsl_CPP14_OR_GREATER
 # define gsl_HAVE_CONSTEXPR_14  1
+#endif
+
+// Presence of C++17 language features:
+
+#if gsl_CPP17_OR_GREATER
+# define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  1
 #endif
 
 // Presence of C++ library features:
@@ -580,10 +587,8 @@ private:
 //
 // Byte-specific type.
 //
-#if gsl_HAVE_ENUM_CLASS
-  enum class byte : std::uint8_t {};
-#elif gsl_HAVE_SIZED_TYPES
-  struct byte { typedef std::uint8_t type; type v; };
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
+  enum class byte : unsigned char {};
 #else
   struct byte { typedef unsigned char type; type v; };
 #endif
@@ -598,8 +603,8 @@ private:
 template< class  T >
 gsl_api inline gsl_constexpr14 byte to_byte( T v ) gsl_noexcept
 {
-#if gsl_HAVE_ENUM_CLASS
-    return static_cast<byte>( v );
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
+    static_assert( false, "Implement to_byte() using conversion from underlying type." );
 #else
     byte b = { static_cast<typename byte::type>( v ) }; return b;
 #endif
@@ -608,8 +613,8 @@ gsl_api inline gsl_constexpr14 byte to_byte( T v ) gsl_noexcept
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
 gsl_api inline gsl_constexpr14 IntegerType to_integer( byte b ) gsl_noexcept
 {
-#if gsl_HAVE_ENUM_CLASS
-    return static_cast<IntegerType>( b );
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
+    static_assert( false, "Implement to_integer() using conversion from underlying type." );
 #else
     return b.v;
 #endif
@@ -620,7 +625,7 @@ gsl_api inline gsl_constexpr14 unsigned char to_uchar( byte b ) gsl_noexcept
     return to_integer<unsigned char>( b );
 }
 
-#if ! gsl_HAVE_ENUM_CLASS
+#if ! gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
 inline gsl_constexpr14 bool operator==( byte a, byte b )
 {
     return a.v == b.v;
@@ -630,7 +635,11 @@ inline gsl_constexpr14 bool operator==( byte a, byte b )
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
 gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return b = to_byte( to_uchar( b ) << shift );
+#else
+    b.v = to_uchar( b ) << shift; return b;
+#endif
 }
 
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
@@ -642,7 +651,11 @@ gsl_api inline gsl_constexpr14 byte operator<<( byte b, IntegerType shift ) gsl_
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
 gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return b = to_byte( to_uchar( b ) >> shift );
+#else
+    b.v = to_uchar( b ) >> shift; return b;
+#endif
 }
 
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
@@ -653,7 +666,11 @@ gsl_api inline gsl_constexpr14 byte operator>>( byte b, IntegerType shift ) gsl_
 
 gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcept
 {
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return l = to_byte( to_uchar( l ) | to_uchar( r ) );
+#else
+    l.v = to_uchar( l ) | to_uchar( r ); return l;
+#endif
 }
 
 gsl_api inline gsl_constexpr14 byte operator|( byte l, byte r ) gsl_noexcept
@@ -663,7 +680,11 @@ gsl_api inline gsl_constexpr14 byte operator|( byte l, byte r ) gsl_noexcept
 
 gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcept
 {
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return l = to_byte( to_uchar( l ) & to_uchar( r ) );
+#else
+    l.v = to_uchar( l ) & to_uchar( r ); return l;
+#endif
 }
 
 gsl_api inline gsl_constexpr14 byte operator&( byte l, byte r ) gsl_noexcept
@@ -673,7 +694,11 @@ gsl_api inline gsl_constexpr14 byte operator&( byte l, byte r ) gsl_noexcept
 
 gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcept
 {
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return l = to_byte( to_uchar( l ) ^ to_uchar (r ) );
+#else
+    l.v = to_uchar( l ) ^ to_uchar (r ); return l;
+#endif
 }
 
 gsl_api inline gsl_constexpr14 byte operator^( byte l, byte r ) gsl_noexcept

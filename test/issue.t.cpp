@@ -32,4 +32,19 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
 #endif
 }
 
+CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[.issue #34](GSL #313)" )
+{
+    struct F {
+        static int f( int & i, gsl::byte & r )
+        {
+           i = 7;
+           r <<= 1;
+           return i;
+        }
+    };
+
+   int i;
+   EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte&>( i ) ) );
+}
+
 // end of file

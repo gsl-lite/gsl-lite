@@ -25,7 +25,7 @@
 
 CASE( "byte: Allows construction from integral via static cast (C++11)" )
 {
-#if gsl_HAVE_ENUM_CLASS
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     gsl::byte b = static_cast<gsl::byte>( 4 );
     EXPECT( static_cast<unsigned char>(b) == 4 );
     EXPECT( to_integer<int>( b ) == 4 );
@@ -36,7 +36,7 @@ CASE( "byte: Allows construction from integral via static cast (C++11)" )
 
 CASE( "byte: Allows construction from integral via byte() (C++11)" )
 {
-#if gsl_HAVE_ENUM_CLASS
+#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     gsl::byte b = gsl::byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 #else
