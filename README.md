@@ -317,6 +317,7 @@ byte: Allows construction from integral via static cast (C++11)
 byte: Allows construction from integral via byte() (C++11)
 byte: Allows construction from integral via to_byte()
 byte: Allows conversion to integral via to_integer()
+byte: Allows comparison operations
 byte: Allows bitwise or operation
 byte: Allows bitwise and operation
 byte: Allows bitwise x-or operation

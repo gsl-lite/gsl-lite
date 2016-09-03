@@ -56,6 +56,28 @@ CASE( "byte: Allows conversion to integral via to_integer()" )
     EXPECT( to_integer<int>( b ) == 4 );
 }
 
+CASE( "byte: Allows comparison operations" )
+{
+    gsl::byte a = to_byte( 3 );
+    gsl::byte b = to_byte( 7 );
+    
+    EXPECT(     a == a );
+    EXPECT(     a != b );
+
+    EXPECT(     a <  b );
+    EXPECT(     a <= a );
+    EXPECT(     a <= b );
+
+    EXPECT(     b >  a );
+    EXPECT(     b >= a );
+    EXPECT(     b >= b );
+
+    EXPECT_NOT( a == b );
+    EXPECT_NOT( a != a );
+    EXPECT_NOT( b <  a );
+    EXPECT_NOT( a >  b );
+}
+
 CASE( "byte: Allows bitwise or operation" )
 {
     gsl::byte const b = to_byte( 0xa5 );
