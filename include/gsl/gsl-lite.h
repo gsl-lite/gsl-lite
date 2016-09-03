@@ -626,7 +626,7 @@ gsl_api inline gsl_constexpr14 unsigned char to_uchar( byte b ) gsl_noexcept
 }
 
 #if ! gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
-inline gsl_constexpr14 bool operator==( byte a, byte b )
+inline gsl_constexpr14 bool operator==( byte a, byte b ) gsl_noexcept
 {
     return a.v == b.v;
 }
