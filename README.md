@@ -176,7 +176,7 @@ Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
 ### Other configuration macros
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
-Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to comapare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
+Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_UNCONSTRAINED\_SPAN\_CONTAINER\_CTOR</b>=1  
 Define this macro to 0 to omit the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. Default is 1.
