@@ -1,5 +1,5 @@
 //
-// gsl-lite is based on GSL: Guidelines Support Library,
+// gsl-lite is based on GSL: Guideline Support Library,
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene

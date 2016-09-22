@@ -1,9 +1,9 @@
-# GSL Lite: Guidelines Support Library for C++98, C++03 and C++11 up
+# GSL Lite: Guideline Support Library for C++98, C++03 and C++11 up
 
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)  [![Standard](https://img.shields.io/badge/c%2B%2B-98-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![Standard](https://img.shields.io/badge/c%2B%2B-11-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![Standard](https://img.shields.io/badge/c%2B%2B-14-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases) [![download](https://img.shields.io/badge/latest%20version%20%20-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.h)
 
 
-GSL Lite is based on the [Microsoft Guidelines Support Library (GSL)](https://github.com/microsoft/gsl). 
+GSL Lite is based on the [Microsoft Guideline Support Library (GSL)](https://github.com/microsoft/gsl). 
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -62,9 +62,9 @@ prompt>g++ -std=c++03 -Wall -I../include/gsl -o 01-basic.exe 01-basic.cpp && 01-
 
 In a nutshell
 -------------
-**gsl-lite** is a single-file header-only variant of Microsoft's implementation of the [Guidelines Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14. 
+**gsl-lite** is a single-file header-only variant of Microsoft's implementation of the [Guideline Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14. 
 
-The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
+The Guideline Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
 
 *gsl-lite* recognizes when it is compiled for the CUDA platform and decorates functions (methods) with `__host__` and `__device__`. See also section [API macro](#api-macro).
 
@@ -259,8 +259,8 @@ OS X      | ?          | ?   |
 
 Other GSL implementations
 -------------------------
-- Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/gsl).
-- Vicente J. Botet Escriba. [Guidelines Support Library (GSL)](https://github.com/viboes/GSL).
+- Microsoft. [Guideline Support Library (GSL)](https://github.com/microsoft/gsl).
+- Vicente J. Botet Escriba. [Guideline Support Library (GSL)](https://github.com/viboes/GSL).
 - Mattia Basaglia. CxxMiscLib [gsl.hpp](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/include/misclib/gsl.hpp), [tests](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/test/gsl.cpp).
 
 
@@ -269,7 +269,7 @@ Notes and references
 ### References
 [1] [Standard C++ Foundation](https://isocpp.org/).  
 [2] Standard C++ Foundation. [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines).  
-[3] Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/gsl).  
+[3] Microsoft. [Guideline Support Library (GSL)](https://github.com/microsoft/gsl).  
 [4] Bjarne Stroustrup. [Writing good C++14 (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Stroustrup%20-%20CppCon%202015%20keynote.pdf) &mdash; [Video](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A). CppCon 2015.  
 [5] Herb Sutter. [Writing good C++14&hellip; By default (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Sutter%20-%20CppCon%202015%20day%202%20plenary%20.pdf) &mdash; [Video](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015.  
 [6] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
