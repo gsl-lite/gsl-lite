@@ -600,18 +600,20 @@ private:
 # define gsl_ENABLE_IF_INTEGRAL_T(T)
 #endif
 
-template< class  T >
-gsl_api inline gsl_constexpr14 byte to_byte( T v ) gsl_noexcept
+template< class T >
+gsl_api inline gsl_constexpr byte to_byte( T v ) gsl_noexcept
 {
-#if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
+#if    gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     static_assert( false, "Implement to_byte() using conversion from underlying type." );
+#elif  gsl_HAVE_CONSTEXPR_11
+    return { static_cast<typename byte::type>( v ) };
 #else
     byte b = { static_cast<typename byte::type>( v ) }; return b;
 #endif
 }
 
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
-gsl_api inline gsl_constexpr14 IntegerType to_integer( byte b ) gsl_noexcept
+gsl_api inline gsl_constexpr IntegerType to_integer( byte b ) gsl_noexcept
 {
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     static_assert( false, "Implement to_integer() using conversion from underlying type." );
@@ -620,39 +622,39 @@ gsl_api inline gsl_constexpr14 IntegerType to_integer( byte b ) gsl_noexcept
 #endif
 }
 
-gsl_api inline gsl_constexpr14 unsigned char to_uchar( byte b ) gsl_noexcept
+gsl_api inline gsl_constexpr unsigned char to_uchar( byte b ) gsl_noexcept
 {
     return to_integer<unsigned char>( b );
 }
 
 #if ! gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
 
-inline gsl_constexpr14 bool operator==( byte l, byte r ) gsl_noexcept
+inline gsl_constexpr bool operator==( byte l, byte r ) gsl_noexcept
 {
     return l.v == r.v;
 }
 
-inline gsl_constexpr14 bool operator!=( byte l, byte r ) gsl_noexcept
+inline gsl_constexpr bool operator!=( byte l, byte r ) gsl_noexcept
 {
     return !( l == r );
 }
 
-inline gsl_constexpr14 bool operator< ( byte l, byte r ) gsl_noexcept
+inline gsl_constexpr bool operator< ( byte l, byte r ) gsl_noexcept
 {
     return l.v < r.v;
 }
 
-inline gsl_constexpr14 bool operator<=( byte l, byte r ) gsl_noexcept
+inline gsl_constexpr bool operator<=( byte l, byte r ) gsl_noexcept
 {
     return !( r < l );
 }
 
-inline gsl_constexpr14 bool operator> ( byte l, byte r ) gsl_noexcept
+inline gsl_constexpr bool operator> ( byte l, byte r ) gsl_noexcept
 {
     return ( r < l );
 }
 
-inline gsl_constexpr14 bool operator>=( byte l, byte r ) gsl_noexcept
+inline gsl_constexpr bool operator>=( byte l, byte r ) gsl_noexcept
 {
     return !( l < r );
 }
@@ -669,7 +671,7 @@ gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift )
 }
 
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
-gsl_api inline gsl_constexpr14 byte operator<<( byte b, IntegerType shift ) gsl_noexcept
+gsl_api inline gsl_constexpr byte operator<<( byte b, IntegerType shift ) gsl_noexcept
 {
     return to_byte( to_uchar( b ) << shift );
 }
@@ -685,7 +687,7 @@ gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift )
 }
 
 template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
-gsl_api inline gsl_constexpr14 byte operator>>( byte b, IntegerType shift ) gsl_noexcept
+gsl_api inline gsl_constexpr byte operator>>( byte b, IntegerType shift ) gsl_noexcept
 {
     return to_byte( to_uchar( b ) >> shift );
 }
@@ -699,7 +701,7 @@ gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcep
 #endif
 }
 
-gsl_api inline gsl_constexpr14 byte operator|( byte l, byte r ) gsl_noexcept
+gsl_api inline gsl_constexpr byte operator|( byte l, byte r ) gsl_noexcept
 {
     return to_byte( to_uchar( l ) | to_uchar( r ) );
 }
@@ -713,7 +715,7 @@ gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcep
 #endif
 }
 
-gsl_api inline gsl_constexpr14 byte operator&( byte l, byte r ) gsl_noexcept
+gsl_api inline gsl_constexpr byte operator&( byte l, byte r ) gsl_noexcept
 {
     return to_byte( to_uchar( l ) & to_uchar( r ) );
 }
@@ -727,12 +729,12 @@ gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcep
 #endif
 }
 
-gsl_api inline gsl_constexpr14 byte operator^( byte l, byte r ) gsl_noexcept
+gsl_api inline gsl_constexpr byte operator^( byte l, byte r ) gsl_noexcept
 {
     return to_byte( to_uchar( l ) ^ to_uchar( r ) );
 }
 
-gsl_api inline gsl_constexpr14 byte operator~( byte b ) gsl_noexcept 
+gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept 
 { 
     return to_byte( ~to_uchar( b ) ); 
 }
