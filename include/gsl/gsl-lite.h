@@ -750,8 +750,8 @@ class span
     template< class U > friend class span;
 
 public:
-    typedef size_t size_type;
-    typedef size_type index_type;   // p0122r3 uses std::ptrdiff_t
+    typedef size_t size_type;       // deprecated since version 0.12.0
+    typedef size_t index_type;      // p0122r3 uses std::ptrdiff_t
 
     typedef T value_type;           // deprecated since version 0.9.0
     typedef T element_type;
