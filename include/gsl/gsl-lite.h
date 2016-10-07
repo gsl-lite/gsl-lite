@@ -1100,6 +1100,35 @@ gsl_api gsl_constexpr14 bool operator>=( span<T> const & l, span<U> const & r )
     return !( l < r );
 }
 
+// span algorithms
+
+namespace detail {
+
+template< class II, class N, class OI >
+OI copy_n( II first, N count, OI result )
+{
+    if ( count > 0 ) 
+    {
+        *result++ = *first;
+        for ( N i = 1; i < count; ++i ) 
+        {
+            *result++ = *++first;
+        }
+    }
+    return result;
+}
+}
+
+template< class T, class U >
+void copy( span<T> src, span<U> dest )
+{
+#if gsl_CPP14_OR_GREATER // gsl_HAVE_TYPE_TRAITS (circumvent Travis clang 3.4)
+    static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
+#endif
+    Expects( dest.size() >= src.size() );
+    detail::copy_n( src.data(), src.size(), dest.data() );
+}
+
 // span creator functions (see ctors)
 
 template< typename T >

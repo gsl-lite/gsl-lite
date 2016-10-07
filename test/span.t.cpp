@@ -1029,6 +1029,35 @@ CASE( "span<>: Allows to change the elements from a span of another type" )
     {for ( size_t i = 1; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
 }
 
+CASE( "span<>: Allows to copy a span to another span of the same element type" )
+{
+    int a[] = { 1, 2, 3,       };
+    int b[] = { 0, 0, 0, 0, 0, };
+
+    span<int> src( a );
+    span<int> dst( b );
+
+    copy( src, dst );
+    
+    EXPECT( src == dst.subspan( 0, src.size() ) );
+}
+
+CASE( "span<>: Allows to copy a span to another span of a different element type" )
+{
+    int  a[] = { 'a', 'b', 'c',       };
+    char b[] = {  0 ,  0 ,  0 , 0, 0, };
+
+    span<int > src( a );
+    span<char> dst( b );
+
+    copy( src, dst );
+    
+    for ( span<int>::index_type i = 0; i < src.size(); ++i )
+    {
+        EXPECT( src[i] == dst[i] );
+    }
+}
+
 CASE( "span<>: Allows building from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };

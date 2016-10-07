@@ -420,6 +420,8 @@ span<>: Allows to view the elements as read-only bytes
 span<>: Allows to view and change the elements as writable bytes
 span<>: Allows to view the elements as a span of another type
 span<>: Allows to change the elements from a span of another type
+span<>: Allows to copy a span to another span of the same element type
+span<>: Allows to copy a span to another span of a different element type
 span<>: Allows building from two pointers
 span<>: Allows building from two const pointers
 span<>: Allows building from a non-null pointer and a size
