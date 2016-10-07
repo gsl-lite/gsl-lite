@@ -329,6 +329,8 @@ byte: Allows shift-left operation
 byte: Allows shift-right operation
 byte: Allows shift-left assignment
 byte: Allows shift-right assignment
+byte: Provides constexpr non-assignment operations (C++11)
+byte: Provides constexpr assignment operations (C++14)
 not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)

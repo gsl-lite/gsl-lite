@@ -174,4 +174,28 @@ CASE( "byte: Allows shift-right assignment" )
     EXPECT( ( b >>= 3 ) == to_byte( to_uchar( b_org ) >> 3 ) );
 }
 
+CASE( "byte: Provides constexpr non-assignment operations (C++11)" )
+{
+#if gsl_HAVE_CONSTEXPR_11
+    static_assert( to_byte( 0xa5 ) == to_byte( 0xa5 )                      , "" );
+    static_assert(          0xa5   == to_integer<int>( to_byte( 0xa5 )    ), "" );
+
+    static_assert( to_byte( 0x02 ) == ( to_byte( 0x01 ) << 1              ), "" );
+    static_assert( to_byte( 0x01 ) == ( to_byte( 0x02 ) >> 1              ), "" );
+
+    static_assert( to_byte( 0x01 ) == ( to_byte( 0x03 ) & to_byte( 0x01 ) ), "" );
+    static_assert( to_byte( 0x01 ) == ( to_byte( 0x00 ) | to_byte( 0x01 ) ), "" );
+    static_assert( to_byte( 0x00 ) == ( to_byte( 0x01 ) ^ to_byte( 0x01 ) ), "" );
+
+    static_assert( to_byte( 0xff ) ==  ~to_byte( 0x00 ), "" );
+#endif
+}
+
+CASE( "byte: Provides constexpr assignment operations (C++14)" )
+{
+#if gsl_HAVE_CONSTEXPR_14
+//  ...
+#endif
+}
+
 // end of file
