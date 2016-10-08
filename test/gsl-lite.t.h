@@ -58,7 +58,7 @@ inline std::ostream & operator<<( std::ostream & os, byte b )
 template< typename T >
 inline std::ostream & operator<<( std::ostream & os, span<T> s )
 {
-    std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os) ); return os;
+    return os << "[", std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os, ",") ), os << "]";
 }
 
 } // namespace gsl
