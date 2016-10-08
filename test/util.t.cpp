@@ -50,7 +50,7 @@ CASE( "finally: Allows function with bind" )
 #endif
 }
 
-int g_i = 0;
+namespace{ int g_i = 0; }
 
 CASE( "finally: Allows pointer to function" )
 {
