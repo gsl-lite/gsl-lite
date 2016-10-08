@@ -1,5 +1,17 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.12.0 2016-10-08
+
+- Fix test compilation with GCC 4.8.4. 
+- Remove span::value_type deprecated since version 0.9.0 (use element_type).
+- Deprecate span::size_type (issue #42).
+- Make span's stream output for tests more container-like.
+- Make operations on byte C++11 constexpr except for op=() variants.
+- Rename “Guidelines support library" to "Guideline -" (issue #39).
+- Add tests for C++11 constexpr-ness.
+- Add copy algorithm for span (issue #36).
+- Add GSL version by Vicente J. Botet Escriba to Readme.
+
 version 0.11.0 2016-09-04
 
 - Add missing byte comparisons (non-enum class case).
