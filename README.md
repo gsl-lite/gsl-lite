@@ -140,6 +140,9 @@ Define this macro to 0 to omit the `implicit` macro. Default is 1.
 \-D<b>gsl\_FEATURE\_HAVE\_OWNER\_MACRO</b>=1  
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
 
+\-D<b>gsl\_FEATURE\_EXPERIMENTAL\_RETURN\_GUARD</b>=0  
+Provide experimental types `final_act_return` and `final_act_error` and convenience functions `on_return()` and `on_error()`. Default is 0.
+
 ### Contract violation response macros
 
 *gsl-lite* provides contract violation response control as suggested in proposal [N4415](http://wg21.link/n4415).
@@ -476,10 +479,12 @@ ensure_z(): Allows to build a wstring_span from a non-const wide C-string
 ensure_z(): Allows to build a cwstring_span from a non-const wide C-string
 ensure_z(): Allows to build a cwstring_span from a const wide C-string
 ensure_z(): Allows to specify ultimate location of the sentinel and ensure its presence
-finally: Allows lambda to run
-finally: Allows function with bind
-finally: Allows pointer to function
+finally: Allows to run lambda on leaving scope
+finally: Allows to run function (bind) on leaving scope
+finally: Allows to run function (pointer) on leaving scope
 finally: Allows to move final_act
+on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)
+on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)
 narrow_cast<>: Allows narrowing without value loss
 narrow_cast<>: Allows narrowing with value loss
 narrow<>(): Allows narrowing without value loss
