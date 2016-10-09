@@ -236,6 +236,12 @@ final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of
 final_act                   | -       | -       | < C++11 | Currently only void(*)() |
 finally()                   | &#10003;| &#10003;| >=C++11 | Make a final_act<> |
 finally()                   | -       | -       | < C++11 | Make a final_act |
+final_act_return            | -       | -       | < C++11 | Currently only void(*)(), [experimental](#feature-selection-macros) |
+on_return()                 | -       | -       | >=C++11 | Make a final_act_return<>, [experimental](#feature-selection-macros) |
+on_return()                 | -       | -       | < C++11 | Make a final_act_return, [experimental](#feature-selection-macros) |
+final_act_error             | -       | -       | < C++11 | Currently only void(*)(), [experimental](#feature-selection-macros) |
+on_error()                  | -       | -       | >=C++11 | Make a final_act_error<>, [experimental](#feature-selection-macros) |
+on_error()                  | -       | -       | < C++11 | Make a final_act_error, [experimental](#feature-selection-macros) |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
 implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
