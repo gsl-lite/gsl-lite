@@ -1,5 +1,9 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.13.0 2016-10-16
+
+- Add on_return() and on_error() as experimental feature (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD).
+
 version 0.12.0 2016-10-08
 
 - Fix test compilation with GCC 4.8.4. 
