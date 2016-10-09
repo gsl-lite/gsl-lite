@@ -18,7 +18,7 @@
 #include "gsl-lite.t.h"
 #include <functional>
 
-CASE( "finally: Allows lambda to run" )
+CASE( "finally: Allows to run lambda on leaving scope" )
 {
 #if gsl_CPP11_OR_GREATER
     struct F { static void incr( int & i ) { i += 1; } };
@@ -34,7 +34,7 @@ CASE( "finally: Allows lambda to run" )
 #endif
 }
 
-CASE( "finally: Allows function with bind" )
+CASE( "finally: Allows to run function (bind) on leaving scope" )
 {
 #if gsl_CPP11_OR_GREATER
     struct F { static void incr( int & i ) { i += 1; } };
@@ -52,7 +52,7 @@ CASE( "finally: Allows function with bind" )
 
 namespace{ int g_i = 0; }
 
-CASE( "finally: Allows pointer to function" )
+CASE( "finally: Allows to run function (pointer) on leaving scope" )
 {
     struct F { static void incr() { g_i += 1; } };
 
@@ -137,6 +137,52 @@ CASE( "finally: Allows moving final_act to throw" "[.]")
     // ... 
 #else
     EXPECT( !!"lambda is not available (no C++11)" );
+#endif
+}
+
+CASE( "on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
+{
+#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#if gsl_CPP11_OR_GREATER
+    struct F { 
+        static void incr() { g_i += 1; }
+        static void pass() { try { auto _ = on_return( &F::incr ); /*throw std::exception{};*/ } catch (...) {} }
+        static void fail() { try { auto _ = on_return( &F::incr );   throw std::exception{};   } catch (...) {} }
+    };
+#else
+    struct F { 
+        static void incr() { g_i += 1; }
+        static void pass() { try { final_act_return _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
+        static void fail() { try { final_act_return _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
+    };
+#endif
+    { g_i = 0; F::pass(); EXPECT( g_i == 1 ); }
+    { g_i = 0; F::fail(); EXPECT( g_i == 0 ); }
+#else
+    EXPECT( !!"on_return not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
+#endif
+}
+
+CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
+{
+#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#if gsl_CPP11_OR_GREATER
+    struct F { 
+        static void incr() { g_i += 1; }
+        static void pass() { try { auto _ = on_error( &F::incr ); /*throw std::exception{};*/ } catch (...) {} }
+        static void fail() { try { auto _ = on_error( &F::incr );   throw std::exception{};   } catch (...) {} }
+    };
+#else
+    struct F { 
+        static void incr() { g_i += 1; }
+        static void pass() { try { final_act_error _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
+        static void fail() { try { final_act_error _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
+    };
+#endif
+    { g_i = 0; F::pass(); EXPECT( g_i == 0 ); }
+    { g_i = 0; F::fail(); EXPECT( g_i == 1 ); }
+#else
+    EXPECT( !!"on_error not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
 #endif
 }
 

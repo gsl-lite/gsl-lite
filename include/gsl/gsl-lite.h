@@ -62,6 +62,10 @@
 # define gsl_FEATURE_HAVE_OWNER_MACRO  1
 #endif
 
+#ifndef  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+# define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0
+#endif
+
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
@@ -351,11 +355,29 @@ public:
     gsl_api final_act( final_act const  & ) = delete;
     gsl_api final_act & operator=( final_act const & ) = delete;
 
-    gsl_api ~final_act() gsl_noexcept 
+    gsl_api virtual ~final_act() gsl_noexcept 
     { 
         if ( invoke_ ) 
             action_(); 
     }
+
+protected:
+    gsl_api void dismiss() gsl_noexcept
+    {
+        invoke_ = false;
+    }
+    
+#if gsl_CPP17_OR_GREATER
+    gsl_api int uncaught_exceptions() gsl_noexcept
+    {
+        return std::uncaught_exceptions();
+    }
+#else
+    gsl_api int uncaught_exceptions()
+    {
+        return std::uncaught_exception() ? 1 : 0;
+    }
+#endif
 
 private:
     F action_;
@@ -374,6 +396,78 @@ gsl_api final_act<F> finally( F && action ) gsl_noexcept
     return final_act<F>( std::forward<F>( action ) );
 }
 
+#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+
+template< class F >
+class final_act_return : public final_act<F>
+{
+public:
+    explicit final_act_return( F && action ) gsl_noexcept
+        : final_act<F>( std::move( action ) )
+    {}
+
+    final_act_return( final_act_return && other ) gsl_noexcept 
+        : final_act<F>( std::move( other ) )
+    {}
+
+    final_act_return( final_act_return const & ) = delete;
+    final_act_return & operator=( final_act_return const & ) = delete;
+
+    ~final_act_return() override
+    {
+        if ( this->uncaught_exceptions() )
+            this->dismiss();
+    }
+};
+
+template< class F >
+inline final_act_return<F> on_return( F const & action ) gsl_noexcept
+{
+    return final_act_return<F>( action );
+}
+
+template< class F >
+inline final_act_return<F> on_return( F && action ) gsl_noexcept
+{
+    return final_act_return<F>( std::forward<F>( action ) );
+}
+
+template< class F >
+class final_act_error : public final_act<F>
+{
+public:
+    explicit final_act_error( F && action ) gsl_noexcept
+        : final_act<F>( std::move( action ) )
+    {}
+
+    final_act_error( final_act_error && other ) gsl_noexcept
+        : final_act<F>( std::move( other ) )
+    {}
+
+    final_act_error( final_act_error const & ) = delete;
+    final_act_error & operator=( final_act_error const & ) = delete;
+
+    ~final_act_error() override
+    {
+        if ( ! this->uncaught_exceptions() )
+            this->dismiss();
+    }
+};
+
+template< class F >
+inline final_act_error<F> on_error( F const & action ) gsl_noexcept
+{
+    return final_act_error<F>( action );
+}
+
+template< class F >
+inline final_act_error<F> on_error( F && action ) gsl_noexcept
+{
+    return final_act_error<F>( std::forward<F>( action ) );
+}
+
+#endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+
 #else // gsl_CPP11_OR_GREATER
 
 class final_act
@@ -386,17 +480,28 @@ public:
     , invoke_( true )
     {}
 
-    gsl_api final_act( final_act const & other ) gsl_noexcept
+    gsl_api final_act( final_act const & other )
         : action_( other.action_ )
         , invoke_( other.invoke_ ) 
     {
         other.invoke_ = false;
     }
 
-    gsl_api ~final_act()
+    gsl_api virtual ~final_act()
     {
         if ( invoke_ ) 
             action_();
+    }
+
+protected:
+    gsl_api void dismiss()
+    {
+        invoke_ = false;
+    }
+    
+    gsl_api int uncaught_exceptions()
+    {
+        return std::uncaught_exception() ? 1 : 0;
     }
 
 private:
@@ -412,6 +517,56 @@ gsl_api final_act finally( F const & f )
 {
     return final_act(( f ));
 }
+
+#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+
+class final_act_return : public final_act
+{
+public:
+    explicit final_act_return( Action action ) 
+        : final_act( action )
+    {}
+
+    ~final_act_return()
+    {
+        if ( this->uncaught_exceptions() )
+            this->dismiss();
+    }
+
+private:
+    final_act_return & operator=( final_act_return const & );
+};
+
+template< class F >
+inline final_act_return on_return( F const & action )
+{
+    return final_act_return( action );
+}
+
+class final_act_error : public final_act
+{
+public:
+    explicit final_act_error( Action action ) 
+        : final_act( action )
+    {}
+
+    ~final_act_error()
+    {
+        if ( ! this->uncaught_exceptions() )
+            this->dismiss();
+    }
+
+private:
+    final_act_error & operator=( final_act_error const & );
+};
+
+template< class F >
+inline final_act_error on_error( F const & action )
+{
+    return final_act_error( action );
+}
+
+#endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 
 #endif // gsl_CPP11_OR_GREATER
 
