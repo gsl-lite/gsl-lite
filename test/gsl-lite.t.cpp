@@ -20,6 +20,11 @@ lest::tests & specification()
     return tests; 
 }
 
+CASE( "gsl-lite version" "[.version]" )
+{
+    gsl_PRESENT( gsl_lite_VERSION );
+}
+
 CASE( "__cplusplus" "[.stdc++]" )
 {
     gsl_PRESENT( __cplusplus );
