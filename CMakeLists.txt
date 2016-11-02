@@ -4,14 +4,15 @@
 # https://github.com/microsoft/gsl
 #
 # This code is licensed under the MIT License (MIT). 
-
-cmake_minimum_required( VERSION 2.8 )
-
 project( gsl_lite )
+cmake_minimum_required( VERSION 3.2 )
 
 enable_testing()
 
 add_subdirectory( test )
 #add_subdirectory( example )
+
+add_library(gsl_lite INTERFACE)
+target_include_directories(gsl_lite INTERFACE include)
 
 # end of file
