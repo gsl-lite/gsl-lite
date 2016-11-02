@@ -13,6 +13,30 @@ add_subdirectory( test )
 #add_subdirectory( example )
 
 add_library(gsl_lite INTERFACE)
-target_include_directories(gsl_lite INTERFACE include)
+target_include_directories(gsl_lite 
+    INTERFACE 
+        $<BUILD_INTERFACE:include>
+)
+
+install(
+    TARGETS
+        gsl_lite
+    EXPORT
+        gsl_lite-config
+)
+
+install(
+    DIRECTORY
+        include/
+    DESTINATION
+        include
+)
+
+install(
+    EXPORT
+        gsl_lite-config
+    DESTINATION
+        lib/gsl_lite
+)
 
 # end of file
