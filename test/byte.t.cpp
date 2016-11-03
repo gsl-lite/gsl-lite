@@ -198,4 +198,13 @@ CASE( "byte: Provides constexpr assignment operations (C++14)" )
 #endif
 }
 
+CASE( "byte: Provides hash support (C++11)" )
+{
+#if gsl_CPP11_OR_GREATER
+    EXPECT_NO_THROW( std::hash<gsl::byte>{}( to_byte( 42 ) ) );
+#else
+    EXPECT( !!"hash support is not available (no C++11)" );
+#endif
+}
+
 // end of file
