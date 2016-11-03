@@ -957,7 +957,7 @@ public:
     }
 
 #if gsl_HAVE_NULLPTR
-    gsl_api gsl_constexpr14 span( std::nullptr_t, size_type size_in )
+    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
         : begin_( nullptr )
         , end_  ( nullptr )
     {
@@ -980,7 +980,7 @@ public:
         Expects( begin_in <= end_in );
     }
 
-    gsl_api gsl_constexpr14 span( pointer data_in, size_type size_in )
+    gsl_api gsl_constexpr14 span( pointer data_in, index_type size_in )
         : begin_( data_in )
         , end_  ( data_in + size_in )
     {
@@ -988,7 +988,7 @@ public:
     }
 
     template< typename U >
-    gsl_api gsl_constexpr14 span( U * & data_in, size_type size_in )
+    gsl_api gsl_constexpr14 span( U * & data_in, index_type size_in )
         : begin_( data_in )
         , end_  ( data_in + size_in )
     {
@@ -996,7 +996,7 @@ public:
     }
 
     template< typename U >
-    gsl_api gsl_constexpr14 span( U * const & data_in, size_type size_in )
+    gsl_api gsl_constexpr14 span( U * const & data_in, index_type size_in )
         : begin_( data_in )
         , end_  ( data_in + size_in )
     {
@@ -1074,25 +1074,25 @@ public:
     template< typename U > operator=();
 #endif
 
-    gsl_api gsl_constexpr14 span first( size_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span first( index_type count ) const gsl_noexcept
     {
         Expects( count <= this->size() );
         return span( this->data(), count );
     }
 
-    gsl_api gsl_constexpr14 span last( size_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span last( index_type count ) const gsl_noexcept
     {
         Expects( count <= this->size() );
         return span( this->data() + this->size() - count, count );
     }
 
-    gsl_api gsl_constexpr14 span subspan( size_type offset ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( index_type offset ) const gsl_noexcept
     {
         Expects( offset <= this->size() );
         return span( this->data() + offset, this->length() - offset ); 
     }
 	
-    gsl_api gsl_constexpr14 span subspan( size_type offset, size_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const gsl_noexcept
     {
         Expects( offset <= this->size() && count <= this->size() - offset );
         return span( this->data() + offset, count ); 
@@ -1138,17 +1138,17 @@ public:
         return const_reverse_iterator( cbegin() );
     }
 
-    gsl_api gsl_constexpr14 reference operator[]( size_type index ) const
+    gsl_api gsl_constexpr14 reference operator[]( index_type index ) const
     {
        return at( index );
     }
 
-    gsl_api gsl_constexpr14 reference operator()( size_type index ) const
+    gsl_api gsl_constexpr14 reference operator()( index_type index ) const
     {
        return at( index );
     }
 
-    gsl_api gsl_constexpr14 reference at( size_type index ) const
+    gsl_api gsl_constexpr14 reference at( index_type index ) const
     {
        Expects( index < size() );
        return begin_[ index ];
@@ -1164,27 +1164,27 @@ public:
         return size() == 0;
     }
 
-    gsl_api gsl_constexpr14 size_type size() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type size() const gsl_noexcept
     {
         return end_ - begin_;
     }
 
-    gsl_api gsl_constexpr14 size_type length() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type length() const gsl_noexcept
     {
         return size();
     }
 
-    gsl_api gsl_constexpr14 size_type used_length() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type used_length() const gsl_noexcept
     {
         return length();
     }
 
-    gsl_api gsl_constexpr14 size_type bytes() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type bytes() const gsl_noexcept
     {
         return sizeof( element_type ) * size();
     }
 
-    gsl_api gsl_constexpr14 size_type used_bytes() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type used_bytes() const gsl_noexcept
     {
         return bytes();
     }
