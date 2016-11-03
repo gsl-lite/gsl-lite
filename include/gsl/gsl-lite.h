@@ -595,7 +595,11 @@ gsl_api T narrow( U u )
 
     if ( static_cast<U>( t ) != u )
     {
+#if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
         throw narrowing_error();
+#else
+        std::terminate();
+#endif
     }
 
 #if gsl_HAVE_TYPE_TRAITS
@@ -605,7 +609,11 @@ gsl_api T narrow( U u )
     if ( ( t < 0 ) != ( u < 0 ) )
 #endif
     {
+#if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
         throw narrowing_error();
+#else
+        std::terminate();
+#endif
     }
     return t;
 }
