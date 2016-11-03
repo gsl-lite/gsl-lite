@@ -570,11 +570,23 @@ inline final_act_error on_error( F const & action )
 
 #endif // gsl_CPP11_OR_GREATER
 
+#if gsl_CPP11_OR_GREATER
+
+template< class T, class U >
+inline gsl_constexpr T narrow_cast( U && u ) gsl_noexcept
+{
+    return static_cast<T>( std::forward<U>( u ) );
+}
+
+#else
+
 template< class T, class U >
 gsl_api T narrow_cast( U u ) gsl_noexcept
 {
     return static_cast<T>( u );
 }
+
+#endif // gsl_CPP11_OR_GREATER
 
 struct narrowing_error : public std::exception {};
 
