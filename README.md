@@ -11,10 +11,10 @@ GSL Lite is based on the [Microsoft Guideline Support Library (GSL)](https://git
 - [License](#license)
 - [Dependencies](#dependencies)
 - [Installation](#installation)
-- [Building the tests](#building-the-tests)
 - [Synopsis](#synopsis)
 - [Features](#features)
 - [Reported to work with](#reported-to-work-with)
+- [Building the tests](#building-the-tests)
 - [Other GSL implementations](#other-gsl-implementations)
 - [Notes and references](#notes-and-references)
 - [Appendix](#appendix)
@@ -84,39 +84,6 @@ Installation
 *gsl-lite* is a single-file header-only library. Put `gsl-lite.h` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
 
 
-Building the tests
-------------------
-To build the tests you need:
-
-- [CMake](http://cmake.org), version 2.8.7 or later to be installed and in your PATH.
-- A [suitable compiler](#reported-to-work-with). 
-
-The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
- 
-The following steps assume that the [GSL Lite source code](https://github.com/martinmoene/gsl-lite) has been cloned into a directory named `c:\gsl-lite`.
-
-1. Create a directory for the build outputs for a particular architecture.  
-Here we use c:\gsl-lite\build-win-x86-vc10.
-
-        cd c:\gsl-lite
-        md build-win-x86-vc10
-        cd build-win-x86-vc10
-
-2. Configure CMake to use the compiler of your choice (run `cmake --help` for a list).
-
-        cmake -G "Visual Studio 10 2010" ..
-
-3. Build the test suite in the Debug configuration (alternatively use Release).    
-
-        cmake --build . --config Debug
-
-4. Run the test suite.    
-
-        ctest -V -C Debug
-
-All tests should pass, indicating your platform is supported and you are ready to use *gsl-lite*. See the table with [supported types and functions](#features).
-
-
 Synopsis
 --------
 
@@ -160,10 +127,10 @@ Define this macro to include `Expects` in the code and exclude `Ensures` from th
 Define this macro to exclude `Expects` from the code and include `Ensures` in the code.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
-Define this macro to call `std::terminate()` on a GSL contract violation. This is the default case.
+Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and `narrow`. This is the default case.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation.
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and `narrow`.
 
 ### Microsoft GSL compatibility macros
 
@@ -264,6 +231,39 @@ Windows   | Clang/LLVM | ? |
 GNU/Linux | Clang/LLVM | 3.4 |
 &nbsp;    | GCC        | 5.1 |
 OS X      | ?          | ?   |
+
+
+Building the tests
+------------------
+To build the tests you need:
+
+- [CMake](http://cmake.org), version 2.8.7 or later to be installed and in your PATH.
+- A [suitable compiler](#reported-to-work-with). 
+
+The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
+ 
+The following steps assume that the [GSL Lite source code](https://github.com/martinmoene/gsl-lite) has been cloned into a directory named `c:\gsl-lite`.
+
+1. Create a directory for the build outputs for a particular architecture.  
+Here we use c:\gsl-lite\build-win-x86-vc10.
+
+        cd c:\gsl-lite
+        md build-win-x86-vc10
+        cd build-win-x86-vc10
+
+2. Configure CMake to use the compiler of your choice (run `cmake --help` for a list).
+
+        cmake -G "Visual Studio 10 2010" ..
+
+3. Build the test suite in the Debug configuration (alternatively use Release).    
+
+        cmake --build . --config Debug
+
+4. Run the test suite.    
+
+        ctest -V -C Debug
+
+All tests should pass, indicating your platform is supported and you are ready to use *gsl-lite*. See the table with [supported types and functions](#features).
 
 
 Other GSL implementations
