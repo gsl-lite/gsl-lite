@@ -130,7 +130,7 @@ Define this macro to exclude `Expects` from the code and include `Ensures` in th
 Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and `narrow`. This is the default case.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and `narrow`.
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and throw a std::exception-derived exception `narrowing_error` on discarding  information in `narrow`.
 
 ### Microsoft GSL compatibility macros
 
