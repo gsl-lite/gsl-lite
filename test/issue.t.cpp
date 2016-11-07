@@ -59,9 +59,9 @@ CASE( "string_span<>: must not include terminating '\\0'" "[.issue #53]" )
     // may include terminating '\0'
     // works differently from M-GSL and basic_string_span proposal:
 
-    EXPECT( span.length() == 2 );
-    EXPECT(    a.length() == 2 );
-    EXPECT(    b.length() == 2 );
+    EXPECT( span.length() == 2u );
+    EXPECT(    a.length() == 2u );
+    EXPECT(    b.length() == 2u );
 
     EXPECT( a == span );
     EXPECT( a == b );
