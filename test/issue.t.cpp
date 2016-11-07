@@ -26,7 +26,7 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
 
     // worked as expected before 0.9.0, in 0.9.[0,1] converts to bool and compares equal!
 
-    EXPECT( a != b ); 
+    EXPECT( a != b );
 #else
     EXPECT( !!"span<>: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
 #endif
@@ -45,6 +45,26 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "
 
    int i;
    EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte&>( i ) ) );
+}
+
+CASE( "string_span<>: must not include terminating '\\0'" "[.issue #53]" )
+{
+    char const data[] = "ab";
+    char const * text = "ab";
+    cstring_span span = "ab";
+
+    cstring_span a( data );
+    cstring_span b( ensure_z( text ) );
+
+    // may include terminating '\0'
+    // works differently from M-GSL and basic_string_span proposal:
+
+    EXPECT( span.length() == 2 );
+    EXPECT(    a.length() == 2 );
+    EXPECT(    b.length() == 2 );
+
+    EXPECT( a == span );
+    EXPECT( a == b );
 }
 
 // end of file
