@@ -17,16 +17,14 @@
 
 #include "gsl-lite.t.h"
 
-typedef string_span::size_type size_type;
+typedef string_span::index_type size_type;
 
-CASE( "string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+CASE( "string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-    char s[] = "hello";
-    cstring_span sv = s;
+    cstring_span sv = "hello";
 
     string_span v2 = sv;
-    string_span v3 = "Hello";
 #endif
 }
 
@@ -37,8 +35,17 @@ CASE( "string_span: ToDo: Disallows construction of a string_span from a const s
 
     string_span sv( s );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == s );
 #endif
+}
+
+CASE( "string_span: Allows construction of a cstring_span from a const C-string" )
+{
+    cstring_span sv = "hello";
+
+    EXPECT( sv.length() == 5u );
+    EXPECT( std::string( sv.data() ) ==  "hello" );
 }
 
 CASE( "string_span: Allows to create a string_span from a non-const C-string and size" )
@@ -47,6 +54,7 @@ CASE( "string_span: Allows to create a string_span from a non-const C-string and
 
     string_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -56,6 +64,7 @@ CASE( "string_span: Allows to create a string_span from a non-const C-array" )
 
     string_span sv( s );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
@@ -66,6 +75,7 @@ CASE( "string_span: Allows to create a string_span from a non-const std::array (
 
     string_span sv( arr );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
