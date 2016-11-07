@@ -1538,7 +1538,7 @@ public:
 #endif
 
 #if gsl_HAVE_NULLPTR
-    gsl_api gsl_constexpr basic_string_span( nullptr_t ptr ) gsl_noexcept
+    gsl_api gsl_constexpr basic_string_span( std::nullptr_t ptr ) gsl_noexcept
     : span_( ptr )
     {}
 #endif
