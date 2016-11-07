@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.14.0"
+#define  gsl_lite_VERSION "0.15.x"
 
 // gsl-lite backward compatibility:
 
@@ -166,8 +166,13 @@
 
 // Presence of C++ library features:
 
+#if gsl_COMPILER_GCC_VERSION
+# define gsl_HAVE_TR1_TYPE_TRAITS  1
+#endif
+
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
 # define gsl_HAVE_ARRAY  1
+# define gsl_HAVE_TR1_TYPE_TRAITS  1
 #endif
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14 || (gsl_COMPILER_MSVC_VERSION >= 9 && _HAS_CPP0X)
@@ -187,6 +192,15 @@
 # define gsl_HAVE_TYPE_TRAITS  1
 #endif
 
+#if gsl_HAVE_TYPE_TRAITS
+# define gsl_HAVE_ADD_CONST  1
+# define gsl_HAVE_INTEGRAL_CONSTANT  1
+# define gsl_HAVE_REMOVE_REFERENCE  1
+#elif gsl_HAVE_TR1_TYPE_TRAITS
+# define gsl_HAVE_TR1_ADD_CONST  1
+# define gsl_HAVE_TR1_INTEGRAL_CONSTANT  1
+# define gsl_HAVE_TR1_REMOVE_REFERENCE  1
+#endif
 // For the rest, consider VC12, VC14 as C++11 for GSL Lite:
 
 #if gsl_COMPILER_MSVC_VERSION >= 12
@@ -224,7 +238,15 @@
 # define gsl_noexcept noexcept
 #endif
 
+#if gsl_HAVE_NULLPTR
+# define gsl_nullptr  nullptr
+#else
+# define gsl_nullptr  NULL
+#endif
+
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
+
+// additional includes:
 
 #if gsl_HAVE_ARRAY
 # include <array>
@@ -232,6 +254,8 @@
 
 #if gsl_HAVE_TYPE_TRAITS
 # include <type_traits>
+#elif gsl_HAVE_TR1_TYPE_TRAITS
+# include <tr1/type_traits>
 #endif
 
 #if gsl_HAVE_SIZED_TYPES
@@ -1368,6 +1392,429 @@ gsl_api span<const T> as_span( std::vector<T> const & cont )
 }
 #endif
 
+template< class T >
+class basic_string_span;
+
+namespace detail {
+
+// C++11 emulation:
+
+#if gsl_HAVE_ADD_CONST
+
+using std::add_const;
+
+#elif gsl_HAVE_TR1_ADD_CONST
+
+using std::tr1::add_const;
+
+#else
+
+template< class T > struct add_const { typedef const T type; };
+
+#endif // gsl_HAVE_ADD_CONST
+
+#if gsl_HAVE_REMOVE_CONST
+
+using std::remove_cv;
+using std::remove_const;
+using std::remove_volatile;
+
+#elif gsl_HAVE_TR1_REMOVE_CONST
+
+using std::tr1::remove_cv;
+using std::tr1::remove_const;
+using std::tr1::remove_volatile;
+
+#else
+
+template< class T > struct remove_const          { typedef T type; };
+template< class T > struct remove_const<T const> { typedef T type; };
+
+template< class T > struct remove_volatile             { typedef T type; };
+template< class T > struct remove_volatile<T volatile> { typedef T type; };
+
+template< class T >
+struct remove_cv
+{
+    typedef typename detail::remove_volatile<typename detail::remove_const<T>::type>::type type;
+};
+
+#endif // gsl_HAVE_REMOVE_CONST
+
+#if gsl_HAVE_INTEGRAL_CONSTANT
+
+using std::integral_constant;
+using std::true_type;
+using std::false_type;
+
+#elif gsl_HAVE_TR1_INTEGRAL_CONSTANT
+
+using std::tr1::integral_constant;
+using std::tr1::true_type;
+using std::tr1::false_type;
+
+#else
+
+template< int v > struct integral_constant { static enum { value = v }; };
+typedef integral_constant< true  > true_type;
+typedef integral_constant< false > false_type;
+
+#endif
+
+template< class T >
+struct is_std_array : false_type {};
+
+template< class T, std::size_t N >
+struct is_std_array< std::array<T, N> > : true_type {};
+
+template< class T >
+struct is_basic_string_span_oracle : false_type {};
+
+template< class T >
+struct is_basic_string_span_oracle< basic_string_span<T> > : true_type {};
+
+template< class T >
+struct is_basic_string_span : is_basic_string_span_oracle< typename remove_cv<T>::type > {};
+
+gsl_api inline std::size_t string_length( char const * ptr, std::size_t max )
+{
+    if ( ptr == gsl_nullptr || max <= 0)
+        return 0;
+
+    span<const char> str_span( ptr, max );
+
+    std::size_t len = 0;
+    while ( len < max && str_span[len] )
+        ++len;
+
+    return len;
+}
+
+gsl_api inline std::size_t string_length( wchar_t const * ptr, std::size_t max )
+{
+    if ( ptr == gsl_nullptr || max <= 0)
+        return 0;
+
+    span<const wchar_t> str_span( ptr, max );
+
+    std::size_t len = 0;
+    while ( len < max && str_span[len] )
+        ++len;
+
+    return len;
+}
+
+} // namespace detail
+
+//
+// basic_string_span<> - A view of contiguous characters, replace (*,len).
+//
+template< class T >
+class basic_string_span
+{
+public:
+    typedef T element_type;
+    typedef span<T> span_type;
+
+    typedef typename span_type::index_type index_type;
+    typedef typename span_type::difference_type difference_type;
+
+    typedef typename span_type::pointer pointer ;
+    typedef typename span_type::reference reference ;
+
+    typedef typename span_type::iterator iterator ;
+    typedef typename span_type::const_iterator const_iterator ;
+    typedef typename span_type::reverse_iterator reverse_iterator;
+    typedef typename span_type::const_reverse_iterator const_reverse_iterator;
+
+    // construction:
+
+#if gsl_HAVE_IS_DEFAULT
+    gsl_api gsl_constexpr basic_string_span() gsl_noexcept = default;
+#endif
+
+#if gsl_HAVE_NULLPTR
+    gsl_api gsl_constexpr basic_string_span( nullptr_t ptr ) gsl_noexcept
+    : span_( ptr )
+    {}
+#endif
+
+    gsl_api gsl_constexpr basic_string_span( pointer ptr )
+    : span_( remove_z( ptr, std::numeric_limits<index_type>::max() ) )
+    {}
+
+    gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
+    : span_( ptr, count )
+    {}
+
+    gsl_api gsl_constexpr basic_string_span( pointer first, pointer last )
+    : span_( first, last )
+    {}
+
+    template< std::size_t N >
+    gsl_api gsl_constexpr basic_string_span( element_type (&arr)[N] )
+    : span_( remove_z( arr ) )
+    {}
+
+#if gsl_HAVE_ARRAY
+
+    template< std::size_t N >
+    gsl_api gsl_constexpr basic_string_span( std::array< typename detail::remove_const<element_type>::type, N> & arr )
+    : span_( remove_z( arr ) )
+    {}
+#endif
+
+#if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
+
+    // Exclude: [array, basic_string,] basic_string_span
+
+    template<
+        class Cont,
+        class = typename std::enable_if<
+            ! detail::is_std_array< Cont >::value
+            && ! detail::is_basic_string_span< Cont >::value
+            && std::is_convertible< typename Cont::pointer, pointer >::value
+            && std::is_convertible< typename Cont::pointer, decltype(std::declval<Cont>().data()) >::value
+        >::type
+    >
+    gsl_api gsl_constexpr basic_string_span( Cont & cont )
+    : span_( ( cont ) )
+    {}
+
+    // Exclude: [array, basic_string,] basic_string_span
+
+    template<
+        class Cont,
+        class = typename std::enable_if<
+            ! detail::is_std_array< Cont >::value
+            && ! detail::is_basic_string_span< Cont >::value
+            && std::is_convertible< typename Cont::pointer, pointer >::value
+            && std::is_convertible< typename Cont::pointer, decltype(std::declval<Cont>().data()) >::value
+        >::type
+    >
+    gsl_api gsl_constexpr basic_string_span( Cont const & cont )
+    : span_( ( cont ) )
+    {}
+
+#elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
+
+    template< class Cont >
+    gsl_api gsl_constexpr basic_string_span( Cont & cont )
+    : span_( cont )
+    {}
+
+    template< class Cont >
+    gsl_api gsl_constexpr basic_string_span( Cont const & cont )
+    : span_( cont )
+    {}
+
+#endif
+
+#if gsl_HAVE_IS_DEFAULT
+    gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
+
+    gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
+#endif
+
+    template< class U
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+        // std::is_same< std::remove_cv<T>, std::remove_cv<U> >::value
+        , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::span_type, span_type>::value >::type
+#endif
+    >
+    gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
+    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() )
+    {}
+
+#if gsl_CPP11_OR_GREATER
+    template< class U
+        // std::is_same< std::remove_cv<T>, std::remove_cv<U> >::value
+        , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::span_type, span_type>::value >::type
+    >
+    gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
+    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() )
+    {}
+#endif
+
+    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type > & str )
+    : span_( &str[0], str.length() )
+    {}
+
+    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type > const & str )
+    : span_( &str[0], str.length() )
+    {}
+
+    // destruction, assignment:
+
+#if gsl_HAVE_IS_DEFAULT
+    gsl_api ~basic_string_span() gsl_noexcept = default;
+
+    gsl_api basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
+
+    gsl_api basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
+#endif
+
+    // sub span:
+
+    gsl_api gsl_constexpr basic_string_span first( index_type count ) const
+    {
+        return span_.first( count );
+    }
+
+    gsl_api gsl_constexpr basic_string_span last( index_type count ) const
+    {
+        return span_.last( count );
+    }
+
+    gsl_api gsl_constexpr basic_string_span subspan( index_type offset, index_type count = -1 ) const
+    {
+        return span_.subspan( offset, count );
+    }
+
+    // observers:
+
+    gsl_api gsl_constexpr index_type length() const gsl_noexcept
+    {
+        return span_.size();
+    }
+
+    gsl_api gsl_constexpr index_type size() const gsl_noexcept
+    {
+        return span_.size();
+    }
+
+    gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
+    {
+        return span_.length_bytes();
+    }
+
+    gsl_api gsl_constexpr index_type size_bytes() const gsl_noexcept
+    {
+        return span_.size_bytes();
+    }
+
+    gsl_api gsl_constexpr bool empty() const gsl_noexcept
+    {
+        return size() == 0;
+    }
+
+    gsl_api gsl_constexpr reference operator[]( index_type idx ) const
+    {
+        return span_[idx];
+    }
+
+    gsl_api gsl_constexpr reference operator()( index_type idx ) const
+    {
+        return span_[idx];
+    }
+
+    gsl_api gsl_constexpr pointer data() const gsl_noexcept
+    {
+        return span_.data();
+    }
+
+    gsl_api iterator begin() const gsl_noexcept
+    {
+        return span_.begin();
+    }
+
+    gsl_api iterator end() const gsl_noexcept
+    {
+        return span_.end();
+    }
+
+    gsl_api iterator rbegin() const gsl_noexcept
+    {
+        return span_.rbegin();
+    }
+
+    gsl_api iterator rend() const gsl_noexcept
+    {
+        return span_.rend();
+    }
+
+private:
+    gsl_api static span_type remove_z( pointer const & sz, std::size_t max )
+    {
+        return span_type( sz, detail::string_length( sz, max ) );
+    }
+
+    template< size_t N >
+    gsl_api static span_type remove_z( element_type (&sz)[N] )
+    {
+        return remove_z( &sz[0], narrow_cast< std::ptrdiff_t >( N ) );
+    }
+
+#if gsl_HAVE_ARRAY
+    template< size_t N >
+    gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> & arr )
+    {
+        return remove_z( &arr[0], narrow_cast< std::ptrdiff_t >( N ) );
+    }
+#endif
+
+private:
+    span_type span_;
+};
+
+// basic_string_span comparison functions:
+
+#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+
+template< class T, class U >
+gsl_api gsl_constexpr bool operator==( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+{
+    return l.size() == r.size()
+        && std::equal( l.begin(), l.end(), r.begin() );
+}
+
+template< class T, class U >
+gsl_api gsl_constexpr bool operator<( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+{
+    return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+}
+
+#else
+
+template< class T >
+gsl_api gsl_constexpr bool operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
+{
+    return l.size() == r.size()
+        && std::equal( l.begin(), l.end(), r.begin() );
+}
+
+template< class T >
+gsl_api gsl_constexpr bool operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
+{
+    return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+}
+
+#endif
+
+template< class T, class U >
+gsl_api gsl_constexpr bool operator!=( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+{
+    return !( l == r );
+}
+
+template< class T, class U >
+gsl_api gsl_constexpr bool operator<=( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+{
+    return !( r < l );
+}
+
+template< class T, class U >
+gsl_api gsl_constexpr bool operator>( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+{
+    return ( r < l );
+}
+
+template< class T, class U >
+gsl_api gsl_constexpr bool operator>=( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+{
+    return !( l < r );
+}
+
 //
 // String types:
 //
@@ -1377,32 +1824,44 @@ typedef wchar_t * zwstring;
 typedef const char * czstring;
 typedef const wchar_t * cwzstring;
 
-typedef span< char > string_span;
-typedef span< wchar_t > wstring_span;
-typedef span< const char > cstring_span;
-typedef span< const wchar_t > cwstring_span;
+typedef basic_string_span< char > string_span;
+typedef basic_string_span< wchar_t > wstring_span;
+typedef basic_string_span< char const > cstring_span;
+typedef basic_string_span< wchar_t const > cwstring_span;
 
 // to_string() allow (explicit) conversions from string_span to string
 
-gsl_api inline std::string to_string( string_span const & view )
+#if 0
+
+template< class T >
+gsl_api std::basic_string< typename std::remove_const<T>::type > to_string( basic_string_span<T> spn )
 {
-    return std::string( view.data(), view.length() );
+     std::string( spn.data(), spn.length() );
 }
 
-gsl_api inline std::string to_string( cstring_span const & view )
+#else
+
+gsl_api inline std::string to_string( string_span const & spn )
 {
-    return std::string( view.data(), view.length() );
+    return std::string( spn.data(), spn.length() );
 }
 
-gsl_api inline std::wstring to_string( wstring_span const & view )
+gsl_api inline std::string to_string( cstring_span const & spn )
 {
-    return std::wstring( view.data(), view.length() );
+    return std::string( spn.data(), spn.length() );
 }
 
-gsl_api inline std::wstring to_string( cwstring_span const & view )
+gsl_api inline std::wstring to_string( wstring_span const & spn )
 {
-    return std::wstring( view.data(), view.length() );
+    return std::wstring( spn.data(), spn.length() );
 }
+
+gsl_api inline std::wstring to_string( cwstring_span const & spn )
+{
+    return std::wstring( spn.data(), spn.length() );
+}
+
+#endif // to_string()
 
 //
 // ensure_sentinel()
