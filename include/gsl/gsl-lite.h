@@ -712,8 +712,8 @@ template<class T>
 class not_null
 {
 public:
-    gsl_api not_null(             T t         ) : ptr_ ( t ){ Expects( ptr_ != NULL ); }
-    gsl_api not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != NULL ); return *this; }
+    gsl_api not_null(             T t         ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
+    gsl_api not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
 
     gsl_api not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
@@ -974,8 +974,8 @@ public:
     typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
     gsl_api gsl_constexpr14 span()
-        : begin_( NULL )
-        , end_  ( NULL )
+        : begin_( gsl_nullptr )
+        , end_  ( gsl_nullptr )
     {
         Expects( size() == 0 );
     }
@@ -1008,7 +1008,7 @@ public:
         : begin_( data_in )
         , end_  ( data_in + size_in )
     {
-        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
+        Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
     template< typename U >
@@ -1016,7 +1016,7 @@ public:
         : begin_( data_in )
         , end_  ( data_in + size_in )
     {
-        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
+        Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
     template< typename U >
@@ -1024,7 +1024,7 @@ public:
         : begin_( data_in )
         , end_  ( data_in + size_in )
     {
-        Expects( size_in == 0 || ( size_in > 0 && data_in != NULL ) );
+        Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
     template< class U, size_t N >
@@ -1055,15 +1055,15 @@ public:
 #elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
-        : begin_( cont.size() == 0 ? NULL : &cont[0] )
-        , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
+        : begin_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
+        , end_  ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
 #endif
 
     template< class Cont >
     gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
-        : begin_( cont.size() == 0 ? NULL : &cont[0] )
-        , end_  ( cont.size() == 0 ? NULL : &cont[0] + cont.size() )
+        : begin_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
+        , end_  ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
 
 #if gsl_HAVE_IS_DEFAULT
@@ -1461,11 +1461,15 @@ typedef integral_constant< false > false_type;
 
 #endif
 
+#if gsl_HAVE_ARRAY
+
 template< class T >
 struct is_std_array : false_type {};
 
 template< class T, std::size_t N >
 struct is_std_array< std::array<T, N> > : true_type {};
+
+#endif
 
 template< class T >
 struct is_basic_string_span_oracle : false_type {};
