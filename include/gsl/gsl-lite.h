@@ -342,12 +342,12 @@ class final_act
 public:
     gsl_api explicit final_act( F action ) gsl_noexcept
         : action_( std::move( action ) )
-        , invoke_( true ) 
+        , invoke_( true )
     {}
 
     gsl_api final_act( final_act && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
-        , invoke_( other.invoke_ ) 
+        , invoke_( other.invoke_ )
     {
         other.invoke_ = false;
     }
@@ -355,10 +355,10 @@ public:
     gsl_api final_act( final_act const  & ) = delete;
     gsl_api final_act & operator=( final_act const & ) = delete;
 
-    gsl_api virtual ~final_act() gsl_noexcept 
-    { 
-        if ( invoke_ ) 
-            action_(); 
+    gsl_api virtual ~final_act() gsl_noexcept
+    {
+        if ( invoke_ )
+            action_();
     }
 
 protected:
@@ -366,7 +366,7 @@ protected:
     {
         invoke_ = false;
     }
-    
+
 #if gsl_CPP17_OR_GREATER
     gsl_api int uncaught_exceptions() gsl_noexcept
     {
@@ -406,7 +406,7 @@ public:
         : final_act<F>( std::move( action ) )
     {}
 
-    final_act_return( final_act_return && other ) gsl_noexcept 
+    final_act_return( final_act_return && other ) gsl_noexcept
         : final_act<F>( std::move( other ) )
     {}
 
@@ -476,20 +476,20 @@ public:
     typedef void (*Action)();
 
     gsl_api final_act( Action action )
-    : action_( action ) 
+    : action_( action )
     , invoke_( true )
     {}
 
     gsl_api final_act( final_act const & other )
         : action_( other.action_ )
-        , invoke_( other.invoke_ ) 
+        , invoke_( other.invoke_ )
     {
         other.invoke_ = false;
     }
 
     gsl_api virtual ~final_act()
     {
-        if ( invoke_ ) 
+        if ( invoke_ )
             action_();
     }
 
@@ -498,7 +498,7 @@ protected:
     {
         invoke_ = false;
     }
-    
+
     gsl_api int uncaught_exceptions()
     {
         return std::uncaught_exception() ? 1 : 0;
@@ -506,7 +506,7 @@ protected:
 
 private:
     gsl_api final_act & operator=( final_act const & );
-    
+
 private:
     Action action_;
     mutable bool invoke_;
@@ -523,7 +523,7 @@ gsl_api final_act finally( F const & f )
 class final_act_return : public final_act
 {
 public:
-    explicit final_act_return( Action action ) 
+    explicit final_act_return( Action action )
         : final_act( action )
     {}
 
@@ -546,7 +546,7 @@ inline final_act_return on_return( F const & action )
 class final_act_error : public final_act
 {
 public:
-    explicit final_act_error( Action action ) 
+    explicit final_act_error( Action action )
         : final_act( action )
     {}
 
@@ -909,9 +909,9 @@ gsl_api inline gsl_constexpr byte operator^( byte l, byte r ) gsl_noexcept
     return to_byte( to_uchar( l ) ^ to_uchar( r ) );
 }
 
-gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept 
-{ 
-    return to_byte( ~to_uchar( b ) ); 
+gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
+{
+    return to_byte( ~to_uchar( b ) );
 }
 
 // tag to select span constructor taking a container
@@ -1089,15 +1089,15 @@ public:
     gsl_api gsl_constexpr14 span subspan( index_type offset ) const gsl_noexcept
     {
         Expects( offset <= this->size() );
-        return span( this->data() + offset, this->length() - offset ); 
+        return span( this->data() + offset, this->length() - offset );
     }
-	
+
     gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const gsl_noexcept
     {
         Expects( offset <= this->size() && count <= this->size() - offset );
-        return span( this->data() + offset, count ); 
+        return span( this->data() + offset, count );
     }
-	
+
     gsl_api gsl_constexpr14 iterator begin() const gsl_noexcept
     {
         return iterator( begin_ );
@@ -1282,10 +1282,10 @@ namespace detail {
 template< class II, class N, class OI >
 OI copy_n( II first, N count, OI result )
 {
-    if ( count > 0 ) 
+    if ( count > 0 )
     {
         *result++ = *first;
-        for ( N i = 1; i < count; ++i ) 
+        for ( N i = 1; i < count; ++i )
         {
             *result++ = *++first;
         }
@@ -1463,8 +1463,8 @@ ensure_z( Cont& cont )
 #if gsl_CPP11_OR_GREATER
 
 namespace std {
-    
-template<> 
+
+template<>
 struct hash< gsl::byte >
 {
 public:

@@ -3,17 +3,17 @@
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene
-// Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
-// 
-// This code is licensed under the MIT License (MIT). 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
-// THE SOFTWARE. 
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #include "gsl-lite.t.h"
 
@@ -24,7 +24,7 @@ CASE( "string_span: Disallows construction of a string_span from a const C-strin
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     char s[] = "hello";
     cstring_span sv = s;
-    
+
     string_span v2 = sv;
     string_span v3 = "Hello";
 #endif
@@ -36,7 +36,7 @@ CASE( "string_span: ToDo: Disallows construction of a string_span from a const s
     const std::string s = "hello, world";
 
     string_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 #endif
 }
@@ -46,7 +46,7 @@ CASE( "string_span: Allows to create a string_span from a non-const C-string and
     char s[] = "hello";
 
     string_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -55,7 +55,7 @@ CASE( "string_span: Allows to create a string_span from a non-const C-array" )
     char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
     string_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
@@ -65,7 +65,7 @@ CASE( "string_span: Allows to create a string_span from a non-const std::array (
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
     string_span sv( arr );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -84,7 +84,7 @@ CASE( "string_span: Allows to create a string_span from a non-const std::vector"
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     string_span sv( vec );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -101,7 +101,7 @@ CASE( "string_span: ToDo: Allows to create a string_span from a non-const std::s
     std::string s = "hello, world";
 
     string_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 #endif
 #endif
@@ -112,7 +112,7 @@ CASE( "string_span: Allows to create a cstring_span from a const C-string and si
     const char s[] = "hello";
 
     cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -121,7 +121,7 @@ CASE( "string_span: Allows to create a cstring_span from a const C-array" )
     const char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
     cstring_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
@@ -131,7 +131,7 @@ CASE( "string_span: Allows to create a cstring_span from a const std::array (C++
     const std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
     cstring_span sv( arr );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -150,7 +150,7 @@ CASE( "string_span: Allows to create a cstring_span from a const std::vector" )
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cstring_span sv( vec );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -167,7 +167,7 @@ CASE( "string_span: Allows to create a cstring_span from a const std::string" )
     const std::string s = "hello, world";
 
     cstring_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -180,7 +180,7 @@ CASE( "string_span: Allows to create a cstring_span from a non-const C-string an
     char s[] = "hello";
 
     cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -189,7 +189,7 @@ CASE( "string_span: Allows to create a cstring_span from a non-const C-array" )
     char s[] = { 'w', 'o', 'r', 'l', 'd', '\0' };
 
     cstring_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
@@ -199,7 +199,7 @@ CASE( "string_span: Allows to create a cstring_span from a non-const std::array 
     std::array<char,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
     cstring_span sv( arr );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -218,7 +218,7 @@ CASE( "string_span: Allows to create a cstring_span from a non-const std::vector
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cstring_span sv( vec );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -235,7 +235,7 @@ CASE( "string_span: Allows to create a cstring_span from a non-const std::string
     std::string s = "hello, world";
 
     cstring_span sv( s );
-    
+
     EXPECT( std::string( sv.data() ) == s );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -257,7 +257,7 @@ CASE( "string_span: Allows to create a wstring_span from a non-const C-array" )
     wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
     wstring_span sv( s );
-    
+
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -267,7 +267,7 @@ CASE( "string_span: Allows to create a wstring_span from a non-const std::array 
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
     wstring_span sv( arr );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -286,7 +286,7 @@ CASE( "string_span: Allows to create a wstring_span from a non-const std::vector
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     wstring_span sv( vec );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -299,7 +299,7 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const C-string a
     wchar_t s[] = L"hello";
 
     cwstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -308,7 +308,7 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const C-array" )
     wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
     cwstring_span sv( s );
-    
+
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -318,7 +318,7 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const std::array
     std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
     cwstring_span sv( arr );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -337,7 +337,7 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const std::vecto
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cwstring_span sv( vec );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -350,7 +350,7 @@ CASE( "string_span: Allows to create a cwstring_span from a const C-string and s
     const wchar_t s[] = L"hello";
 
     cwstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -359,7 +359,7 @@ CASE( "string_span: Allows to create a cwstring_span from a const C-array" )
     const wchar_t s[] = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 
     cwstring_span sv( s );
-    
+
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -369,7 +369,7 @@ CASE( "string_span: Allows to create a cwstring_span from a const std::array (C+
     const std::array<wchar_t,6> arr = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
 
     cwstring_span sv( arr );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -388,7 +388,7 @@ CASE( "string_span: Allows to create a cwstring_span from a const std::vector" )
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cwstring_span sv( vec );
-    
+
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -403,7 +403,7 @@ CASE( "string_span: Allows to compare a string_span with another string_span" )
 
     string_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
     string_span tv( t, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( sv == sv );
     EXPECT( sv != tv );
     EXPECT( sv <= sv );
@@ -421,7 +421,7 @@ CASE( "string_span: Allows to compare a string_span with a cstring_span" )
 
     string_span   sv( s, gsl_DIMENSION_OF( s ) - 1 );
     cstring_span csv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( sv == csv );
 #else
     EXPECT( !!"string_span<>: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
@@ -433,7 +433,7 @@ CASE( "to_string(): Allows to explicitly convert from string_span to std::string
     char s[] = "hello";
 
     string_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( to_string( sv ) == s );
 }
 
@@ -442,7 +442,7 @@ CASE( "to_string(): Allows to explicitly convert from cstring_span to std::strin
     const char s[] = "hello";
 
     cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     EXPECT( to_string( sv ) == s );
 }
 
@@ -451,9 +451,9 @@ CASE( "to_string(): Allows to explicitly convert from wstring_span to std::wstri
     wchar_t s[] = L"hello";
 
     wstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
-    
+
     std::wstring ws( to_string( wstring_span( s, gsl_DIMENSION_OF( s ) - 1 ) ) );
-    
+
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
@@ -462,7 +462,7 @@ CASE( "to_string(): Allows to explicitly convert from cwstring_span to std::wstr
     wchar_t s[] = L"hello";
 
     std::wstring ws( to_string( cwstring_span( s, gsl_DIMENSION_OF( s ) - 1 ) ) );
-    
+
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
@@ -470,9 +470,9 @@ CASE( "ensure_z(): Disallows to build a string_span from a const C-string" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     const char s[] = "hello";
-    
+
     string_span sv = ensure_z( s );
-    
+
     EXPECT( sv.length() == 5 );
     EXPECT( std::string( sv.data() ) == s );
 #endif
@@ -482,9 +482,9 @@ CASE( "ensure_z(): Disallows to build a wstring_span from a const wide C-string"
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
     const wchar_t s[] = L"hello";
-    
+
     wstring_span sv = ensure_z( s );
-    
+
     EXPECT( sv.length() == 5 );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 #endif
@@ -493,12 +493,12 @@ CASE( "ensure_z(): Disallows to build a wstring_span from a const wide C-string"
 CASE( "ensure_z(): Allows to build a string_span from a non-const C-string" )
 {
     char s[] = "hello";
-    
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     string_span sv = ensure_z( s );
-#else 
+#else
     string_span sv = ensure_z( &s[0] );
-#endif   
+#endif
     EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
@@ -506,13 +506,13 @@ CASE( "ensure_z(): Allows to build a string_span from a non-const C-string" )
 CASE( "ensure_z(): Allows to build a cstring_span from a non-const C-string" )
 {
     char s[] = "hello";
-    
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     cstring_span sv = ensure_z( s );
 #else
     cstring_span sv = ensure_z( &s[0] );
 #endif
-    
+
     EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
@@ -520,13 +520,13 @@ CASE( "ensure_z(): Allows to build a cstring_span from a non-const C-string" )
 CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
 {
     const char s[] = "hello";
-    
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     cstring_span sv = ensure_z( s );
 #else
     cstring_span sv = ensure_z( &s[0] );
 #endif
-    
+
     EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
@@ -534,13 +534,13 @@ CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
 CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string" )
 {
     wchar_t s[] = L"hello";
-    
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     wstring_span sv = ensure_z( s );
 #else
     wstring_span sv = ensure_z( &s[0] );
 #endif
-    
+
     EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
@@ -548,13 +548,13 @@ CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string
 CASE( "ensure_z(): Allows to build a cwstring_span from a non-const wide C-string" )
 {
     wchar_t s[] = L"hello";
-    
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     cwstring_span sv = ensure_z( s );
 #else
     cwstring_span sv = ensure_z( &s[0] );
 #endif
-    
+
     EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
@@ -562,13 +562,13 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a non-const wide C-strin
 CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
 {
     const wchar_t s[] = L"hello";
-    
+
 #if gsl_COMPILER_MSVC_VERSION != 6
     cwstring_span sv = ensure_z( s );
 #else
     cwstring_span sv = ensure_z( &s[0] );
 #endif
-    
+
     EXPECT( sv.length() == size_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
@@ -576,7 +576,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
 CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensure its presence" )
 {
     const char * s = "hello"; // not: s[]
-    
+
     EXPECT_THROWS( ensure_z( s, size_type( 3 ) ) );
 }
 
