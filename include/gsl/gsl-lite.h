@@ -284,6 +284,73 @@
 
 namespace gsl {
 
+namespace detail {
+
+// C++11 emulation:
+
+#if gsl_HAVE_REMOVE_CONST
+
+using std::remove_cv;
+using std::remove_const;
+using std::remove_volatile;
+
+#elif gsl_HAVE_TR1_REMOVE_CONST
+
+using std::tr1::remove_cv;
+using std::tr1::remove_const;
+using std::tr1::remove_volatile;
+
+#else
+
+template< class T > struct remove_const          { typedef T type; };
+template< class T > struct remove_const<T const> { typedef T type; };
+
+template< class T > struct remove_volatile             { typedef T type; };
+template< class T > struct remove_volatile<T volatile> { typedef T type; };
+
+template< class T >
+struct remove_cv
+{
+    typedef typename detail::remove_volatile<typename detail::remove_const<T>::type>::type type;
+};
+
+#endif // gsl_HAVE_REMOVE_CONST
+
+#if gsl_HAVE_INTEGRAL_CONSTANT
+
+using std::integral_constant;
+using std::true_type;
+using std::false_type;
+
+#elif gsl_HAVE_TR1_INTEGRAL_CONSTANT
+
+using std::tr1::integral_constant;
+using std::tr1::true_type;
+using std::tr1::false_type;
+
+#else
+
+template< int v > struct integral_constant { static enum { value = v }; };
+typedef integral_constant< true  > true_type;
+typedef integral_constant< false > false_type;
+
+#endif
+
+#if gsl_HAVE_ARRAY
+
+template< class T >
+struct is_std_array_oracle : false_type {};
+
+template< class T, std::size_t N >
+struct is_std_array_oracle< std::array<T, N> > : true_type {};
+
+template< class T >
+struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
+
+#endif
+
+} // namespace detail
+
 //
 // GSL.owner: ownership pointers
 //
@@ -1392,87 +1459,14 @@ gsl_api span<const T> as_span( std::vector<T> const & cont )
 }
 #endif
 
+//
+// basic_string_span:
+//
+
 template< class T >
 class basic_string_span;
 
 namespace detail {
-
-// C++11 emulation:
-
-#if gsl_HAVE_ADD_CONST
-
-using std::add_const;
-
-#elif gsl_HAVE_TR1_ADD_CONST
-
-using std::tr1::add_const;
-
-#else
-
-template< class T > struct add_const { typedef const T type; };
-
-#endif // gsl_HAVE_ADD_CONST
-
-#if gsl_HAVE_REMOVE_CONST
-
-using std::remove_cv;
-using std::remove_const;
-using std::remove_volatile;
-
-#elif gsl_HAVE_TR1_REMOVE_CONST
-
-using std::tr1::remove_cv;
-using std::tr1::remove_const;
-using std::tr1::remove_volatile;
-
-#else
-
-template< class T > struct remove_const          { typedef T type; };
-template< class T > struct remove_const<T const> { typedef T type; };
-
-template< class T > struct remove_volatile             { typedef T type; };
-template< class T > struct remove_volatile<T volatile> { typedef T type; };
-
-template< class T >
-struct remove_cv
-{
-    typedef typename detail::remove_volatile<typename detail::remove_const<T>::type>::type type;
-};
-
-#endif // gsl_HAVE_REMOVE_CONST
-
-#if gsl_HAVE_INTEGRAL_CONSTANT
-
-using std::integral_constant;
-using std::true_type;
-using std::false_type;
-
-#elif gsl_HAVE_TR1_INTEGRAL_CONSTANT
-
-using std::tr1::integral_constant;
-using std::tr1::true_type;
-using std::tr1::false_type;
-
-#else
-
-template< int v > struct integral_constant { static enum { value = v }; };
-typedef integral_constant< true  > true_type;
-typedef integral_constant< false > false_type;
-
-#endif
-
-#if gsl_HAVE_ARRAY
-
-template< class T >
-struct is_std_array_oracle : false_type {};
-
-template< class T, std::size_t N >
-struct is_std_array_oracle< std::array<T, N> > : true_type {};
-
-template< class T >
-struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
-
-#endif
 
 template< class T >
 struct is_basic_string_span_oracle : false_type {};
