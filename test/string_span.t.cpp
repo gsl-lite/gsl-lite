@@ -90,11 +90,12 @@ CASE( "string_span: Allows to create a string_span from a non-const std::vector"
 #if gsl_HAVE_INITIALIZER_LIST
     std::vector<char> vec = { 'w', 'o', 'r', 'l', 'd', '\0' };
 #else
-    std::vector<char> vec( 'w', 5 );
+    std::vector<char> vec( 'w', 6 );
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     string_span sv( vec );
 
+    EXPECT( sv.length() == 6u );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -112,6 +113,7 @@ CASE( "string_span: ToDo: Allows to create a string_span from a non-const std::s
 
     string_span sv( s );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == s );
 #endif
 #endif
@@ -123,6 +125,7 @@ CASE( "string_span: Allows to create a cstring_span from a const C-string and si
 
     cstring_span sv( s, gsl_DIMENSION_OF( s ) - 1 );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -132,6 +135,7 @@ CASE( "string_span: Allows to create a cstring_span from a const C-array" )
 
     cstring_span sv( s );
 
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
