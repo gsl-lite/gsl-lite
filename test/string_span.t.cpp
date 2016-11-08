@@ -90,7 +90,7 @@ CASE( "string_span: Allows to create a string_span from a non-const std::vector"
 #if gsl_HAVE_INITIALIZER_LIST
     std::vector<char> vec = { 'w', 'o', 'r', 'l', 'd', '\0' };
 #else
-    std::vector<char> vec( 'w', 6 );
+    std::vector<char> vec( 6, 'w' );
 #endif
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     string_span sv( vec );
