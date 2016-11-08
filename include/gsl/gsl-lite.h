@@ -1464,10 +1464,13 @@ typedef integral_constant< false > false_type;
 #if gsl_HAVE_ARRAY
 
 template< class T >
-struct is_std_array : false_type {};
+struct is_std_array_oracle : false_type {};
 
 template< class T, std::size_t N >
-struct is_std_array< std::array<T, N> > : true_type {};
+struct is_std_array_oracle< std::array<T, N> > : true_type {};
+
+template< class T >
+struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
 
 #endif
 
@@ -1566,11 +1569,17 @@ public:
     gsl_api gsl_constexpr basic_string_span( std::array< typename detail::remove_const<element_type>::type, N> & arr )
     : span_( remove_z( arr ) )
     {}
+
+    template< std::size_t N >
+    gsl_api gsl_constexpr basic_string_span( std::array< typename detail::remove_const<element_type>::type, N> const & arr )
+    : span_( remove_z( arr ) )
+    {}
+
 #endif
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
 
-    // Exclude: [array, basic_string,] basic_string_span
+    // Exclude: array, [basic_string,] basic_string_span
 
     template<
         class Cont,
@@ -1585,7 +1594,7 @@ public:
     : span_( ( cont ) )
     {}
 
-    // Exclude: [array, basic_string,] basic_string_span
+    // Exclude: array, [basic_string,] basic_string_span
 
     template<
         class Cont,
@@ -1622,7 +1631,6 @@ public:
 
     template< class U
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
-        // std::is_same< std::remove_cv<T>, std::remove_cv<U> >::value
         , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value >::type
 #endif
     >
@@ -1632,7 +1640,6 @@ public:
 
 #if gsl_CPP11_OR_GREATER
     template< class U
-        // std::is_same< std::remove_cv<T>, std::remove_cv<U> >::value
         , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value >::type
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
@@ -1641,13 +1648,14 @@ public:
 #endif
 
     template< class CharTraits, class Allocator >
-    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > & str )
+    gsl_api gsl_constexpr basic_string_span( 
+        std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > & str )
     : span_( &str[0], str.length() )
     {}
 
     template< class CharTraits, class Allocator >
-    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > const &
-    str )
+    gsl_api gsl_constexpr basic_string_span( 
+        std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > const & str )
     : span_( &str[0], str.length() )
     {}
 
@@ -1760,6 +1768,12 @@ private:
 #if gsl_HAVE_ARRAY
     template< size_t N >
     gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> & arr )
+    {
+        return remove_z( &arr[0], narrow_cast< std::ptrdiff_t >( N ) );
+    }
+
+    template< size_t N >
+    gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> const & arr )
     {
         return remove_z( &arr[0], narrow_cast< std::ptrdiff_t >( N ) );
     }
