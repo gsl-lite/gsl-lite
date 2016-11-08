@@ -3,17 +3,17 @@
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene
-// Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
-// 
-// This code is licensed under the MIT License (MIT). 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
-// THE SOFTWARE. 
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #include "gsl-lite.t.h"
 
@@ -68,7 +68,7 @@ CASE( "at(): Terminates access to non-existing gsl::span elements" )
     EXPECT_THROWS( at(a, 4) );
 }
 
-CASE( "at(): Allows access to existing C-array elements" )
+CASE( "at(): Allows to access existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };
 
@@ -78,7 +78,7 @@ CASE( "at(): Allows access to existing C-array elements" )
     }
 }
 
-CASE( "at(): Allows access to existing std::array elements (C++11)" )
+CASE( "at(): Allows to access existing std::array elements (C++11)" )
 {
 #if gsl_HAVE_ARRAY
     std::array<int, 4> a = {{ 1, 2, 3, 4 }};
@@ -92,7 +92,7 @@ CASE( "at(): Allows access to existing std::array elements (C++11)" )
 #endif
 }
 
-CASE( "at(): Allows access to existing std::vector elements" )
+CASE( "at(): Allows to access existing std::vector elements" )
 {
     std::vector<int> a; // = { 1, 2, 3, 4 };
 
@@ -103,7 +103,7 @@ CASE( "at(): Allows access to existing std::vector elements" )
     }
 }
 
-CASE( "at(): Allows access to std::initializer_list elements (C++11)" )
+CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 {
 // Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
 
@@ -119,7 +119,7 @@ CASE( "at(): Allows access to std::initializer_list elements (C++11)" )
 #endif
 }
 
-CASE( "at(): Allows access to gsl::span elements" )
+CASE( "at(): Allows to access gsl::span elements" )
 {
     int arr[] = { 1, 2, 3, 4 };
     span<int> a( arr );
