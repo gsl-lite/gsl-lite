@@ -1706,12 +1706,12 @@ public:
 
     gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
     {
-        return span_.length_bytes();
+        return span_.bytes();
     }
 
     gsl_api gsl_constexpr index_type size_bytes() const gsl_noexcept
     {
-        return span_.size_bytes();
+        return span_.bytes();
     }
 
     gsl_api gsl_constexpr bool empty() const gsl_noexcept
