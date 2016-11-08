@@ -1673,9 +1673,14 @@ public:
         return span_.last( count );
     }
 
-    gsl_api gsl_constexpr basic_string_span subspan( index_type offset, difference_type count = -1 ) const
+    gsl_api gsl_constexpr basic_string_span subspan( index_type offset ) const
     {
-        return span_.subspan( offset, (count == -1 ? (this->size() - offset) : static_cast<index_type>(count)) );
+        return span_.subspan( offset );
+    }
+
+    gsl_api gsl_constexpr basic_string_span subspan( index_type offset, index_type count ) const
+    {
+        return span_.subspan( offset, count );
     }
 
     // observers:
