@@ -733,26 +733,68 @@ CASE( "string_span: Allows to compare a string_span with a cstring_span" )
 
 CASE( "string_span: Allows to test for empty span via empty(), empty case" )
 {
+    string_span sz;
+
+    EXPECT( sz.empty() );
 }
 
 CASE( "string_span: Allows to test for empty span via empty(), non-empty case" )
 {
+    string_span s = "hello";
+
+    EXPECT_NOT( s.empty() );
 }
 
 CASE( "string_span: Allows to obtain the number of elements via length()" )
 {
+    char a[] = "hello";
+    char b[] = "world";
+    string_span sz;
+    string_span sa = a;
+    string_span sb = b;
+
+    EXPECT( sz.length() == size_type( 0 ) );
+    EXPECT( sa.length() == size_type( std::strlen( a ) ) );
+    EXPECT( sb.length() == size_type( std::strlen( b ) ) );
 }
 
 CASE( "string_span: Allows to obtain the number of elements via size()" )
 {
+    char a[] = "hello";
+    char b[] = "world";
+    string_span sz;
+    string_span sa = a;
+    string_span sb = b;
+
+    EXPECT( sz.size() == size_type( 0 ) );
+    EXPECT( sa.size() == size_type( std::strlen( a ) ) );
+    EXPECT( sb.size() == size_type( std::strlen( b ) ) );
 }
 
 CASE( "string_span: Allows to obtain the number of bytes via length_bytes()" )
 {
+    wchar_t a[] = L"hello";
+    wchar_t b[] = L"world";
+    wstring_span sz;
+    wstring_span sa = a;
+    wstring_span sb = b;
+
+    EXPECT( sz.length_bytes() == size_type( 0 ) );
+    EXPECT( sa.length_bytes() == size_type( sizeof(wchar_t) * std::wcslen( a ) ) );
+    EXPECT( sb.length_bytes() == size_type( sizeof(wchar_t) * std::wcslen( b ) ) );
 }
 
 CASE( "string_span: Allows to obtain the number of bytes via size_bytes()" )
 {
+    wchar_t a[] = L"hello";
+    wchar_t b[] = L"world";
+    wstring_span sz;
+    wstring_span sa = a;
+    wstring_span sb = b;
+
+    EXPECT( sz.size_bytes() == size_type( 0 ) );
+    EXPECT( sa.size_bytes() == size_type( sizeof(wchar_t) * std::wcslen( a ) ) );
+    EXPECT( sb.size_bytes() == size_type( sizeof(wchar_t) * std::wcslen( b ) ) );
 }
 
 CASE( "to_string(): Allows to explicitly convert from string_span to std::string" )
