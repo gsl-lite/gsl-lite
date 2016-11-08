@@ -1532,11 +1532,13 @@ public:
 
 #if gsl_HAVE_IS_DEFAULT
     gsl_api gsl_constexpr basic_string_span() gsl_noexcept = default;
+#else
+    gsl_api gsl_constexpr basic_string_span() gsl_noexcept {}
 #endif
 
 #if gsl_HAVE_NULLPTR
     gsl_api gsl_constexpr basic_string_span( std::nullptr_t ptr ) gsl_noexcept
-    : span_( ptr )
+    : span_( ptr, 0 )
     {}
 #endif
 
