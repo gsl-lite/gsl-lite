@@ -84,9 +84,7 @@ CASE( "string_span: Allows to create a string_span from a non-const std::array (
 
 CASE( "string_span: Allows to create a string_span from a non-const std::vector" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"not available for VC6" );
-#else
+
 #if gsl_HAVE_INITIALIZER_LIST
     std::vector<char> vec = { 'w', 'o', 'r', 'l', 'd', '\0' };
 #else
@@ -100,23 +98,16 @@ CASE( "string_span: Allows to create a string_span from a non-const std::vector"
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
 #endif
-#endif
 }
 
-CASE( "string_span: ToDo: Allows to create a string_span from a non-const std::string" )
+CASE( "string_span: Allows to create a string_span from a non-const std::string" )
 {
-#if 0
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"not available for VC6" );
-#else
     std::string s = "hello, world";
 
     string_span sv( s );
 
-    EXPECT( sv.length() == 5u );
+    EXPECT( sv.length() == 12u );
     EXPECT( std::string( sv.data() ) == s );
-#endif
-#endif
 }
 
 CASE( "string_span: Allows to create a cstring_span from a const C-string and size" )
@@ -154,9 +145,6 @@ CASE( "string_span: Allows to create a cstring_span from a const std::array (C++
 
 CASE( "string_span: Allows to create a cstring_span from a const std::vector" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"Not available for MSVC6" );
-#else
 #if gsl_HAVE_INITIALIZER_LIST
     const std::vector<char> vec = { 'w', 'o', 'r', 'l', 'd', '\0' };
 #else
@@ -169,14 +157,10 @@ CASE( "string_span: Allows to create a cstring_span from a const std::vector" )
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
 #endif
-#endif
 }
 
 CASE( "string_span: Allows to create a cstring_span from a const std::string" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"Not available for MSVC6" );
-#else
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     const std::string s = "hello, world";
 
@@ -185,7 +169,6 @@ CASE( "string_span: Allows to create a cstring_span from a const std::string" )
     EXPECT( std::string( sv.data() ) == s );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
-#endif
 #endif
 }
 
@@ -222,9 +205,6 @@ CASE( "string_span: Allows to create a cstring_span from a non-const std::array 
 
 CASE( "string_span: Allows to create a cstring_span from a non-const std::vector" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"Not available for MSVC6" );
-#else
 #if gsl_HAVE_INITIALIZER_LIST
     std::vector<char> vec = { 'w', 'o', 'r', 'l', 'd', '\0' };
 #else
@@ -237,14 +217,10 @@ CASE( "string_span: Allows to create a cstring_span from a non-const std::vector
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
 #endif
-#endif
 }
 
 CASE( "string_span: Allows to create a cstring_span from a non-const std::string" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"Not available for MSVC6" );
-#else
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     std::string s = "hello, world";
 
@@ -253,7 +229,6 @@ CASE( "string_span: Allows to create a cstring_span from a non-const std::string
     EXPECT( std::string( sv.data() ) == s );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
-#endif
 #endif
 }
 
@@ -290,9 +265,6 @@ CASE( "string_span: Allows to create a wstring_span from a non-const std::array 
 
 CASE( "string_span: Allows to create a wstring_span from a non-const std::vector" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"not available for VC6" );
-#else
 #if gsl_HAVE_INITIALIZER_LIST
     std::vector<wchar_t> vec = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 #else
@@ -304,7 +276,6 @@ CASE( "string_span: Allows to create a wstring_span from a non-const std::vector
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
-#endif
 #endif
 }
 
@@ -341,9 +312,6 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const std::array
 
 CASE( "string_span: Allows to create a cwstring_span from a non-const std::vector" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"not available for VC6" );
-#else
 #if gsl_HAVE_INITIALIZER_LIST
     std::vector<wchar_t> vec = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 #else
@@ -355,7 +323,6 @@ CASE( "string_span: Allows to create a cwstring_span from a non-const std::vecto
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
-#endif
 #endif
 }
 
@@ -392,9 +359,6 @@ CASE( "string_span: Allows to create a cwstring_span from a const std::array (C+
 
 CASE( "string_span: Allows to create a cwstring_span from a const std::vector" )
 {
-#if gsl_COMPILER_MSVC_VERSION == 6
-    EXPECT( !!"not available for VC6" );
-#else
 #if gsl_HAVE_INITIALIZER_LIST
     const std::vector<wchar_t> vec = { L'w', L'o', L'r', L'l', L'd', L'\0' };
 #else
@@ -406,7 +370,6 @@ CASE( "string_span: Allows to create a cwstring_span from a const std::vector" )
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
-#endif
 #endif
 }
 

@@ -73,9 +73,9 @@ CASE( "span<>: Terminates construction from a null pointer and a non-zero size" 
 
 CASE( "span<>: Terminates creation of a sub span of the first n elements for n exceeding the span" )
 {
-    struct F { 
-    static void blow() 
-    { 
+    struct F {
+    static void blow()
+    {
         int arr[] = { 1, 2, 3, };
         span<int> v( arr );
 
@@ -87,9 +87,9 @@ CASE( "span<>: Terminates creation of a sub span of the first n elements for n e
 
 CASE( "span<>: Terminates creation of a sub span of the last n elements for n exceeding the span" )
 {
-    struct F { 
-    static void blow() 
-    { 
+    struct F {
+    static void blow()
+    {
         int arr[] = { 1, 2, 3, };
         span<int> v( arr );
 
@@ -101,16 +101,16 @@ CASE( "span<>: Terminates creation of a sub span of the last n elements for n ex
 
 CASE( "span<>: Terminates creation of a sub span outside the span" )
 {
-    struct F { 
-    static void blow_offset() 
-    { 
+    struct F {
+    static void blow_offset()
+    {
         int arr[] = { 1, 2, 3, };
         span<int> v( arr );
 
         (void) v.subspan( 4 );
     }
-    static void blow_count() 
-    { 
+    static void blow_count()
+    {
         int arr[] = { 1, 2, 3, };
         span<int> v( arr );
 
@@ -123,10 +123,10 @@ CASE( "span<>: Terminates creation of a sub span outside the span" )
 
 CASE( "span<>: Terminates access outside the span" )
 {
-    struct F { 
-        static void blow_ix(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; } 
-        static void blow_iv(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v(i); } 
-        static void blow_at(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); } 
+    struct F {
+        static void blow_ix(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; }
+        static void blow_iv(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v(i); }
+        static void blow_at(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); }
     };
 
     EXPECT_NO_THROW( F::blow_ix(2) );
@@ -140,7 +140,7 @@ CASE( "span<>: Terminates access outside the span" )
 CASE( "span<>: Allows default construction" )
 {
     span<int> v;
-    
+
     EXPECT( v.size() == size_type( 0 ) );
 }
 
@@ -263,7 +263,7 @@ CASE( "span<>: Allows construction from any pointer and a zero size" )
 CASE( "span<>: Allows construction from a C-array" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    
+
     span<      int> v( arr );
     span<const int> w( arr );
 
@@ -274,7 +274,7 @@ CASE( "span<>: Allows construction from a C-array" )
 CASE( "span<>: Allows construction from a const C-array" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-    
+
     span<const int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
@@ -645,7 +645,7 @@ CASE( "span<>: Allows to change element via array indexing" )
     int arr[] = { 1, 2, 3, };
     span<int>       v( arr );
     span<int> const w( arr );
-    
+
     v[1] = 22;
     w[2] = 33;
 
@@ -658,7 +658,7 @@ CASE( "span<>: Allows to change element via call indexing" )
     int arr[] = { 1, 2, 3, };
     span<int>       v( arr );
     span<int> const w( arr );
-    
+
     v(1) = 22;
     w(2) = 33;
 
@@ -671,7 +671,7 @@ CASE( "span<>: Allows to change element via at()" )
     int arr[] = { 1, 2, 3, };
     span<int>       v( arr );
     span<int> const w( arr );
-    
+
     v.at(1) = 22;
     w.at(2) = 33;
 
@@ -688,7 +688,7 @@ CASE( "span<>: Allows to change element via data()" )
 
     *v.data() = 22;
     EXPECT( 22 == *v.data() );
-      
+
     *w.data() = 33;
     EXPECT( 33 == *w.data() );
 }
@@ -774,7 +774,7 @@ CASE( "span<>: Allows to compare to another span of the same type and different 
     span<volatile int> va( aa );
     span<         int>  b( bb );
     span<   const int> cb( bb );
-    
+
     EXPECT( va == ca );
     EXPECT(  a == va );
 
@@ -798,7 +798,7 @@ CASE( "span<>: Allows to compare empty spans as equal" )
     span<int> r( &a, size_type( 0 ) );
 
     EXPECT( p == q );
-    EXPECT( p == r );    
+    EXPECT( p == r );
 
 #if gsl_HAVE_NULLPTR
     span<int> s( nullptr, 0 );
@@ -1038,7 +1038,7 @@ CASE( "span<>: Allows to copy a span to another span of the same element type" )
     span<int> dst( b );
 
     copy( src, dst );
-    
+
     EXPECT( src == dst.subspan( 0, src.size() ) );
 }
 
@@ -1051,7 +1051,7 @@ CASE( "span<>: Allows to copy a span to another span of a different element type
     span<char> dst( b );
 
     copy( src, dst );
-    
+
     for ( span<int>::index_type i = 0; i < src.size(); ++i )
     {
         EXPECT( src[i] == dst[i] );
@@ -1096,28 +1096,20 @@ CASE( "span<>: Allows building from a non-null const pointer and a size" )
 
 CASE( "span<>: Allows building from a C-array" )
 {
-#if gsl_COMPILER_MSVC_VERSION != 6
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<int> v = as_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
-#else
-    EXPECT( !!"not available for VC6" );
-#endif
 }
 
 CASE( "span<>: Allows building from a const C-array" )
 {
-#if gsl_COMPILER_MSVC_VERSION != 6
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<const int> v = as_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
-#else
-    EXPECT( !!"not available for VC6" );
-#endif
 }
 
 CASE( "span<>: Allows building from a std::array<> (C++11)" )
