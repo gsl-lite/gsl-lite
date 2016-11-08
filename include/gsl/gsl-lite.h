@@ -973,7 +973,7 @@ public:
 
     typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
-    gsl_api gsl_constexpr14 span()
+    gsl_api gsl_constexpr14 span() gsl_noexcept
         : begin_( gsl_nullptr )
         , end_  ( gsl_nullptr )
     {
@@ -1623,7 +1623,7 @@ public:
     template< class U
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
         // std::is_same< std::remove_cv<T>, std::remove_cv<U> >::value
-        , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::span_type, span_type>::value >::type
+        , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value >::type
 #endif
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
@@ -1633,18 +1633,21 @@ public:
 #if gsl_CPP11_OR_GREATER
     template< class U
         // std::is_same< std::remove_cv<T>, std::remove_cv<U> >::value
-        , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::span_type, span_type>::value >::type
+        , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value >::type
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() )
     {}
 #endif
 
-    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type > & str )
+    template< class CharTraits, class Allocator >
+    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > & str )
     : span_( &str[0], str.length() )
     {}
 
-    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type > const & str )
+    template< class CharTraits, class Allocator >
+    gsl_api gsl_constexpr basic_string_span( std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > const &
+    str )
     : span_( &str[0], str.length() )
     {}
 
@@ -1670,9 +1673,9 @@ public:
         return span_.last( count );
     }
 
-    gsl_api gsl_constexpr basic_string_span subspan( index_type offset, index_type count = -1 ) const
+    gsl_api gsl_constexpr basic_string_span subspan( index_type offset, difference_type count = -1 ) const
     {
-        return span_.subspan( offset, count );
+        return span_.subspan( offset, (count == -1 ? (this->size() - offset) : static_cast<index_type>(count)) );
     }
 
     // observers:
@@ -1727,12 +1730,12 @@ public:
         return span_.end();
     }
 
-    gsl_api iterator rbegin() const gsl_noexcept
+    gsl_api reverse_iterator rbegin() const gsl_noexcept
     {
         return span_.rbegin();
     }
 
-    gsl_api iterator rend() const gsl_noexcept
+    gsl_api reverse_iterator rend() const gsl_noexcept
     {
         return span_.rend();
     }
