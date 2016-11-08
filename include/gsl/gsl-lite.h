@@ -246,22 +246,6 @@
 
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
 
-// additional includes:
-
-#if gsl_HAVE_ARRAY
-# include <array>
-#endif
-
-#if gsl_HAVE_TYPE_TRAITS
-# include <type_traits>
-#elif gsl_HAVE_TR1_TYPE_TRAITS
-# include <tr1/type_traits>
-#endif
-
-#if gsl_HAVE_SIZED_TYPES
-# include <cstdint>
-#endif
-
 // Other features:
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD
@@ -280,6 +264,22 @@
 # else
 #  define gsl_api /*gsl_api*/
 # endif
+#endif
+
+// additional includes:
+
+#if gsl_HAVE_ARRAY
+# include <array>
+#endif
+
+#if gsl_HAVE_TYPE_TRAITS
+# include <type_traits>
+#elif gsl_HAVE_TR1_TYPE_TRAITS
+# include <tr1/type_traits>
+#endif
+
+#if gsl_HAVE_SIZED_TYPES
+# include <cstdint>
 #endif
 
 namespace gsl {
@@ -1647,13 +1647,13 @@ public:
 #endif
 
     template< class CharTraits, class Allocator >
-    gsl_api gsl_constexpr basic_string_span( 
+    gsl_api gsl_constexpr basic_string_span(
         std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > & str )
     : span_( &str[0], str.length() )
     {}
 
     template< class CharTraits, class Allocator >
-    gsl_api gsl_constexpr basic_string_span( 
+    gsl_api gsl_constexpr basic_string_span(
         std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > const & str )
     : span_( &str[0], str.length() )
     {}
