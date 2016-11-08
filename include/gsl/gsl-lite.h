@@ -1762,20 +1762,20 @@ private:
     template< size_t N >
     gsl_api static span_type remove_z( element_type (&sz)[N] )
     {
-        return remove_z( &sz[0], narrow_cast< std::ptrdiff_t >( N ) );
+        return remove_z( &sz[0], narrow_cast< std::size_t >( N ) );
     }
 
 #if gsl_HAVE_ARRAY
     template< size_t N >
     gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> & arr )
     {
-        return remove_z( &arr[0], narrow_cast< std::ptrdiff_t >( N ) );
+        return remove_z( &arr[0], narrow_cast< std::size_t >( N ) );
     }
 
     template< size_t N >
     gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> const & arr )
     {
-        return remove_z( &arr[0], narrow_cast< std::ptrdiff_t >( N ) );
+        return remove_z( &arr[0], narrow_cast< std::size_t >( N ) );
     }
 #endif
 
