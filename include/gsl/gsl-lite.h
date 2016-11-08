@@ -1617,6 +1617,11 @@ public:
 
 #endif
 
+    template< class Cont >
+    gsl_api gsl_constexpr14 basic_string_span( with_container_t, Cont & cont )
+    : span_( with_container, cont )
+    {}
+
 #if gsl_HAVE_IS_DEFAULT
     gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
 

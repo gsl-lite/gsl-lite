@@ -100,6 +100,22 @@ CASE( "string_span: Allows to create a string_span from a non-const std::vector"
 #endif
 }
 
+CASE( "string_span<>: Allows tagged construction from a container (std::vector<>)" )
+{
+# if gsl_HAVE_INITIALIZER_LIST
+    std::vector<char> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+#else
+    std::vector<char> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+#endif
+    string_span  sv( with_container, vec );
+    cstring_span sw( with_container, vec );
+
+    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sw.length() == size_type( 9 ) );
+    EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
+    EXPECT( std::equal( sw.begin(), sw.end(), vec.begin() ) );
+}
+
 CASE( "string_span: Allows to create a string_span from a non-const std::string" )
 {
     std::string s = "hello, world";
