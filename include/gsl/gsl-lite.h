@@ -264,6 +264,10 @@
 
 // Other features:
 
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD
+# define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR   1
+#endif
+
 // Note: !defined(__NVCC__) doesn't work with nvcc here:
 #define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR  \
     ( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
@@ -1039,10 +1043,6 @@ public:
         : begin_( arr.data() )
         , end_  ( arr.data() + N )
     {}
-#endif
-
-#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD
-# define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR   1
 #endif
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
