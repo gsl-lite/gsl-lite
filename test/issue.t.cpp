@@ -67,4 +67,11 @@ CASE( "string_span<>: must not include terminating '\\0'" "[.issue #53]" )
     EXPECT( a == b );
 }
 
+CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" "[.issue #53a]" )
+{
+#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+    cstring_span span = "Hello world";
+    std::string str = to_string( span );
+#endif
+}
 // end of file
