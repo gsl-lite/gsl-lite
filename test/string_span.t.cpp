@@ -632,8 +632,9 @@ CASE( "string_span: Allows to move-construct from another span of the same type 
 
 CASE( "string_span: Allows to copy-assign from another span of the same type" )
 {
-    string_span a = "hello";
-    string_span b = "world";
+    char hello[] = "hello";
+    string_span a = hello;
+    string_span b;
 
     b = a;
 
