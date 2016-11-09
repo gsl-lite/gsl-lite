@@ -201,6 +201,7 @@
 # define gsl_HAVE_TR1_INTEGRAL_CONSTANT  1
 # define gsl_HAVE_TR1_REMOVE_REFERENCE  1
 #endif
+
 // For the rest, consider VC12, VC14 as C++11 for GSL Lite:
 
 #if gsl_COMPILER_MSVC_VERSION >= 12
