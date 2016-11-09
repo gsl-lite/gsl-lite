@@ -31,6 +31,14 @@ namespace std {
 namespace lest {
 #endif
 
+#if gsl_HAVE_ARRAY
+template< typename T, std::size_t N >
+inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
+{
+    return os << std::hex << "[std::array[" << N << "]";
+}
+#endif
+
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 {
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
@@ -50,6 +58,7 @@ namespace gsl {
 
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
+
 inline std::ostream & operator<<( std::ostream & os, byte b )
 {
     return os << std::hex << "0x" << to_integer<int>(b);
