@@ -409,10 +409,9 @@ CASE( "span<>: Allows to copy-construct from another span of a compatible type" 
     EXPECT( std::equal( y.begin(), y.end(), arr ) );
 }
 
-#if gsl_CPP11_OR_GREATER
-
 CASE( "span<>: Allows to move-construct from another span of the same type (C++11)" )
 {
+#if gsl_CPP11_OR_GREATER
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<      int> v(( span<      int>( arr ) ));
@@ -423,8 +422,10 @@ CASE( "span<>: Allows to move-construct from another span of the same type (C++1
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
     EXPECT( std::equal( x.begin(), x.end(), arr ) );
     EXPECT( std::equal( y.begin(), y.end(), arr ) );
-}
+#else
+    EXPECT( !!"move-semantics are not available (no C++11)" );
 #endif
+}
 
 CASE( "span<>: Allows to copy-assign from another span of the same type" )
 {
@@ -440,10 +441,9 @@ CASE( "span<>: Allows to copy-assign from another span of the same type" )
     EXPECT( std::equal( t.begin(), t.end(), arr ) );
 }
 
-#if gsl_CPP11_OR_GREATER
-
 CASE( "span<>: Allows to move-assign from another span of the same type (C++11)" )
 {
+#if gsl_CPP11_OR_GREATER
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<      int> v;
     span<const int> w;
@@ -453,8 +453,10 @@ CASE( "span<>: Allows to move-assign from another span of the same type (C++11)"
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
     EXPECT( std::equal( w.begin(), w.end(), arr ) );
-}
+#else
+    EXPECT( !!"move-semantics are not available (no C++11)" );
 #endif
+}
 
 CASE( "span<>: Allows to create a sub span of the first n elements" )
 {
