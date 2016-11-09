@@ -1754,6 +1754,28 @@ public:
         return span_.rend();
     }
 
+    // const version not in p0123r2:
+    
+    gsl_api const_iterator cbegin() const gsl_noexcept
+    {
+        return span_.cbegin();
+    }
+
+    gsl_api const_iterator cend() const gsl_noexcept
+    {
+        return span_.cend();
+    }
+
+    gsl_api const_reverse_iterator crbegin() const gsl_noexcept
+    {
+        return span_.crbegin();
+    }
+
+    gsl_api const_reverse_iterator crend() const gsl_noexcept
+    {
+        return span_.crend();
+    }
+
 private:
     gsl_api static span_type remove_z( pointer const & sz, std::size_t max )
     {
