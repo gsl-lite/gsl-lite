@@ -1506,10 +1506,8 @@ gsl_api inline std::size_t string_length( char const * ptr, std::size_t max )
     if ( ptr == gsl_nullptr || max <= 0)
         return 0;
 
-    span<const char> str_span( ptr, max );
-
     std::size_t len = 0;
-    while ( len < max && str_span[len] )
+    while ( len < max && ptr[len] )
         ++len;
 
     return len;
@@ -1520,10 +1518,8 @@ gsl_api inline std::size_t string_length( wchar_t const * ptr, std::size_t max )
     if ( ptr == gsl_nullptr || max <= 0)
         return 0;
 
-    span<const wchar_t> str_span( ptr, max );
-
     std::size_t len = 0;
-    while ( len < max && str_span[len] )
+    while ( len < max && ptr[len] )
         ++len;
 
     return len;
