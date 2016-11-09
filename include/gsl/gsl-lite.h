@@ -424,7 +424,7 @@ struct fail_fast : public std::runtime_error
 
 #if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
-gsl_api inline void fail_fast_assert( bool cond, char const * const message )
+gsl_api gsl_constexpr14 inline void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
@@ -432,7 +432,7 @@ gsl_api inline void fail_fast_assert( bool cond, char const * const message )
 
 #else // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
-gsl_api inline void fail_fast_assert( bool cond )
+gsl_api gsl_constexpr14 inline void fail_fast_assert( bool cond )
 {
     if ( !cond )
         std::terminate();
