@@ -597,102 +597,269 @@ CASE( "string_span: Allows to construct a cwstring_span from a const container, 
 
 CASE( "string_span: Allows to copy-construct from another span of the same type" )
 {
+    cstring_span a = "hello";
+
+    cstring_span b( a );
+
+    EXPECT( a.length() == b.length() );
+    EXPECT( std::equal( a.begin(), a.end(), b.begin() ) );
 }
 
 CASE( "string_span: Allows to copy-construct from another span of a compatible type" )
 {
-}
+    char hello[] = "hello";
+    string_span a = hello;
 
-#if gsl_CPP11_OR_GREATER
+    cstring_span b( a );
+
+    EXPECT( a.length() == b.length() );
+    EXPECT( std::equal( a.begin(), a.end(), b.begin() ) );
+}
 
 CASE( "string_span: Allows to move-construct from another span of the same type (C++11)" )
 {
-}
+#if gsl_CPP11_OR_GREATER
+    char hello[] = "hello";
 
+    string_span a(( string_span( hello ) ));
+
+    EXPECT( a.length() == strlen( hello ) );
+    EXPECT( std::equal( a.begin(), a.end(), hello ) );
+#else
+    EXPECT( !!"move-semantics are not available (no C++11)" );
 #endif
+}
 
 CASE( "string_span: Allows to copy-assign from another span of the same type" )
 {
-}
+    string_span a = "hello";
+    string_span b = "world";
 
-#if gsl_CPP11_OR_GREATER
+    b = a;
+
+    EXPECT( a.length() == b.length() );
+    EXPECT( std::equal( a.begin(), a.end(), b.begin() ) );
+}
 
 CASE( "string_span: Allows to move-assign from another span of the same type (C++11)" )
 {
-}
+#if gsl_CPP11_OR_GREATER
+    char hello[] = "hello";
+    string_span a;
 
+    a = string_span( hello );
+
+    EXPECT( a.length() == strlen( hello ) );
+    EXPECT( std::equal( a.begin(), a.end(), hello ) );
+#else
+    EXPECT( !!"move-semantics are not available (no C++11)" );
 #endif
+}
 
 CASE( "string_span: Allows to create a sub span of the first n elements" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    size_type count = 2;
+
+    string_span s = a.first( count );
+
+    EXPECT( s.size() == count );
+    EXPECT( std::equal( s.begin(), s.end(), hello ) );
 }
 
 CASE( "string_span: Allows to create a sub span of the last n elements" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    size_type count = 2;
+
+    string_span s = a.last( count );
+
+    EXPECT( s.size() == count );
+    EXPECT( std::equal( s.begin(), s.end(), hello + strlen(hello) - count ) );
 }
 
 CASE( "string_span: Allows to create a sub span starting at a given offset" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    size_type offset = 1;
+
+    string_span s = a.subspan( offset );
+
+    EXPECT( s.size() == strlen(hello) - offset );
+    EXPECT( std::equal( s.begin(), s.end(), hello + offset ) );
 }
 
 CASE( "string_span: Allows to create a sub span starting at a given offset with a given length" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    size_type offset = 1;
+    size_type length = 1;
+
+    string_span s = a.subspan( offset, length );
+
+    EXPECT( s.size() == length );
+    EXPECT( std::equal( s.begin(), s.end(), hello + offset ) );
 }
 
 CASE( "string_span: Allows to create an empty sub span at full offset" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    size_type offset = strlen( hello );
+
+    string_span s = a.subspan( offset );
+
+    EXPECT( s.empty() );
 }
 
 CASE( "string_span: Allows to create an empty sub span at full offset with zero length" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    size_type offset = strlen( hello );
+    size_type length = 0;
+
+    string_span s = a.subspan( offset, length );
+
+    EXPECT( s.empty() );
 }
 
 CASE( "string_span: Allows forward iteration" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( string_span::iterator pos = a.begin(); pos != a.end(); ++pos )
+    {
+        EXPECT( *pos == a[ std::distance( a.begin(), pos )] );
+    }
 }
 
 CASE( "string_span: Allows const forward iteration" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( string_span::const_iterator pos = a.begin(); pos != a.end(); ++pos )
+    {
+        EXPECT( *pos == a[ std::distance( a.cbegin(), pos )] );
+    }
 }
 
 CASE( "string_span: Allows reverse iteration" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( string_span::reverse_iterator pos = a.rbegin(); pos != a.rend(); ++pos )
+    {
+        EXPECT( *pos == a[ a.size() - 1 - std::distance( a.rbegin(), pos )] );
+    }
 }
 
 CASE( "string_span: Allows const reverse iteration" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( string_span::const_reverse_iterator pos = a.crbegin(); pos != a.crend(); ++pos )
+    {
+        EXPECT( *pos == a[ a.size() - 1 - std::distance( a.crbegin(), pos )] );
+    }
 }
 
 CASE( "string_span: Allows to observe an element via array indexing" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( size_type i = 0; i < a.size(); ++i )
+    {
+        EXPECT( a[i] == hello[i] );
+    }
 }
 
 CASE( "string_span: Allows to observe an element via call indexing" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( size_type i = 0; i < a.size(); ++i )
+    {
+        EXPECT( a(i) == hello[i] );
+    }
 }
 
+#if 0
 CASE( "string_span: Allows to observe an element via at()" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    for ( size_type i = 0; i < a.size(); ++i )
+    {
+        EXPECT( a.at(i) == hello[i] );
+    }
 }
+#endif
 
 CASE( "string_span: Allows to observe an element via data()" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+
+    EXPECT( *a.data() == *a.begin() );
+
+    for ( size_type i = 0; i < a.size(); ++i )
+    {
+        EXPECT( a.data()[i] == hello[i] );
+    }
 }
 
 CASE( "string_span: Allows to change an element via array indexing" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    
+    a[1] = '7';
+
+    EXPECT( hello[1] == '7' );
 }
 
 CASE( "string_span: Allows to change an element via call indexing" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    
+    a(1) = '7';
+
+    EXPECT( hello[1] == '7' );
 }
 
+#if 0
 CASE( "string_span: Allows to change an element via at()" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    
+    a.at(1) = '7';
+
+    EXPECT( hello[1] == '7' );
 }
+#endif
 
 CASE( "string_span: Allows to change an element via data()" )
 {
+    char hello[] = "hello";
+    string_span a( hello );
+    
+    *a.data() = '7';
+
+    EXPECT( hello[0] == '7' );
 }
 
 CASE( "string_span: Allows to compare a string_span with another string_span" )
