@@ -1408,6 +1408,18 @@ void copy( span<T> src, span<U> dest )
 // span creator functions (see ctors)
 
 template< typename T >
+gsl_api span< const byte > as_bytes(span<T> other) gsl_noexcept
+{
+    return span< const byte >( reinterpret_cast<const byte *>( other.data() ), other.bytes() );
+}
+
+template< typename T>
+gsl_api span< byte > as_writeable_bytes(span<T> other) gsl_noexcept
+{
+    return span< byte >( reinterpret_cast<byte *>( other.data() ), other.bytes() );
+}
+
+template< typename T >
 gsl_api gsl_constexpr14 span<T> as_span( T * begin, T * end )
 {
     return span<T>( begin, end );
