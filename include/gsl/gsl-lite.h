@@ -1,3 +1,4 @@
+#include <iostream>
 //
 // gsl-lite is based on GSL: Guideline Support Library,
 // https://github.com/microsoft/gsl
@@ -424,15 +425,24 @@ struct fail_fast : public std::runtime_error
 
 #if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
-gsl_api gsl_constexpr14 inline void fail_fast_assert( bool cond, char const * const message )
+# if gsl_COMPILER_GCC_VERSION  // workaround for gcc 5 throw constexpr bug
+gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const message ) -> void
+{
+    !cond ? throw fail_fast( message ) : 0;
+}
+
+# else
+
+gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
 }
+# endif
 
 #else // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
-gsl_api gsl_constexpr14 inline void fail_fast_assert( bool cond )
+gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
 {
     if ( !cond )
         std::terminate();
