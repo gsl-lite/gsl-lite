@@ -886,6 +886,9 @@ CASE( "string_span: Allows to compare a string_span with another string_span" )
 
 CASE( "string_span: Allows to compare empty spans as equal" )
 {
+    string_span a, b;
+    
+    EXPECT( a == b );
 }
 
 CASE( "string_span: Allows to compare a string_span with a cstring_span" )
