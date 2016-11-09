@@ -3,17 +3,17 @@
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene
-// Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
-// 
-// This code is licensed under the MIT License (MIT). 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
-// THE SOFTWARE. 
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #pragma once
 
@@ -110,7 +110,7 @@
 namespace gsl {
 
 //
-// GSL.owner: ownership pointers 
+// GSL.owner: ownership pointers
 //
 // ToDo:
 #if gsl_FEATURE_HAVE_SHARED_PTR
@@ -126,7 +126,7 @@ template< class T > struct owner { typedef T type; };
 
 #if gsl_FEATURE_HAVE_OWNER_MACRO
 # define Owner(t)  ::gsl::owner<t>::type
-#endif 
+#endif
 
 //
 // GSL.assert: assertions
@@ -136,39 +136,39 @@ template< class T > struct owner { typedef T type; };
 
 #if gsl_CONFIG_THROWS_FOR_TESTING
 
-struct fail_fast : public std::runtime_error 
+struct fail_fast : public std::runtime_error
 {
-    fail_fast() 
+    fail_fast()
     : std::runtime_error( "GSL assertion" ) {}
-    
-    explicit fail_fast( char const * const message ) 
+
+    explicit fail_fast( char const * const message )
     : std::runtime_error( message ) {}
 };
 
-inline void fail_fast_assert( bool cond ) 
-{ 
-    if ( !cond ) 
-        throw fail_fast(); 
+inline void fail_fast_assert( bool cond )
+{
+    if ( !cond )
+        throw fail_fast();
 }
 
-inline void fail_fast_assert( bool cond, char const * const message ) 
-{ 
-    if ( !cond ) 
-        throw fail_fast( message ); 
+inline void fail_fast_assert( bool cond, char const * const message )
+{
+    if ( !cond )
+        throw fail_fast( message );
 }
 
 #else // gsl_CONFIG_THROWS_FOR_TESTING
 
-inline void fail_fast_assert( bool cond ) 
-{ 
-    if ( !cond ) 
-        terminate(); 
+inline void fail_fast_assert( bool cond )
+{
+    if ( !cond )
+        terminate();
 }
 
-inline void fail_fast_assert( bool cond, char const * const ) 
-{ 
-    if ( !cond ) 
-        terminate(); 
+inline void fail_fast_assert( bool cond, char const * const )
+{
+    if ( !cond )
+        terminate();
 }
 
 #endif // gsl_CONFIG_THROWS_FOR_TESTING
@@ -182,15 +182,15 @@ class final_act
 public:
     typedef void (*Action)();
 
-    final_act( Action action ) 
+    final_act( Action action )
     : action_( action ) {}
 
-    ~final_act() 
+    ~final_act()
     {
         action_();
     }
 
-private:    
+private:
     Action action_;
 };
 
@@ -202,22 +202,22 @@ final_act finally( Fn const & f )
 
 template< class T, class U >
 T narrow_cast( U u )
-{ 
-    return static_cast<T>( u ); 
+{
+    return static_cast<T>( u );
 }
 
 struct narrowing_error : public std::exception {};
 
 template< class T, class U >
-T narrow( U u ) 
-{ 
-    T t = narrow_cast<T>( u ); 
-    
-    if ( static_cast<U>( t ) != u ) 
+T narrow( U u )
+{
+    T t = narrow_cast<T>( u );
+
+    if ( static_cast<U>( t ) != u )
     {
-        throw narrowing_error(); 
+        throw narrowing_error();
     }
-    return t; 
+    return t;
 }
 
 //
@@ -236,9 +236,9 @@ struct order_precedence : precedence_1 {};
 
 template< class Array, class T >
 T & at( Array & arr, size_t index, T*, precedence_0 const & )
-{ 
-    Expects( index < gsl_DIMENSION_OF( arr ) ); 
-    return arr[index]; 
+{
+    Expects( index < gsl_DIMENSION_OF( arr ) );
+    return arr[index];
 }
 
 } // namespace detail
@@ -252,11 +252,11 @@ T & at( Array & arr, size_t index, T*, precedence_0 const & )
     { \
         Expects( index < cont.size() ); \
         return cont[index]; \
-    } }} 
+    } }}
 
 template< class Cont >
 int & at( Cont & cont, size_t index )
-{ 
+{
     return detail::at( cont, index, &cont[0], detail::order_precedence() );
 }
 
@@ -283,11 +283,11 @@ private:
     not_null & operator=( int );
 
 public:
-    T get() const 
+    T get() const
     {
         return ptr_;
-    } 
-    
+    }
+
          operator T() const { return get(); }
     T    operator->() const { return get(); }
 
@@ -328,12 +328,12 @@ public:
 
     typedef pointer       iterator;
     typedef const_pointer const_iterator;
-    
+
     typedef std::reverse_iterator< iterator, T >             reverse_iterator;
     typedef std::reverse_iterator< const_iterator, const T > const_reverse_iterator;
 
     // Todo:
-    // typedef typename std::iterator_traits< iterator >::difference_type difference_type;    
+    // typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
     span()
         : begin_( NULL )
@@ -361,10 +361,10 @@ private:
     struct precedence_1 : precedence_0 {};
     struct precedence_2 : precedence_1 {};
     struct order_precedence : precedence_1 {};
-    
+
     template< class Array, class U >
     span create( Array & arr, U*, precedence_0 const & ) const
-    { 
+    {
         return span( arr, gsl_DIMENSION_OF( arr ) );
     }
 
@@ -373,10 +373,10 @@ private:
         return span( &cont[0], cont.size() );
     }
 
-public:    
+public:
     template< class Cont >
     span( Cont & cont )
-    { 
+    {
         *this = create( cont, &cont[0], order_precedence() );
     }
 
@@ -398,7 +398,7 @@ public:
     }
 
 #if 0
-    // Converting from other span ?    
+    // Converting from other span ?
     template< typename U > operator=();
 #endif
 
@@ -454,28 +454,28 @@ public:
 
     bool operator==( span const & other ) const
     {
-        return  size() == other.size() 
-            && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );	    
+        return  size() == other.size()
+            && (begin_ == other.begin_ || std::equal( this->begin(), this->end(), other.begin() ) );
     }
 
-    bool operator!=( span const & other ) const 
-    { 
-        return !( *this == other ); 
+    bool operator!=( span const & other ) const
+    {
+        return !( *this == other );
     }
 
     bool operator< ( span const & other ) const
-    { 
-        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() ); 
+    {
+        return std::lexicographical_compare( this->begin(), this->end(), other.begin(), other.end() );
     }
 
     bool operator<=( span const & other ) const
-    { 
-        return !( other < *this ); 
+    {
+        return !( other < *this );
     }
 
     bool operator> ( span const & other ) const
-    { 
-        return ( other < *this ); 
+    {
+        return ( other < *this );
     }
 
     bool operator>=( span const & other ) const
@@ -546,12 +546,12 @@ public:
     {
         static span<U> view( U * data, size_type size )
         {
-            return span<U>( data, size ); 
+            return span<U>( data, size );
         }
     };
 
     template< typename U >
-    span< U > as_span( U u = U() ) const 
+    span< U > as_span( U u = U() ) const
     {
         Expects( ( this->bytes() % sizeof(U) ) == 0 );
         return mk<U>::view( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
@@ -565,15 +565,15 @@ private:
 // span creator functions (see ctors)
 
 template< typename T>
-span< const byte > as_bytes(span<T> other)
+span< const byte > as_bytes( span<T> spn )
 {
-    return span< const byte >( reinterpret_cast<const byte *>( other.data() ), other.bytes() );
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.bytes() );
 }
 
 template< typename T>
-span< byte > as_writeable_bytes(span<T> other)
+span< byte > as_writeable_bytes( span<T> spn )
 {
-    return span< byte >( reinterpret_cast<byte *>( other.data() ), other.bytes() );
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.bytes() );
 }
 
 template< typename T >
@@ -589,20 +589,20 @@ span<T> as_span( T * begin, size_t size )
 }
 
 namespace detail {
-    
+
 template< class T >
 struct mk
 {
     static span<T> view( std::vector<T> & cont )
     {
-        return span<T>( cont ); 
+        return span<T>( cont );
     }
 };
 }
 
 template< class T >
 span<T> as_span( std::vector<T> & cont )
-{ 
+{
     return detail::mk<T>::view( cont );
 }
 
@@ -643,7 +643,7 @@ inline std::wstring to_string( cwstring_span const & view )
 }
 
 //
-// ensure_sentinel() 
+// ensure_sentinel()
 //
 // Provides a way to obtain a span from a contiguous sequence
 // that ends with a (non-inclusive) sentinel value.
@@ -659,14 +659,14 @@ struct ensure
     {
         typedef T * pointer;
         typedef typename std::iterator_traits<pointer>::difference_type difference_type;
-        
+
         pointer cur = seq;
 
-        while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel ) 
+        while ( std::distance( seq, cur ) < static_cast<difference_type>( max ) && *cur != Sentinel )
             ++cur;
-        
+
         Expects( *cur == Sentinel );
-        
+
         return span<T>( seq, cur - seq );
     }
 };
@@ -680,7 +680,7 @@ struct ensure
 
 template< typename T >
 span<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
-{ 
+{
     return detail::ensure<T, size_t, 0>::sentinel( sz, max );
 }
 
