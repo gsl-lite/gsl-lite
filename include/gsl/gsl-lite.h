@@ -1837,7 +1837,7 @@ gsl_api gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U const 
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#if gsl_HAVE_OWNER_TEMPLATE
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
 template< class T, class U, 
     class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
@@ -1885,7 +1885,7 @@ gsl_api gsl_constexpr14 bool operator!=( basic_string_span<T> const & l, U const
 template< class T, class U >
 gsl_api gsl_constexpr14 bool operator<=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-#if gsl_HAVE_OWNER_TEMPLATE || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
     return !( r < l );
 #else
     basic_string_span< typename detail::add_const<T>::type > rr( r );
@@ -1896,7 +1896,7 @@ gsl_api gsl_constexpr14 bool operator<=( basic_string_span<T> const & l, U const
 template< class T, class U >
 gsl_api gsl_constexpr14 bool operator>( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-#if gsl_HAVE_OWNER_TEMPLATE || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
     return ( r < l );
 #else
     basic_string_span< typename detail::add_const<T>::type > rr( r );
@@ -1910,7 +1910,7 @@ gsl_api gsl_constexpr14 bool operator>=( basic_string_span<T> const & l, U const
     return !( l < r );
 }
 
-#if gsl_HAVE_OWNER_TEMPLATE
+#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
 template< class T, class U, 
     class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
@@ -1940,7 +1940,7 @@ gsl_api gsl_constexpr14 bool operator>=( U const & l, basic_string_span<T> const
     return !( l < r );
 }
 
-#endif // gsl_HAVE_OWNER_TEMPLATE
+#endif // gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
 //
 // String types:
