@@ -288,6 +288,20 @@ namespace detail {
 
 // C++11 emulation:
 
+#if gsl_HAVE_ADD_CONST
+
+using std::add_const;
+
+#elif gsl_HAVE_TR1_ADD_CONST
+
+using std::tr1::add_const;
+
+#else
+
+template< class T > struct add_const { typedef const T type; };
+
+#endif // gsl_HAVE_ADD_CONST
+
 #if gsl_HAVE_REMOVE_CONST
 
 using std::remove_cv;
@@ -1811,58 +1825,126 @@ private:
 #if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
 
 template< class T, class U >
-gsl_api gsl_constexpr bool operator==( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+gsl_api gsl_constexpr14 bool operator==( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
+    basic_string_span< typename detail::add_const<T>::type > r( u );
+    
     return l.size() == r.size()
         && std::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T, class U >
-gsl_api gsl_constexpr bool operator<( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+gsl_api gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
+    basic_string_span< typename detail::add_const<T>::type > r( u );
+    
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#else
+#if gsl_HAVE_OWNER_TEMPLATE
 
-template< class T >
-gsl_api gsl_constexpr bool operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
+template< class T, class U, 
+    class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
+gsl_api gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
+    basic_string_span< typename detail::add_const<T>::type > l( u );
+    
     return l.size() == r.size()
         && std::equal( l.begin(), l.end(), r.begin() );
 }
 
-template< class T >
-gsl_api gsl_constexpr bool operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
+template< class T, class U, 
+    class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
+gsl_api gsl_constexpr14 bool operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
+    basic_string_span< typename detail::add_const<T>::type > l( u );
+    
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
-
 #endif
 
+#else //gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
+{
+    return l.size() == r.size()
+        && std::equal( l.begin(), l.end(), r.begin() );
+}
+
+template< class T >
+gsl_api gsl_constexpr14 bool operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
+{
+    return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+}
+
+#endif // gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+
 template< class T, class U >
-gsl_api gsl_constexpr bool operator!=( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+gsl_api gsl_constexpr14 bool operator!=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
     return !( l == r );
 }
 
 template< class T, class U >
-gsl_api gsl_constexpr bool operator<=( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+gsl_api gsl_constexpr14 bool operator<=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
+{
+#if gsl_HAVE_OWNER_TEMPLATE || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+    return !( r < l );
+#else
+    basic_string_span< typename detail::add_const<T>::type > rr( r );
+    return !( rr < l );
+#endif
+}
+
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator>( basic_string_span<T> const & l, U const & r ) gsl_noexcept
+{
+#if gsl_HAVE_OWNER_TEMPLATE || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+    return ( r < l );
+#else
+    basic_string_span< typename detail::add_const<T>::type > rr( r );
+    return ( rr < l );
+#endif
+}
+
+template< class T, class U >
+gsl_api gsl_constexpr14 bool operator>=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
+{
+    return !( l < r );
+}
+
+#if gsl_HAVE_OWNER_TEMPLATE
+
+template< class T, class U, 
+    class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
+gsl_api gsl_constexpr14 bool operator!=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
+{
+    return !( l == r );
+}
+
+template< class T, class U, 
+    class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
+gsl_api gsl_constexpr14 bool operator<=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return !( r < l );
 }
 
-template< class T, class U >
-gsl_api gsl_constexpr bool operator>( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+template< class T, class U, 
+    class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
+gsl_api gsl_constexpr14 bool operator>( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return ( r < l );
 }
 
-template< class T, class U >
-gsl_api gsl_constexpr bool operator>=( basic_string_span<T> const & l, basic_string_span<U> const & r ) gsl_noexcept
+template< class T, class U, 
+    class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
+gsl_api gsl_constexpr14 bool operator>=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return !( l < r );
 }
+
+#endif // gsl_HAVE_OWNER_TEMPLATE
 
 //
 // String types:
