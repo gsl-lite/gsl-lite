@@ -1049,13 +1049,8 @@ public:
     typedef pointer       iterator;
     typedef const_pointer const_iterator;
 
-#if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
-    typedef std::reverse_iterator< iterator, T >             reverse_iterator;
-    typedef std::reverse_iterator< const_iterator, const T > const_reverse_iterator;
-#else
-    typedef std::reverse_iterator< iterator >                reverse_iterator;
-    typedef std::reverse_iterator< const_iterator >          const_reverse_iterator;
-#endif
+    typedef std::reverse_iterator< iterator >       reverse_iterator;
+    typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
 
     typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
