@@ -515,6 +515,7 @@ string_span: Allows to change an element via data()
 string_span: Allows to compare a string_span with another string_span
 string_span: Allows to compare empty spans as equal
 string_span: Allows to compare a string_span with a cstring_span
+string_span: Allows to compare with types convertible to string_span
 string_span: Allows to test for empty span via empty(), empty case
 string_span: Allows to test for empty span via empty(), non-empty case
 string_span: Allows to obtain the number of elements via length()
