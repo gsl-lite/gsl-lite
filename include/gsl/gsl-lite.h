@@ -1588,7 +1588,7 @@ public:
 
     template< std::size_t N >
     gsl_api gsl_constexpr basic_string_span( element_type (&arr)[N] )
-    : span_( remove_z( arr, N ) )
+    : span_( remove_z( &arr[0], N ) )
     {}
 
 #if gsl_HAVE_ARRAY
