@@ -1,5 +1,13 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.17.1 2016-11-09
+
+- Fixes thanks to Magnus Bergsten, @Sillamacka:
+- Marked several functions as constexpr.
+- Fix: make gsl::fail_fast_assert() constexpr allowing Expects() from constexpr functions.
+- Fix: prevent pointer decay to let remove_z() invoke wrong overload.
+- Fix: remove span used in string_length(), it has two bound problems.
+
 version 0.17.0 2016-11-09
 
 - Add free-standing as_bytes() and as_writable_bytes() as in M-GSL (PR #55, thanks to Dmitry Banschikov, @ubique).
