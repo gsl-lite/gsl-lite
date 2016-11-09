@@ -901,7 +901,72 @@ CASE( "string_span: Allows to compare a string_span with a cstring_span" )
 
     EXPECT( sv == csv );
 #else
-    EXPECT( !!"string_span<>: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
+    EXPECT( !!"string_span: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
+#endif
+}
+
+CASE( "string_span: Allows to compare with types convertible to string_span" )
+{
+#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+
+    char const * phello   = "hello";
+    char const   ahello[] = "hello";
+    std::string  shello   = "hello";
+    cstring_span        a = phello;
+
+    EXPECT(     a == phello );
+    EXPECT(     a == ahello );
+    EXPECT(     a == shello );
+    EXPECT(     a <= phello );
+    EXPECT(     a <= ahello );
+    EXPECT(     a <= shello );
+    EXPECT(     a >= phello );
+    EXPECT(     a >= ahello );
+    EXPECT(     a >= shello );
+
+    EXPECT_NOT( a != phello );
+    EXPECT_NOT( a != ahello );
+    EXPECT_NOT( a != shello );
+    EXPECT_NOT( a  < phello );
+    EXPECT_NOT( a  < ahello );
+    EXPECT_NOT( a  < shello );
+    EXPECT_NOT( a  > phello );
+    EXPECT_NOT( a  > ahello );
+    EXPECT_NOT( a  > shello );
+
+#if gsl_HAVE_OWNER_TEMPLATE
+    EXPECT(     phello == a );
+    EXPECT(     ahello == a );
+    EXPECT(     shello == a );
+    EXPECT(     phello <= a );
+    EXPECT(     ahello <= a );
+    EXPECT(     shello <= a );
+    EXPECT(     phello >= a );
+    EXPECT(     ahello >= a );
+    EXPECT(     shello >= a );
+                                          
+    EXPECT_NOT( phello != a );
+    EXPECT_NOT( ahello != a );
+    EXPECT_NOT( shello != a );
+    EXPECT_NOT( phello  < a );
+    EXPECT_NOT( ahello  < a );
+    EXPECT_NOT( shello  < a );
+    EXPECT_NOT( phello  > a );
+    EXPECT_NOT( ahello  > a );
+    EXPECT_NOT( shello  > a );
+#endif
+
+#if gsl_HAVE_ARRAY
+    std::array<char,6> world = {{ 'w', 'o', 'r', 'l', 'd', '\0' }};
+    cstring_span   b = world;
+
+    EXPECT( b == world );
+# if gsl_HAVE_OWNER_TEMPLATE
+    EXPECT( world == b );
+# endif 
+#endif // gsl_HAVE_OWNER_TEMPLATE
+#else
+    EXPECT( !!"string_span: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
 #endif
 }
 
