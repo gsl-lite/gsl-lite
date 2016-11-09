@@ -1153,7 +1153,7 @@ public:
         , end_  ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
 
-#if gsl_HAVE_IS_DEFAULT
+#if gsl_HAVE_IS_DEFAULT && ! gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 430, 600)
     gsl_api gsl_constexpr14 span( span && ) = default;
     gsl_api gsl_constexpr14 span( span const & ) = default;
 #else
@@ -1810,12 +1810,6 @@ private:
     gsl_api gsl_constexpr14 static span_type remove_z( pointer const & sz, std::size_t max )
     {
         return span_type( sz, detail::string_length( sz, max ) );
-    }
-
-    template< size_t N >
-    gsl_api gsl_constexpr14 static span_type remove_z( element_type (&sz)[N] )
-    {
-        return remove_z( &sz[0], narrow_cast< std::size_t >( N ) );
     }
 
 #if gsl_HAVE_ARRAY
