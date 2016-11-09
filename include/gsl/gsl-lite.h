@@ -424,7 +424,7 @@ struct fail_fast : public std::runtime_error
 
 #if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
-gsl_api inline void fail_fast_assert( bool cond, char const * const message )
+gsl_api gsl_constexpr14 inline void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
@@ -432,7 +432,7 @@ gsl_api inline void fail_fast_assert( bool cond, char const * const message )
 
 #else // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
-gsl_api inline void fail_fast_assert( bool cond )
+gsl_api gsl_constexpr14 inline void fail_fast_assert( bool cond )
 {
     if ( !cond )
         std::terminate();
@@ -1501,29 +1501,25 @@ struct is_basic_string_span_oracle< basic_string_span<T> > : true_type {};
 template< class T >
 struct is_basic_string_span : is_basic_string_span_oracle< typename remove_cv<T>::type > {};
 
-gsl_api inline std::size_t string_length( char const * ptr, std::size_t max )
+gsl_api gsl_constexpr14 inline std::size_t string_length( char const * ptr, std::size_t max )
 {
     if ( ptr == gsl_nullptr || max <= 0)
         return 0;
 
-    span<const char> str_span( ptr, max );
-
     std::size_t len = 0;
-    while ( len < max && str_span[len] )
+    while ( len < max && ptr[len] )
         ++len;
 
     return len;
 }
 
-gsl_api inline std::size_t string_length( wchar_t const * ptr, std::size_t max )
+gsl_api gsl_constexpr14 inline std::size_t string_length( wchar_t const * ptr, std::size_t max )
 {
     if ( ptr == gsl_nullptr || max <= 0)
         return 0;
 
-    span<const wchar_t> str_span( ptr, max );
-
     std::size_t len = 0;
-    while ( len < max && str_span[len] )
+    while ( len < max && ptr[len] )
         ++len;
 
     return len;
@@ -1580,7 +1576,7 @@ public:
 
     template< std::size_t N >
     gsl_api gsl_constexpr basic_string_span( element_type (&arr)[N] )
-    : span_( remove_z( arr ) )
+    : span_( remove_z( arr, N ) )
     {}
 
 #if gsl_HAVE_ARRAY
@@ -1801,26 +1797,26 @@ public:
     }
 
 private:
-    gsl_api static span_type remove_z( pointer const & sz, std::size_t max )
+    gsl_api gsl_constexpr14 static span_type remove_z( pointer const & sz, std::size_t max )
     {
         return span_type( sz, detail::string_length( sz, max ) );
     }
 
     template< size_t N >
-    gsl_api static span_type remove_z( element_type (&sz)[N] )
+    gsl_api gsl_constexpr14 static span_type remove_z( element_type (&sz)[N] )
     {
         return remove_z( &sz[0], narrow_cast< std::size_t >( N ) );
     }
 
 #if gsl_HAVE_ARRAY
     template< size_t N >
-    gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> & arr )
+    gsl_api gsl_constexpr14 static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> & arr )
     {
         return remove_z( &arr[0], narrow_cast< std::size_t >( N ) );
     }
 
     template< size_t N >
-    gsl_api static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> const & arr )
+    gsl_api gsl_constexpr14 static span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> const & arr )
     {
         return remove_z( &arr[0], narrow_cast< std::size_t >( N ) );
     }
