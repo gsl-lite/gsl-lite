@@ -186,10 +186,11 @@ cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-
 span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
 span_p<>                    | &#10003;| -       | -       | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
 as_span()                   | -       | &#10003;| &#10003;| Create a span |
-string_span                 | &#10003;| &#10003;| &#10003;| span&lt;char> |
-wstring_span                | -       | &#10003;| &#10003;| span&lt;wchar_t > |
-cstring_span                | &#10003;| &#10003;| &#10003;| span&lt;const char> |
-cwstring_span               | -       | &#10003;| &#10003;| span&lt;const wchar_t > |
+basic_string_span<>         | -       | &#10003;| &#10003;| See also propasal [p0123](http://wg21.link/p0123) |
+string_span                 | &#10003;| &#10003;| &#10003;| basic_string_span&lt;char> |
+wstring_span                | -       | &#10003;| &#10003;| basic_string_span&lt;wchar_t > |
+cstring_span                | &#10003;| &#10003;| &#10003;| basic_string_span&lt;const char> |
+cwstring_span               | -       | &#10003;| &#10003;| basic_string_span&lt;const wchar_t > |
 ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_span or cwstring_span |
 to_string()                 | -       | &#10003;| &#10003;| Convert a string_span to std::string or std::wstring |
 **2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
@@ -199,6 +200,7 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
 final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
 final_act                   | -       | -       | < C++11 | Currently only void(*)() |
 finally()                   | &#10003;| &#10003;| >=C++11 | Make a final_act<> |
@@ -318,15 +320,15 @@ at(): Terminates access to non-existing std::array elements (C++11)
 at(): Terminates access to non-existing std::vector elements
 at(): Terminates access to non-existing std::initializer_list elements (C++11)
 at(): Terminates access to non-existing gsl::span elements
-at(): Allows access to existing C-array elements
-at(): Allows access to existing std::array elements (C++11)
-at(): Allows access to existing std::vector elements
-at(): Allows access to std::initializer_list elements (C++11)
-at(): Allows access to gsl::span elements
-byte: Allows construction from integral via static cast (C++11)
-byte: Allows construction from integral via byte() (C++11)
-byte: Allows construction from integral via to_byte()
-byte: Allows conversion to integral via to_integer()
+at(): Allows to access existing C-array elements
+at(): Allows to access existing std::array elements (C++11)
+at(): Allows to access existing std::vector elements
+at(): Allows to access std::initializer_list elements (C++11)
+at(): Allows to access gsl::span elements
+byte: Allows to construct from integral via static cast (C++11)
+byte: Allows to construct from integral via byte() (C++11)
+byte: Allows to construct from integral via to_byte()
+byte: Allows to convert to integral via to_integer()
 byte: Allows comparison operations
 byte: Allows bitwise or operation
 byte: Allows bitwise and operation
@@ -349,10 +351,10 @@ not_null<>: Terminates construction from a null pointer value
 not_null<>: Terminates construction from related pointer types for null pointer value
 not_null<>: Terminates assignment from a null pointer value
 not_null<>: Terminates assignment from related pointer types for null pointer value
-not_null<>: Allows construction from a non-null underlying pointer
-not_null<>: Allows construction from a non-null user-defined ref-counted type
-not_null<>: Allows construction from a non-null related pointer
-not_null<>: Allows construction from a not_null related pointer type
+not_null<>: Allows to construct from a non-null underlying pointer
+not_null<>: Allows to construct from a non-null user-defined ref-counted type
+not_null<>: Allows to construct from a non-null related pointer
+not_null<>: Allows to construct from a not_null related pointer type
 not_null<>: Allows assignment from a not_null related pointer type
 not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
@@ -368,48 +370,48 @@ span<>: Terminates creation of a sub span of the first n elements for n exceedin
 span<>: Terminates creation of a sub span of the last n elements for n exceeding the span
 span<>: Terminates creation of a sub span outside the span
 span<>: Terminates access outside the span
-span<>: Allows default construction
-span<>: Allows construction from a nullptr and a zero size (C++11)
-span<>: Allows construction from a l-value (C++11)
-span<>: Allows construction from a const l-value (C++11)
-span<>: Allows construction from two pointers
-span<>: Allows construction from two pointers to const
-span<>: Allows construction from a non-null pointer and a size
-span<>: Allows construction from a non-null pointer to const and a size
-span<>: Allows construction from a temporary pointer and a size
-span<>: Allows construction from a temporary pointer to const and a size
-span<>: Allows construction from any pointer and a zero size
-span<>: Allows construction from a C-array
-span<>: Allows construction from a const C-array
-span<>: Allows construction from a C-array with size via decay to pointer (potentially dangerous)
-span<>: Allows construction from a const C-array with size via decay to pointer (potentially dangerous)
-span<>: Allows construction from a std::array<> (C++11)
-span<>: Allows construction from a std::array<> with const data (C++11)
-span<>: Allows construction from a container (std::vector<>)
-span<>: Allows tagged construction from a container (std::vector<>)
-span<>: Allows construction from another span of the same type
-span<>: Allows construction from another span of a compatible type
-span<>: Allows assignment from another span of the same type
-span<>: Allows move-construction from another span of the same type (C++11)
-span<>: Allows move-assignment from another span of the same type (C++11)
-span<>: Allows creation of a sub span of the first n elements
-span<>: Allows creation of a sub span of the last n elements
-span<>: Allows creation of a sub span starting at a given offset
-span<>: Allows creation of a sub span starting at a given offset with a given length
-span<>: Allows creation of an empty sub span at full offset
-span<>: Allows creation of an empty sub span at full offset with zero length
+span<>: Allows to default-construct
+span<>: Allows to construct from a nullptr and a zero size (C++11)
+span<>: Allows to construct from a l-value (C++11)
+span<>: Allows to construct from a const l-value (C++11)
+span<>: Allows to construct from two pointers
+span<>: Allows to construct from two pointers to const
+span<>: Allows to construct from a non-null pointer and a size
+span<>: Allows to construct from a non-null pointer to const and a size
+span<>: Allows to construct from a temporary pointer and a size
+span<>: Allows to construct from a temporary pointer to const and a size
+span<>: Allows to construct from any pointer and a zero size
+span<>: Allows to construct from a C-array
+span<>: Allows to construct from a const C-array
+span<>: Allows to construct from a C-array with size via decay to pointer (potentially dangerous)
+span<>: Allows to construct from a const C-array with size via decay to pointer (potentially dangerous)
+span<>: Allows to construct from a std::array<> (C++11)
+span<>: Allows to construct from a std::array<> with const data (C++11)
+span<>: Allows to construct from a container (std::vector<>)
+span<>: Allows to tag-construct from a container (std::vector<>)
+span<>: Allows to copy-construct from another span of the same type
+span<>: Allows to copy-construct from another span of a compatible type
+span<>: Allows to move-construct from another span of the same type (C++11)
+span<>: Allows to copy-assign from another span of the same type
+span<>: Allows to move-assign from another span of the same type (C++11)
+span<>: Allows to create a sub span of the first n elements
+span<>: Allows to create a sub span of the last n elements
+span<>: Allows to create a sub span starting at a given offset
+span<>: Allows to create a sub span starting at a given offset with a given length
+span<>: Allows to create an empty sub span at full offset
+span<>: Allows to create an empty sub span at full offset with zero length
 span<>: Allows forward iteration
 span<>: Allows const forward iteration
 span<>: Allows reverse iteration
 span<>: Allows const reverse iteration
-span<>: Allows to observe element via array indexing
-span<>: Allows to observe element via call indexing
-span<>: Allows to observe element via at()
-span<>: Allows to observe element via data()
-span<>: Allows to change element via array indexing
-span<>: Allows to change element via call indexing
-span<>: Allows to change element via at()
-span<>: Allows to change element via data()
+span<>: Allows to observe an element via array indexing
+span<>: Allows to observe an element via call indexing
+span<>: Allows to observe an element via at()
+span<>: Allows to observe an element via data()
+span<>: Allows to change an element via array indexing
+span<>: Allows to change an element via call indexing
+span<>: Allows to change an element via at()
+span<>: Allows to change an element via data()
 span<>: Allows to compare equal to another span of the same type
 span<>: Allows to compare unequal to another span of the same type
 span<>: Allows to compare less than another span of the same type
@@ -420,11 +422,11 @@ span<>: Allows to compare to another span of the same type and different cv-ness
 span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
-span<>: Allows to obtain number of elements via size()
-span<>: Allows to obtain number of elements via length()
-span<>: Allows to obtain number of elements via used_length()
-span<>: Allows to obtain number of bytes via bytes()
-span<>: Allows to obtain number of bytes via used_bytes()
+span<>: Allows to obtain the number of elements via size()
+span<>: Allows to obtain the number of elements via length()
+span<>: Allows to obtain the number of elements via used_length()
+span<>: Allows to obtain the number of bytes via bytes()
+span<>: Allows to obtain the number of bytes via used_bytes()
 span<>: Allows to swap with another span of the same type
 span<>: Allows to view the elements as read-only bytes
 span<>: Allows to view and change the elements as writable bytes
@@ -442,37 +444,83 @@ span<>: Allows building from a std::array<> (C++11)
 span<>: Allows building from a const std::array<> (C++11)
 span<>: Allows building from a container (std::vector<>)
 span<>: Allows building from a const container (std::vector<>)
-string_span: Disallows construction of a string_span from a const C-string and size (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-string_span: ToDo: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-string_span: Allows to create a string_span from a non-const C-string and size
-string_span: Allows to create a string_span from a non-const C-array
-string_span: Allows to create a string_span from a non-const std::array (C++11)
-string_span: Allows to create a string_span from a non-const std::vector
-string_span: ToDo: Allows to create a string_span from a non-const std::string
-string_span: Allows to create a cstring_span from a const C-string and size
-string_span: Allows to create a cstring_span from a const C-array
-string_span: Allows to create a cstring_span from a const std::array (C++11)
-string_span: Allows to create a cstring_span from a const std::vector
-string_span: Allows to create a cstring_span from a const std::string
-string_span: Allows to create a cstring_span from a non-const C-string and size
-string_span: Allows to create a cstring_span from a non-const C-array
-string_span: Allows to create a cstring_span from a non-const std::array (C++11)
-string_span: Allows to create a cstring_span from a non-const std::vector
-string_span: Allows to create a cstring_span from a non-const std::string
-string_span: Allows to create a wstring_span from a non-const C-string and size
-string_span: Allows to create a wstring_span from a non-const C-array
-string_span: Allows to create a wstring_span from a non-const std::array (C++11)
-string_span: Allows to create a wstring_span from a non-const std::vector
-string_span: Allows to create a cwstring_span from a non-const C-string and size
-string_span: Allows to create a cwstring_span from a non-const C-array
-string_span: Allows to create a cwstring_span from a non-const std::array (C++11)
-string_span: Allows to create a cwstring_span from a non-const std::vector
-string_span: Allows to create a cwstring_span from a const C-string and size
-string_span: Allows to create a cwstring_span from a const C-array
-string_span: Allows to create a cwstring_span from a const std::array (C++11)
-string_span: Allows to create a cwstring_span from a const std::vector
+string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_span: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+string_span: Allows to default-construct
+string_span: Allows to construct from a nullptr (C++11)
+string_span: Allows to construct a cstring_span from a const C-string
+string_span: Allows to construct a string_span from a non-const C-string and size
+string_span: Allows to construct a string_span from a non-const C-string begin and end pointer
+string_span: Allows to construct a string_span from a non-const C-array
+string_span: Allows to construct a string_span from a non-const std::string
+string_span: Allows to construct a string_span from a non-const std::array (C++11)
+string_span: Allows to construct a string_span from a non-const container (std::vector)
+string_span: Allows to construct a string_span from a non-const container, via a tag (std::vector)
+string_span: Allows to construct a cstring_span from a non-const C-string and size
+string_span: Allows to construct a cstring_span from a non-const C-string begin and end pointer
+string_span: Allows to construct a cstring_span from a non-const C-array
+string_span: Allows to construct a cstring_span from a non-const std::string
+string_span: Allows to construct a cstring_span from a non-const std::array (C++11)
+string_span: Allows to construct a cstring_span from a non-const container (std::vector)
+string_span: Allows to construct a cstring_span from a non-const container, via a tag (std::vector)
+string_span: Allows to construct a cstring_span from a const C-string and size
+string_span: Allows to construct a cstring_span from a non-const C-string begin and end pointer
+string_span: Allows to construct a cstring_span from a const C-array
+string_span: Allows to construct a cstring_span from a const std::string
+string_span: Allows to construct a cstring_span from a const std::array (C++11)
+string_span: Allows to construct a cstring_span from a const container (std::vector)
+string_span: Allows to construct a cstring_span from a const container, via a tag (std::vector)
+string_span: Allows to construct a wstring_span from a non-const C-string and size
+string_span: Allows to construct a wstring_span from a non-const C-string begin and end pointer
+string_span: Allows to construct a wstring_span from a non-const C-array
+string_span: Allows to construct a wstring_span from a non-const std::wstring
+string_span: Allows to construct a wstring_span from a non-const std::array (C++11)
+string_span: Allows to construct a wstring_span from a non-const container (std::vector)
+string_span: Allows to construct a wstring_span from a non-const container, via a tag (std::vector)
+string_span: Allows to construct a cwstring_span from a non-const C-string and size
+string_span: Allows to construct a cwstring_span from a non-const C-string begin and end pointer
+string_span: Allows to construct a cwstring_span from a non-const C-array
+string_span: Allows to construct a cwstring_span from a non-const std::wstring
+string_span: Allows to construct a cwstring_span from a non-const std::array (C++11)
+string_span: Allows to construct a cwstring_span from a non-const container (std::vector)
+string_span: Allows to construct a cwstring_span from a non-const container, via a tag (std::vector)
+string_span: Allows to construct a cwstring_span from a const C-string and size
+string_span: Allows to construct a cwstring_span from a const C-string begin and end pointer
+string_span: Allows to construct a cwstring_span from a const C-array
+string_span: Allows to construct a cwstring_span from a const std::wstring
+string_span: Allows to construct a cwstring_span from a const std::array (C++11)
+string_span: Allows to construct a cwstring_span from a const container (std::vector)
+string_span: Allows to construct a cwstring_span from a const container, via a tag (std::vector)
+string_span: Allows to copy-construct from another span of the same type
+string_span: Allows to copy-construct from another span of a compatible type
+string_span: Allows to move-construct from another span of the same type (C++11)
+string_span: Allows to copy-assign from another span of the same type
+string_span: Allows to move-assign from another span of the same type (C++11)
+string_span: Allows to create a sub span of the first n elements
+string_span: Allows to create a sub span of the last n elements
+string_span: Allows to create a sub span starting at a given offset
+string_span: Allows to create a sub span starting at a given offset with a given length
+string_span: Allows to create an empty sub span at full offset
+string_span: Allows to create an empty sub span at full offset with zero length
+string_span: Allows forward iteration
+string_span: Allows const forward iteration
+string_span: Allows reverse iteration
+string_span: Allows const reverse iteration
+string_span: Allows to observe an element via array indexing
+string_span: Allows to observe an element via call indexing
+string_span: Allows to observe an element via data()
+string_span: Allows to change an element via array indexing
+string_span: Allows to change an element via call indexing
+string_span: Allows to change an element via data()
 string_span: Allows to compare a string_span with another string_span
+string_span: Allows to compare empty spans as equal
 string_span: Allows to compare a string_span with a cstring_span
+string_span: Allows to test for empty span via empty(), empty case
+string_span: Allows to test for empty span via empty(), non-empty case
+string_span: Allows to obtain the number of elements via length()
+string_span: Allows to obtain the number of elements via size()
+string_span: Allows to obtain the number of bytes via length_bytes()
+string_span: Allows to obtain the number of bytes via size_bytes()
 to_string(): Allows to explicitly convert from string_span to std::string
 to_string(): Allows to explicitly convert from cstring_span to std::string
 to_string(): Allows to explicitly convert from wstring_span to std::wstring

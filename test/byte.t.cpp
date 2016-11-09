@@ -17,13 +17,13 @@
 
 #include "gsl-lite.t.h"
 
-// Use gsl::byte instead of plain byte to prevent collisions with 
+// Use gsl::byte instead of plain byte to prevent collisions with
 // other byte declarations, such as in rpcndr.h (Windows kit).
 
-// We have a chicken & egg problem here: 
+// We have a chicken & egg problem here:
 //   verifying operations via to_integer() that has yet to verified itself...
 
-CASE( "byte: Allows construction from integral via static cast (C++11)" )
+CASE( "byte: Allows to construct from integral via static cast (C++11)" )
 {
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     gsl::byte b = static_cast<gsl::byte>( 4 );
@@ -34,7 +34,7 @@ CASE( "byte: Allows construction from integral via static cast (C++11)" )
 #endif
 }
 
-CASE( "byte: Allows construction from integral via byte() (C++11)" )
+CASE( "byte: Allows to construct from integral via byte() (C++11)" )
 {
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     gsl::byte b = gsl::byte( 4 );
@@ -44,13 +44,13 @@ CASE( "byte: Allows construction from integral via byte() (C++11)" )
 #endif
 }
 
-CASE( "byte: Allows construction from integral via to_byte()" )
+CASE( "byte: Allows to construct from integral via to_byte()" )
 {
     gsl::byte b = to_byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 }
 
-CASE( "byte: Allows conversion to integral via to_integer()" )
+CASE( "byte: Allows to convert to integral via to_integer()" )
 {
     gsl::byte b = to_byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
@@ -60,7 +60,7 @@ CASE( "byte: Allows comparison operations" )
 {
     gsl::byte a = to_byte( 3 );
     gsl::byte b = to_byte( 7 );
-    
+
     EXPECT(     a == a );
     EXPECT(     a != b );
 
@@ -111,10 +111,10 @@ CASE( "byte: Allows bitwise or assignment" )
 
     gsl::byte const b_org = to_byte( 0xa5 );
     gsl::byte       b     = b_org;
-    
-    SECTION("Identity") { EXPECT( ( b |= b               ) == b_org           ); } 
-    SECTION("Identity") { EXPECT( ( b |= to_byte( 0x00 ) ) == b_org           ); } 
-    SECTION("Saturate") { EXPECT( ( b |= to_byte( 0xff ) ) == to_byte( 0xff ) ); } 
+
+    SECTION("Identity") { EXPECT( ( b |= b               ) == b_org           ); }
+    SECTION("Identity") { EXPECT( ( b |= to_byte( 0x00 ) ) == b_org           ); }
+    SECTION("Saturate") { EXPECT( ( b |= to_byte( 0xff ) ) == to_byte( 0xff ) ); }
     }
 }
 
@@ -125,9 +125,9 @@ CASE( "byte: Allows bitwise and assignment" )
     gsl::byte const b_org = to_byte( 0xa5 );
     gsl::byte       b     = b_org;
 
-    SECTION("Identity") { EXPECT( ( b &= b               ) == b_org           ); } 
-    SECTION("Identity") { EXPECT( ( b &= to_byte( 0xff ) ) == b_org           ); } 
-    SECTION("Clear"   ) { EXPECT( ( b &= to_byte( 0x00 ) ) == to_byte( 0x00 ) ); } 
+    SECTION("Identity") { EXPECT( ( b &= b               ) == b_org           ); }
+    SECTION("Identity") { EXPECT( ( b &= to_byte( 0xff ) ) == b_org           ); }
+    SECTION("Clear"   ) { EXPECT( ( b &= to_byte( 0x00 ) ) == to_byte( 0x00 ) ); }
     }
 }
 
@@ -138,9 +138,9 @@ CASE( "byte: Allows bitwise x-or assignment" )
     gsl::byte const b_org = to_byte( 0xa5 );
     gsl::byte       b     = b_org;
 
-    SECTION("Identity") { EXPECT( ( b ^= b               ) == to_byte( 0 ) ); } 
-    SECTION("Identity") { EXPECT( ( b ^= to_byte( 0x00 ) ) ==  b_org       ); } 
-    SECTION("Invert"  ) { EXPECT( ( b ^= to_byte( 0xff ) ) == ~b_org       ); } 
+    SECTION("Identity") { EXPECT( ( b ^= b               ) == to_byte( 0 ) ); }
+    SECTION("Identity") { EXPECT( ( b ^= to_byte( 0x00 ) ) ==  b_org       ); }
+    SECTION("Invert"  ) { EXPECT( ( b ^= to_byte( 0xff ) ) == ~b_org       ); }
     }
 }
 

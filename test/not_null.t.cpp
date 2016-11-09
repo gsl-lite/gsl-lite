@@ -3,17 +3,17 @@
 // https://github.com/microsoft/gsl
 //
 // Copyright (c) 2015 Martin Moene
-// Copyright (c) 2015 Microsoft Corporation. All rights reserved. 
-// 
-// This code is licensed under the MIT License (MIT). 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
-// THE SOFTWARE. 
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 #include "gsl-lite.t.h"
 #include <vector>
@@ -46,11 +46,11 @@ CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # if gsl_HAVE_NULLPTR
-    not_null< int* > p = nullptr; 
-# endif 
+    not_null< int* > p = nullptr;
+# endif
     not_null< int* > p = NULL;
     not_null< std::vector<char>* > q = 0;
-#endif 
+#endif
 }
 
 CASE( "not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
@@ -99,12 +99,12 @@ CASE( "not_null<>: Terminates construction from related pointer types for null p
 CASE( "not_null<>: Terminates assignment from a null pointer value" )
 {
     int i = 12;
-    not_null<int*> p = &i; 
+    not_null<int*> p = &i;
 #if gsl_HAVE_NULLPTR
     int * z = nullptr;
 #else
     int * z = NULL;
-#endif 
+#endif
 
     EXPECT_THROWS( p = z );
 }
@@ -115,25 +115,25 @@ CASE( "not_null<>: Terminates assignment from related pointer types for null poi
     MyDerived * z = nullptr;
 #else
     MyDerived * z = NULL;
-#endif 
+#endif
     MyDerived derived;
     not_null< MyBase* > p = &derived;
 
     EXPECT_THROWS( p = z );
 }
 
-CASE( "not_null<>: Allows construction from a non-null underlying pointer" )
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer" )
 {
-    int i = 12; 
+    int i = 12;
 
     not_null< int* > p( &i );
 
     EXPECT( p.get() == &i );
 }
 
-CASE( "not_null<>: Allows construction from a non-null user-defined ref-counted type" )
+CASE( "not_null<>: Allows to construct from a non-null user-defined ref-counted type" )
 {
-    int i = 12; 
+    int i = 12;
     RefCounted< int > rp = RefCounted<int>( &i );
 
     not_null<   int*>  p( rp );
@@ -141,7 +141,7 @@ CASE( "not_null<>: Allows construction from a non-null user-defined ref-counted 
     EXPECT( p.get() == &i );
 }
 
-CASE( "not_null<>: Allows construction from a non-null related pointer" )
+CASE( "not_null<>: Allows to construct from a non-null related pointer" )
 {
     MyDerived derived;
     not_null< MyBase* > p = &derived;
@@ -149,7 +149,7 @@ CASE( "not_null<>: Allows construction from a non-null related pointer" )
     EXPECT( (void*)p.get() == &derived );
 }
 
-CASE( "not_null<>: Allows construction from a not_null related pointer type" )
+CASE( "not_null<>: Allows to construct from a not_null related pointer type" )
 {
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
@@ -164,7 +164,7 @@ CASE( "not_null<>: Allows assignment from a not_null related pointer type" )
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
     not_null< MyBase*    > q = p;
-    
+
     q = p;
 
     EXPECT( q == p );
@@ -185,7 +185,7 @@ CASE( "not_null<>: Allows implicit conversion to underlying type" )
     struct F { static bool helper( not_null<int*> p ) { return *p == 12; } };
 
     int i = 12;
-    not_null< int* > p = &i; 
+    not_null< int* > p = &i;
 
     EXPECT( *p == i );
     EXPECT( F::helper( p ) );
