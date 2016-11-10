@@ -1126,8 +1126,8 @@ public:
 
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( U (&arr)[N] )
-        : begin_( arr )
-        , end_  ( arr + N )
+        : begin_( &arr[0] )
+        , end_  ( &arr[0] + N )
     {}
 
 #if gsl_HAVE_ARRAY
