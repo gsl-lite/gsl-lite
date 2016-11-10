@@ -923,6 +923,11 @@ gsl_api inline gsl_constexpr unsigned char to_uchar( byte b ) gsl_noexcept
     return to_integer<unsigned char>( b );
 }
 
+gsl_api inline gsl_constexpr unsigned char to_uchar( int i ) gsl_noexcept
+{
+    return static_cast<unsigned char>( i );
+}
+
 #if ! gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
 
 gsl_api inline gsl_constexpr bool operator==( byte l, byte r ) gsl_noexcept
@@ -962,7 +967,7 @@ gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift )
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return b = to_byte( to_uchar( b ) << shift );
 #else
-    b.v = to_uchar( b ) << shift; return b;
+    b.v = to_uchar( b.v << shift ); return b;
 #endif
 }
 
@@ -978,7 +983,7 @@ gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift )
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return b = to_byte( to_uchar( b ) >> shift );
 #else
-    b.v = to_uchar( b ) >> shift; return b;
+    b.v = to_uchar( b.v >> shift ); return b;
 #endif
 }
 
