@@ -66,6 +66,10 @@
 # define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0
 #endif
 
+#ifndef  gsl_CONFIG_SPAN_INDEX_TYPE
+# define gsl_CONFIG_SPAN_INDEX_TYPE  size_t
+#endif
+
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
@@ -1053,7 +1057,7 @@ class span
     template< class U > friend class span;
 
 public:
-    typedef size_t index_type;      // p0122r3 uses std::ptrdiff_t
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;  // p0122r3 uses std::ptrdiff_t
 
     typedef T element_type;
     typedef T & reference;
