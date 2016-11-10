@@ -564,6 +564,18 @@ private:
 
 // span creator functions (see ctors)
 
+template< typename T>
+span< const byte > as_bytes(span<T> other)
+{
+    return span< const byte >( reinterpret_cast<const byte *>( other.data() ), other.bytes() );
+}
+
+template< typename T>
+span< byte > as_writeable_bytes(span<T> other)
+{
+    return span< byte >( reinterpret_cast<byte *>( other.data() ), other.bytes() );
+}
+
 template< typename T >
 span<T> as_span( T * begin, T * end )
 {

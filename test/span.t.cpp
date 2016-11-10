@@ -946,11 +946,16 @@ CASE( "span<>: Allows to view the elements as read-only bytes" )
 
     span<int> va( a );
     span<const gyte> vb( va.as_bytes() );
+    span<const gyte> vc(as_bytes(va));
 
     EXPECT( vb[0] == b[0] );
+    EXPECT( vc[0] == b[0] );
     EXPECT( vb[1] == b[1] );
+    EXPECT( vc[1] == b[1] );
     EXPECT( vb[2] == b[2] );
+    EXPECT( vc[2] == b[2] );
     EXPECT( vb[3] == b[3] );
+    EXPECT( vc[3] == b[3] );
 }
 
 CASE( "span<>: Allows to view and change the elements as writable bytes" )
@@ -967,13 +972,20 @@ CASE( "span<>: Allows to view and change the elements as writable bytes" )
     type  a[] = { 0x0, };
     span<int> va( a );
     span<gyte> vb( va.as_writeable_bytes() );
+    span<gyte> vc( as_writeable_bytes(va) );
 
-    {for ( size_t i = 0; i < sizeof(type); ++i ) EXPECT( vb[i] == to_byte(0) ); }
+    for ( size_t i = 0; i < sizeof(type); ++i ) {
+        EXPECT( vb[i] == to_byte(0) );
+        EXPECT( vc[i] == to_byte(0) );
+    }
 
     vb[0] = to_byte(0x42);
 
     EXPECT( vb[0] == to_byte(0x42) );
-    {for ( size_t i = 1; i < sizeof(type); ++i ) EXPECT( vb[i] == to_byte(0) ); }
+    for ( size_t i = 1; i < sizeof(type); ++i ) {
+        EXPECT( vb[i] == to_byte(0) );
+        EXPECT( vc[i] == to_byte(0) );
+    }
 }
 
 CASE( "span<>: Allows to view the elements as a span of another type" )
