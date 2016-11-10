@@ -25,7 +25,7 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
     owner<int*> p = new int( 120 );
 
     EXPECT( (p != NULL) );
-    EXPECT(  p != (void*)0 );
+    EXPECT(  p != nullptr_void() );
 # if gsl_HAVE_NULLPTR
     EXPECT(  p != nullptr );
 # endif 
@@ -47,7 +47,7 @@ CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
     Owner(int*) p = new int( 120 );
 
     EXPECT( (p != NULL) );
-    EXPECT(  p != (void*)0 );
+    EXPECT(  p != nullptr_void() );
 # if gsl_HAVE_NULLPTR
     EXPECT(  p != nullptr );
 # endif 

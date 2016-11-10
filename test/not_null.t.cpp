@@ -146,7 +146,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer" )
     MyDerived derived;
     not_null< MyBase* > p = &derived;
 
-    EXPECT( (void*)p.get() == &derived );
+    EXPECT( p.get() == &derived );
 }
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type" )
@@ -177,7 +177,7 @@ CASE( "not_null<>: Allows assignment from a non-null bare recast pointer" )
 
     not_null< Unrelated* > t = reinterpret_cast< Unrelated* >( p.get() );
 
-    EXPECT( (void*)p.get() == (void*)t.get() );
+    EXPECT( p.get() == reinterpret_cast<  MyDerived* >( t.get() ) );
 }
 
 CASE( "not_null<>: Allows implicit conversion to underlying type" )

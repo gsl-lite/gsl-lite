@@ -55,6 +55,8 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 #endif
 
 namespace gsl {
+    
+inline const void * nullptr_void() { return 0; }
 
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
