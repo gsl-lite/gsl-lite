@@ -1063,11 +1063,11 @@ CASE( "span<>: Allows to copy a span to another span of the same element type" )
 
 CASE( "span<>: Allows to copy a span to another span of a different element type" )
 {
-    int  a[] = { 'a', 'b', 'c',       };
-    char b[] = {  0 ,  0 ,  0 , 0, 0, };
+    char a[] = { 'a', 'b', 'c',       };
+    int  b[] = {  0 ,  0 ,  0 , 0, 0, };
 
-    span<int > src( a );
-    span<char> dst( b );
+    span<char> src( a );
+    span<int > dst( b );
 
     copy( src, dst );
 
