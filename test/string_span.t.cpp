@@ -20,7 +20,7 @@
 #include <string.h> // strlen()
 #include <wchar.h>  // wcslen()
 
-typedef string_span::index_type size_type;
+typedef string_span::index_type index_type;
 
 CASE( "string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
@@ -38,7 +38,7 @@ CASE( "string_span: Disallows construction of a string_span from a const std::st
 
     string_span sv( s );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 #endif
 }
@@ -47,7 +47,7 @@ CASE( "string_span: Allows to default-construct" )
 {
     string_span s;
 
-    EXPECT( s.size() == size_type( 0 ) );
+    EXPECT( s.size() == index_type( 0 ) );
 }
 
 CASE( "string_span: Allows to construct from a nullptr (C++11)" )
@@ -56,8 +56,8 @@ CASE( "string_span: Allows to construct from a nullptr (C++11)" )
     string_span  v( nullptr );
     cstring_span w( nullptr );
 
-    EXPECT( v.size() == size_type( 0 ) );
-    EXPECT( w.size() == size_type( 0 ) );
+    EXPECT( v.size() == index_type( 0 ) );
+    EXPECT( w.size() == index_type( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
@@ -67,7 +67,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const C-string" )
 {
     cstring_span sv = "hello";
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) ==  "hello" );
 }
 
@@ -77,7 +77,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const C-string 
 
     string_span sv( s, strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -87,7 +87,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const C-string 
 
     string_span sv( s, s + strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -97,7 +97,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const C-array" 
 
     string_span sv( s );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
@@ -118,7 +118,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const std::arra
 
     string_span sv( arr );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -136,7 +136,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const container
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     string_span sv( vec );
 
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -152,7 +152,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const container
 #endif
     string_span  sv( with_container, vec );
 
-    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
 
@@ -162,7 +162,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const C-string
 
     cstring_span sv( s, strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -172,7 +172,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const C-string
 
     cstring_span sv( s, s + strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -183,10 +183,10 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const C-array"
     cstring_span sv( s );
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_COMPILER_MSVC_VERSION
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
 #else
     EXPECT( !!"Warning: Unconstrained span container constructor enabled: terminating '\0' included in span" );
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
 #endif
     EXPECT( std::string( sv.data() ) == "world" );
 }
@@ -212,7 +212,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const std::arr
 
     cstring_span sv( arr );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -229,7 +229,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const containe
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cstring_span sv( vec );
 
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -245,7 +245,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const containe
 #endif
     cstring_span sv( with_container, vec );
 
-    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
 
@@ -255,7 +255,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const C-string and
 
     cstring_span sv( s, strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -265,7 +265,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const C-string
 
     cstring_span sv( s, s + strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -275,7 +275,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const C-array" )
 
     cstring_span sv( s );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == "world" );
 }
 
@@ -300,7 +300,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const std::array (
 
     cstring_span sv( arr );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -317,7 +317,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const container (s
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cstring_span sv( vec );
 
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -334,7 +334,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const container, v
 #endif
     cstring_span sv( with_container, vec );
 
-    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
 
@@ -353,7 +353,7 @@ CASE( "string_span: Allows to construct a wstring_span from a non-const C-string
 
     wstring_span sv( s, s + wcslen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == s );
 }
 
@@ -363,7 +363,7 @@ CASE( "string_span: Allows to construct a wstring_span from a non-const C-array"
 
     wstring_span sv( s );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -384,7 +384,7 @@ CASE( "string_span: Allows to construct a wstring_span from a non-const std::arr
 
     wstring_span sv( arr );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -401,7 +401,7 @@ CASE( "string_span: Allows to construct a wstring_span from a non-const containe
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     wstring_span sv( vec );
 
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -417,7 +417,7 @@ CASE( "string_span: Allows to construct a wstring_span from a non-const containe
 #endif
     wstring_span sv( with_container, vec );
 
-    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
 
@@ -427,7 +427,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const C-strin
 
     cwstring_span sv( s, wcslen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -437,7 +437,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const C-strin
 
     cwstring_span sv( s, s + wcslen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == s );
 }
 
@@ -448,10 +448,10 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const C-array
     cwstring_span sv( s );
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_COMPILER_MSVC_VERSION
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
 #else
     EXPECT( !!"Warning: Unconstrained span container constructor enabled: terminating '\0' included in span" );
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
 #endif
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
@@ -473,7 +473,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const std::ar
 
     cwstring_span sv( arr );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -490,7 +490,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const contain
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cwstring_span sv( vec );
 
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -506,7 +506,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const contain
 #endif
     cwstring_span sv( with_container, vec );
 
-    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
 
@@ -516,7 +516,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const C-string an
 
     cwstring_span sv( s, wcslen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -526,7 +526,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const C-string be
 
     cwstring_span sv( s, s + wcslen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == s );
 }
 
@@ -536,7 +536,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const C-array" )
 
     cwstring_span sv( s );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -557,7 +557,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const std::array 
 
     cwstring_span sv( arr );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
@@ -574,7 +574,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const container (
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     cwstring_span sv( vec );
 
-    EXPECT( sv.length() == size_type( 6 ) );
+    EXPECT( sv.length() == index_type( 6 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 #else
     EXPECT( !!"(un)constrained construction from container is not available" );
@@ -591,7 +591,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const container, 
 #endif
     cwstring_span sv( with_container, vec );
 
-    EXPECT( sv.length() == size_type( 9 ) );
+    EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
 
@@ -623,7 +623,7 @@ CASE( "string_span: Allows to move-construct from another span of the same type 
 
     string_span a(( string_span( hello ) ));
 
-    EXPECT( a.length() == strlen( hello ) );
+    EXPECT( a.length() == index_type( strlen( hello ) ) );
     EXPECT( std::equal( a.begin(), a.end(), hello ) );
 #else
     EXPECT( !!"move-semantics are not available (no C++11)" );
@@ -650,7 +650,7 @@ CASE( "string_span: Allows to move-assign from another span of the same type (C+
 
     a = string_span( hello );
 
-    EXPECT( a.length() == strlen( hello ) );
+    EXPECT( a.length() == index_type( strlen( hello ) ) );
     EXPECT( std::equal( a.begin(), a.end(), hello ) );
 #else
     EXPECT( !!"move-semantics are not available (no C++11)" );
@@ -661,7 +661,7 @@ CASE( "string_span: Allows to create a sub span of the first n elements" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    size_type count = 2;
+    index_type count = 2;
 
     string_span s = a.first( count );
 
@@ -673,7 +673,7 @@ CASE( "string_span: Allows to create a sub span of the last n elements" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    size_type count = 2;
+    index_type count = 2;
 
     string_span s = a.last( count );
 
@@ -685,11 +685,11 @@ CASE( "string_span: Allows to create a sub span starting at a given offset" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    size_type offset = 1;
+    index_type offset = 1;
 
     string_span s = a.subspan( offset );
 
-    EXPECT( s.size() == strlen(hello) - offset );
+    EXPECT( s.size() == index_type( strlen(hello) - offset ) );
     EXPECT( std::equal( s.begin(), s.end(), hello + offset ) );
 }
 
@@ -697,8 +697,8 @@ CASE( "string_span: Allows to create a sub span starting at a given offset with 
 {
     char hello[] = "hello";
     string_span a( hello );
-    size_type offset = 1;
-    size_type length = 1;
+    index_type offset = 1;
+    index_type length = 1;
 
     string_span s = a.subspan( offset, length );
 
@@ -710,7 +710,7 @@ CASE( "string_span: Allows to create an empty sub span at full offset" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    size_type offset = strlen( hello );
+    index_type offset = strlen( hello );
 
     string_span s = a.subspan( offset );
 
@@ -721,8 +721,8 @@ CASE( "string_span: Allows to create an empty sub span at full offset with zero 
 {
     char hello[] = "hello";
     string_span a( hello );
-    size_type offset = strlen( hello );
-    size_type length = 0;
+    index_type offset = strlen( hello );
+    index_type length = 0;
 
     string_span s = a.subspan( offset, length );
 
@@ -778,7 +778,7 @@ CASE( "string_span: Allows to observe an element via array indexing" )
     char hello[] = "hello";
     string_span a( hello );
 
-    for ( size_type i = 0; i < a.size(); ++i )
+    for ( index_type i = 0; i < a.size(); ++i )
     {
         EXPECT( a[i] == hello[i] );
     }
@@ -789,7 +789,7 @@ CASE( "string_span: Allows to observe an element via call indexing" )
     char hello[] = "hello";
     string_span a( hello );
 
-    for ( size_type i = 0; i < a.size(); ++i )
+    for ( index_type i = 0; i < a.size(); ++i )
     {
         EXPECT( a(i) == hello[i] );
     }
@@ -801,7 +801,7 @@ CASE( "string_span: Allows to observe an element via at()" )
     char hello[] = "hello";
     string_span a( hello );
 
-    for ( size_type i = 0; i < a.size(); ++i )
+    for ( index_type i = 0; i < a.size(); ++i )
     {
         EXPECT( a.at(i) == hello[i] );
     }
@@ -815,7 +815,7 @@ CASE( "string_span: Allows to observe an element via data()" )
 
     EXPECT( *a.data() == *a.begin() );
 
-    for ( size_type i = 0; i < a.size(); ++i )
+    for ( index_type i = 0; i < a.size(); ++i )
     {
         EXPECT( a.data()[i] == hello[i] );
     }
@@ -871,8 +871,8 @@ CASE( "string_span: Allows to compare a string_span with another string_span" )
     string_span sv( s, strlen( s ) );
     string_span tv( t, strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
-    EXPECT( tv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
+    EXPECT( tv.length() == index_type( 5 ) );
 
     EXPECT( sv == sv );
     EXPECT( sv != tv );
@@ -992,9 +992,9 @@ CASE( "string_span: Allows to obtain the number of elements via length()" )
     string_span sa = a;
     string_span sb = b;
 
-    EXPECT( sz.length() == size_type( 0 ) );
-    EXPECT( sa.length() == size_type( strlen( a ) ) );
-    EXPECT( sb.length() == size_type( strlen( b ) ) );
+    EXPECT( sz.length() == index_type( 0 ) );
+    EXPECT( sa.length() == index_type( strlen( a ) ) );
+    EXPECT( sb.length() == index_type( strlen( b ) ) );
 }
 
 CASE( "string_span: Allows to obtain the number of elements via size()" )
@@ -1005,9 +1005,9 @@ CASE( "string_span: Allows to obtain the number of elements via size()" )
     string_span sa = a;
     string_span sb = b;
 
-    EXPECT( sz.size() == size_type( 0 ) );
-    EXPECT( sa.size() == size_type( strlen( a ) ) );
-    EXPECT( sb.size() == size_type( strlen( b ) ) );
+    EXPECT( sz.size() == index_type( 0 ) );
+    EXPECT( sa.size() == index_type( strlen( a ) ) );
+    EXPECT( sb.size() == index_type( strlen( b ) ) );
 }
 
 CASE( "string_span: Allows to obtain the number of bytes via length_bytes()" )
@@ -1018,9 +1018,9 @@ CASE( "string_span: Allows to obtain the number of bytes via length_bytes()" )
     wstring_span sa = a;
     wstring_span sb = b;
 
-    EXPECT( sz.length_bytes() == size_type( 0 ) );
-    EXPECT( sa.length_bytes() == size_type( sizeof(wchar_t) * wcslen( a ) ) );
-    EXPECT( sb.length_bytes() == size_type( sizeof(wchar_t) * wcslen( b ) ) );
+    EXPECT( sz.length_bytes() == index_type( 0 ) );
+    EXPECT( sa.length_bytes() == index_type( sizeof(wchar_t) * wcslen( a ) ) );
+    EXPECT( sb.length_bytes() == index_type( sizeof(wchar_t) * wcslen( b ) ) );
 }
 
 CASE( "string_span: Allows to obtain the number of bytes via size_bytes()" )
@@ -1031,9 +1031,9 @@ CASE( "string_span: Allows to obtain the number of bytes via size_bytes()" )
     wstring_span sa = a;
     wstring_span sb = b;
 
-    EXPECT( sz.size_bytes() == size_type( 0 ) );
-    EXPECT( sa.size_bytes() == size_type( sizeof(wchar_t) * wcslen( a ) ) );
-    EXPECT( sb.size_bytes() == size_type( sizeof(wchar_t) * wcslen( b ) ) );
+    EXPECT( sz.size_bytes() == index_type( 0 ) );
+    EXPECT( sa.size_bytes() == index_type( sizeof(wchar_t) * wcslen( a ) ) );
+    EXPECT( sb.size_bytes() == index_type( sizeof(wchar_t) * wcslen( b ) ) );
 }
 
 CASE( "to_string(): Allows to explicitly convert from string_span to std::string" )
@@ -1042,7 +1042,7 @@ CASE( "to_string(): Allows to explicitly convert from string_span to std::string
 
     string_span sv( s, strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( to_string( sv ) == s );
 }
 
@@ -1052,7 +1052,7 @@ CASE( "to_string(): Allows to explicitly convert from cstring_span to std::strin
 
     cstring_span sv( s, strlen( s ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( to_string( sv ) == s );
 }
 
@@ -1064,7 +1064,7 @@ CASE( "to_string(): Allows to explicitly convert from wstring_span to std::wstri
 
     std::wstring ws( to_string( wstring_span( s, wcslen( s ) ) ) );
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
@@ -1074,7 +1074,7 @@ CASE( "to_string(): Allows to explicitly convert from cwstring_span to std::wstr
 
     std::wstring ws( to_string( cwstring_span( s, wcslen( s ) ) ) );
 
-    EXPECT( ws.length() == size_type( 5 ) );
+    EXPECT( ws.length() == 5u );
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
 
@@ -1085,7 +1085,7 @@ CASE( "ensure_z(): Disallows to build a string_span from a const C-string" )
 
     string_span sv = ensure_z( s );
 
-    EXPECT( sv.length() == 5 );
+    EXPECT( sv.length() == 5u );
     EXPECT( std::string( sv.data() ) == s );
 #endif
 }
@@ -1111,7 +1111,7 @@ CASE( "ensure_z(): Allows to build a string_span from a non-const C-string" )
 #else
     string_span sv = ensure_z( &s[0] );
 #endif
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -1125,7 +1125,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a non-const C-string" )
     cstring_span sv = ensure_z( &s[0] );
 #endif
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -1139,7 +1139,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
     cstring_span sv = ensure_z( &s[0] );
 #endif
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::string( sv.data() ) == s );
 }
 
@@ -1153,7 +1153,7 @@ CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string
     wstring_span sv = ensure_z( &s[0] );
 #endif
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -1167,7 +1167,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a non-const wide C-strin
     cwstring_span sv = ensure_z( &s[0] );
 #endif
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -1181,7 +1181,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
     cwstring_span sv = ensure_z( &s[0] );
 #endif
 
-    EXPECT( sv.length() == size_type( 5 ) );
+    EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
 
@@ -1189,7 +1189,7 @@ CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensur
 {
     const char * s = "hello"; // not: s[]
 
-    EXPECT_THROWS( ensure_z( s, size_type( 3 ) ) );
+    EXPECT_THROWS( ensure_z( s, index_type( 3 ) ) );
 }
 
 // end of file
