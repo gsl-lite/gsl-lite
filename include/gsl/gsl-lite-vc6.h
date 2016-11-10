@@ -1,6 +1,6 @@
 //
 // gsl-lite-vc6 is based on GSL: Guideline Support Library,
-// https://github.com/microsoft/gsl
+// For more information see https://github.com/martinmoene/gsl-lite
 //
 // Copyright (c) 2015 Martin Moene
 // Copyright (c) 2015 Microsoft Corporation. All rights reserved.
