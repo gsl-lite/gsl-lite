@@ -148,7 +148,7 @@ CASE( "string_span: Allows to construct a string_span from a non-const container
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<char> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
-    std::vector<char> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+    std::vector<char> vec; {for ( char i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
     string_span  sv( with_container, vec );
 
@@ -241,7 +241,7 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const containe
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<char> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
-    std::vector<char> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+    std::vector<char> vec; {for ( char i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
     cstring_span sv( with_container, vec );
 
@@ -329,7 +329,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const container, v
 # if gsl_HAVE_INITIALIZER_LIST
     const std::vector<char> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
-    std::vector<char> tmp; {for ( int i = 1; i < 10; ++i ) tmp.push_back(i); }
+    std::vector<char> tmp; {for ( char i = 1; i < 10; ++i ) tmp.push_back(i); }
     const std::vector<char> vec( tmp );
 #endif
     cstring_span sv( with_container, vec );
@@ -413,7 +413,7 @@ CASE( "string_span: Allows to construct a wstring_span from a non-const containe
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<wchar_t> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
-    std::vector<wchar_t> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+    std::vector<wchar_t> vec; {for ( wchar_t i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
     wstring_span sv( with_container, vec );
 
@@ -502,7 +502,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const contain
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<wchar_t> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
-    std::vector<wchar_t> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
+    std::vector<wchar_t> vec; {for ( wchar_t i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
     cwstring_span sv( with_container, vec );
 
@@ -586,7 +586,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const container, 
 # if gsl_HAVE_INITIALIZER_LIST
     const std::vector<wchar_t> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
-    std::vector<wchar_t> tmp; {for ( int i = 1; i < 10; ++i ) tmp.push_back(i); }
+    std::vector<wchar_t> tmp; {for ( wchar_t i = 1; i < 10; ++i ) tmp.push_back(i); }
     const std::vector<wchar_t> vec( tmp );
 #endif
     cwstring_span sv( with_container, vec );
@@ -825,7 +825,7 @@ CASE( "string_span: Allows to change an element via array indexing" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    
+
     a[1] = '7';
 
     EXPECT( hello[1] == '7' );
@@ -835,7 +835,7 @@ CASE( "string_span: Allows to change an element via call indexing" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    
+
     a(1) = '7';
 
     EXPECT( hello[1] == '7' );
@@ -846,7 +846,7 @@ CASE( "string_span: Allows to change an element via at()" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    
+
     a.at(1) = '7';
 
     EXPECT( hello[1] == '7' );
@@ -857,7 +857,7 @@ CASE( "string_span: Allows to change an element via data()" )
 {
     char hello[] = "hello";
     string_span a( hello );
-    
+
     *a.data() = '7';
 
     EXPECT( hello[0] == '7' );
@@ -887,7 +887,7 @@ CASE( "string_span: Allows to compare a string_span with another string_span" )
 CASE( "string_span: Allows to compare empty spans as equal" )
 {
     string_span a, b;
-    
+
     EXPECT( a == b );
 }
 
@@ -944,7 +944,7 @@ CASE( "string_span: Allows to compare with types convertible to string_span" )
     EXPECT(     phello >= a );
     EXPECT(     ahello >= a );
     EXPECT(     shello >= a );
-                                          
+
     EXPECT_NOT( phello != a );
     EXPECT_NOT( ahello != a );
     EXPECT_NOT( shello != a );
@@ -963,7 +963,7 @@ CASE( "string_span: Allows to compare with types convertible to string_span" )
     EXPECT( b == world );
 # if gsl_HAVE_OWNER_TEMPLATE
     EXPECT( world == b );
-# endif 
+# endif
 #endif // gsl_HAVE_OWNER_TEMPLATE
 #else
     EXPECT( !!"string_span: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
