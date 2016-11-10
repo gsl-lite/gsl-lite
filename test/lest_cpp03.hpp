@@ -35,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.27.0"
+#define  lest_VERSION "1.27.1"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -868,10 +868,10 @@ struct count : action
         static uint64_t hz = 0, hzo = 0;
         if ( ! hz )
         {
-            QueryPerformanceFrequency( (LARGE_INTEGER *) &hz  );
-            QueryPerformanceCounter  ( (LARGE_INTEGER *) &hzo );
+            QueryPerformanceFrequency( reinterpret_cast<LARGE_INTEGER *>( &hz  ) );
+            QueryPerformanceCounter  ( reinterpret_cast<LARGE_INTEGER *>( &hzo ) );
         }
-        uint64_t t; QueryPerformanceCounter( (LARGE_INTEGER *) &t );
+        uint64_t t; QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER *>( &t ) );
 
         return ( ( t - hzo ) * 1000000 ) / hz;
     }
@@ -891,7 +891,7 @@ struct timer
 
     double elapsed_seconds() const
     {
-        return ( current_ticks() - start_ticks ) / 1e6;
+        return static_cast<double>( current_ticks() - start_ticks ) / 1e6;
     }
 };
 
@@ -1047,7 +1047,7 @@ inline seed_t seed( text opt, text arg )
         return static_cast<seed_t>( time( NULL ) );
 
     if ( is_number( arg ) )
-        return lest::stoi( arg );
+        return seed_t( lest::stoi( arg ) );
 
     throw std::runtime_error( "expecting 'time' or positive number with option '" + opt + "', got '" + arg + "' (try option --help)" );
 }
