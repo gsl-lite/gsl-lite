@@ -1,5 +1,12 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.17.2 2016-11-10
+
+- Use &arr[0], not automatic decay
+- Workaround GNUC 5 throw constexpr bug
+- Workaround for GNUC 5.2.0 failing two tests
+- Use order: gsl_api inline gsl_constexpr type f() gsl_noexcept
+
 version 0.17.1 2016-11-09
 
 - Fixes thanks to Magnus Bergsten, @Sillamacka:
