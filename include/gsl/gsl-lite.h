@@ -1452,7 +1452,7 @@ gsl_api inline gsl_constexpr14 span<T> as_span( T * begin, size_t size )
 template< typename T, size_t N >
 gsl_api inline gsl_constexpr14 span<T> as_span( T (&arr)[N] )
 {
-    return span<T>( arr, N );
+    return span<T>( &arr[0], N );
 }
 
 #if gsl_HAVE_ARRAY
