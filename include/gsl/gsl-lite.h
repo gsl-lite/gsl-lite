@@ -230,7 +230,7 @@
 #endif
 
 #if gsl_FEATURE_HAVE_IMPLICIT_MACRO
-# define implicit
+# define implicit /*implicit*/
 #endif
 
 #if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
