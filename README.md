@@ -151,8 +151,8 @@ Define this macro to the type to use for indices in `span` and `basic_string_spa
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
 
-\-D<b>gsl\_CONFIG\_ALLOWS\_UNCONSTRAINED\_SPAN\_CONTAINER\_CTOR</b>=1  
-Define this macro to 0 to omit the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. Default is 1.
+\-D<b>gsl\_CONFIG\_ALLOWS\_UNCONSTRAINED\_SPAN\_CONTAINER\_CTOR</b>=0  
+Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. Default is 0.
 
 Note: an alternative is to use the constructor tagged `with_container`: span&lt;_value_type_> *s*(with_container, *cont*). 
 
