@@ -1,5 +1,19 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.18.0 2016-11-11
+
+- Remove span::size_type, deprecated since 0.12.0.
+- Add gsl_CONFIG_SPAN_INDEX_TYPE configuration macro; default size_t.
+- Add span constructor for std::array<> const &.
+- Add span constructor for std::unique_ptr, std::shared_ptr.
+- Make span's unconstrained constructor disabled at default.
+  This enables construction from unique_ptr and shared_ptr.
+- Prevent conversion warning [-Wconversion]
+- Prevent old-style casts warning [-Wold-style-cast]
+- Replace arr with &arr[0], not automatic decay (several).
+- Update lest_cpp03.hpp to version 1.27.2
+- Fix noexcept with default ctors for GNUC < 4.9.0 (adapted PR #58, thanks to Dmitry Banschikov, @ubique).
+
 version 0.17.2 2016-11-10
 
 - Use &arr[0], not automatic decay
