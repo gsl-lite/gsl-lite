@@ -383,6 +383,105 @@ CASE( "span<>: Allows to tag-construct from a container (std::vector<>)" )
     EXPECT( std::equal( w.begin(), w.end(), vec.begin() ) );
 }
 
+CASE( "span<>: Allows to construct from an empty gsl::shared_ptr" )
+{
+#if gsl_HAVE_SHARED_PTR
+    span<int> ptr = gsl::shared_ptr<int>( gsl_nullptr );
+
+    span<int> s( ptr );
+
+    EXPECT( s.length() == 0           );
+    EXPECT( s.data()   == gsl_nullptr );
+#else
+    EXPECT( !!"gsl::shared_ptr is not available" );
+#endif
+}
+
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr" )
+{
+#if gsl_HAVE_SHARED_PTR
+    gsl::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
+
+    span<int> s( ptr );
+
+    EXPECT( s.length() == 0           );
+    EXPECT( s.data()   == gsl_nullptr );
+#else
+    EXPECT( !!"gsl::unique_ptr is not available" );
+#endif
+}
+
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array)" )
+{
+#if gsl_HAVE_SHARED_PTR
+    gsl::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
+
+    span<int> s( ptr, 0 );
+
+    EXPECT( s.length() == 0           );
+    EXPECT( s.data()   == gsl_nullptr );
+#else
+    EXPECT( !!"gsl::unique_ptr is not available" );
+#endif
+}
+
+CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr" )
+{
+#if gsl_HAVE_SHARED_PTR
+    shared_ptr<int> ptr = gsl::make_shared<int>( 4 );
+
+    span<int> s( ptr );
+
+    EXPECT( s.length() == 1         );
+    EXPECT( s.data()   == ptr.get() );
+    EXPECT( s[0]       == 4         );
+#else
+    EXPECT( !!"gsl::shared_ptr is not available" );
+#endif
+}
+
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr" )
+{
+#if gsl_HAVE_SHARED_PTR
+# if gsl_HAVE_MAKE_UNIQUE
+    gsl::unique_ptr<int> ptr = std::make_unique<int>( 4 );
+#else
+    gsl::unique_ptr<int> ptr = unique_ptr<int>( new int( 4 ) );
+#endif
+
+    span<int> s( ptr );
+
+    EXPECT( s.length() == 1         );
+    EXPECT( s.data()   == ptr.get() );
+    EXPECT( s[0]       == 4         );
+#else
+    EXPECT( !!"gsl::unique_ptr is not available" );
+#endif
+}
+
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array)" )
+{
+#if gsl_HAVE_SHARED_PTR
+# if gsl_HAVE_MAKE_UNIQUE
+    gsl::unique_ptr<int[]> arr = make_unique<int[]>( 4 );
+#else
+    gsl::unique_ptr<int[]> arr = unique_ptr<int[]>( new int[4] );
+#endif
+
+    for ( int i = 0; i < 4; i++ )
+        arr[i] = i + 1;
+
+    span<int> s( arr, 4 );
+
+    EXPECT( s.length() == 4         );
+    EXPECT( s.data()   == arr.get() );
+    EXPECT( s[0]       == 1         );
+    EXPECT( s[1]       == 2         );
+#else
+    EXPECT( !!"gsl::unique_ptr is not available" );
+#endif
+}
+
 CASE( "span<>: Allows to copy-construct from another span of the same type" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };

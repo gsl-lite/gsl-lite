@@ -192,6 +192,10 @@
 # define gsl_HAVE_UNIQUE_PTR  1
 #endif
 
+#if gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
+# define gsl_HAVE_MAKE_UNIQUE  1
+#endif
+
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
 # define gsl_HAVE_TYPE_TRAITS  1
 #endif
@@ -376,6 +380,10 @@ struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
 #if gsl_HAVE_SHARED_PTR
   using std::unique_ptr;
   using std::shared_ptr;
+  using std::make_shared;
+# if gsl_HAVE_MAKE_UNIQUE
+  using std::make_unique;
+# endif
 #endif
 
 #if gsl_HAVE_ALIAS_TEMPLATE
@@ -1167,6 +1175,30 @@ public:
         : begin_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
         , end_  ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
+
+#if gsl_HAVE_SHARED_PTR
+    gsl_api gsl_constexpr14 span( shared_ptr<element_type> const & ptr )
+        : begin_( ptr.get() )
+        , end_  ( ptr.get() ? ptr.get() + 1 : 0 )
+    {}
+#endif
+
+#if gsl_HAVE_UNIQUE_PTR
+# if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+    template< class ArrayElementType = typename std::add_pointer<element_type>::type >
+# else
+    template< class ArrayElementType >
+# endif
+    gsl_api gsl_constexpr14 span( unique_ptr<ArrayElementType> const & ptr, index_type count )
+        : begin_( ptr.get() )
+        , end_  ( ptr.get() + count )
+    {}
+
+    gsl_api gsl_constexpr14 span( unique_ptr<element_type> const & ptr )
+        : begin_( ptr.get() )
+        , end_  ( ptr.get() ? ptr.get() + 1 : 0 )
+    {}
+#endif
 
 #if gsl_HAVE_IS_DEFAULT && ! gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 430, 600)
     gsl_api gsl_constexpr14 span( span && ) = default;
