@@ -35,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.27.1"
+#define  lest_VERSION "1.27.2"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -851,10 +851,12 @@ struct count : action
 #if lest_FEATURE_TIME
 
 #if lest_PLATFORM_IS_WINDOWS
-# if lest_COMPILER_IS_MSVC6
+# if ! lest_CPP11_OR_GREATER && ! lest_COMPILER_MSVC_VERSION
+    typedef unsigned long uint64_t;
+# elif lest_COMPILER_MSVC_VERSION >= 6 && lest_COMPILER_MSVC_VERSION < 10
     typedef /*un*/signed __int64 uint64_t;
 # else
-    typedef unsigned long long uint64_t;
+    using ::uint64_t;
 # endif
 #else
 # if ! lest_CPP11_OR_GREATER
@@ -865,15 +867,15 @@ struct count : action
 #if lest_PLATFORM_IS_WINDOWS
     inline uint64_t current_ticks()
     {
-        static uint64_t hz = 0, hzo = 0;
-        if ( ! hz )
+        static LARGE_INTEGER hz = { 0,0 }, hzo = { 0,0 };
+        if ( ! hz.QuadPart )
         {
-            QueryPerformanceFrequency( reinterpret_cast<LARGE_INTEGER *>( &hz  ) );
-            QueryPerformanceCounter  ( reinterpret_cast<LARGE_INTEGER *>( &hzo ) );
+            QueryPerformanceFrequency( &hz  );
+            QueryPerformanceCounter  ( &hzo );
         }
-        uint64_t t; QueryPerformanceCounter( reinterpret_cast<LARGE_INTEGER *>( &t ) );
+        LARGE_INTEGER t = { 0,0 }; QueryPerformanceCounter( &t );
 
-        return ( ( t - hzo ) * 1000000 ) / hz;
+        return uint64_t( ( ( t.QuadPart - hzo.QuadPart ) * 1000000 ) / hz.QuadPart );
     }
 #else
     inline uint64_t current_ticks()
