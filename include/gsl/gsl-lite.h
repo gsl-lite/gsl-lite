@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.17.2"
+#define  gsl_lite_VERSION "0.18.x"
 
 // gsl-lite backward compatibility:
 
@@ -1643,6 +1643,13 @@ public:
     template< class Cont >
     gsl_api gsl_constexpr basic_string_span( Cont const & cont )
     : span_( cont )
+    {}
+
+#else
+
+    template< class U >
+    gsl_api gsl_constexpr basic_string_span( span<U> const & rhs )
+    : span_( rhs )
     {}
 
 #endif

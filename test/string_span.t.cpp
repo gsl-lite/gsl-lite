@@ -184,9 +184,11 @@ CASE( "string_span: Allows to construct a cstring_span from a non-const C-array"
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_COMPILER_MSVC_VERSION
     EXPECT( sv.length() == index_type( 5 ) );
-#else
+#elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     EXPECT( !!"Warning: Unconstrained span container constructor enabled: terminating '\0' included in span" );
     EXPECT( sv.length() == index_type( 6 ) );
+#else
+    EXPECT( sv.length() == index_type( 5 ) );
 #endif
     EXPECT( std::string( sv.data() ) == "world" );
 }
@@ -449,9 +451,11 @@ CASE( "string_span: Allows to construct a cwstring_span from a non-const C-array
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_COMPILER_MSVC_VERSION
     EXPECT( sv.length() == index_type( 5 ) );
-#else
+#elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     EXPECT( !!"Warning: Unconstrained span container constructor enabled: terminating '\0' included in span" );
     EXPECT( sv.length() == index_type( 6 ) );
+#else
+    EXPECT( sv.length() == index_type( 5 ) );
 #endif
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
