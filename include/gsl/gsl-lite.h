@@ -1520,21 +1520,10 @@ struct is_basic_string_span_oracle< basic_string_span<T> > : true_type {};
 template< class T >
 struct is_basic_string_span : is_basic_string_span_oracle< typename remove_cv<T>::type > {};
 
-gsl_api inline gsl_constexpr14 std::size_t string_length( char const * ptr, std::size_t max )
+template< class T >
+gsl_api inline gsl_constexpr14 std::size_t string_length( T * ptr, std::size_t max )
 {
-    if ( ptr == gsl_nullptr || max <= 0)
-        return 0;
-
-    std::size_t len = 0;
-    while ( len < max && ptr[len] )
-        ++len;
-
-    return len;
-}
-
-gsl_api inline gsl_constexpr14 std::size_t string_length( wchar_t const * ptr, std::size_t max )
-{
-    if ( ptr == gsl_nullptr || max <= 0)
+    if ( ptr == gsl_nullptr || max <= 0 )
         return 0;
 
     std::size_t len = 0;
