@@ -1664,9 +1664,16 @@ public:
     {}
 
 #if gsl_HAVE_IS_DEFAULT
+
+#if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 490, 600)
     gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
 
     gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
+#else
+    gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
+
+    gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
+#endif
 #endif
 
     template< class U
