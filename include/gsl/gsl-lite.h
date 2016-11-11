@@ -1139,6 +1139,12 @@ public:
         : begin_( arr.data() )
         , end_  ( arr.data() + N )
     {}
+
+    template< class U, size_t N >
+    gsl_api gsl_constexpr14 span( std::array< U, N > const & arr )
+        : begin_( arr.data() )
+        , end_  ( arr.data() + N )
+    {}
 #endif
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
