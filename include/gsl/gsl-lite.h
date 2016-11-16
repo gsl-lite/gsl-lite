@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.18.0"
+#define  gsl_lite_VERSION "0.18.x"
 
 // gsl-lite backward compatibility:
 
@@ -1479,15 +1479,15 @@ gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 }
 
 template< typename T >
-gsl_api inline gsl_constexpr14 span<T> make_span( T * begin, T * end )
+gsl_api inline gsl_constexpr14 span<T> make_span( T * first, T * last )
 {
-    return span<T>( begin, end );
+    return span<T>( first, last );
 }
 
 template< typename T >
-gsl_api inline gsl_constexpr14 span<T> make_span( T * begin, size_t size )
+gsl_api inline gsl_constexpr14 span<T> make_span( T * ptr, typename span<T>::index_type count )
 {
-    return span<T>( begin, size );
+    return span<T>( ptr, count );
 }
 
 template< typename T, size_t N >
