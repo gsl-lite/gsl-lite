@@ -188,7 +188,7 @@ cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-
 **2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
 span_p<>                    | &#10003;| -       | -       | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
-as_span()                   | -       | &#10003;| &#10003;| Create a span |
+make_span()                 | -       | &#10003;| &#10003;| Create a span |
 basic_string_span<>         | -       | &#10003;| &#10003;| See also propasal [p0123](http://wg21.link/p0123) |
 string_span                 | &#10003;| &#10003;| &#10003;| basic_string_span&lt;char> |
 wstring_span                | -       | &#10003;| &#10003;| basic_string_span&lt;wchar_t > |
@@ -443,16 +443,16 @@ span<>: Allows to view the elements as a span of another type
 span<>: Allows to change the elements from a span of another type
 span<>: Allows to copy a span to another span of the same element type
 span<>: Allows to copy a span to another span of a different element type
-span<>: Allows building from two pointers
-span<>: Allows building from two const pointers
-span<>: Allows building from a non-null pointer and a size
-span<>: Allows building from a non-null const pointer and a size
-span<>: Allows building from a C-array
-span<>: Allows building from a const C-array
-span<>: Allows building from a std::array<> (C++11)
-span<>: Allows building from a const std::array<> (C++11)
-span<>: Allows building from a container (std::vector<>)
-span<>: Allows building from a const container (std::vector<>)
+make_span(): Allows building from two pointers
+make_span(): Allows building from two const pointers
+make_span(): Allows building from a non-null pointer and a size
+make_span(): Allows building from a non-null const pointer and a size
+make_span(): Allows building from a C-array
+make_span(): Allows building from a const C-array
+make_span(): Allows building from a std::array<> (C++11)
+make_span(): Allows building from a const std::array<> (C++11)
+make_span(): Allows building from a container (std::vector<>)
+make_span(): Allows building from a const container (std::vector<>)
 string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Allows to default-construct

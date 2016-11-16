@@ -1176,66 +1176,66 @@ CASE( "span<>: Allows to copy a span to another span of a different element type
     }
 }
 
-CASE( "span<>: Allows building from two pointers" )
+CASE( "make_span(): Allows building from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> v = as_span( arr, arr + gsl_DIMENSION_OF( arr ) );
+    span<int> v = make_span( arr, arr + gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows building from two const pointers" )
+CASE( "make_span(): Allows building from two const pointers" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<const int> v = as_span( arr, arr + gsl_DIMENSION_OF( arr ) );
+    span<const int> v = make_span( arr, arr + gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows building from a non-null pointer and a size" )
+CASE( "make_span(): Allows building from a non-null pointer and a size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> v = as_span( arr, gsl_DIMENSION_OF( arr ) );
+    span<int> v = make_span( arr, gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows building from a non-null const pointer and a size" )
+CASE( "make_span(): Allows building from a non-null const pointer and a size" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<const int> v = as_span( arr, gsl_DIMENSION_OF( arr ) );
+    span<const int> v = make_span( arr, gsl_DIMENSION_OF( arr ) );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows building from a C-array" )
+CASE( "make_span(): Allows building from a C-array" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<int> v = as_span( arr );
+    span<int> v = make_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows building from a const C-array" )
+CASE( "make_span(): Allows building from a const C-array" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
-    span<const int> v = as_span( arr );
+    span<const int> v = make_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "span<>: Allows building from a std::array<> (C++11)" )
+CASE( "make_span(): Allows building from a std::array<> (C++11)" )
 {
 # if gsl_HAVE_ARRAY
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
-    span<int> v = as_span( arr );
+    span<int> v = make_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
@@ -1243,12 +1243,12 @@ CASE( "span<>: Allows building from a std::array<> (C++11)" )
 #endif
 }
 
-CASE( "span<>: Allows building from a const std::array<> (C++11)" )
+CASE( "make_span(): Allows building from a const std::array<> (C++11)" )
 {
 # if gsl_HAVE_ARRAY
     const std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
-    span<const int> v = as_span( arr );
+    span<const int> v = make_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
@@ -1256,26 +1256,26 @@ CASE( "span<>: Allows building from a const std::array<> (C++11)" )
 #endif
 }
 
-CASE( "span<>: Allows building from a container (std::vector<>)" )
+CASE( "make_span(): Allows building from a container (std::vector<>)" )
 {
 # if gsl_HAVE_INITIALIZER_LIST
     std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
     std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
 #endif
-    span<int> v = as_span( vec );
+    span<int> v = make_span( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-CASE( "span<>: Allows building from a const container (std::vector<>)" )
+CASE( "make_span(): Allows building from a const container (std::vector<>)" )
 {
 # if gsl_HAVE_INITIALIZER_LIST
     const std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 #else
     const std::vector<int> vec( 10, 42 );
 #endif
-    span<const int> v = as_span( vec );
+    span<const int> v = make_span( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }

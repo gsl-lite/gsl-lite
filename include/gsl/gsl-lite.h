@@ -1479,19 +1479,19 @@ gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 }
 
 template< typename T >
-gsl_api inline gsl_constexpr14 span<T> as_span( T * begin, T * end )
+gsl_api inline gsl_constexpr14 span<T> make_span( T * begin, T * end )
 {
     return span<T>( begin, end );
 }
 
 template< typename T >
-gsl_api inline gsl_constexpr14 span<T> as_span( T * begin, size_t size )
+gsl_api inline gsl_constexpr14 span<T> make_span( T * begin, size_t size )
 {
     return span<T>( begin, size );
 }
 
 template< typename T, size_t N >
-gsl_api inline gsl_constexpr14 span<T> as_span( T (&arr)[N] )
+gsl_api inline gsl_constexpr14 span<T> make_span( T (&arr)[N] )
 {
     return span<T>( &arr[0], N );
 }
@@ -1499,13 +1499,13 @@ gsl_api inline gsl_constexpr14 span<T> as_span( T (&arr)[N] )
 #if gsl_HAVE_ARRAY
 
 template< typename T, size_t N >
-gsl_api inline gsl_constexpr14 span<T> as_span( std::array<T,N> & arr )
+gsl_api inline gsl_constexpr14 span<T> make_span( std::array<T,N> & arr )
 {
     return span<T>( arr );
 }
 
 template< typename T, size_t N >
-gsl_api inline gsl_constexpr14 span<const T> as_span( std::array<T,N> const & arr )
+gsl_api inline gsl_constexpr14 span<const T> make_span( std::array<T,N> const & arr )
 {
     return span<const T>( arr );
 }
@@ -1514,13 +1514,13 @@ gsl_api inline gsl_constexpr14 span<const T> as_span( std::array<T,N> const & ar
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR && gsl_HAVE_AUTO
 
 template< class Cont >
-gsl_api inline gsl_constexpr14 auto as_span( Cont & cont ) -> span< typename Cont::value_type >
+gsl_api inline gsl_constexpr14 auto make_span( Cont & cont ) -> span< typename Cont::value_type >
 {
     return span< typename Cont::value_type >( cont );
 }
 
 template< class Cont >
-gsl_api inline gsl_constexpr14 auto as_span( Cont const & cont ) -> span< const typename Cont::value_type >
+gsl_api inline gsl_constexpr14 auto make_span( Cont const & cont ) -> span< const typename Cont::value_type >
 {
     return span< const typename Cont::value_type >( cont );
 }
@@ -1528,13 +1528,13 @@ gsl_api inline gsl_constexpr14 auto as_span( Cont const & cont ) -> span< const 
 #else
 
 template< class T >
-gsl_api inline span<T> as_span( std::vector<T> & cont )
+gsl_api inline span<T> make_span( std::vector<T> & cont )
 {
     return span<T>( with_container, cont );
 }
 
 template< class T >
-gsl_api inline span<const T> as_span( std::vector<T> const & cont )
+gsl_api inline span<const T> make_span( std::vector<T> const & cont )
 {
     return span<const T>( with_container, cont );
 }

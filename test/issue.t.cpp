@@ -21,8 +21,8 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
 {
 #if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
     char data[] = { 'a', 'b' };
-    string_span  a = as_span( data );
-    cstring_span b = as_span( data ).last( 1 );
+    string_span  a = make_span( data );
+    cstring_span b = make_span( data ).last( 1 );
 
     // worked as expected before 0.9.0, in 0.9.[0,1] converts to bool and compares equal!
 
