@@ -1082,16 +1082,16 @@ public:
     typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
     gsl_api gsl_constexpr14 span() gsl_noexcept
-        : begin_( gsl_nullptr )
-        , end_  ( gsl_nullptr )
+        : first_( gsl_nullptr )
+        , last_ ( gsl_nullptr )
     {
         Expects( size() == 0 );
     }
 
 #if gsl_HAVE_NULLPTR
     gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
-        : begin_( nullptr )
-        , end_  ( nullptr )
+        : first_( nullptr )
+        , last_ ( nullptr )
     {
         Expects( size_in == 0 );
     }
@@ -1105,53 +1105,53 @@ public:
     gsl_api gsl_constexpr14 span( element_type && ) = delete;
 #endif
 
-    gsl_api gsl_constexpr14 span( pointer begin_in, pointer end_in )
-        : begin_( begin_in )
-        , end_  ( end_in )
+    gsl_api gsl_constexpr14 span( pointer first_in, pointer last_in )
+        : first_( first_in )
+        , last_ ( last_in )
     {
-        Expects( begin_in <= end_in );
+        Expects( first_in <= last_in );
     }
 
     gsl_api gsl_constexpr14 span( pointer data_in, index_type size_in )
-        : begin_( data_in )
-        , end_  ( data_in + size_in )
+        : first_( data_in )
+        , last_ ( data_in + size_in )
     {
         Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
     template< typename U >
     gsl_api gsl_constexpr14 span( U * & data_in, index_type size_in )
-        : begin_( data_in )
-        , end_  ( data_in + size_in )
+        : first_( data_in )
+        , last_ ( data_in + size_in )
     {
         Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
     template< typename U >
     gsl_api gsl_constexpr14 span( U * const & data_in, index_type size_in )
-        : begin_( data_in )
-        , end_  ( data_in + size_in )
+        : first_( data_in )
+        , last_ ( data_in + size_in )
     {
         Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( U (&arr)[N] )
-        : begin_( &arr[0] )
-        , end_  ( &arr[0] + N )
+        : first_( &arr[0] )
+        , last_ ( &arr[0] + N )
     {}
 
 #if gsl_HAVE_ARRAY
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( std::array< U, N > & arr )
-        : begin_( arr.data() )
-        , end_  ( arr.data() + N )
+        : first_( arr.data() )
+        , last_ ( arr.data() + N )
     {}
 
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( std::array< U, N > const & arr )
-        : begin_( arr.data() )
-        , end_  ( arr.data() + N )
+        : first_( arr.data() )
+        , last_ ( arr.data() + N )
     {}
 #endif
 
@@ -1159,27 +1159,27 @@ public:
     // SFINAE enable only if Cont has a data() member function
     template< class Cont, typename = decltype(std::declval<Cont>().data()) >
     gsl_api gsl_constexpr14 span( Cont & cont )
-        : begin_( cont.data() )
-        , end_  ( cont.data() + cont.size() )
+        : first_( cont.data() )
+        , last_ ( cont.data() + cont.size() )
     {}
 #elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
-        : begin_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
-        , end_  ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
 #endif
 
     template< class Cont >
     gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
-        : begin_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
-        , end_  ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
 
 #if gsl_HAVE_SHARED_PTR
     gsl_api gsl_constexpr14 span( shared_ptr<element_type> const & ptr )
-        : begin_( ptr.get() )
-        , end_  ( ptr.get() ? ptr.get() + 1 : 0 )
+        : first_( ptr.get() )
+        , last_ ( ptr.get() ? ptr.get() + 1 : 0 )
     {}
 #endif
 
@@ -1190,13 +1190,13 @@ public:
     template< class ArrayElementType >
 # endif
     gsl_api gsl_constexpr14 span( unique_ptr<ArrayElementType> const & ptr, index_type count )
-        : begin_( ptr.get() )
-        , end_  ( ptr.get() + count )
+        : first_( ptr.get() )
+        , last_ ( ptr.get() + count )
     {}
 
     gsl_api gsl_constexpr14 span( unique_ptr<element_type> const & ptr )
-        : begin_( ptr.get() )
-        , end_  ( ptr.get() ? ptr.get() + 1 : 0 )
+        : first_( ptr.get() )
+        , last_ ( ptr.get() ? ptr.get() + 1 : 0 )
     {}
 #endif
 
@@ -1205,15 +1205,15 @@ public:
     gsl_api gsl_constexpr14 span( span const & ) = default;
 #else
     gsl_api gsl_constexpr14 span( span const & other )
-        : begin_( other.begin() )
-        , end_  ( other.end() )
+        : first_( other.begin() )
+        , last_ ( other.end() )
     {}
 #endif
 
     template< typename U >
     gsl_api gsl_constexpr14 span( span<U> const & other )
-        : begin_( other.begin() )
-        , end_  ( other.end() )
+        : first_( other.begin() )
+        , last_ ( other.end() )
     {}
 
 #if gsl_HAVE_IS_DEFAULT
@@ -1258,12 +1258,12 @@ public:
 
     gsl_api gsl_constexpr14 iterator begin() const gsl_noexcept
     {
-        return iterator( begin_ );
+        return iterator( first_ );
     }
 
     gsl_api gsl_constexpr14 iterator end() const gsl_noexcept
     {
-        return iterator( end_ );
+        return iterator( last_ );
     }
 
     gsl_api gsl_constexpr14 const_iterator cbegin() const gsl_noexcept
@@ -1309,12 +1309,12 @@ public:
     gsl_api gsl_constexpr14 reference at( index_type index ) const
     {
        Expects( index < size() );
-       return begin_[ index ];
+       return first_[ index ];
     }
 
     gsl_api gsl_constexpr14 pointer data() const gsl_noexcept
     {
-        return begin_;
+        return first_;
     }
 
     gsl_api gsl_constexpr14 bool empty() const gsl_noexcept
@@ -1324,7 +1324,7 @@ public:
 
     gsl_api gsl_constexpr14 index_type size() const gsl_noexcept
     {
-        return end_ - begin_;
+        return last_ - first_;
     }
 
     gsl_api gsl_constexpr14 index_type length() const gsl_noexcept
@@ -1350,8 +1350,8 @@ public:
     gsl_api void swap( span & other ) gsl_noexcept
     {
         using std::swap;
-        swap( begin_, other.begin_ );
-        swap( end_  , other.end_   );
+        swap( first_, other.first_ );
+        swap( last_ , other.last_  );
     }
 
     // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
@@ -1374,8 +1374,8 @@ public:
     }
 
 private:
-    pointer begin_;
-    pointer end_;
+    pointer first_;
+    pointer last_;
 };
 
 // span comparison functions
