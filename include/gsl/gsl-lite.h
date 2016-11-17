@@ -1332,14 +1332,14 @@ public:
         return size();
     }
 
-    gsl_api gsl_constexpr14 index_type bytes() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type size_bytes() const gsl_noexcept
     {
-        return sizeof( element_type ) * size();
+        return size() * narrow_cast<index_type>( sizeof( element_type ) );
     }
 
-    gsl_api gsl_constexpr14 index_type used_bytes() const gsl_noexcept
+    gsl_api gsl_constexpr14 index_type length_bytes() const gsl_noexcept
     {
-        return bytes();
+        return size_bytes();
     }
 
     gsl_api void swap( span & other ) gsl_noexcept
@@ -1353,19 +1353,19 @@ public:
 
     gsl_api span< const byte > as_bytes() const gsl_noexcept
     {
-        return span< const byte >( reinterpret_cast<const byte *>( data() ), bytes() );
+        return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() );
     }
 
     gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
     {
-        return span< byte >( reinterpret_cast<byte *>( data() ), bytes() );
+        return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() );
     }
 
     template< class U >
     gsl_api span< U > as_span() const gsl_noexcept
     {
-        Expects( ( this->bytes() % sizeof(U) ) == 0 );
-        return span< U >( reinterpret_cast<U *>( this->data() ), this->bytes() / sizeof( U ) );
+        Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
+        return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) );
     }
 
 private:
@@ -1464,13 +1464,13 @@ gsl_api inline void copy( span<T> src, span<U> dest )
 template< class T >
 gsl_api inline span< const byte > as_bytes( span<T> spn ) gsl_noexcept
 {
-    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.bytes() );
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() );
 }
 
 template< class T>
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
-    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.bytes() );
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() );
 }
 
 template< class T >
@@ -1792,12 +1792,12 @@ public:
 
     gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
     {
-        return span_.bytes();
+        return span_.size_bytes();
     }
 
     gsl_api gsl_constexpr index_type size_bytes() const gsl_noexcept
     {
-        return span_.bytes();
+        return span_.size_bytes();
     }
 
     gsl_api gsl_constexpr bool empty() const gsl_noexcept

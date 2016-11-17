@@ -957,7 +957,7 @@ CASE( "span<>: Allows to obtain the number of elements via length()" )
     EXPECT(  z.length() == index_type( 0 ) );
 }
 
-CASE( "span<>: Allows to obtain the number of bytes via bytes()" )
+CASE( "span<>: Allows to obtain the number of bytes via size_bytes()" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
@@ -966,12 +966,12 @@ CASE( "span<>: Allows to obtain the number of bytes via bytes()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
-    EXPECT( vb.bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
-    EXPECT(  z.bytes() == index_type( 0 * sizeof(int) ) );
+    EXPECT( va.size_bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
+    EXPECT( vb.size_bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
+    EXPECT(  z.size_bytes() == index_type( 0 * sizeof(int) ) );
 }
 
-CASE( "span<>: Allows to obtain the number of bytes via used_bytes()" )
+CASE( "span<>: Allows to obtain the number of bytes via length_bytes()" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
@@ -980,9 +980,9 @@ CASE( "span<>: Allows to obtain the number of bytes via used_bytes()" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.used_bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
-    EXPECT( vb.used_bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
-    EXPECT(  z.used_bytes() == index_type( 0 * sizeof(int) ) );
+    EXPECT( va.length_bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
+    EXPECT( vb.length_bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
+    EXPECT(  z.length_bytes() == index_type( 0 * sizeof(int) ) );
 }
 
 CASE( "span<>: Allows to swap with another span of the same type" )
