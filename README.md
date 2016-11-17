@@ -188,6 +188,8 @@ cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-
 span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
 span_p<>                    | &#10003;| -       | -       | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
 make_span()                 | -       | &#10003;| &#10003;| Create a span |
+as_bytes()                  | -       | &#10003;| &#10003;| A span as bytes |
+as_writeable_bytes          | -       | &#10003;| &#10003;| A span as writeable bytes |
 basic_string_span<>         | -       | &#10003;| &#10003;| See also propasal [p0123](http://wg21.link/p0123) |
 string_span                 | &#10003;| &#10003;| &#10003;| basic_string_span&lt;char> |
 wstring_span                | -       | &#10003;| &#10003;| basic_string_span&lt;wchar_t > |
@@ -217,6 +219,8 @@ narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
 implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
 move_owner                  | ?       | -       | -       | ... |
+**5. Algorithms**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+copy()                      | &nbsp;  | &nbsp;  | &nbsp;  | Copy from source span to destination span |
 **5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 
