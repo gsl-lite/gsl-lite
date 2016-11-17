@@ -383,7 +383,7 @@ CASE( "span<>: Allows to tag-construct from a container (std::vector<>)" )
     EXPECT( std::equal( w.begin(), w.end(), vec.begin() ) );
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::shared_ptr" )
+CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11)" )
 {
 #if gsl_HAVE_SHARED_PTR
     span<int> ptr = gsl::shared_ptr<int>( gsl_nullptr );
@@ -397,9 +397,9 @@ CASE( "span<>: Allows to construct from an empty gsl::shared_ptr" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr" )
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11)" )
 {
-#if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE_UNIQUE_PTR
     gsl::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
@@ -411,9 +411,9 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array)" )
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)" )
 {
-#if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE_UNIQUE_PTR
     gsl::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
 
     span<int> s( ptr, 0 );
@@ -425,7 +425,7 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array)" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr" )
+CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)" )
 {
 #if gsl_HAVE_SHARED_PTR
     shared_ptr<int> ptr = gsl::make_shared<int>( 4 );
@@ -440,9 +440,9 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr" )
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)" )
 {
-#if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE_UNIQUE_PTR
 # if gsl_HAVE_MAKE_UNIQUE
     gsl::unique_ptr<int> ptr = std::make_unique<int>( 4 );
 #else
@@ -459,9 +459,9 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array)" )
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11)" )
 {
-#if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE_UNIQUE_PTR
 # if gsl_HAVE_MAKE_UNIQUE
     gsl::unique_ptr<int[]> arr = make_unique<int[]>( 4 );
 #else
@@ -1278,6 +1278,104 @@ CASE( "make_span(): Allows building from a const container (std::vector<>)" )
     span<const int> v = make_span( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+}
+
+CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
+{
+# if gsl_HAVE_SHARED_PTR
+    auto ptr = gsl::shared_ptr<int>( gsl_nullptr );
+
+    auto s = make_span( ptr );
+
+    EXPECT( s.length() == 0           );
+    EXPECT( s.data()   == gsl_nullptr );
+#else
+    EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_span(): Allows building from an empty gsl::unique_ptr (C++11)" )
+{
+# if gsl_HAVE_UNIQUE_PTR
+    auto ptr = gsl::unique_ptr<int>( gsl_nullptr );
+
+    auto s = make_span( ptr );
+
+    EXPECT( s.length() == 0           );
+    EXPECT( s.data()   == gsl_nullptr );
+#else
+    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)" )
+{
+# if gsl_HAVE_UNIQUE_PTR
+    auto arr = std::unique_ptr<int[]>( gsl_nullptr );
+
+    auto s = make_span( arr, 0 );
+
+    EXPECT( s.length() == 0           );
+    EXPECT( s.data()   == gsl_nullptr );
+#else
+    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)" )
+{
+# if gsl_HAVE_SHARED_PTR
+    auto ptr = gsl::make_shared<int>( 4 );
+
+    auto s = make_span( ptr );
+
+    EXPECT( s.length() == 1         );
+    EXPECT( s.data()   == ptr.get() );
+    EXPECT( s[0]       == 4         );
+#else
+    EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
+{
+# if gsl_HAVE_UNIQUE_PTR
+# if gsl_HAVE_MAKE_UNIQUE
+    auto ptr = gsl::make_unique<int>( 4 );
+#else
+    auto ptr = gsl::unique_ptr<int>( new int(4) );
+#endif
+
+    auto s = make_span( ptr );
+
+    EXPECT( s.length() == 1         );
+    EXPECT( s.data()   == ptr.get() );
+    EXPECT( s[0]       == 4         );
+#else
+    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+#endif
+}
+
+CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++11)" )
+{
+# if gsl_HAVE_UNIQUE_PTR
+# if gsl_HAVE_MAKE_SHARED
+    auto arr = std::make_unique<int[]>(4);
+#else
+    auto arr = std::unique_ptr<int[]>( new int[4] );
+#endif
+    for ( int i = 0; i < 4; i++ )
+        arr[i] = i + 1;
+
+    auto s = make_span( arr, 4 );
+
+    EXPECT( s.length() == 4         );
+    EXPECT( s.data()   == arr.get() );
+    EXPECT( s[0]       == 1         );
+    EXPECT( s[1]       == 2         );
+#else
+    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+#endif
 }
 
 // end of file

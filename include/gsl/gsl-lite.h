@@ -1540,6 +1540,18 @@ gsl_api inline span<const T> make_span( std::vector<T> const & cont )
 }
 #endif
 
+template< class Ptr >
+gsl_api inline span<typename Ptr::element_type> make_span( Ptr & ptr )
+{ 
+    return span<typename Ptr::element_type>( ptr ); 
+}
+
+template< class Ptr >
+span<typename Ptr::element_type> make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
+{ 
+    return span<typename Ptr::element_type>( ptr, count); 
+}
+
 //
 // basic_string_span:
 //

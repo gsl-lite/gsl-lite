@@ -392,12 +392,12 @@ span<>: Allows to construct from a std::array<> (C++11)
 span<>: Allows to construct from a std::array<> with const data (C++11)
 span<>: Allows to construct from a container (std::vector<>)
 span<>: Allows to tag-construct from a container (std::vector<>)
-span<>: Allows to construct from an empty gsl::shared_ptr
-span<>: Allows to construct from an empty gsl::unique_ptr
-span<>: Allows to construct from an empty gsl::unique_ptr (array)
-span<>: Allows to construct from a non-empty gsl::shared_ptr
-span<>: Allows to construct from a non-empty gsl::unique_ptr
-span<>: Allows to construct from a non-empty gsl::unique_ptr (array)
+span<>: Allows to construct from an empty gsl::shared_ptr (C++11)
+span<>: Allows to construct from an empty gsl::unique_ptr (C++11)
+span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)
+span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)
+span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)
+span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11)
 span<>: Allows to copy-construct from another span of the same type
 span<>: Allows to copy-construct from another span of a compatible type
 span<>: Allows to move-construct from another span of the same type (C++11)
@@ -453,6 +453,12 @@ make_span(): Allows building from a std::array<> (C++11)
 make_span(): Allows building from a const std::array<> (C++11)
 make_span(): Allows building from a container (std::vector<>)
 make_span(): Allows building from a const container (std::vector<>)
+make_span(): Allows building from an empty gsl::shared_ptr (C++11)
+make_span(): Allows building from an empty gsl::unique_ptr (C++11)
+make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)
+make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)
+make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)
+make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++11)
 string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Allows to default-construct
