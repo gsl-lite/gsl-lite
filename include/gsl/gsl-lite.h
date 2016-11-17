@@ -817,7 +817,7 @@ gsl_api inline T & at( span<T> s, size_t index )
 //
 // not_null<> - Wrap any indirection and enforce non-null.
 //
-template<class T>
+template< class T >
 class not_null
 {
 public:
@@ -829,11 +829,11 @@ public:
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
-    template< typename U, typename Dummy =
+    template< class U, class Dummy =
         typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
     gsl_api not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
-    template< typename U, typename Dummy =
+    template< class U, class Dummy =
         typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
     gsl_api not_null & operator=( not_null<U> const & other )
     {
@@ -843,10 +843,10 @@ public:
 
 #else
 
-    template< typename U >
+    template< class U >
     gsl_api not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
-    template< typename U >
+    template< class U >
     gsl_api not_null & operator=( not_null<U> const & other )
     {
         ptr_ = other.get();
@@ -1119,7 +1119,7 @@ public:
         Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
-    template< typename U >
+    template< class U >
     gsl_api gsl_constexpr14 span( U * & data_in, index_type size_in )
         : first_( data_in )
         , last_ ( data_in + size_in )
@@ -1127,7 +1127,7 @@ public:
         Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
     }
 
-    template< typename U >
+    template< class U >
     gsl_api gsl_constexpr14 span( U * const & data_in, index_type size_in )
         : first_( data_in )
         , last_ ( data_in + size_in )
@@ -1157,7 +1157,7 @@ public:
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
     // SFINAE enable only if Cont has a data() member function
-    template< class Cont, typename = decltype(std::declval<Cont>().data()) >
+    template< class Cont, class = decltype(std::declval<Cont>().data()) >
     gsl_api gsl_constexpr14 span( Cont & cont )
         : first_( cont.data() )
         , last_ ( cont.data() + cont.size() )
@@ -1210,7 +1210,7 @@ public:
     {}
 #endif
 
-    template< typename U >
+    template< class U >
     gsl_api gsl_constexpr14 span( span<U> const & other )
         : first_( other.begin() )
         , last_ ( other.end() )
@@ -1229,7 +1229,7 @@ public:
 
 #if 0
     // Converting from other span ?
-    template< typename U > operator=();
+    template< class U > operator=();
 #endif
 
     gsl_api gsl_constexpr14 span first( index_type count ) const gsl_noexcept
@@ -1366,7 +1366,7 @@ public:
         return span< byte >( reinterpret_cast<byte *>( data() ), bytes() );
     }
 
-    template< typename U >
+    template< class U >
     gsl_api span< U > as_span() const gsl_noexcept
     {
         Expects( ( this->bytes() % sizeof(U) ) == 0 );
@@ -1466,31 +1466,31 @@ gsl_api inline void copy( span<T> src, span<U> dest )
 
 // span creator functions (see ctors)
 
-template< typename T >
+template< class T >
 gsl_api inline span< const byte > as_bytes( span<T> spn ) gsl_noexcept
 {
     return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.bytes() );
 }
 
-template< typename T>
+template< class T>
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.bytes() );
 }
 
-template< typename T >
+template< class T >
 gsl_api inline gsl_constexpr14 span<T> make_span( T * first, T * last )
 {
     return span<T>( first, last );
 }
 
-template< typename T >
+template< class T >
 gsl_api inline gsl_constexpr14 span<T> make_span( T * ptr, typename span<T>::index_type count )
 {
     return span<T>( ptr, count );
 }
 
-template< typename T, size_t N >
+template< class T, size_t N >
 gsl_api inline gsl_constexpr14 span<T> make_span( T (&arr)[N] )
 {
     return span<T>( &arr[0], N );
@@ -1498,13 +1498,13 @@ gsl_api inline gsl_constexpr14 span<T> make_span( T (&arr)[N] )
 
 #if gsl_HAVE_ARRAY
 
-template< typename T, size_t N >
+template< class T, size_t N >
 gsl_api inline gsl_constexpr14 span<T> make_span( std::array<T,N> & arr )
 {
     return span<T>( arr );
 }
 
-template< typename T, size_t N >
+template< class T, size_t N >
 gsl_api inline gsl_constexpr14 span<const T> make_span( std::array<T,N> const & arr )
 {
     return span<const T>( arr );
@@ -1542,14 +1542,14 @@ gsl_api inline span<const T> make_span( std::vector<T> const & cont )
 
 template< class Ptr >
 gsl_api inline span<typename Ptr::element_type> make_span( Ptr & ptr )
-{ 
-    return span<typename Ptr::element_type>( ptr ); 
+{
+    return span<typename Ptr::element_type>( ptr );
 }
 
 template< class Ptr >
 span<typename Ptr::element_type> make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
-{ 
-    return span<typename Ptr::element_type>( ptr, count); 
+{
+    return span<typename Ptr::element_type>( ptr, count);
 }
 
 //
