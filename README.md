@@ -169,7 +169,6 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 **1.1 Indirection**         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 not_null<>                  | &#10003;| &#10003;| &#10003;| Wrap any indirection and enforce non-null |
-maybe_null<>                | -       | &#10003;| -       | &nbsp; |
 **1.2 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 owner<>                     | &#10003;| &#10003;| >=C++11 | Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
