@@ -221,7 +221,7 @@ implicit                    | &#10003;| -       | &#10003;| Symmetric with expli
 move_owner                  | ?       | -       | -       | ... |
 **5. Algorithms**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 copy()                      | &nbsp;  | &nbsp;  | &nbsp;  | Copy from source span to destination span |
-**5. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+**6. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 
 Note: GSL Lite treats VC12 (VS2013) and VC14 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
