@@ -957,20 +957,6 @@ CASE( "span<>: Allows to obtain the number of elements via length()" )
     EXPECT(  z.length() == index_type( 0 ) );
 }
 
-CASE( "span<>: Allows to obtain the number of elements via used_length()" )
-{
-    int a[] = { 1, 2, 3, };
-    int b[] = { 1, 2, 3, 4, 5, };
-
-    span<int> z;
-    span<int> va( a );
-    span<int> vb( b );
-
-    EXPECT( va.used_length() == index_type( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( vb.used_length() == index_type( gsl_DIMENSION_OF( b ) ) );
-    EXPECT(  z.used_length() == index_type( 0 ) );
-}
-
 CASE( "span<>: Allows to obtain the number of bytes via bytes()" )
 {
     int a[] = { 1, 2, 3, };

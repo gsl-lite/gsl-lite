@@ -1332,11 +1332,6 @@ public:
         return size();
     }
 
-    gsl_api gsl_constexpr14 index_type used_length() const gsl_noexcept
-    {
-        return length();
-    }
-
     gsl_api gsl_constexpr14 index_type bytes() const gsl_noexcept
     {
         return sizeof( element_type ) * size();

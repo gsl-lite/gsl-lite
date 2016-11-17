@@ -436,7 +436,6 @@ span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain the number of elements via size()
 span<>: Allows to obtain the number of elements via length()
-span<>: Allows to obtain the number of elements via used_length()
 span<>: Allows to obtain the number of bytes via bytes()
 span<>: Allows to obtain the number of bytes via used_bytes()
 span<>: Allows to swap with another span of the same type
