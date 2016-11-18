@@ -481,7 +481,7 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
 // GSL.util: utilities
 //
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 11
 
 template< class F >
 class final_act
@@ -498,9 +498,6 @@ public:
     {
         other.invoke_ = false;
     }
-
-    gsl_api final_act( final_act const  & ) = delete;
-    gsl_api final_act & operator=( final_act const & ) = delete;
 
     gsl_api virtual ~final_act() gsl_noexcept
     {
@@ -527,6 +524,9 @@ protected:
 #endif
 
 private:
+    gsl_api final_act( final_act const  & );
+    gsl_api final_act & operator=( final_act const & );
+
     F action_;
     bool invoke_;
 };
@@ -615,7 +615,7 @@ gsl_api inline final_act_error<F> on_error( F && action ) gsl_noexcept
 
 #endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 
-#else // gsl_CPP11_OR_GREATER
+#else // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 11
 
 class final_act
 {
@@ -715,7 +715,7 @@ gsl_api inline final_act_error on_error( F const & action )
 
 #endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 
-#endif // gsl_CPP11_OR_GREATER
+#endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 11
 
 #if gsl_CPP11_OR_GREATER
 
