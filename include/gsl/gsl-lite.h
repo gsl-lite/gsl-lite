@@ -1705,7 +1705,7 @@ public:
     {}
 
 #if gsl_HAVE_IS_DEFAULT
-# if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 440, 490 )
+# if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 440, 500 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
 
     gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
