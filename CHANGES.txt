@@ -1,5 +1,20 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.20.0 2016-11-18
+
+- Remove used_length(), same as length()
+- Rename bytes(), used_bytes() to size_bytes(), length_bytes()
+- Make final_act<T> and final_act_return<T> useable with VC11/VS2012 (PR #61, thanks to @lm1458777)
+- Fix fail_fast_assert() for gcc < 6 for no-throw/std::terminate() case (comment, thanks to @xsacha)
+- Fix =default with gsl_noexcept for gcc < 6 for basic_string_span (PR #58, thanks to @xsacha)
+
+version 0.19.0 2016-11-17
+
+- Rename as_span() creator functions to make_span() (issue #49).
+- Add make_span() for gsl::shared_ptr, gsl::unique_ptr.
+- Add section Algorithms to feature table.
+- Remove maybe_null from feature table (M-GSL PR 123, 124, 126).
+
 version 0.18.0 2016-11-11
 
 - Remove span::size_type, deprecated since 0.12.0.
