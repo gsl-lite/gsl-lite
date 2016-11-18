@@ -18,9 +18,11 @@
 #include "gsl-lite.t.h"
 #include <functional>
 
+#define gsl_CPP11_OR_GREATER_WRT_FINAL ( gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11 )
+
 CASE( "finally: Allows to run lambda on leaving scope" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -36,7 +38,7 @@ CASE( "finally: Allows to run lambda on leaving scope" )
 
 CASE( "finally: Allows to run function (bind) on leaving scope" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -56,7 +58,7 @@ CASE( "finally: Allows to run function (pointer) on leaving scope" )
 {
     struct F { static void incr() { g_i += 1; } };
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
 
     g_i = 0;
     {
@@ -76,7 +78,7 @@ CASE( "finally: Allows to run function (pointer) on leaving scope" )
 
 CASE( "finally: Allows to move final_act" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -117,7 +119,7 @@ CASE( "finally: Allows to move final_act" )
 
 CASE( "finally: Allows moving final_act to throw" "[.]")
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct action
     {
         int & i_;
@@ -143,11 +145,11 @@ CASE( "finally: Allows moving final_act to throw" "[.]")
 CASE( "on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
 #if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
-        static void pass() { try { auto _ = on_return( &F::incr ); /*throw std::exception{};*/ } catch (...) {} }
-        static void fail() { try { auto _ = on_return( &F::incr );   throw std::exception{};   } catch (...) {} }
+        static void pass() { try { auto _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
+        static void fail() { try { auto _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
     };
 #else
     struct F { 
@@ -166,11 +168,11 @@ CASE( "on_return: Allows to perform action on leaving scope without exception (g
 CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
 #if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
-        static void pass() { try { auto _ = on_error( &F::incr ); /*throw std::exception{};*/ } catch (...) {} }
-        static void fail() { try { auto _ = on_error( &F::incr );   throw std::exception{};   } catch (...) {} }
+        static void pass() { try { auto _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
+        static void fail() { try { auto _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
     };
 #else
     struct F { 

@@ -499,6 +499,16 @@ public:
         other.invoke_ = false;
     }
 
+#if gsl_HAVE_IS_DELETE
+    gsl_api final_act( final_act const  & ) = delete;
+    gsl_api final_act & operator=( final_act const & ) = delete;
+#else
+private:
+    gsl_api final_act( final_act const  & );
+    gsl_api final_act & operator=( final_act const & );
+public:
+#endif
+
     gsl_api virtual ~final_act() gsl_noexcept
     {
         if ( invoke_ )
@@ -524,9 +534,6 @@ protected:
 #endif
 
 private:
-    gsl_api final_act( final_act const  & );
-    gsl_api final_act & operator=( final_act const & );
-
     F action_;
     bool invoke_;
 };
@@ -557,8 +564,15 @@ public:
         : final_act<F>( std::move( other ) )
     {}
 
+#if gsl_HAVE_IS_DELETE
     gsl_api final_act_return( final_act_return const & ) = delete;
     gsl_api final_act_return & operator=( final_act_return const & ) = delete;
+#else
+private:
+    gsl_api final_act_return( final_act_return const & );
+    gsl_api final_act_return & operator=( final_act_return const & );
+public:
+#endif
 
     gsl_api ~final_act_return() override
     {
@@ -591,8 +605,15 @@ public:
         : final_act<F>( std::move( other ) )
     {}
 
+#if gsl_HAVE_IS_DELETE
     gsl_api final_act_error( final_act_error const & ) = delete;
     gsl_api final_act_error & operator=( final_act_error const & ) = delete;
+#else
+private:
+    gsl_api final_act_error( final_act_error const & );
+    gsl_api final_act_error & operator=( final_act_error const & );
+public:
+#endif
 
     gsl_api ~final_act_error() override
     {
