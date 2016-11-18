@@ -434,11 +434,12 @@ struct fail_fast : public std::runtime_error
     : std::runtime_error( message ) {}
 };
 
-#if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+// workaround for gcc 5 throw/terminate constexpr bug:
 
-// workaround for gcc 5 throw constexpr bug:
+#if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 430, 600 ) && gsl_HAVE_CONSTEXPR_14
 
-# if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 430, 600 ) && gsl_HAVE_CONSTEXPR_14
+# if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+
 gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const message ) -> void
 {
     !cond ? throw fail_fast( message ) : 0;
@@ -446,14 +447,26 @@ gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * co
 
 # else
 
+gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond ) -> void
+{
+	struct F { static gsl_constexpr14 void f(){}; };
+
+    !cond ? std::terminate() : F::f();
+}
+
+# endif
+
+#else // workaround
+
+# if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+
 gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
 }
-# endif // workaround
 
-#else // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# else
 
 gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
 {
@@ -461,7 +474,8 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
         std::terminate();
 }
 
-#endif // gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# endif
+#endif // workaround
 
 //
 // GSL.util: utilities
