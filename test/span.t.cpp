@@ -390,8 +390,8 @@ CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11)" )
 
     span<int> s( ptr );
 
-    EXPECT( s.length() == 0           );
-    EXPECT( s.data()   == gsl_nullptr );
+    EXPECT( s.length() == index_type( 0  ) );
+    EXPECT( s.data()   == gsl_nullptr      );
 #else
     EXPECT( !!"gsl::shared_ptr is not available" );
 #endif
@@ -404,8 +404,8 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11)" )
 
     span<int> s( ptr );
 
-    EXPECT( s.length() == 0           );
-    EXPECT( s.data()   == gsl_nullptr );
+    EXPECT( s.length() == index_type( 0 ) );
+    EXPECT( s.data()   == gsl_nullptr     );
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
@@ -418,8 +418,8 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)"
 
     span<int> s( ptr, 0 );
 
-    EXPECT( s.length() == 0           );
-    EXPECT( s.data()   == gsl_nullptr );
+    EXPECT( s.length() == index_type( 0 ) );
+    EXPECT( s.data()   == gsl_nullptr     );
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
@@ -432,9 +432,9 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)" )
 
     span<int> s( ptr );
 
-    EXPECT( s.length() == 1         );
-    EXPECT( s.data()   == ptr.get() );
-    EXPECT( s[0]       == 4         );
+    EXPECT( s.length() == index_type( 1 ) );
+    EXPECT( s.data()   == ptr.get()       );
+    EXPECT( s[0]       == 4               );
 #else
     EXPECT( !!"gsl::shared_ptr is not available" );
 #endif
@@ -451,9 +451,9 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)" )
 
     span<int> s( ptr );
 
-    EXPECT( s.length() == 1         );
-    EXPECT( s.data()   == ptr.get() );
-    EXPECT( s[0]       == 4         );
+    EXPECT( s.length() == index_type( 1 ) );
+    EXPECT( s.data()   == ptr.get()       );
+    EXPECT( s[0]       == 4               );
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
@@ -473,10 +473,10 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
 
     span<int> s( arr, 4 );
 
-    EXPECT( s.length() == 4         );
-    EXPECT( s.data()   == arr.get() );
-    EXPECT( s[0]       == 1         );
-    EXPECT( s[1]       == 2         );
+    EXPECT( s.length() == index_type( 4 ) );
+    EXPECT( s.data()   == arr.get()       );
+    EXPECT( s[0]       == 1               );
+    EXPECT( s[1]       == 2               );
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
@@ -1273,8 +1273,8 @@ CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
 
     auto s = make_span( ptr );
 
-    EXPECT( s.length() == 0           );
-    EXPECT( s.data()   == gsl_nullptr );
+    EXPECT( s.length() == index_type( 0) );
+    EXPECT( s.data()   == gsl_nullptr    );
 #else
     EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
 #endif
@@ -1287,8 +1287,8 @@ CASE( "make_span(): Allows building from an empty gsl::unique_ptr (C++11)" )
 
     auto s = make_span( ptr );
 
-    EXPECT( s.length() == 0           );
-    EXPECT( s.data()   == gsl_nullptr );
+    EXPECT( s.length() == index_type( 0 ) );
+    EXPECT( s.data()   == gsl_nullptr     );
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
@@ -1301,8 +1301,8 @@ CASE( "make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)
 
     auto s = make_span( arr, 0 );
 
-    EXPECT( s.length() == 0           );
-    EXPECT( s.data()   == gsl_nullptr );
+    EXPECT( s.length() == index_type( 0 ) );
+    EXPECT( s.data()   == gsl_nullptr     );
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
@@ -1315,9 +1315,9 @@ CASE( "make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)" )
 
     auto s = make_span( ptr );
 
-    EXPECT( s.length() == 1         );
-    EXPECT( s.data()   == ptr.get() );
-    EXPECT( s[0]       == 4         );
+    EXPECT( s.length() == index_type( 1 ) );
+    EXPECT( s.data()   == ptr.get()       );
+    EXPECT( s[0]       == 4               );
 #else
     EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
 #endif
@@ -1334,9 +1334,9 @@ CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
 
     auto s = make_span( ptr );
 
-    EXPECT( s.length() == 1         );
-    EXPECT( s.data()   == ptr.get() );
-    EXPECT( s[0]       == 4         );
+    EXPECT( s.length() == index_type( 1 ) );
+    EXPECT( s.data()   == ptr.get()       );
+    EXPECT( s[0]       == 4               );
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
@@ -1355,10 +1355,10 @@ CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++
 
     auto s = make_span( arr, 4 );
 
-    EXPECT( s.length() == 4         );
-    EXPECT( s.data()   == arr.get() );
-    EXPECT( s[0]       == 1         );
-    EXPECT( s[1]       == 2         );
+    EXPECT( s.length() == index_type( 4 ) );
+    EXPECT( s.data()   == arr.get()       );
+    EXPECT( s[0]       == 1               );
+    EXPECT( s[1]       == 2               );
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
