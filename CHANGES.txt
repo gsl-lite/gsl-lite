@@ -1,5 +1,11 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.21.0 2016-11-28
+
+- Add as_bytes() for basic_string_span<> (thanks to Magnus Bergsten, @Sillamacka).
+- Fix: remove call to hash<std::size_t>(), undefined with Xcode on Mac OS X (thanks to Dave Tallman).
+- Fix: remove static from enum in integral_constant (thanks to Dave Tallman).
+
 version 0.20.0 2016-11-18
 
 - Remove used_length(), same as length()
