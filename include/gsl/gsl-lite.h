@@ -2161,7 +2161,7 @@ struct hash< gsl::byte >
 public:
     std::size_t operator()( gsl::byte v ) const gsl_noexcept
     {
-        return hash<std::size_t>()( gsl::to_integer<std::size_t>( v ) );
+        return gsl::to_integer<std::size_t>( v );
     }
 };
 
