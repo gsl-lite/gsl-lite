@@ -353,7 +353,7 @@ using std::tr1::false_type;
 
 #else
 
-template< int v > struct integral_constant { static enum { value = v }; };
+template< int v > struct integral_constant { enum { value = v }; };
 typedef integral_constant< true  > true_type;
 typedef integral_constant< false > false_type;
 
