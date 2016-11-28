@@ -1040,6 +1040,20 @@ CASE( "string_span: Allows to obtain the number of bytes via size_bytes()" )
     EXPECT( sb.size_bytes() == index_type( sizeof(wchar_t) * wcslen( b ) ) );
 }
 
+CASE( "string_span: Allows to view the elements as read-only bytes" )
+{
+    char const *    hello = "hello";
+    cstring_span s( hello);
+
+    span<const gsl::byte> b = as_bytes( s );
+
+    EXPECT( b[0] == to_byte( hello[0] ) );
+    EXPECT( b[1] == to_byte( hello[1] ) );
+    EXPECT( b[2] == to_byte( hello[2] ) );
+    EXPECT( b[3] == to_byte( hello[3] ) );
+    EXPECT( b[4] == to_byte( hello[4] ) );
+}
+
 CASE( "to_string(): Allows to explicitly convert from string_span to std::string" )
 {
     char s[] = "hello";

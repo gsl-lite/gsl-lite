@@ -2047,6 +2047,14 @@ gsl_api inline gsl_constexpr14 bool operator>=( U const & l, basic_string_span<T
 
 #endif // gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
+// convert basic_string_span to byte span:
+
+template< class T >
+gsl_api inline span< const byte > as_bytes( basic_string_span<T> spn ) gsl_noexcept
+{
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() );
+}
+
 //
 // String types:
 //

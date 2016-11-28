@@ -539,6 +539,7 @@ string_span: Allows to obtain the number of elements via length()
 string_span: Allows to obtain the number of elements via size()
 string_span: Allows to obtain the number of bytes via length_bytes()
 string_span: Allows to obtain the number of bytes via size_bytes()
+string_span: Allows to view the elements as read-only bytes
 to_string(): Allows to explicitly convert from string_span to std::string
 to_string(): Allows to explicitly convert from cstring_span to std::string
 to_string(): Allows to explicitly convert from wstring_span to std::wstring
