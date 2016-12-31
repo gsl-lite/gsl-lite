@@ -35,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.27.2"
+#define  lest_VERSION "1.28.0"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -787,6 +787,7 @@ struct action
 
 private:
     action( action const & );
+	void operator=(action const & );
 };
 
 struct print : action
