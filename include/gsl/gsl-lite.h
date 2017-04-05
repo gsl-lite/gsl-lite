@@ -803,7 +803,7 @@ gsl_api inline T narrow( U u )
 //
 
 template< class T, size_t N >
-gsl_api inline T & at( T(&arr)[N], size_t index )
+gsl_api inline gsl_constexpr14 T & at( T(&arr)[N], size_t index )
 {
     Expects( index < N );
     return arr[index];
@@ -812,7 +812,7 @@ gsl_api inline T & at( T(&arr)[N], size_t index )
 #if gsl_HAVE_ARRAY
 
 template< class T, size_t N >
-gsl_api inline T & at( std::array<T, N> & arr, size_t index )
+gsl_api inline gsl_constexpr14 T & at( std::array<T, N> & arr, size_t index )
 {
     Expects( index < N );
     return arr[index];
@@ -820,7 +820,7 @@ gsl_api inline T & at( std::array<T, N> & arr, size_t index )
 #endif
 
 template< class Cont >
-gsl_api inline typename Cont::value_type & at( Cont & cont, size_t index )
+gsl_api inline gsl_constexpr14 typename Cont::value_type & at( Cont & cont, size_t index )
 {
     Expects( index < cont.size() );
     return cont[index];
@@ -829,7 +829,7 @@ gsl_api inline typename Cont::value_type & at( Cont & cont, size_t index )
 #if gsl_HAVE_INITIALIZER_LIST
 
 template< class T >
-gsl_api inline const T & at( std::initializer_list<T> cont, size_t index )
+gsl_api inline const gsl_constexpr14 T & at( std::initializer_list<T> cont, size_t index )
 {
     Expects( index < cont.size() );
     return *( cont.begin() + index );
@@ -840,7 +840,7 @@ template< class T >
 class span;
 
 template< class T >
-gsl_api inline T & at( span<T> s, size_t index )
+gsl_api inline gsl_constexpr14 T & at( span<T> s, size_t index )
 {
     return s.at( index );
 }
