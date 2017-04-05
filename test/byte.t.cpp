@@ -23,24 +23,24 @@
 // We have a chicken & egg problem here:
 //   verifying operations via to_integer() that has yet to verified itself...
 
-CASE( "byte: Allows to construct from integral via static cast (C++11)" )
+CASE( "byte: Allows to construct from integral via static cast (C++17)" )
 {
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     gsl::byte b = static_cast<gsl::byte>( 4 );
     EXPECT( static_cast<unsigned char>(b) == 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 #else
-    EXPECT( !!"enum class is not available (no C++11)" );
+    EXPECT( !!"enum class is not constructible from underlying type (no C++17)" );
 #endif
 }
 
-CASE( "byte: Allows to construct from integral via byte() (C++11)" )
+CASE( "byte: Allows to construct from integral via byte() (C++17)" )
 {
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     gsl::byte b = gsl::byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 #else
-    EXPECT( !!"enum class is not available (no C++11)" );
+    EXPECT( !!"enum class is not constructible from underlying type (no C++17)" );
 #endif
 }
 

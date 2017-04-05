@@ -331,8 +331,8 @@ at(): Allows to access existing std::array elements (C++11)
 at(): Allows to access existing std::vector elements
 at(): Allows to access std::initializer_list elements (C++11)
 at(): Allows to access gsl::span elements
-byte: Allows to construct from integral via static cast (C++11)
-byte: Allows to construct from integral via byte() (C++11)
+byte: Allows to construct from integral via static cast (C++17)
+byte: Allows to construct from integral via byte() (C++17)
 byte: Allows to construct from integral via to_byte()
 byte: Allows to convert to integral via to_integer()
 byte: Allows comparison operations
