@@ -428,10 +428,10 @@ struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
 #define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
 #define gsl_STRINGIFY_( x )  #x
 
-struct fail_fast : public std::runtime_error
+struct fail_fast : public std::logic_error
 {
     gsl_api explicit fail_fast( char const * const message )
-    : std::runtime_error( message ) {}
+    : std::logic_error( message ) {}
 };
 
 // workaround for gcc 5 throw/terminate constexpr bug:
