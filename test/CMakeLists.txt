@@ -3,7 +3,7 @@
 # gsl-lite is based on GSL: Guideline Support Library,
 # https://github.com/microsoft/gsl
 #
-# This code is licensed under the MIT License (MIT). 
+# This code is licensed under the MIT License (MIT).
 
 cmake_minimum_required( VERSION 2.8 )
 
@@ -13,7 +13,6 @@ include_directories  ( "${PROJECT_SOURCE_DIR}/../include/gsl" )
 
 set( SOURCES gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
 
-add_executable (   gsl-lite.t ${SOURCES} )
 add_definitions( -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 
 set( HAS_STD_FLAGS  FALSE )
@@ -43,6 +42,8 @@ elseif( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR
         endif()
     endif()
 
+    add_compile_options( -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion )
+
     add_executable( gsl-lite-cpp98.t ${SOURCES} )
     target_compile_options( gsl-lite-cpp98.t  PUBLIC -std=c++98 )
 
@@ -59,13 +60,13 @@ elseif( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR
         target_compile_options( gsl-lite-cpp14.t  PUBLIC -std=c++14 )
     endif()
 
-	set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion" )
-
 elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "Intel" )
 # as is
 else()
 # as is
 endif()
+
+add_executable( gsl-lite.t ${SOURCES} )
 
 # configure unit tests via CTest:
 
