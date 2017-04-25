@@ -59,7 +59,7 @@ elseif( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR
         target_compile_options( gsl-lite-cpp14.t  PUBLIC -std=c++14 )
     endif()
 
-    add_compile_options( -Wall -Wno-missing-braces -fno-elide-constructors )
+	set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion" )
 
 elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "Intel" )
 # as is
