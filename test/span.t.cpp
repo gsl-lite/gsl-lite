@@ -124,9 +124,9 @@ CASE( "span<>: Terminates creation of a sub span outside the span" )
 CASE( "span<>: Terminates access outside the span" )
 {
     struct F {
-        static void blow_ix(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; }
-        static void blow_iv(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v(i); }
-        static void blow_at(int i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); }
+        static void blow_ix(size_t i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; }
+        static void blow_iv(size_t i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v(i); }
+        static void blow_at(size_t i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); }
     };
 
     EXPECT_NO_THROW( F::blow_ix(2) );
@@ -463,20 +463,20 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
 {
 #if gsl_HAVE_UNIQUE_PTR
 # if gsl_HAVE_MAKE_UNIQUE
-    gsl::unique_ptr<int[]> arr = make_unique<int[]>( 4 );
+    gsl::unique_ptr<size_t[]> arr = make_unique<size_t[]>( 4 );
 #else
-    gsl::unique_ptr<int[]> arr = unique_ptr<int[]>( new int[4] );
+    gsl::unique_ptr<size_t[]> arr = unique_ptr<size_t[]>( new size_t[4] );
 #endif
 
-    for ( int i = 0; i < 4; i++ )
+    for ( size_t i = 0; i < 4; i++ )
         arr[i] = i + 1;
 
-    span<int> s( arr, 4 );
+    span<size_t> s( arr, 4 );
 
     EXPECT( s.length() == index_type( 4 ) );
     EXPECT( s.data()   == arr.get()       );
-    EXPECT( s[0]       == 1               );
-    EXPECT( s[1]       == 2               );
+    EXPECT( s[0]       == 1u              );
+    EXPECT( s[1]       == 2u              );
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
@@ -674,7 +674,8 @@ CASE( "span<>: Allows reverse iteration" )
 
     for ( span<int>::reverse_iterator pos = v.rbegin(); pos != v.rend(); ++pos )
     {
-        EXPECT( *pos == arr[ v.size() - 1 - std::distance(v.rbegin(), pos)] );
+        size_t dist = narrow<size_t>( std::distance(v.rbegin(), pos) );
+        EXPECT( *pos == arr[ v.size() - 1 - dist ] );
     }
 }
 
@@ -685,7 +686,8 @@ CASE( "span<>: Allows const reverse iteration" )
 
     for ( span<int>::const_reverse_iterator pos = v.crbegin(); pos != v.crend(); ++pos )
     {
-        EXPECT( *pos == arr[ v.size() - 1 - std::distance(v.crbegin(), pos)] );
+        size_t dist = narrow<size_t>( std::distance(v.crbegin(), pos) );
+        EXPECT( *pos == arr[ v.size() - 1 - dist ] );
     }
 }
 
@@ -1346,19 +1348,19 @@ CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++
 {
 # if gsl_HAVE_UNIQUE_PTR
 # if gsl_HAVE_MAKE_SHARED
-    auto arr = std::make_unique<int[]>(4);
+    auto arr = std::make_unique<size_t[]>(4);
 #else
-    auto arr = std::unique_ptr<int[]>( new int[4] );
+    auto arr = std::unique_ptr<size_t[]>( new size_t[4] );
 #endif
-    for ( int i = 0; i < 4; i++ )
+    for ( size_t i = 0; i < 4; i++ )
         arr[i] = i + 1;
 
     auto s = make_span( arr, 4 );
 
     EXPECT( s.length() == index_type( 4 ) );
     EXPECT( s.data()   == arr.get()       );
-    EXPECT( s[0]       == 1               );
-    EXPECT( s[1]       == 2               );
+    EXPECT( s[0]       == 1u              );
+    EXPECT( s[1]       == 2u              );
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif

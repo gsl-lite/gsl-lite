@@ -1359,7 +1359,7 @@ public:
 
     gsl_api gsl_constexpr14 index_type size() const gsl_noexcept
     {
-        return last_ - first_;
+        return narrow_cast<index_type>( last_ - first_ );
     }
 
     gsl_api gsl_constexpr14 index_type length() const gsl_noexcept
@@ -2125,7 +2125,7 @@ gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_lim
 
     Expects( *cur == Sentinel );
 
-    return span<T>( seq, cur - seq );
+    return span<T>( seq, narrow_cast< typename span<T>::index_type >( cur - seq ) );
 }
 } // namespace detail
 

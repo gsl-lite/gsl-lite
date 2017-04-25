@@ -70,9 +70,9 @@ CASE( "at(): Terminates access to non-existing gsl::span elements" )
 
 CASE( "at(): Allows to access existing C-array elements" )
 {
-    int a[] = { 1, 2, 3, 4 };
+    size_t a[] = { 1, 2, 3, 4 };
 
-    for ( int i = 0; i < 4; ++i )
+    for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) ==  i + 1 );
     }
@@ -81,9 +81,9 @@ CASE( "at(): Allows to access existing C-array elements" )
 CASE( "at(): Allows to access existing std::array elements (C++11)" )
 {
 #if gsl_HAVE_ARRAY
-    std::array<int, 4> a = {{ 1, 2, 3, 4 }};
+    std::array<size_t, 4> a = {{ 1, 2, 3, 4 }};
 
-    for ( int i = 0; i < 4; ++i )
+    for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) == i + 1 );
     }
@@ -94,9 +94,9 @@ CASE( "at(): Allows to access existing std::array elements (C++11)" )
 
 CASE( "at(): Allows to access existing std::vector elements" )
 {
-    std::vector<int> a; // = { 1, 2, 3, 4 };
+    std::vector<size_t> a; // = { 1, 2, 3, 4 };
 
-    for ( int i = 0; i < 4; ++i )
+    for ( size_t i = 0; i < 4; ++i )
     {
         a.push_back( i + 1 );
         EXPECT( at(a, i) == i + 1 );
@@ -108,9 +108,9 @@ CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 // Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
 
 #if gsl_HAVE_INITIALIZER_LIST && ( !gsl_COMPILER_GCC_VERSION || gsl_COMPILER_GCC_VERSION >= 473 )
-    std::initializer_list<int> a = { 1, 2, 3, 4 };
+    std::initializer_list<size_t> a = { 1, 2, 3, 4 };
 
-    for ( int i = 0; i < 4; ++i )
+    for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) == i + 1 );
     }
@@ -121,10 +121,10 @@ CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 
 CASE( "at(): Allows to access gsl::span elements" )
 {
-    int arr[] = { 1, 2, 3, 4 };
-    span<int> a( arr );
+    size_t arr[] = { 1, 2, 3, 4 };
+    span<size_t> a( arr );
 
-    for ( int i = 0; i < 4; ++i )
+    for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) == i + 1 );
     }
