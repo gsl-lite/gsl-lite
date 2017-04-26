@@ -24,6 +24,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -2102,6 +2103,74 @@ gsl_api inline std::wstring to_string( cwstring_span const & spn )
 }
 
 #endif // to_string()
+
+//
+// Stream output for string_span types
+//
+
+namespace detail {
+
+template< class Stream >
+gsl_api void write_padding( Stream & os, std::streamsize n )
+{
+    for ( std::streamsize i = 0; i < n; ++i )
+        os.rdbuf()->sputc( os.fill() );
+}
+
+template< class Stream, class Span >
+gsl_api Stream & write_to_stream( Stream & os, Span const & spn )
+{
+    typename Stream::sentry sentry( os );
+
+    if ( !os )
+        return os;
+
+    std::streamsize length = narrow<std::streamsize>( spn.length() );
+
+    // Whether, and how, to pad
+    bool pad = ( length < os.width() );
+    bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::left;
+
+    if ( left_pad )
+        write_padding( os, os.width() - length );
+
+    // Write span characters
+    os.rdbuf()->sputn( spn.begin(), length );
+
+    if ( pad && !left_pad )
+        write_padding( os, os.width() - length );
+
+    // Reset output stream width
+    os.width(0);
+
+    return os;
+}
+
+} // namespace detail
+
+template< typename Traits >
+gsl_api std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< char, Traits > & os, string_span const & spn )
+{
+    return detail::write_to_stream( os, spn );
+}
+
+template< typename Traits >
+gsl_api std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< char, Traits > & os, cstring_span const & spn )
+{
+    return detail::write_to_stream( os, spn );
+}
+
+template< typename Traits >
+gsl_api std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t, Traits > & os, wstring_span const & spn )
+{
+    return detail::write_to_stream( os, spn );
+}
+
+template< typename Traits >
+gsl_api std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t, Traits > & os, cwstring_span const & spn )
+{
+    return detail::write_to_stream( os, spn );
+}
 
 //
 // ensure_sentinel()

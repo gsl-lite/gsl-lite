@@ -72,12 +72,6 @@ inline std::ostream & operator<<( std::ostream & os, span<T> s )
     return os << "[", std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os, ",") ), os << "]";
 }
 
-template< typename T >
-inline std::ostream & operator<<( std::ostream & os, basic_string_span<T> s )
-{
-    return os << "[", std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os, ",") ), os << "]";
-}
-
 } // namespace gsl
 
 #endif // GSL_TEST_GSL_LITE_H_INCLUDED
