@@ -17,6 +17,7 @@
 
 #include "gsl-lite.t.h"
 
+#include <sstream>  // std::ostringstream
 #include <string.h> // strlen()
 #include <wchar.h>  // wcslen()
 
@@ -1212,6 +1213,62 @@ CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensur
     const char * s = "hello"; // not: s[]
 
     EXPECT_THROWS( ensure_z( s, index_type( 3 ) ) );
+}
+
+CASE ( "operator<<: Allows printing a string_span to an output stream" )
+{
+    std::ostringstream oss;
+    char s[] = "hello";
+    string_span sv = ensure_z( s );
+
+    oss << sv << '\n'
+        << std::left << std::setw(10) << sv << '\n'
+        << sv << '\n'
+        << std::setfill('.') << std::right << std::setw(10) << sv;
+
+    EXPECT( oss.str() == "hello\n     hello\nhello\nhello....." );
+}
+
+CASE ( "operator<<: Allows printing a cstring_span to an output stream" )
+{
+    std::ostringstream oss;
+    char s[] = "hello";
+    cstring_span sv = ensure_z( s );
+
+    oss << sv << '\n'
+        << std::left << std::setw(10) << sv << '\n'
+        << sv << '\n'
+        << std::setfill('.') << std::right << std::setw(10) << sv;
+
+    EXPECT( oss.str() == "hello\n     hello\nhello\nhello....." );
+}
+
+CASE ( "operator<<: Allows printing a wstring_span to an output stream" )
+{
+    std::wostringstream oss;
+    wchar_t s[] = L"hello";
+    wstring_span sv = ensure_z( s );
+
+    oss << sv << '\n'
+        << std::left << std::setw(10) << sv << '\n'
+        << sv << '\n'
+        << std::setfill(L'.') << std::right << std::setw(10) << sv;
+
+    EXPECT( oss.str() == L"hello\n     hello\nhello\nhello....." );
+}
+
+CASE ( "operator<<: Allows printing a cwstring_span to an output stream" )
+{
+    std::wostringstream oss;
+    wchar_t s[] = L"hello";
+    cwstring_span sv = ensure_z( s );
+
+    oss << sv << '\n'
+        << std::left << std::setw(10) << sv << '\n'
+        << sv << '\n'
+        << std::setfill(L'.') << std::right << std::setw(10) << sv;
+
+    EXPECT( oss.str() == L"hello\n     hello\nhello\nhello....." );
 }
 
 // end of file
