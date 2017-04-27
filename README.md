@@ -553,6 +553,10 @@ ensure_z(): Allows to build a wstring_span from a non-const wide C-string
 ensure_z(): Allows to build a cwstring_span from a non-const wide C-string
 ensure_z(): Allows to build a cwstring_span from a const wide C-string
 ensure_z(): Allows to specify ultimate location of the sentinel and ensure its presence
+operator<<: Allows printing a string_span to an output stream
+operator<<: Allows printing a cstring_span to an output stream
+operator<<: Allows printing a wstring_span to an output stream
+operator<<: Allows printing a cwstring_span to an output stream
 finally: Allows to run lambda on leaving scope
 finally: Allows to run function (bind) on leaving scope
 finally: Allows to run function (pointer) on leaving scope
