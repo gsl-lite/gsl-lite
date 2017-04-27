@@ -35,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.28.0"
+#define  lest_VERSION "1.29.1"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -187,9 +187,6 @@ namespace lest
 #define lest_THEN(     story   )  lest_SECTION( lest::text(   " Then: ") + story   )
 #define lest_AND_WHEN( story   )  lest_SECTION( lest::text(   "  And: ") + story   )
 #define lest_AND_THEN( story   )  lest_SECTION( lest::text(   "  And: ") + story   )
-
-#define lest_TEST \
-    lest_CASE
 
 #define lest_CASE( specification, proposition ) \
     static void lest_FUNCTION( lest::env & ); \
@@ -454,6 +451,11 @@ public:
     friend bool operator == ( approx const & lhs, double rhs ) { return  operator==( rhs, lhs ); }
     friend bool operator != ( double lhs, approx const & rhs ) { return !operator==( lhs, rhs ); }
     friend bool operator != ( approx const & lhs, double rhs ) { return !operator==( rhs, lhs ); }
+
+    friend bool operator <= ( double lhs, approx const & rhs ) { return lhs < rhs.magnitude_ || lhs == rhs; }
+    friend bool operator <= ( approx const & lhs, double rhs ) { return lhs.magnitude_ < rhs || lhs == rhs; }
+    friend bool operator >= ( double lhs, approx const & rhs ) { return lhs > rhs.magnitude_ || lhs == rhs; }
+    friend bool operator >= ( approx const & lhs, double rhs ) { return lhs.magnitude_ > rhs || lhs == rhs; }
 
 private:
     double epsilon_;
