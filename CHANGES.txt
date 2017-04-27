@@ -1,5 +1,14 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.22.0 2017-04-27
+
+- Add operator<< for string_span (thanks to Magnus Bergsten, @Sillamacka).
+- Fix conversion and sign-conversion warnings (thanks to Magnus Bergsten, @Sillamacka).
+- Fix memory leak, which prevents tests to pass with address sanitizing (thanks to @Vladimir Rapatskiy).
+- Fix order of add_compile_options() and its targets in CMakeLists.txt.
+- Replace fail_fast's base with std::logic_error as per issue #69.
+- Update lest_cpp03.hpp to version 1.29.1 (Fix above conversion and sign-conversion warnings).
+
 version 0.21.0 2016-11-28
 
 - Add as_bytes() for basic_string_span<> (thanks to Magnus Bergsten, @Sillamacka).
