@@ -857,17 +857,17 @@ template< class T >
 class not_null
 {
 public:
-    gsl_api not_null(             T t         ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
-    gsl_api not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
+    gsl_api gsl_constexpr14 not_null(             T t         ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
+    gsl_api                 not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
 
-    gsl_api not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
-    gsl_api not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
+    gsl_api gsl_constexpr   not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
+    gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
     template< class U, class Dummy =
         typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
-    gsl_api not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
+    gsl_api gsl_constexpr not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
     template< class U, class Dummy =
         typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
@@ -880,10 +880,10 @@ public:
 #else
 
     template< class U >
-    gsl_api not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
+    gsl_api gsl_constexpr not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
 
     template< class U >
-    gsl_api not_null & operator=( not_null<U> const & other )
+    gsl_api gsl_constexpr not_null & operator=( not_null<U> const & other )
     {
         ptr_ = other.get();
         return *this;
@@ -900,7 +900,7 @@ private:
     gsl_api not_null & operator=( int );
 
 public:
-    gsl_api T get() const
+    gsl_api gsl_constexpr T get() const
     {
 #if gsl_HAVE_NULLPTR && gsl_COMPILER_MSVC_VERSION > 0
         // The assume() should help the optimizer:
@@ -909,11 +909,11 @@ public:
         return ptr_;
     }
 
-    gsl_api      operator T() const { return get(); }
-    gsl_api T    operator->() const { return get(); }
+    gsl_api gsl_constexpr      operator T() const { return get(); }
+    gsl_api gsl_constexpr T    operator->() const { return get(); }
 
-    gsl_api bool operator==(T const & rhs) const { return    ptr_ == rhs; }
-    gsl_api bool operator!=(T const & rhs) const { return !(*this == rhs); }
+    gsl_api gsl_constexpr bool operator==(T const & rhs) const { return    ptr_ == rhs; }
+    gsl_api gsl_constexpr bool operator!=(T const & rhs) const { return !(*this == rhs); }
 
 private:
     T ptr_;
