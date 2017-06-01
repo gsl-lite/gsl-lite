@@ -25,6 +25,21 @@ CASE( "gsl-lite version" "[.version]" )
     gsl_PRESENT( gsl_lite_VERSION );
 }
 
+CASE( "C++ compiler: compiler version" "[.compiler]" )
+{
+#if gsl_COMPILER_GNUC_VERSION
+    gsl_PRESENT( gsl_COMPILER_GNUC_VERSION );
+#else
+    gsl_ABSENT(  gsl_COMPILER_GNUC_VERSION );
+#endif
+
+#if gsl_COMPILER_MSVC_VERSION
+    gsl_PRESENT( gsl_COMPILER_MSVC_VERSION );
+#else
+    gsl_ABSENT(  gsl_COMPILER_MSVC_VERSION );
+#endif
+}
+
 CASE( "__cplusplus" "[.stdc++]" )
 {
     gsl_PRESENT( __cplusplus );
@@ -93,6 +108,12 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
     gsl_PRESENT( gsl_HAVE_CONSTEXPR_14 );
 #else
     gsl_ABSENT(  gsl_HAVE_CONSTEXPR_14 );
+#endif
+
+#if gsl_HAVE_DECLTYPE_AUTO
+    gsl_PRESENT( gsl_HAVE_DECLTYPE_AUTO );
+#else
+    gsl_ABSENT(  gsl_HAVE_DECLTYPE_AUTO );
 #endif
 
 #if gsl_HAVE_ENUM_CLASS
