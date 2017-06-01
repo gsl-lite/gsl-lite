@@ -364,6 +364,8 @@ not_null<>: Allows to construct from a not_null related pointer type
 not_null<>: Allows assignment from a not_null related pointer type
 not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
+not_null<>: Allows indirect member access
+not_null<>: Allows dereferencing
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
 span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)

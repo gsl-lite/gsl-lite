@@ -187,8 +187,24 @@ CASE( "not_null<>: Allows implicit conversion to underlying type" )
     int i = 12;
     not_null< int* > p = &i;
 
-    EXPECT( *p == i );
     EXPECT( F::helper( p ) );
+}
+
+CASE( "not_null<>: Allows indirect member access" )
+{
+    struct S { char c; int i; } s = { 'a', 7 };
+    not_null< S* > p = &s;
+
+    EXPECT( p->c == 'a' );
+    EXPECT( p->i ==  7  );
+}
+
+CASE( "not_null<>: Allows dereferencing" )
+{
+    int i = 12;
+    not_null< int* > p = &i;
+
+    EXPECT( *p == i );
 }
 
 // end of file
