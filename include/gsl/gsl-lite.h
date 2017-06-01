@@ -163,6 +163,10 @@
 # define gsl_HAVE_CONSTEXPR_14  1
 #endif
 
+#if gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
+# define gsl_HAVE_DECLTYPE_AUTO  1
+#endif
+
 // Presence of C++17 language features:
 
 #if gsl_CPP17_OR_GREATER
@@ -911,6 +915,10 @@ public:
 
     gsl_api gsl_constexpr      operator T() const { return get(); }
     gsl_api gsl_constexpr T    operator->() const { return get(); }
+
+#if gsl_HAVE_DECLTYPE_AUTO
+    gsl_api gsl_constexpr decltype(auto) operator*() const { return *get(); }
+#endif
 
     gsl_api gsl_constexpr bool operator==(T const & rhs) const { return    ptr_ == rhs; }
     gsl_api gsl_constexpr bool operator!=(T const & rhs) const { return !(*this == rhs); }
