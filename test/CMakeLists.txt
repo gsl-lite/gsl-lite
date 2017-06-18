@@ -19,16 +19,16 @@ set( HAS_STD_FLAGS  FALSE )
 set( HAS_CPP11_FLAG FALSE )
 set( HAS_CPP14_FLAG FALSE )
 
-if( ${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC )
+if( MSVC )
     add_compile_options( -W3 -EHsc -D_SCL_SECURE_NO_WARNINGS )
 
-elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" OR
-        ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" )
+elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
+        CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
 
     set( HAS_STD_FLAGS TRUE )
 
     # GNU: available -std flags depends on version
-    if( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" )
+    if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
         execute_process(
             COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 
@@ -60,7 +60,7 @@ elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU" OR
         target_compile_options( gsl-lite-cpp14.t  PUBLIC -std=c++14 )
     endif()
 
-elseif( ${CMAKE_CXX_COMPILER_ID} MATCHES "Intel" )
+elseif( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
 # as is
 else()
 # as is
