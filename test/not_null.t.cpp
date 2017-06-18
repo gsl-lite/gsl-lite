@@ -190,9 +190,15 @@ CASE( "not_null<>: Allows implicit conversion to underlying type" )
     EXPECT( F::helper( p ) );
 }
 
+namespace nonlocal
+{
+    struct S { char c; int i; };
+}
+
 CASE( "not_null<>: Allows indirect member access" )
 {
-    struct S { char c; int i; } s = { 'a', 7 };
+    using namespace nonlocal;
+    S s = { 'a', 7 };
     not_null< S* > p = &s;
 
     EXPECT( p->c == 'a' );
