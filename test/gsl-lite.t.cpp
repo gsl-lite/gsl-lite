@@ -27,13 +27,13 @@ CASE( "gsl-lite version" "[.version]" )
 
 CASE( "C++ compiler: compiler version" "[.compiler]" )
 {
-#if gsl_COMPILER_GNUC_VERSION
+#ifdef gsl_COMPILER_GNUC_VERSION
     gsl_PRESENT( gsl_COMPILER_GNUC_VERSION );
 #else
     gsl_ABSENT(  gsl_COMPILER_GNUC_VERSION );
 #endif
 
-#if gsl_COMPILER_MSVC_VERSION
+#ifdef gsl_COMPILER_MSVC_VERSION
     gsl_PRESENT( gsl_COMPILER_MSVC_VERSION );
 #else
     gsl_ABSENT(  gsl_COMPILER_MSVC_VERSION );
@@ -197,7 +197,7 @@ CASE( "Presence of C++ library features" "[.stdlibrary]" )
     gsl_ABSENT(  gsl_HAVE_TYPE_TRAITS );
 #endif
 
-#if _HAS_CPP0X
+#ifdef _HAS_CPP0X
     gsl_PRESENT( _HAS_CPP0X );
 #else
     gsl_ABSENT(  _HAS_CPP0X );
