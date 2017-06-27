@@ -1347,7 +1347,7 @@ CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
 CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++11)" )
 {
 # if gsl_HAVE_UNIQUE_PTR
-# if gsl_HAVE_MAKE_SHARED
+# if gsl_HAVE_MAKE_UNIQUE
     auto arr = std::make_unique<size_t[]>(4);
 #else
     auto arr = std::unique_ptr<size_t[]>( new size_t[4] );
