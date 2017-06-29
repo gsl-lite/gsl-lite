@@ -110,9 +110,9 @@
 
 // Compiler detection (C++17 is speculative):
 
-#define gsl_CPP11_OR_GREATER  ( __cplusplus >= 201103L )
-#define gsl_CPP14_OR_GREATER  ( __cplusplus >= 201402L )
-#define gsl_CPP17_OR_GREATER  ( __cplusplus >= 201700L )
+#define gsl_CPP11_OR_GREATER  (__cplusplus >= 201103L )
+#define gsl_CPP14_OR_GREATER  (__cplusplus >= 201402L )
+#define gsl_CPP17_OR_GREATER  (__cplusplus >= 201700L )
 
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
@@ -126,32 +126,30 @@
 
 // Note: simplistic version computation; works for GCC versions on http://godbolt.org/
 #if defined(__GNUC__) && !defined(__clang__)
-# define gsl_COMPILER_GCC_VERSION  ( 10 * (10 *__GNUC__ + __GNUC_MINOR__) + __GNUC_PATCHLEVEL__)
+# define gsl_COMPILER_GNUC_VERSION  ( 10 * (10 *__GNUC__ + __GNUC_MINOR__) + __GNUC_PATCHLEVEL__)
 #else
-# define gsl_COMPILER_GCC_VERSION  0
+# define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
 // Presence of C++11 language features:
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10
-# define gsl_HAVE_AUTO  1
-# define gsl_HAVE_NULLPTR  1
-#endif
+#define gsl_CPP11_10  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10)
+#define gsl_CPP11_12  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12)
+#define gsl_CPP11_14  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14)
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
-# define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  1
-#endif
+#define gsl_HAVE_AUTO     gsl_CPP11_10
+#define gsl_HAVE_NULLPTR  gsl_CPP11_10
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
-# define gsl_HAVE_ALIAS_TEMPLATE  1
-# define gsl_HAVE_CONSTEXPR_11  1
-# define gsl_HAVE_ENUM_CLASS  1
-# define gsl_HAVE_EXPLICIT_CONVERSION  1
-# define gsl_HAVE_INITIALIZER_LIST  1
-# define gsl_HAVE_IS_DEFAULT  1
-# define gsl_HAVE_IS_DELETE  1
-# define gsl_HAVE_NOEXCEPT  1
-#endif
+#define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_12
+
+#define gsl_HAVE_ALIAS_TEMPLATE       gsl_CPP11_14
+#define gsl_HAVE_CONSTEXPR_11         gsl_CPP11_14
+#define gsl_HAVE_ENUM_CLASS           gsl_CPP11_14
+#define gsl_HAVE_EXPLICIT_CONVERSION  gsl_CPP11_14
+#define gsl_HAVE_INITIALIZER_LIST     gsl_CPP11_14
+#define gsl_HAVE_IS_DEFAULT           gsl_CPP11_14
+#define gsl_HAVE_IS_DELETE            gsl_CPP11_14
+#define gsl_HAVE_NOEXCEPT             gsl_CPP11_14
 
 #if gsl_CPP11_OR_GREATER
 // see above
@@ -159,68 +157,56 @@
 
 // Presence of C++14 language features:
 
-#if gsl_CPP14_OR_GREATER
-# define gsl_HAVE_CONSTEXPR_14  1
-#endif
+#define gsl_CPP14_00  (gsl_CPP14_OR_GREATER)
+#define gsl_CPP14_14  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14)
 
-#if gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
-# define gsl_HAVE_DECLTYPE_AUTO  1
-#endif
+#define gsl_HAVE_CONSTEXPR_14   gsl_CPP14_00
+#define gsl_HAVE_DECLTYPE_AUTO  gsl_CPP14_14
 
 // Presence of C++17 language features:
 
-#if gsl_CPP17_OR_GREATER
-# define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  1
-#endif
+#define gsl_CPP17_00  (gsl_CPP17_OR_GREATER)
+#define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_00
 
 // Presence of C++ library features:
 
-#if gsl_COMPILER_GCC_VERSION
-# define gsl_HAVE_TR1_TYPE_TRAITS  1
+#ifdef _HAS_CPP0X
+# define gsl_HAS_CPP0X  _HAS_CPP0X
+#else
+# define gsl_HAS_CPP0X  0
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
-# define gsl_HAVE_ARRAY  1
-# define gsl_HAVE_TR1_TYPE_TRAITS  1
-#endif
+#define gsl_CPP11_LA                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11)
+#define gsl_HAVE_ARRAY                  gsl_CPP11_LA
+#define gsl_HAVE_TR1_TYPE_TRAITS        gsl_CPP11_LA
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14 || (gsl_COMPILER_MSVC_VERSION >= 9 && _HAS_CPP0X)
-# define gsl_HAVE_CONTAINER_DATA_METHOD  1
-#endif
+#define gsl_CPP11_LB                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14 || (gsl_COMPILER_MSVC_VERSION >= 9 && gsl_HAS_CPP0X))
+#define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_LB
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14
-# define gsl_HAVE_SIZED_TYPES  1
-#endif
+#define gsl_CPP11_LC                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14)
+#define gsl_HAVE_SIZED_TYPES            gsl_CPP11_LC
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14 || (gsl_COMPILER_MSVC_VERSION >= 10 && _HAS_CPP0X)
-# define gsl_HAVE_SHARED_PTR  1
-# define gsl_HAVE_UNIQUE_PTR  1
-#endif
+#define gsl_CPP11_LD                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14 || (gsl_COMPILER_MSVC_VERSION >= 10 && gsl_HAS_CPP0X))
+#define gsl_HAVE_MAKE_SHARED            gsl_CPP11_LD
+#define gsl_HAVE_SHARED_PTR             gsl_CPP11_LD
+#define gsl_HAVE_UNIQUE_PTR             gsl_CPP11_LD
 
-#if gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
-# define gsl_HAVE_MAKE_UNIQUE  1
-#endif
+#define gsl_CPP14_LA                   (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12)
+#define gsl_HAVE_MAKE_UNIQUE            gsl_CPP14_LA
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
-# define gsl_HAVE_TYPE_TRAITS  1
-#endif
+#define gsl_HAVE_TYPE_TRAITS           (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11)
 
-#if gsl_HAVE_TYPE_TRAITS
-# define gsl_HAVE_ADD_CONST  1
-# define gsl_HAVE_INTEGRAL_CONSTANT  1
-# define gsl_HAVE_REMOVE_REFERENCE  1
-#elif gsl_HAVE_TR1_TYPE_TRAITS
-# define gsl_HAVE_TR1_ADD_CONST  1
-# define gsl_HAVE_TR1_INTEGRAL_CONSTANT  1
-# define gsl_HAVE_TR1_REMOVE_REFERENCE  1
-#endif
+#define gsl_HAVE_ADD_CONST              gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_INTEGRAL_CONSTANT      gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_REMOVE_CONST           gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_REMOVE_REFERENCE       gsl_HAVE_TYPE_TRAITS
 
-// For the rest, consider VC12, VC14 as C++11 for GSL Lite:
+#define gsl_HAVE_TR1_ADD_CONST          gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_TR1_INTEGRAL_CONSTANT  gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_TR1_REMOVE_CONST       gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_TR1_REMOVE_REFERENCE   gsl_HAVE_TR1_TYPE_TRAITS
 
-#if gsl_COMPILER_MSVC_VERSION >= 12
-# undef  gsl_CPP11_OR_GREATER
-# define gsl_CPP11_OR_GREATER  1
-#endif
+// For the rest, consider VC12, VC14 as C++11 for GSL Lite.
 
 // C++ feature usage:
 
@@ -262,9 +248,8 @@
 
 // Other features:
 
-#if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD
-# define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR   1
-#endif
+#define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR  \
+    ( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD )
 
 // Note: !defined(__NVCC__) doesn't work with nvcc here:
 #define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR  \
@@ -441,7 +426,7 @@ struct fail_fast : public std::logic_error
 
 // workaround for gcc 5 throw/terminate constexpr bug:
 
-#if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 430, 600 ) && gsl_HAVE_CONSTEXPR_14
+#if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600 ) && gsl_HAVE_CONSTEXPR_14
 
 # if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
 
@@ -486,7 +471,7 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
 // GSL.util: utilities
 //
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 11
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
 
 template< class F >
 class final_act
@@ -641,7 +626,7 @@ gsl_api inline final_act_error<F> on_error( F && action ) gsl_noexcept
 
 #endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 
-#else // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 11
+#else // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11
 
 class final_act
 {
@@ -743,7 +728,7 @@ gsl_api inline final_act_error on_error( F const & action )
 
 #endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 11
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
 
 template< class T, class U >
 gsl_api inline gsl_constexpr T narrow_cast( U && u ) gsl_noexcept
@@ -759,7 +744,7 @@ gsl_api inline T narrow_cast( U u ) gsl_noexcept
     return static_cast<T>( u );
 }
 
-#endif // gsl_CPP11_OR_GREATER
+#endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
 
 struct narrowing_error : public std::exception {};
 
@@ -1244,7 +1229,7 @@ public:
     {}
 #endif
 
-#if gsl_HAVE_IS_DEFAULT && ! gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 430, 600)
+#if gsl_HAVE_IS_DEFAULT && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
     gsl_api gsl_constexpr14 span( span && ) = default;
     gsl_api gsl_constexpr14 span( span const & ) = default;
 #else
@@ -1749,7 +1734,7 @@ public:
     {}
 
 #if gsl_HAVE_IS_DEFAULT
-# if gsl_BETWEEN( gsl_COMPILER_GCC_VERSION, 440, 600 )
+# if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
 
     gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
@@ -1769,7 +1754,7 @@ public:
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() )
     {}
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
     template< class U
         , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value >::type
     >
@@ -2236,7 +2221,7 @@ ensure_z( Cont & cont )
 
 } // namespace gsl
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
 
 namespace std {
 
