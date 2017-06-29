@@ -35,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.29.1"
+#define  lest_VERSION "1.30.1"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -85,9 +85,7 @@
 # define lest_COMPILER_IS_MSVC6  1
 #endif
 
-#if ( __cplusplus >= 201103L ) || lest_COMPILER_MSVC_VERSION >= 12
-# define lest_CPP11_OR_GREATER  1
-#endif
+#define lest_CPP11_OR_GREATER  ((__cplusplus >= 201103L ) || lest_COMPILER_MSVC_VERSION >= 12)
 
 #if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 
