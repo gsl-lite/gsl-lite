@@ -1,5 +1,24 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.24.0 2017-07-10
+
+- Add try it online badge.
+- Implement to_byte(), to_integer() for C++17 per issue #75 (thanks to David Mugnai, @cinghiale).
+
+version 0.23.0 2017-06-29
+
+- Enable use of option -Wundef per issue #74.
+- Update lest to version 1.30.1.
+- Check macro via #ifdef if possibly undefined (support -Wundef).
+- Fix check for make_unique().
+- Fix CMake compiler selection.
+- Make struct definition nonlocal for C++98, C++03.
+- Add not_null<> tests for member access and dereferencing.
+- Add dereference operator to not_null<> per issue #73.
+- Add compiler version information.
+- Add constexpr to not_null<>.
+- Report gsl_CPP11_OR_GREATER etc.
+
 version 0.22.0 2017-04-27
 
 - Add operator<< for string_span (thanks to Magnus Bergsten, @Sillamacka).
