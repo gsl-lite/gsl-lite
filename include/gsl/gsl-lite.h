@@ -941,7 +941,7 @@ template< class T >
 gsl_api inline gsl_constexpr byte to_byte( T v ) gsl_noexcept
 {
 #if    gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
-    static_assert( false, "Implement to_byte() using conversion from underlying type." );
+    return static_cast<byte>( v );
 #elif  gsl_HAVE_CONSTEXPR_11
     return { static_cast<typename byte::type>( v ) };
 #else
@@ -953,7 +953,7 @@ template< class IntegerType  gsl_ENABLE_IF_INTEGRAL_T( IntegerType ) >
 gsl_api inline gsl_constexpr IntegerType to_integer( byte b ) gsl_noexcept
 {
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
-    static_assert( false, "Implement to_integer() using conversion from underlying type." );
+    return static_cast<typename std::underlying_type<byte>::type>( b );
 #else
     return b.v;
 #endif
