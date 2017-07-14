@@ -439,7 +439,7 @@ gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * co
 
 gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond ) -> void
 {
-	struct F { static gsl_constexpr14 void f(){}; };
+    struct F { static gsl_constexpr14 void f(){}; };
 
     !cond ? std::terminate() : F::f();
 }
