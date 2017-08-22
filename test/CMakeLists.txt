@@ -76,6 +76,7 @@ else()
 endif()
 
 add_executable( gsl-lite.t ${SOURCES} )
+target_link_libraries( gsl-lite.t gsl_lite )
 
 # configure unit tests via CTest:
 

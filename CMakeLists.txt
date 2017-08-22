@@ -9,6 +9,9 @@ cmake_minimum_required( VERSION 2.8 )
 
 project( gsl_lite )
 
+add_library(    gsl_lite INTERFACE )
+target_sources( gsl_lite INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis )
+
 enable_testing()
 
 add_subdirectory( test )
