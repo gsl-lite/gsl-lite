@@ -914,8 +914,7 @@ public:
     gsl_api gsl_constexpr bool operator!=(T const & rhs) const { return !(*this == rhs); }
 
 private:
-    T ptr_;
-
+    // unwanted operators...pointers only point to single objects!
     gsl_api not_null & operator++();
     gsl_api not_null & operator--();
     gsl_api not_null   operator++( int );
@@ -924,6 +923,12 @@ private:
     gsl_api not_null & operator+=( size_t );
     gsl_api not_null & operator- ( size_t );
     gsl_api not_null & operator-=( size_t );
+    gsl_api not_null & operator+=( std::ptrdiff_t );
+    gsl_api not_null & operator-=( std::ptrdiff_t );
+    gsl_api void       operator[]( std::ptrdiff_t ) const;
+
+private:
+    T ptr_;
 };
 
 //
