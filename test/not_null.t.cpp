@@ -213,4 +213,128 @@ CASE( "not_null<>: Allows dereferencing" )
     EXPECT( *p == i );
 }
 
+namespace {
+
+// provide not_null pointers to compare:
+
+struct NotNull
+{
+    int    v1; int          v2;
+    int * pv1; int const * pv2;
+
+    NotNull()
+    :  v1(   7 ),  v2(  42 )
+    , pv1( &v1 ), pv2( &v2 ) {}
+
+    not_null<int       *> p1() const { return pv1; }
+    not_null<int const *> p2() const { return pv2; }
+};
+}
+
+CASE( "not_null<>: Allows to compare equal to another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT(     _.p1() == _.p1() );
+    EXPECT_NOT( _.p1() == _.p2() );
+}
+
+CASE( "not_null<>: Allows to compare unequal to another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT(     _.p1() != _.p2() );
+    EXPECT_NOT( _.p1() != _.p1() );
+}
+
+CASE( "not_null<>: Allows to compare less than another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT_NOT( _.p1() < _.p1() );
+    EXPECT(   ( _.p1() < _.p2() ) == ( _.pv1 < _.pv2 ) );
+    EXPECT(   ( _.p2() < _.p1() ) == ( _.pv2 < _.pv1 ) );
+}
+
+CASE( "not_null<>: Allows to compare less than or equal to another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT( ( _.p1() <= _.p1() ) );
+    EXPECT( ( _.p1() <= _.p2() ) == ( _.pv1 <= _.pv2 ) );
+    EXPECT( ( _.p2() <= _.p1() ) == ( _.pv2 <= _.pv1 ) );
+}
+
+CASE( "not_null<>: Allows to compare greater than another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT_NOT( _.p1() > _.p1() );
+    EXPECT(   ( _.p1() > _.p2() ) == ( _.pv1 > _.pv2 ) );
+    EXPECT(   ( _.p2() > _.p1() ) == ( _.pv2 > _.pv1 ) );
+}
+
+CASE( "not_null<>: Allows to compare greater than or equal to another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT(   _.p1() >= _.p1() );
+    EXPECT( ( _.p1() >= _.p2() ) == ( _.pv1 >= _.pv2 ) );
+    EXPECT( ( _.p2() >= _.p1() ) == ( _.pv2 >= _.pv1 ) );
+}
+
+// raw pointer
+
+CASE( "not_null<>: Allows to compare equal to a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT(     _.p1() == _.pv1 );
+    EXPECT_NOT( _.p1() == _.pv2 );
+}
+
+CASE( "not_null<>: Allows to compare unequal to a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT(     _.p1() != _.pv2 );
+    EXPECT_NOT( _.p1() != _.pv1 );
+}
+
+CASE( "not_null<>: Allows to compare less than a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT_NOT( _.p1() < _.pv1 );
+    EXPECT(   ( _.p1() < _.pv2 ) == ( _.pv1 < _.pv2 ) );
+    EXPECT(   ( _.p2() < _.pv1 ) == ( _.pv2 < _.pv1 ) );
+}
+
+CASE( "not_null<>: Allows to compare less than or equal to a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT( ( _.p1() <= _.pv1 ) );
+    EXPECT( ( _.p1() <= _.pv2 ) == ( _.pv1 <= _.pv2 ) );
+    EXPECT( ( _.p2() <= _.pv1 ) == ( _.pv2 <= _.pv1 ) );
+}
+
+CASE( "not_null<>: Allows to compare greater than a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT_NOT( _.p1() > _.pv1 );
+    EXPECT(   ( _.p1() > _.pv2 ) == ( _.pv1 > _.pv2 ) );
+    EXPECT(   ( _.p2() > _.pv1 ) == ( _.pv2 > _.pv1 ) );
+}
+
+CASE( "not_null<>: Allows to compare greater than or equal to a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT(   _.p1() >= _.pv1 );
+    EXPECT( ( _.p1() >= _.pv2 ) == ( _.pv1 >= _.pv2 ) );
+    EXPECT( ( _.p2() >= _.pv1 ) == ( _.pv2 >= _.pv1 ) );
+}
+
 // end of file

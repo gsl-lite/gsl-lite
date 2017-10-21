@@ -910,9 +910,6 @@ public:
     gsl_api gsl_constexpr decltype(auto) operator*() const { return *get(); }
 #endif
 
-    gsl_api gsl_constexpr bool operator==(T const & rhs) const { return    ptr_ == rhs; }
-    gsl_api gsl_constexpr bool operator!=(T const & rhs) const { return !(*this == rhs); }
-
 private:
     // unwanted operators...pointers only point to single objects!
     gsl_api not_null & operator++();
@@ -930,6 +927,42 @@ private:
 private:
     T ptr_;
 };
+
+template< class T, class U >
+gsl_api inline gsl_constexpr14 bool operator==( not_null<T> const & l, not_null<U> const & r )
+{
+    return  l.get() == r.get();
+}
+
+template< class T, class U >
+gsl_api inline gsl_constexpr14 bool operator< ( not_null<U> const & l, not_null<U> const & r )
+{
+    return l.get() < r.get();
+}
+
+template< class T, class U >
+gsl_api inline gsl_constexpr14 bool operator!=( not_null<U> const & l, not_null<U> const & r )
+{
+    return !( l == r );
+}
+
+template< class T, class U >
+gsl_api inline gsl_constexpr14 bool operator<=( not_null<U> const & l, not_null<U> const & r )
+{
+    return !( r < l );
+}
+
+template< class T, class U >
+gsl_api inline gsl_constexpr14 bool operator> ( not_null<U> const & l, not_null<U> const & r )
+{
+    return ( r < l );
+}
+
+template< class T, class U >
+gsl_api inline gsl_constexpr14 bool operator>=( not_null<U> const & l, not_null<U> const & r )
+{
+    return !( l < r );
+}
 
 // more unwanted operators
 
