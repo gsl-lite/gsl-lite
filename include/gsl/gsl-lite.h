@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.24.0"
+#define  gsl_lite_VERSION "0.25.0-beta"
 
 // gsl-lite backward compatibility:
 
@@ -376,8 +376,13 @@ struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
 # endif
 #endif
 
-#if gsl_HAVE_ALIAS_TEMPLATE
+#if  gsl_HAVE_ALIAS_TEMPLATE
+# if gsl_HAVE_TYPE_TRAITS
+  template< class T, class = typename std::enable_if< std::is_pointer<T>::value >::type >
+  using owner = T;
+# else
   template< class T > using owner = T;
+# endif
 #else
   template< class T > struct owner { typedef T type; };
 #endif
