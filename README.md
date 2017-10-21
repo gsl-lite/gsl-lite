@@ -366,8 +366,21 @@ not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
 not_null<>: Allows indirect member access
 not_null<>: Allows dereferencing
+not_null<>: Allows to compare equal to another not_null of the same type
+not_null<>: Allows to compare unequal to another not_null of the same type
+not_null<>: Allows to compare less than another not_null of the same type
+not_null<>: Allows to compare less than or equal to another not_null of the same type
+not_null<>: Allows to compare greater than another not_null of the same type
+not_null<>: Allows to compare greater than or equal to another not_null of the same type
+not_null<>: Allows to compare equal to a raw pointer of the same type
+not_null<>: Allows to compare unequal to a raw pointer of the same type
+not_null<>: Allows to compare less than a raw pointer of the same type
+not_null<>: Allows to compare less than or equal to a raw pointer of the same type
+not_null<>: Allows to compare greater than a raw pointer of the same type
+not_null<>: Allows to compare greater than or equal to a raw pointer of the same type
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
+owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 span<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 span<>: Disallows construction from a std::array of incompatible type (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
