@@ -931,6 +931,20 @@ private:
     T ptr_;
 };
 
+// more unwanted operators
+
+template< class T, class U >
+std::ptrdiff_t operator-( not_null<T> const &, not_null<U> const & );
+
+template< class T >
+not_null<T> operator-( not_null<T> const &, std::ptrdiff_t );
+
+template< class T >
+not_null<T> operator+( not_null<T> const &, std::ptrdiff_t );
+
+template< class T >
+not_null<T> operator+( std::ptrdiff_t, not_null<T> const & );
+
 //
 // Byte-specific type.
 //
