@@ -928,6 +928,23 @@ private:
     T ptr_;
 };
 
+// more not_null unwanted operators
+
+template< class T, class U >
+std::ptrdiff_t operator-( not_null<T> const &, not_null<U> const & );
+
+template< class T >
+not_null<T> operator-( not_null<T> const &, std::ptrdiff_t );
+
+template< class T >
+not_null<T> operator+( not_null<T> const &, std::ptrdiff_t );
+
+template< class T >
+not_null<T> operator+( std::ptrdiff_t, not_null<T> const & );
+
+
+// not_null comparisons
+
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator==( not_null<T> const & l, not_null<U> const & r )
 {
@@ -963,20 +980,6 @@ gsl_api inline gsl_constexpr14 bool operator>=( not_null<U> const & l, not_null<
 {
     return !( l < r );
 }
-
-// more unwanted operators
-
-template< class T, class U >
-std::ptrdiff_t operator-( not_null<T> const &, not_null<U> const & );
-
-template< class T >
-not_null<T> operator-( not_null<T> const &, std::ptrdiff_t );
-
-template< class T >
-not_null<T> operator+( not_null<T> const &, std::ptrdiff_t );
-
-template< class T >
-not_null<T> operator+( std::ptrdiff_t, not_null<T> const & );
 
 //
 // Byte-specific type.
