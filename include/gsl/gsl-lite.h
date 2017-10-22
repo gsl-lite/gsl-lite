@@ -883,12 +883,9 @@ public:
     }
 #endif
 
-    gsl_api gsl_constexpr T get() const
+    gsl_api gsl_constexpr14 T get() const
     {
-#if gsl_HAVE_NULLPTR && gsl_COMPILER_MSVC_VERSION > 0
-        // The assume() should help the optimizer:
-        __assume( ptr_ != nullptr );
-#endif
+        Ensures( ptr_ != nullptr );
         return ptr_;
     }
 
