@@ -17,6 +17,17 @@
 
 #include "gsl-lite.t.h"
 
+CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
+{
+#if  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+# if gsl_HAVE_TYPE_TRAITS
+    owner<int> p = gsl_nullptr;
+# else
+    EXPECT( !!"owner<> alias template restricted to pointer type is not available." );
+# endif
+#endif
+}
+
 CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 {
 #if gsl_HAVE_OWNER_TEMPLATE
@@ -60,17 +71,6 @@ CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
     delete p;
 #else
     EXPECT( !!"Owner() macro is not available." );
-#endif
-}
-
-CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
-{
-#if  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# if gsl_HAVE_TYPE_TRAITS
-    owner<int> p = gsl_nullptr;
-# else
-    EXPECT( !!"owner<> alias template restricted to pointer type is not available." );
-# endif
 #endif
 }
 
