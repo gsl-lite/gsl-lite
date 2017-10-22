@@ -845,8 +845,8 @@ template< class T >
 class not_null
 {
 public:
-    gsl_api gsl_constexpr14 not_null(             T t         ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
-    gsl_api                 not_null & operator=( T const & t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
+    gsl_api gsl_constexpr14 not_null(             T t ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
+    gsl_api                 not_null & operator=( T t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
 
     gsl_api gsl_constexpr   not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
