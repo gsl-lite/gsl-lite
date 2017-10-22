@@ -848,27 +848,32 @@ public:
     gsl_api gsl_constexpr14 not_null(             T t ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
     gsl_api                 not_null & operator=( T t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
 
+#if gsl_HAVE_IS_DEFAULT
+    gsl_api gsl_constexpr   not_null(             not_null const & other ) = default;
+    gsl_api                 not_null & operator=( not_null const & other ) = default;
+#else
     gsl_api gsl_constexpr   not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
+#endif
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 
-    template< class U, class Dummy =
-        typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
-    gsl_api gsl_constexpr not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
+    template< class U, class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
+    gsl_api gsl_constexpr not_null( not_null<U> const & other )
+    : ptr_( other.get() )
+    {}
 
-    template< class U, class Dummy =
-        typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
+    template< class U, class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
     gsl_api not_null & operator=( not_null<U> const & other )
     {
         ptr_ = other.get();
         return *this;
     }
-
 #else
-
     template< class U >
-    gsl_api gsl_constexpr not_null( not_null<U> const & other ) : ptr_( other.get() ) {}
+    gsl_api gsl_constexpr not_null( not_null<U> const & other )
+    : ptr_( other.get() )
+    {}
 
     template< class U >
     gsl_api gsl_constexpr not_null & operator=( not_null<U> const & other )
