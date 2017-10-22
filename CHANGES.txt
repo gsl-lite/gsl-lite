@@ -1,5 +1,14 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.25.0 2017-10-22
+
+- Restrict owner<T> to pointers if possible, per issue #80.
+- Introduce gsl_is_delete, per issue #81.
+- Add deleted operators for not_null<>, per issue #82.
+- Add more comparison operators for not_null<>, per issue #83.
+- Use = default for not_null copy assignment/construction if available.
+- Take parameter in not_null assignment by value as in ctor.
+
 version 0.24.0 2017-07-10
 
 - Add try it online badge.
