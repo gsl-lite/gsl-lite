@@ -233,15 +233,15 @@
 #endif
 
 #if gsl_HAVE_IS_DELETE
-# define gsl_IS_DELETE = delete
+# define gsl_is_delete = delete
 #else
-# define gsl_IS_DELETE
+# define gsl_is_delete
 #endif
 
 #if gsl_HAVE_IS_DELETE
-# define gsl_IS_DELETE_ACCESS public:
+# define gsl_is_delete_access public
 #else
-# define gsl_IS_DELETE_ACCESS private:
+# define gsl_is_delete_access private
 #endif
 
 #if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
@@ -512,9 +512,9 @@ public:
             action_();
     }
 
-gsl_IS_DELETE_ACCESS
-    gsl_api final_act( final_act const  & ) gsl_IS_DELETE;
-    gsl_api final_act & operator=( final_act const & ) gsl_IS_DELETE;
+gsl_is_delete_access:
+    gsl_api final_act( final_act const  & ) gsl_is_delete;
+    gsl_api final_act & operator=( final_act const & ) gsl_is_delete;
 
 protected:
     gsl_api void dismiss() gsl_noexcept
@@ -571,9 +571,9 @@ public:
             this->dismiss();
     }
 
-gsl_IS_DELETE_ACCESS
-    gsl_api final_act_return( final_act_return const & ) gsl_IS_DELETE;
-    gsl_api final_act_return & operator=( final_act_return const & ) gsl_IS_DELETE;
+gsl_is_delete_access:
+    gsl_api final_act_return( final_act_return const & ) gsl_is_delete;
+    gsl_api final_act_return & operator=( final_act_return const & ) gsl_is_delete;
 };
 
 template< class F >
@@ -606,9 +606,9 @@ public:
             this->dismiss();
     }
 
-gsl_IS_DELETE_ACCESS
-    gsl_api final_act_error( final_act_error const & ) gsl_IS_DELETE;
-    gsl_api final_act_error & operator=( final_act_error const & ) gsl_IS_DELETE;
+gsl_is_delete_access:
+    gsl_api final_act_error( final_act_error const & ) gsl_is_delete;
+    gsl_api final_act_error & operator=( final_act_error const & ) gsl_is_delete;
 };
 
 template< class F >
@@ -899,28 +899,28 @@ public:
     gsl_api gsl_constexpr decltype(auto) operator*() const { return *get(); }
 #endif
 
-gsl_IS_DELETE_ACCESS
+gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE_NULLPTR
-    gsl_api not_null(             std::nullptr_t ) gsl_IS_DELETE;
-    gsl_api not_null & operator=( std::nullptr_t ) gsl_IS_DELETE;
+    gsl_api not_null(             std::nullptr_t ) gsl_is_delete;
+    gsl_api not_null & operator=( std::nullptr_t ) gsl_is_delete;
 #else
-    gsl_api not_null(             int ) gsl_IS_DELETE;
-    gsl_api not_null & operator=( int ) gsl_IS_DELETE;
+    gsl_api not_null(             int ) gsl_is_delete;
+    gsl_api not_null & operator=( int ) gsl_is_delete;
 #endif
 
     // unwanted operators...pointers only point to single objects!
-    gsl_api not_null & operator++() gsl_IS_DELETE;
-    gsl_api not_null & operator--() gsl_IS_DELETE;
-    gsl_api not_null   operator++( int ) gsl_IS_DELETE;
-    gsl_api not_null   operator--( int ) gsl_IS_DELETE;
-    gsl_api not_null & operator+ ( size_t ) gsl_IS_DELETE;
-    gsl_api not_null & operator+=( size_t ) gsl_IS_DELETE;
-    gsl_api not_null & operator- ( size_t ) gsl_IS_DELETE;
-    gsl_api not_null & operator-=( size_t ) gsl_IS_DELETE;
-    gsl_api not_null & operator+=( std::ptrdiff_t ) gsl_IS_DELETE;
-    gsl_api not_null & operator-=( std::ptrdiff_t ) gsl_IS_DELETE;
-    gsl_api void       operator[]( std::ptrdiff_t ) const gsl_IS_DELETE;
+    gsl_api not_null & operator++() gsl_is_delete;
+    gsl_api not_null & operator--() gsl_is_delete;
+    gsl_api not_null   operator++( int ) gsl_is_delete;
+    gsl_api not_null   operator--( int ) gsl_is_delete;
+    gsl_api not_null & operator+ ( size_t ) gsl_is_delete;
+    gsl_api not_null & operator+=( size_t ) gsl_is_delete;
+    gsl_api not_null & operator- ( size_t ) gsl_is_delete;
+    gsl_api not_null & operator-=( size_t ) gsl_is_delete;
+    gsl_api not_null & operator+=( std::ptrdiff_t ) gsl_is_delete;
+    gsl_api not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
+    gsl_api void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
 
 private:
     T ptr_;
@@ -929,16 +929,16 @@ private:
 // more not_null unwanted operators
 
 template< class T, class U >
-std::ptrdiff_t operator-( not_null<T> const &, not_null<U> const & );
+std::ptrdiff_t operator-( not_null<T> const &, not_null<U> const & ) gsl_is_delete;
 
 template< class T >
-not_null<T> operator-( not_null<T> const &, std::ptrdiff_t );
+not_null<T> operator-( not_null<T> const &, std::ptrdiff_t ) gsl_is_delete;
 
 template< class T >
-not_null<T> operator+( not_null<T> const &, std::ptrdiff_t );
+not_null<T> operator+( not_null<T> const &, std::ptrdiff_t ) gsl_is_delete;
 
 template< class T >
-not_null<T> operator+( std::ptrdiff_t, not_null<T> const & );
+not_null<T> operator+( std::ptrdiff_t, not_null<T> const & ) gsl_is_delete;
 
 
 // not_null comparisons
