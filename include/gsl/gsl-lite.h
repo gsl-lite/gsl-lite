@@ -1707,8 +1707,8 @@ public:
     : span_( ptr, count )
     {}
 
-    gsl_api gsl_constexpr basic_string_span( pointer first, pointer last )
-    : span_( first, last )
+    gsl_api gsl_constexpr basic_string_span( pointer firstElem, pointer lastElem )
+    : span_( firstElem, lastElem )
     {}
 
     template< std::size_t N >
