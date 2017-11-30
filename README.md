@@ -83,6 +83,10 @@ Installation
 ------------
 *gsl-lite* is a single-file header-only library. Put `gsl-lite.h` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
 
+If you use [conan package manager](https://www.conan.io/), follow these steps -
+ - Add nonstd-lite to conan remotes - `conan remote add nonstd-lite https://api.bintray.com/conan/agauniyal/nonstd-lite`
+ - Add `gsl-lite/0.25.0@nonstd-lite/stable` to **`[requires]`** section in **`conanfile.txt`**
+ - Run `conan install` command
 
 Synopsis
 --------
