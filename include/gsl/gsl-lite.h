@@ -885,7 +885,7 @@ public:
 
     gsl_api gsl_constexpr14 T get() const
     {
-        Ensures( ptr_ != nullptr );
+        Ensures( ptr_ != gsl_nullptr );
         return ptr_;
     }
 
