@@ -515,6 +515,7 @@ public:
 gsl_is_delete_access:
     gsl_api final_act( final_act const  & ) gsl_is_delete;
     gsl_api final_act & operator=( final_act const & ) gsl_is_delete;
+    gsl_api final_act & operator=( final_act && ) gsl_is_delete;
 
 protected:
     gsl_api void dismiss() gsl_noexcept
@@ -849,10 +850,14 @@ public:
     gsl_api                 not_null & operator=( T t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
 
 #if gsl_HAVE_IS_DEFAULT
-    gsl_api gsl_constexpr   not_null(             not_null const & other ) = default;
+    gsl_api gsl_constexpr   not_null( not_null const & other ) = default;
+    gsl_api gsl_constexpr   not_null( not_null &&      other ) = default;
+    gsl_api                ~not_null() = default;
     gsl_api                 not_null & operator=( not_null const & other ) = default;
+    gsl_api                 not_null & operator=( not_null &&      other ) = default;
 #else
-    gsl_api gsl_constexpr   not_null(             not_null const & other ) : ptr_ ( other.ptr_  ) {}
+    gsl_api gsl_constexpr   not_null( not_null const & other ) : ptr_ ( other.ptr_  ) {}
+    gsl_api                ~not_null() {};
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 #endif
 
@@ -1301,6 +1306,12 @@ public:
     {}
 
 #if gsl_HAVE_IS_DEFAULT
+    ~span() = default;
+#else
+    ~span() {}
+#endif
+
+#if gsl_HAVE_IS_DEFAULT
     gsl_api span & operator=( span && ) = default;
     gsl_api span & operator=( span const & ) = default;
 #else
@@ -1437,19 +1448,19 @@ public:
 
     gsl_api span< const byte > as_bytes() const gsl_noexcept
     {
-        return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() );
+        return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() ); // NOLINT
     }
 
     gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
     {
-        return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() );
+        return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() ); // NOLINT
     }
 
     template< class U >
     gsl_api span< U > as_span() const gsl_noexcept
     {
         Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
-        return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) );
+        return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) ); // NOLINT
     }
 
 private:
@@ -1548,13 +1559,13 @@ gsl_api inline void copy( span<T> src, span<U> dest )
 template< class T >
 gsl_api inline span< const byte > as_bytes( span<T> spn ) gsl_noexcept
 {
-    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() );
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 template< class T>
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
-    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() );
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 template< class T >
@@ -1656,7 +1667,7 @@ gsl_api inline gsl_constexpr14 std::size_t string_length( T * ptr, std::size_t m
         return 0;
 
     std::size_t len = 0;
-    while ( len < max && ptr[len] )
+    while ( len < max && ptr[len] ) // NOLINT
         ++len;
 
     return len;
@@ -1806,7 +1817,7 @@ public:
 #endif
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
-    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() )
+    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12
@@ -1814,7 +1825,7 @@ public:
         , class = typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value >::type
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
-    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() )
+    : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
 #endif
 
@@ -2101,7 +2112,7 @@ gsl_api inline gsl_constexpr14 bool operator>=( U const & l, basic_string_span<T
 template< class T >
 gsl_api inline span< const byte > as_bytes( basic_string_span<T> spn ) gsl_noexcept
 {
-    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() );
+    return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 //
