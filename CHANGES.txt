@@ -1,5 +1,14 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.26.0 2017-12-09
+
+- Rename final_act to final_action per issue #89.
+- Make clang-tidy cppcoreguidelines checks pass per PR #91 (thanks to @poconbhui).
+- Fix nullptr to gsl_nullptr in not_nul::get() per PR #90 (thanks to @poconbhui).
+- Fix -Wshadow warning per PR #84 (thanks to @MikeLankamp).
+- Add conan installation instructions and badge (thanks to @agauniyal).
+- Add CMake install target per issue #85.
+
 version 0.25.0 2017-10-22
 
 - Restrict owner<T> to pointers if possible, per issue #80.
