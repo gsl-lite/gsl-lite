@@ -123,7 +123,7 @@ Define this macro to 0 to omit the `implicit` macro. Default is 1.
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
 
 \-D<b>gsl\_FEATURE\_EXPERIMENTAL\_RETURN\_GUARD</b>=0  
-Provide experimental types `final_act_return` and `final_act_error` and convenience functions `on_return()` and `on_error()`. Default is 0.
+Provide experimental types `final_action_return` and `final_action_error` and convenience functions `on_return()` and `on_error()`. Default is 0.
 
 ### Contract violation response macros
 
@@ -220,16 +220,16 @@ Expects()                   | &#10003;| &#10003;| &#10003;| Precondition asserti
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
-final_act<>                 | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
-final_act                   | -       | -       | < C++11 | Currently only void(*)() |
-finally()                   | &#10003;| &#10003;| >=C++11 | Make a final_act<> |
-finally()                   | -       | -       | < C++11 | Make a final_act |
-final_act_return            | -       | -       | < C++11 | Currently only void(*)(), [experimental](#feature-selection-macros) |
-on_return()                 | -       | -       | >=C++11 | Make a final_act_return<>, [experimental](#feature-selection-macros) |
-on_return()                 | -       | -       | < C++11 | Make a final_act_return, [experimental](#feature-selection-macros) |
-final_act_error             | -       | -       | < C++11 | Currently only void(*)(), [experimental](#feature-selection-macros) |
-on_error()                  | -       | -       | >=C++11 | Make a final_act_error<>, [experimental](#feature-selection-macros) |
-on_error()                  | -       | -       | < C++11 | Make a final_act_error, [experimental](#feature-selection-macros) |
+final_action<>              | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
+final_action                | -       | -       | < C++11 | Currently only void(*)() |
+finally()                   | &#10003;| &#10003;| >=C++11 | Make a final_action<> |
+finally()                   | -       | -       | < C++11 | Make a final_action |
+final_action_return         | -       | -       | < C++11 | Currently only void(*)(), [experimental](#feature-selection-macros) |
+on_return()                 | -       | -       | >=C++11 | Make a final_action_return<>, [experimental](#feature-selection-macros) |
+on_return()                 | -       | -       | < C++11 | Make a final_action_return, [experimental](#feature-selection-macros) |
+final_action_error          | -       | -       | < C++11 | Currently only void(*)(), [experimental](#feature-selection-macros) |
+on_error()                  | -       | -       | >=C++11 | Make a final_action_error<>, [experimental](#feature-selection-macros) |
+on_error()                  | -       | -       | < C++11 | Make a final_action_error, [experimental](#feature-selection-macros) |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
 implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
@@ -590,7 +590,7 @@ operator<<: Allows printing a cwstring_span to an output stream
 finally: Allows to run lambda on leaving scope
 finally: Allows to run function (bind) on leaving scope
 finally: Allows to run function (pointer) on leaving scope
-finally: Allows to move final_act
+finally: Allows to move final_action
 on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)
 on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)
 narrow_cast<>: Allows narrowing without value loss

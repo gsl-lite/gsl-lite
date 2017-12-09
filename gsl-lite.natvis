@@ -10,7 +10,7 @@
     <DisplayString>{_Data._What,nasb}</DisplayString>
   </Type>
 
-  <Type Name="gsl::final_act&lt;*&gt;">
+  <Type Name="gsl::final_action&lt;*&gt;">
     <DisplayString>{{ invoke = {invoke_}, action = {action_} }}</DisplayString>
     <Expand>
       <Item Name="[invoke]">invoke_</Item>
