@@ -1230,6 +1230,9 @@ public:
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( U (&arr)[N] ) gsl_noexcept
         : first_( &arr[0] )
+#ifdef _MSC_VER
+#pragma warning(suppress: 26481)
+#endif
         , last_ ( &arr[0] + N )
     {}
 
