@@ -475,7 +475,7 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * co
 
 # else
 
-gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
+gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond ) gsl_noexcept
 {
     if ( !cond )
         std::terminate();
