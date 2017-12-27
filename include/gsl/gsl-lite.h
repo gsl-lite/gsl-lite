@@ -1143,6 +1143,9 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 
 // tag to select span constructor taking a container
 struct with_container_t{ gsl_constexpr14 with_container_t() gsl_noexcept {} };
+#ifdef _MSC_VER
+#pragma warning(suppress: 26426)
+#endif
 const with_container_t with_container;
 
 //
