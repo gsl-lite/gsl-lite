@@ -1142,7 +1142,7 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 }
 
 // tag to select span constructor taking a container
-struct with_container_t{ gsl_constexpr14 with_container_t(){} };
+struct with_container_t{ gsl_constexpr14 with_container_t() gsl_noexcept {} };
 const with_container_t with_container;
 
 //
@@ -1225,7 +1225,7 @@ public:
     }
 
     template< class U, size_t N >
-    gsl_api gsl_constexpr14 span( U (&arr)[N] )
+    gsl_api gsl_constexpr14 span( U (&arr)[N] ) gsl_noexcept
         : first_( &arr[0] )
         , last_ ( &arr[0] + N )
     {}
