@@ -733,6 +733,9 @@ gsl_api inline final_action_error on_error( F const & action )
 template< class T, class U >
 gsl_api inline gsl_constexpr T narrow_cast( U && u ) gsl_noexcept
 {
+#ifdef _MSC_VER
+#pragma warning(suppress: 26472)
+#endif
     return static_cast<T>( std::forward<U>( u ) );
 }
 
@@ -1003,6 +1006,9 @@ gsl_api inline gsl_constexpr byte to_byte( T v ) gsl_noexcept
 #if    gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
     return static_cast<byte>( v );
 #elif  gsl_HAVE_CONSTEXPR_11
+#ifdef _MSC_VER
+#pragma warning(suppress: 26472)
+#endif
     return { static_cast<typename byte::type>( v ) };
 #else
     byte b = { static_cast<typename byte::type>( v ) }; return b;
@@ -1026,6 +1032,9 @@ gsl_api inline gsl_constexpr unsigned char to_uchar( byte b ) gsl_noexcept
 
 gsl_api inline gsl_constexpr unsigned char to_uchar( int i ) gsl_noexcept
 {
+#ifdef _MSC_VER
+#pragma warning(suppress: 26472)
+#endif
     return static_cast<unsigned char>( i );
 }
 
