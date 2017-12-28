@@ -19,9 +19,9 @@
 
 #pragma once
 
-#ifndef GSL_GSL_H_INCLUDED
-#define GSL_GSL_H_INCLUDED
+#ifndef GSL_GSL_HPP_INCLUDED
+#define GSL_GSL_HPP_INCLUDED
 
 #include "gsl/gsl-lite.hpp"
 
-#endif // GSL_GSL_H_INCLUDED
+#endif // GSL_GSL_HPP_INCLUDED
