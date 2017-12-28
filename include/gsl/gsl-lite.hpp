@@ -108,11 +108,13 @@
 # error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS and gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES may be defined.
 #endif
 
-// Compiler detection (C++17 is speculative):
+// Compiler detection (C++20 is speculative):
+// Note: MSVC supports C++14 since it supports C++17.
 
-#define gsl_CPP11_OR_GREATER  (__cplusplus >= 201103L )
-#define gsl_CPP14_OR_GREATER  (__cplusplus >= 201402L )
-#define gsl_CPP17_OR_GREATER  (__cplusplus >= 201700L )
+#define gsl_CPP11_OR_GREATER  (__cplusplus >= 201103L || _MSVC_LANG >= 201103L )
+#define gsl_CPP14_OR_GREATER  (__cplusplus >= 201402L || _MSVC_LANG >= 201703L )
+#define gsl_CPP17_OR_GREATER  (__cplusplus >= 201703L || _MSVC_LANG >= 201703L )
+#define gsl_CPP20_OR_GREATER  (__cplusplus >= 202000L || _MSVC_LANG >= 202000L )
 
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
@@ -475,7 +477,7 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * co
 
 # else
 
-gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond )
+gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond ) gsl_noexcept
 {
     if ( !cond )
         std::terminate();
@@ -1142,7 +1144,7 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 }
 
 // tag to select span constructor taking a container
-struct with_container_t{ gsl_constexpr14 with_container_t(){} };
+struct with_container_t{ gsl_constexpr14 with_container_t() gsl_noexcept {} };
 const with_container_t with_container;
 
 //
@@ -1225,7 +1227,7 @@ public:
     }
 
     template< class U, size_t N >
-    gsl_api gsl_constexpr14 span( U (&arr)[N] )
+    gsl_api gsl_constexpr14 span( U (&arr)[N] ) gsl_noexcept
         : first_( &arr[0] )
         , last_ ( &arr[0] + N )
     {}

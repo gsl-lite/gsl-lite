@@ -14,6 +14,10 @@
 #define gsl_ABSENT( x ) \
     std::cout << #x << ": (undefined)\n"
 
+#ifndef  _MSVC_LANG
+# define _MSVC_LANG  0
+#endif
+
 lest::tests & specification()
 {
     static lest::tests tests;
