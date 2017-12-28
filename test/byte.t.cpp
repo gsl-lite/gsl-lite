@@ -15,7 +15,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "gsl-lite.t.h"
+#include "gsl-lite.t.hpp"
 
 // Use gsl::byte instead of plain byte to prevent collisions with
 // other byte declarations, such as in rpcndr.h (Windows kit).

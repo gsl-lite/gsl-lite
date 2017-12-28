@@ -42,7 +42,7 @@
 		<Unit filename="../test/at.t.cpp" />
 		<Unit filename="../test/byte.t.cpp" />
 		<Unit filename="../test/gsl-lite.t.cpp" />
-		<Unit filename="../test/gsl-lite.t.h" />
+		<Unit filename="../test/gsl-lite.t.hpp" />
 		<Unit filename="../test/issue.t.cpp" />
 		<Unit filename="../test/lest_cpp03.hpp" />
 		<Unit filename="../test/not_null.t.cpp" />

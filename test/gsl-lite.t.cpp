@@ -6,7 +6,7 @@
 // This code is licensed under the MIT License (MIT).
 //
 
-#include "gsl-lite.t.h"
+#include "gsl-lite.t.hpp"
 
 #define gsl_PRESENT( x ) \
     std::cout << #x << ": " << x << "\n"

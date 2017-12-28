@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef GSL_TEST_GSL_LITE_H_INCLUDED
-#define GSL_TEST_GSL_LITE_H_INCLUDED
+#ifndef GSL_TEST_GSL_LITE_HPP_INCLUDED
+#define GSL_TEST_GSL_LITE_HPP_INCLUDED
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
 # include "gsl-lite-vc6.hpp"
@@ -74,6 +74,6 @@ inline std::ostream & operator<<( std::ostream & os, span<T> s )
 
 } // namespace gsl
 
-#endif // GSL_TEST_GSL_LITE_H_INCLUDED
+#endif // GSL_TEST_GSL_LITE_HPP_INCLUDED
 
 // end of file

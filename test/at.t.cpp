@@ -15,7 +15,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "gsl-lite.t.h"
+#include "gsl-lite.t.hpp"
 
 CASE( "at(): Terminates access to non-existing C-array elements" )
 {

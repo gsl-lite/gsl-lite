@@ -15,7 +15,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "gsl-lite.t.h"
+#include "gsl-lite.t.hpp"
 
 CASE( "span<>: free comparation functions fail for different const-ness" "[.issue #32]" )
 {
