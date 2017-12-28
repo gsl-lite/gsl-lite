@@ -22,6 +22,6 @@
 #ifndef GSL_GSL_H_INCLUDED
 #define GSL_GSL_H_INCLUDED
 
-#include "gsl/gsl-lite.h"
+#include "gsl/gsl-lite.hpp"
 
 #endif // GSL_GSL_H_INCLUDED

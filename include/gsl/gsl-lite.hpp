@@ -17,8 +17,8 @@
 
 #pragma once
 
-#ifndef GSL_GSL_LITE_H_INCLUDED
-#define GSL_GSL_LITE_H_INCLUDED
+#ifndef GSL_GSL_LITE_HPP_INCLUDED
+#define GSL_GSL_LITE_HPP_INCLUDED
 
 #include <exception>
 #include <iterator>
@@ -2305,6 +2305,6 @@ public:
 
 #endif
 
-#endif // GSL_GSL_LITE_H_INCLUDED
+#endif // GSL_GSL_LITE_HPP_INCLUDED
 
 // end of file

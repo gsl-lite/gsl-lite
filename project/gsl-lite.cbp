@@ -34,8 +34,9 @@
 		<Unit filename="../gsl-lite.natvis" />
 		<Unit filename="../include/gsl.h" />
 		<Unit filename="../include/gsl/gsl" />
-		<Unit filename="../include/gsl/gsl-lite-vc6.h" />
+		<Unit filename="../include/gsl/gsl-lite-vc6.hpp" />
 		<Unit filename="../include/gsl/gsl-lite.h" />
+		<Unit filename="../include/gsl/gsl-lite.hpp" />
 		<Unit filename="../test/CMakeLists.txt" />
 		<Unit filename="../test/assert.t.cpp" />
 		<Unit filename="../test/at.t.cpp" />

@@ -12,7 +12,7 @@
 #define GSL_TEST_GSL_LITE_H_INCLUDED
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
-# include "gsl-lite-vc6.h"
+# include "gsl-lite-vc6.hpp"
 #else
 # include "gsl-lite.hpp"
 #endif
@@ -55,7 +55,7 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 #endif
 
 namespace gsl {
-    
+
 inline const void * nullptr_void() { return 0; }
 
 // use oparator<< instead of to_string() overload;
