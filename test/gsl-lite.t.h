@@ -14,7 +14,7 @@
 #if defined(_MSC_VER) && _MSC_VER < 1300
 # include "gsl-lite-vc6.h"
 #else
-# include "gsl-lite.h"
+# include "gsl-lite.hpp"
 #endif
 
 #include "lest_cpp03.hpp"

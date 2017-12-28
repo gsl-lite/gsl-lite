@@ -1,4 +1,4 @@
-#include "gsl-lite.h"
+#include "gsl-lite.hpp"
 
 using namespace gsl;
 

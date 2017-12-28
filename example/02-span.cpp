@@ -1,6 +1,6 @@
 // Use span
 
-#include "gsl-lite.h"
+#include "gsl-lite.hpp"
 #include <iostream>
 
 using namespace gsl;
