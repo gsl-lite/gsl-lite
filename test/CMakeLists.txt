@@ -1,11 +1,11 @@
-# Copyright 2015 by Martin Moene
+# Copyright 2015-2017 by Martin Moene
 #
 # gsl-lite is based on GSL: Guideline Support Library,
 # https://github.com/microsoft/gsl
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 2.8.12 )
 
 project( test )
 
@@ -21,7 +21,8 @@ set( HAS_CPP14_FLAG FALSE )
 set( HAS_CPP17_FLAG FALSE )
 
 if( MSVC )
-    add_compile_options( -W3 -EHsc -D_SCL_SECURE_NO_WARNINGS )
+    add_compile_options( -W3 -EHsc )
+    add_definitions( -D_SCL_SECURE_NO_WARNINGS -DNOMINMAX )
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
@@ -46,7 +47,24 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         endif()
     endif()
 
-    add_compile_options( -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion )
+    # Clang: available -std flags depends on version
+    if( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+        execute_process(
+            COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
+
+        if( CLANG_VERSION )
+            if( NOT CLANG_VERSION VERSION_LESS 3.3.0 )
+                set( HAS_CPP11_FLAG TRUE )
+            endif()
+# clang 3.5.0 -std=c++14: no member named 'gets' in the global namespace: using ::gets;
+#            if( NOT CLANG_VERSION VERSION_LESS 3.4.0 )
+#                set( HAS_CPP14_FLAG TRUE )
+#            endif()
+#            if( NOT CLANG_VERSION VERSION_LESS 3.5.0 )
+#                set( HAS_CPP17_FLAG TRUE )
+#            endif()
+        endif()
+    endif()
 
     add_executable( gsl-lite-cpp98.t ${SOURCES} )
     target_compile_options( gsl-lite-cpp98.t  PUBLIC -std=c++98 )
@@ -68,6 +86,8 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         add_executable( gsl-lite-cpp17.t ${SOURCES} )
         target_compile_options( gsl-lite-cpp17.t  PUBLIC -std=c++17 )
     endif()
+
+    add_compile_options( -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion )
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
 # as is
