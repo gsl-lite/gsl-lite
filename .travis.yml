@@ -96,19 +96,6 @@ matrix:
           packages: ["clang-5.0", "g++-7", "python3-pip", "lcov"]
           sources: *apt_sources
 
-  allow_failures:
-    - env: COMPILER=clang++-3.5
-      compiler: clang
-
-    - env: COMPILER=clang++-3.6
-      compiler: clang
-
-    - env: COMPILER=clang++-3.7
-      compiler: clang
-
-    - env: COMPILER=clang++-3.8
-      compiler: clang
-
 script:
   - export CXX=$COMPILER
   - mkdir build

@@ -31,41 +31,27 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
 
     # GNU: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
-        execute_process(
-            COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-
-        message( STATUS "GCC_VERSION: ${GCC_VERSION}" )
-
-        if( GCC_VERSION )
-            if( NOT GCC_VERSION VERSION_LESS 4.8.0 )
-                set( HAS_CPP11_FLAG TRUE )
-            endif()
-            if( NOT GCC_VERSION VERSION_LESS 4.9.2 )
-                set( HAS_CPP14_FLAG TRUE )
-            endif()
-            if( NOT GCC_VERSION VERSION_LESS 7.1.0 )
-                set( HAS_CPP17_FLAG TRUE )
-            endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8.0 )
+            set( HAS_CPP11_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.2 )
+            set( HAS_CPP14_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.1.0 )
+            set( HAS_CPP17_FLAG TRUE )
         endif()
     endif()
 
     # Clang: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES Clang )
-        execute_process(
-            COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
-
-        message( STATUS "CLANG_VERSION: ${CLANG_VERSION}" )
-
-        if( CLANG_VERSION )
-            if( NOT CLANG_VERSION VERSION_LESS 3.3.0 )
-                set( HAS_CPP11_FLAG TRUE )
-            endif()
-            if( NOT CLANG_VERSION VERSION_LESS 3.4.0 )
-                set( HAS_CPP14_FLAG TRUE )
-            endif()
-            if( NOT CLANG_VERSION VERSION_LESS 5.0.0 )
-                set( HAS_CPP17_FLAG TRUE )
-            endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3.0 )
+            set( HAS_CPP11_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4.0 )
+            set( HAS_CPP14_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0.0 )
+            set( HAS_CPP17_FLAG TRUE )
         endif()
     endif()
 
