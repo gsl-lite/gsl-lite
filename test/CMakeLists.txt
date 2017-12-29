@@ -34,6 +34,8 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         execute_process(
             COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
 
+        message( STATUS "GCC_VERSION: ${GCC_VERSION}" )
+
         if( GCC_VERSION )
             if( NOT GCC_VERSION VERSION_LESS 4.8.0 )
                 set( HAS_CPP11_FLAG TRUE )
@@ -52,6 +54,8 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         execute_process(
             COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE CLANG_VERSION)
 
+        message( STATUS "CLANG_VERSION: ${CLANG_VERSION}" )
+
         if( CLANG_VERSION )
             if( NOT CLANG_VERSION VERSION_LESS 3.3.0 )
                 set( HAS_CPP11_FLAG TRUE )
@@ -59,7 +63,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
             if( NOT CLANG_VERSION VERSION_LESS 3.4.0 )
                 set( HAS_CPP14_FLAG TRUE )
             endif()
-            if( NOT CLANG_VERSION VERSION_LESS 3.5.0 )
+            if( NOT CLANG_VERSION VERSION_LESS 5.0.0 )
                 set( HAS_CPP17_FLAG TRUE )
             endif()
         endif()
@@ -94,8 +98,10 @@ else()
 # as is
 endif()
 
-add_executable( gsl-lite.t ${SOURCES} )
-target_link_libraries( gsl-lite.t gsl_lite )
+if( NOT HAS_STD_FLAGS )
+    add_executable( gsl-lite.t ${SOURCES} )
+    target_link_libraries( gsl-lite.t gsl_lite )
+endif()
 
 # configure unit tests via CTest:
 
@@ -103,6 +109,9 @@ enable_testing()
 
 if( NOT HAS_STD_FLAGS )
     add_test(     NAME test          COMMAND gsl-lite.t --pass )
+    add_test(     NAME list_version  COMMAND gsl-lite.t --version )
+    add_test(     NAME list_tags     COMMAND gsl-lite.t --list-tags )
+    add_test(     NAME list_tests    COMMAND gsl-lite.t --list-tests )
 else()
     add_test(     NAME test-cpp98    COMMAND gsl-lite-cpp98.t )
     add_test(     NAME test-cpp03    COMMAND gsl-lite-cpp03.t )
@@ -116,8 +125,5 @@ else()
         add_test( NAME test-cpp17    COMMAND gsl-lite-cpp17.t --pass )
     endif()
 endif()
-add_test(         NAME list_version  COMMAND gsl-lite.t --version )
-add_test(         NAME list_tags     COMMAND gsl-lite.t --list-tags )
-add_test(         NAME list_tests    COMMAND gsl-lite.t --list-tests )
 
 # end of file
