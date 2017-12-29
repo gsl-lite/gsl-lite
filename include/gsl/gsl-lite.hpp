@@ -30,7 +30,7 @@
 #include <utility>
 #include <vector>
 
-#define  gsl_lite_VERSION "0.26.0"
+#define  gsl_lite_VERSION "0.27.0"
 
 // gsl-lite backward compatibility:
 
@@ -307,7 +307,7 @@
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
-# define gsl_RESTORE_MSVC_WARNINGS()             __pragma(warning(pop) )
+# define gsl_RESTORE_MSVC_WARNINGS()             __pragma(warning(pop ))
 #else
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)
