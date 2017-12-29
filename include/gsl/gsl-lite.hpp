@@ -111,10 +111,16 @@
 // Compiler detection (C++20 is speculative):
 // Note: MSVC supports C++14 since it supports C++17.
 
-#define gsl_CPP11_OR_GREATER  (__cplusplus >= 201103L || _MSVC_LANG >= 201103L )
-#define gsl_CPP14_OR_GREATER  (__cplusplus >= 201402L || _MSVC_LANG >= 201703L )
-#define gsl_CPP17_OR_GREATER  (__cplusplus >= 201703L || _MSVC_LANG >= 201703L )
-#define gsl_CPP20_OR_GREATER  (__cplusplus >= 202000L || _MSVC_LANG >= 202000L )
+#ifdef _MSVC_LANG
+# define gsl_MSVC_LANG  _MSVC_LANG
+#else
+# define gsl_MSVC_LANG  0
+#endif
+
+#define gsl_CPP11_OR_GREATER  (__cplusplus >= 201103L || gsl_MSVC_LANG >= 201103L )
+#define gsl_CPP14_OR_GREATER  (__cplusplus >= 201402L || gsl_MSVC_LANG >= 201703L )
+#define gsl_CPP17_OR_GREATER  (__cplusplus >= 201703L || gsl_MSVC_LANG >= 201703L )
+#define gsl_CPP20_OR_GREATER  (__cplusplus >= 202000L || gsl_MSVC_LANG >= 202000L )
 
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
@@ -279,7 +285,7 @@
 # endif
 #endif
 
-// additional includes:
+// Additional includes:
 
 #if gsl_HAVE_ARRAY
 # include <array>
@@ -294,6 +300,27 @@
 #if gsl_HAVE_SIZED_TYPES
 # include <cstdint>
 #endif
+
+// MSVC warning suppression macros:
+
+#if gsl_COMPILER_MSVC_VERSION >= 14
+# define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
+# define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
+# define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
+# define gsl_RESTORE_MSVC_WARNINGS()             __pragma(warning(pop) )
+#else
+# define gsl_SUPPRESS_MSGSL_WARNING(expr)
+# define gsl_SUPPRESS_MSVC_WARNING(code, descr)
+# define gsl_DISABLE_MSVC_WARNINGS(codes)
+# define gsl_RESTORE_MSVC_WARNINGS()
+#endif
+
+// Suppress the following MSVC GSL warnings:
+// - C26439, gsl::f.6: noexcept, special functions
+// - C26440, gsl::f.6: noexcept, functions
+// Note: MSVC GSL rule set does not recognize gsl_noexcept
+
+gsl_DISABLE_MSVC_WARNINGS( 26439 26440 )
 
 namespace gsl {
 
@@ -1028,6 +1055,8 @@ gsl_api inline gsl_constexpr unsigned char to_uchar( byte b ) gsl_noexcept
 
 gsl_api inline gsl_constexpr unsigned char to_uchar( int i ) gsl_noexcept
 {
+    gsl_SUPPRESS_MSGSL_WARNING(type.1)
+
     return static_cast<unsigned char>( i );
 }
 
@@ -1143,9 +1172,15 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
     return to_byte( ~to_uchar( b ) );
 }
 
-// tag to select span constructor taking a container
-struct with_container_t{ gsl_constexpr14 with_container_t() gsl_noexcept {} };
+// tag to select span constructor taking a container (prevent ms-gsl warning C26426):
+
+#if gsl_CPP14_OR_GREATER
+struct with_container_t{ constexpr with_container_t() noexcept {} };
 const with_container_t with_container;
+#else
+struct with_container_t{ with_container_t(){} };
+const with_container_t with_container;
+#endif
 
 //
 // span<> - A 1D view of contiguous T's, replace (*,len).
@@ -2306,6 +2341,8 @@ public:
 } // namespace std
 
 #endif
+
+gsl_RESTORE_MSVC_WARNINGS()
 
 #endif // GSL_GSL_LITE_HPP_INCLUDED
 

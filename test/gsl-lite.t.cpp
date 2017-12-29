@@ -14,10 +14,6 @@
 #define gsl_ABSENT( x ) \
     std::cout << #x << ": (undefined)\n"
 
-#ifndef  _MSVC_LANG
-# define _MSVC_LANG  0
-#endif
-
 lest::tests & specification()
 {
     static lest::tests tests;
@@ -51,7 +47,7 @@ CASE( "__cplusplus" "[.stdc++]" )
 
 CASE( "_MSVC_LANG" "[.stdc++]" )
 {
-#ifdef gsl_COMPILER_MSVC_VERSION
+#ifdef _MSVC_LANG
     gsl_PRESENT( _MSVC_LANG );
 #else
     gsl_ABSENT(  _MSVC_LANG );
