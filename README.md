@@ -62,7 +62,7 @@ prompt>g++ -std=c++03 -Wall -I../include/gsl -o 01-basic.exe 01-basic.cpp && 01-
 
 In a nutshell
 -------------
-**gsl-lite** is a single-file header-only variant of Microsoft's implementation of the [Guideline Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14. 
+**gsl-lite** is a single-file header-only variant of Microsoft's implementation of the [Guideline Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14, C++17.
 
 The Guideline Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
 
@@ -249,8 +249,8 @@ The table below mentions the compiler versions *gsl-lite* is reported to work wi
 OS        | Compiler   | Versions |
 ---------:|:-----------|:---------|
 Windows   | Clang/LLVM | ? |
-&nbsp;    | GCC        | 4.8.4, 4.9.2, 5.2.0 |
-&nbsp;    | Visual C++<br>(Visual Studio)| 6 (6) via header [gsl-lite-vc6.h](include/gsl/gsl-lite-vc6.hpp)<br>8 (2005), 10 (2010), 11 (2012),<br>12 (2013), 14 (2015) |
+&nbsp;    | GCC        | 4.8.4, 4.9.2, 5.2.0, 7.2.0 |
+&nbsp;    | Visual C++<br>(Visual Studio)| 6 (6) via header [gsl-lite-vc6.hpp](include/gsl/gsl-lite-vc6.hpp)<br>8 (2005), 10 (2010), 11 (2012),<br>12 (2013), 14 (2015, 2017) |
 GNU/Linux | Clang/LLVM | 3.4 |
 &nbsp;    | GCC        | 5.1 |
 OS X      | ?          | ?   |
@@ -305,7 +305,7 @@ Notes and references
 [4] Bjarne Stroustrup. [Writing good C++14 (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Stroustrup%20-%20CppCon%202015%20keynote.pdf) &mdash; [Video](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A). CppCon 2015.  
 [5] Herb Sutter. [Writing good C++14&hellip; By default (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Sutter%20-%20CppCon%202015%20day%202%20plenary%20.pdf) &mdash; [Video](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015.  
 [6] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
-[7] Bjarne Stroustrup et al. [A brief introduction to C++’s model for type- and resource-safety](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Introduction%20to%20type%20and%20resource%20safety.pdf).  
+[7] Bjarne Stroustrup et al. [A brief introduction to C++â€™s model for type- and resource-safety](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Introduction%20to%20type%20and%20resource%20safety.pdf).  
 [8] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). 21 Sep 2015.
 
 ### Compiler feature testing
