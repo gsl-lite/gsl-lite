@@ -49,6 +49,15 @@ CASE( "__cplusplus" "[.stdc++]" )
     gsl_PRESENT( __cplusplus );
 }
 
+CASE( "_MSVC_LANG" "[.stdc++]" )
+{
+#ifdef gsl_COMPILER_MSVC_VERSION
+    gsl_PRESENT( _MSVC_LANG );
+#else
+    gsl_ABSENT(  _MSVC_LANG );
+#endif
+}
+
 CASE( "gsl_CPP11_OR_GREATER" "[.stdc++]" )
 {
     gsl_PRESENT( gsl_CPP11_OR_GREATER );
