@@ -29,6 +29,7 @@
 		<Unit filename="../CMakeLists.txt" />
 		<Unit filename="../LICENSE" />
 		<Unit filename="../README.md" />
+		<Unit filename="../appveyor.yml" />
 		<Unit filename="../example/01-basic.cpp" />
 		<Unit filename="../example/02-span.cpp" />
 		<Unit filename="../gsl-lite.natvis" />
