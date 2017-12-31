@@ -316,11 +316,19 @@
 #endif
 
 // Suppress the following MSVC GSL warnings:
-// - C26439, gsl::f.6: noexcept, special functions
-// - C26440, gsl::f.6: noexcept, functions
-// Note: MSVC GSL rule set does not recognize gsl_noexcept
+// - C26410: gsl::r.32: the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
+// - C26415: gsl::r.30: smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
+// - C26418: gsl::r.36: shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
+// - C26472, gsl::t.1 : don't use a static_cast for arithmetic conversions;
+//                      use brace initialization, gsl::narrow_cast or gsl::narow
+// - C26439, gsl::f.6 : special function 'function' can be declared 'noexcept'
+// - C26440, gsl::f.6 : function 'function' can be declared 'noexcept'
+// - C26473: gsl::t.1 : don't cast between pointer types where the source type and the target type are the same
+// - C26481: gsl::b.1 : don't use pointer arithmetic. Use span instead
+// - C26482, gsl::b.2 : only index into arrays using constant expressions
+// - C26490: gsl::t.1 : don't use reinterpret_cast
 
-gsl_DISABLE_MSVC_WARNINGS( 26439 26440 )
+gsl_DISABLE_MSVC_WARNINGS( 26410 26415 26418 26472 26439 26440 26473 26481 26482 26490 )
 
 namespace gsl {
 
@@ -1055,8 +1063,6 @@ gsl_api inline gsl_constexpr unsigned char to_uchar( byte b ) gsl_noexcept
 
 gsl_api inline gsl_constexpr unsigned char to_uchar( int i ) gsl_noexcept
 {
-    gsl_SUPPRESS_MSGSL_WARNING(type.1)
-
     return static_cast<unsigned char>( i );
 }
 
@@ -1400,12 +1406,20 @@ public:
 
     gsl_api gsl_constexpr14 const_iterator cbegin() const gsl_noexcept
     {
+#if gsl_CPP11_OR_GREATER
+        return { begin() };
+#else
         return const_iterator( begin() );
+#endif
     }
 
     gsl_api gsl_constexpr14 const_iterator cend() const gsl_noexcept
     {
+#if gsl_CPP11_OR_GREATER
+        return { end() };
+#else
         return const_iterator( end() );
+#endif
     }
 
     gsl_api gsl_constexpr14 reverse_iterator rbegin() const gsl_noexcept
@@ -2025,7 +2039,7 @@ private:
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
-    basic_string_span< typename detail::add_const<T>::type > r( u );
+    const basic_string_span< typename detail::add_const<T>::type > r( u );
 
     return l.size() == r.size()
         && std::equal( l.begin(), l.end(), r.begin() );
@@ -2034,7 +2048,7 @@ gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, 
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
-    basic_string_span< typename detail::add_const<T>::type > r( u );
+    const basic_string_span< typename detail::add_const<T>::type > r( u );
 
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
@@ -2045,7 +2059,7 @@ template< class T, class U,
     class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
 gsl_api inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
-    basic_string_span< typename detail::add_const<T>::type > l( u );
+    const basic_string_span< typename detail::add_const<T>::type > l( u );
 
     return l.size() == r.size()
         && std::equal( l.begin(), l.end(), r.begin() );
@@ -2055,7 +2069,7 @@ template< class T, class U,
     class = typename std::enable_if<!detail::is_basic_string_span<U>::value >::type >
 gsl_api inline gsl_constexpr14 bool operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
-    basic_string_span< typename detail::add_const<T>::type > l( u );
+    const basic_string_span< typename detail::add_const<T>::type > l( u );
 
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
@@ -2221,11 +2235,11 @@ gsl_api Stream & write_to_stream( Stream & os, Span const & spn )
     if ( !os )
         return os;
 
-    std::streamsize length = narrow<std::streamsize>( spn.length() );
+    const std::streamsize length = narrow<std::streamsize>( spn.length() );
 
     // Whether, and how, to pad
-    bool pad = ( length < os.width() );
-    bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::left;
+    const bool pad = ( length < os.width() );
+    const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::left;
 
     if ( left_pad )
         write_padding( os, os.width() - length );
@@ -2282,6 +2296,8 @@ template< class T, class SizeType, const T Sentinel >
 gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
 {
     typedef T * pointer;
+
+    gsl_SUPPRESS_MSVC_WARNING( 26429, "f.23: symbol 'cur' is never tested for nullness, it can be marked as not_null" )
 
     pointer cur = seq;
 
