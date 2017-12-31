@@ -11,10 +11,19 @@
 #ifndef GSL_TEST_GSL_LITE_HPP_INCLUDED
 #define GSL_TEST_GSL_LITE_HPP_INCLUDED
 
+// Select GSL Lite for VC6 if compiling with VC6:
+
 #if defined(_MSC_VER) && _MSC_VER < 1300
 # include "gsl-lite-vc6.hpp"
 #else
 # include "gsl-lite.hpp"
+#endif
+
+// Limit C++ Core Guidelines checking to GSL Lite:
+
+#if defined(_MSC_VER) && _MSC_VER >= 1910
+# include <CppCoreCheck\Warnings.h>
+# pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #endif
 
 #include "lest_cpp03.hpp"
