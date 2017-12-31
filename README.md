@@ -560,7 +560,7 @@ string_span: Allows to change an element via array indexing
 string_span: Allows to change an element via call indexing
 string_span: Allows to change an element via data()
 string_span: Allows to compare a string_span with another string_span
-string_span: Allows to compare empty spans as equal
+string_span: Allows to compare empty span to non-empty span
 string_span: Allows to compare a string_span with a cstring_span
 string_span: Allows to compare with types convertible to string_span
 string_span: Allows to test for empty span via empty(), empty case

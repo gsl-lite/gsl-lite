@@ -893,11 +893,20 @@ CASE( "string_span: Allows to compare a string_span with another string_span" )
     EXPECT( tv >  sv );
 }
 
-CASE( "string_span: Allows to compare empty spans as equal" )
+CASE( "string_span: Allows to compare empty spans as equal (questionable)" "[.]" )
 {
     string_span a, b;
 
     EXPECT( a == b );
+}
+
+CASE( "string_span: Allows to compare empty span to non-empty span" )
+{
+    char s[] = "hello";
+    string_span a, b( s, strlen( s ) );
+
+    EXPECT( a != b );
+    EXPECT( b != a );
 }
 
 CASE( "string_span: Allows to compare a string_span with a cstring_span" )
