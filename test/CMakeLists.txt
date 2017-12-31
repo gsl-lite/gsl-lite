@@ -9,6 +9,13 @@ cmake_minimum_required( VERSION 2.8.12 )
 
 project( test )
 
+function( enable_msvs_guideline_checker target )
+    set_target_properties( ${target} PROPERTIES
+        VS_GLOBAL_EnableCppCoreCheck true
+        VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
+        VS_GLOBAL_RunCodeAnalysis true )
+endfunction()
+
 include_directories  ( "${PROJECT_SOURCE_DIR}/../include/gsl" )
 
 set( SOURCES gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
@@ -42,6 +49,7 @@ if( MSVC )
     if( HAS_MSVC_CPP17_FLAG )
         add_executable( gsl-lite-cpp17.t ${SOURCES} )
         target_compile_options( gsl-lite-cpp17.t  PUBLIC -std:c++17 )
+        enable_msvs_guideline_checker( gsl-lite-cpp17.t )
     endif()
 
     if( HAS_MSVC_CPPLATEST_FLAG )
@@ -131,7 +139,7 @@ if( HAS_MSVC_STD_FLAGS )
         add_test( NAME test-cpp17     COMMAND gsl-lite-cpp17.t )
     endif()
     if( HAS_MSVC_CPPLATEST_FLAG )
-        add_test( NAME test-cpplatest COMMAND gsl-lite-cpp17.t )
+        add_test( NAME test-cpplatest COMMAND gsl-lite-cpplatest.t )
     endif()
 elseif( HAS_STD_FLAGS )
     add_test(     NAME test-cpp98     COMMAND gsl-lite-cpp98.t )
