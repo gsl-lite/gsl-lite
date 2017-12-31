@@ -1,16 +1,44 @@
 version: '1.0.{build}'
 
+image:
+    - Visual Studio 2017
+    - Visual Studio 2015
+
+platform:
+    - Win32
+    - x64
+
 configuration:
     - Debug
     - Release
 
-os: Visual Studio 2017
+environment:
+    matrix:
+        - generator: "Visual Studio 15 2017"
+        - generator: "Visual Studio 14 2015"
+        - generator: "Visual Studio 12 2013"
+        - generator: "Visual Studio 11 2012"
+        - generator: "Visual Studio 10 2010"
+
+matrix:
+    fast_finish: true
+    exclude:
+        - os: Visual Studio 2015
+          generator: "Visual Studio 15 2017"
+        - os: Visual Studio 2017
+          generator: "Visual Studio 14 2015"
+        - os: Visual Studio 2017
+          generator: "Visual Studio 12 2013"
+        - os: Visual Studio 2017
+          generator: "Visual Studio 11 2012"
+        - os: Visual Studio 2017
+          generator: "Visual Studio 10 2010"
 
 before_build:
     - mkdir build
     - cd build
-    - cmake -G "Visual Studio 15 2017" ..
+    - cmake -A %platform% -G "%generator%" ..
 
 build_script:
-    - cmake --build . --config %CONFIGURATION%
-    - ctest -C %CONFIGURATION%
+    - cmake --build . --config %configuration%
+    - ctest -C %configuration%
