@@ -1,5 +1,21 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.28.0 2018-01-01
+
+- Expand Travis and Appveyor CI compiler matrices and use CMake configuration.
+- Fix to use CMAKE_CXX_COMPILER_VERSION in CMake configuration.
+- Add targets for various -std flags for MSVC to CMake configuration.
+- Add Core Guidelines checking, limited to GSL Lite.
+- Add test to compare empty to non-empty string span.
+- Suppress test to compare empty string spans.
+- Update Wandbox link for release 0.28.0.
+- Update Wandbox link for release 0.27.0.
+
+version 0.27.0 2017-12-30
+
+- Change extension of GSL Lite header file to .hpp with backwards compatibility via headers gsl.h and gsl/gsl-lite.h. See issue #94 (thanks to @AraHaan).
+- Suppress several warnings from Microsoft's CppCoreCheck. See pull request #95 (thanks to @AraHaan).
+
 version 0.26.0 2017-12-09
 
 - Rename final_act to final_action per issue #89.
