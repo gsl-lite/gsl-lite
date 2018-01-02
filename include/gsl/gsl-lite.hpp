@@ -2239,7 +2239,7 @@ gsl_api Stream & write_to_stream( Stream & os, Span const & spn )
 
     // Whether, and how, to pad
     const bool pad = ( length < os.width() );
-    const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::left;
+    const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::right;
 
     if ( left_pad )
         write_padding( os, os.width() - length );

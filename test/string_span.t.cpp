@@ -1231,9 +1231,9 @@ CASE ( "operator<<: Allows printing a string_span to an output stream" )
     string_span sv = ensure_z( s );
 
     oss << sv << '\n'
-        << std::left << std::setw(10) << sv << '\n'
+        << std::right << std::setw(10) << sv << '\n'
         << sv << '\n'
-        << std::setfill('.') << std::right << std::setw(10) << sv;
+        << std::setfill('.') << std::left << std::setw(10) << sv;
 
     EXPECT( oss.str() == "hello\n     hello\nhello\nhello....." );
 }
@@ -1245,9 +1245,9 @@ CASE ( "operator<<: Allows printing a cstring_span to an output stream" )
     cstring_span sv = ensure_z( s );
 
     oss << sv << '\n'
-        << std::left << std::setw(10) << sv << '\n'
+        << std::right << std::setw(10) << sv << '\n'
         << sv << '\n'
-        << std::setfill('.') << std::right << std::setw(10) << sv;
+        << std::setfill('.') << std::left << std::setw(10) << sv;
 
     EXPECT( oss.str() == "hello\n     hello\nhello\nhello....." );
 }
@@ -1259,9 +1259,9 @@ CASE ( "operator<<: Allows printing a wstring_span to an output stream" )
     wstring_span sv = ensure_z( s );
 
     oss << sv << '\n'
-        << std::left << std::setw(10) << sv << '\n'
+        << std::right << std::setw(10) << sv << '\n'
         << sv << '\n'
-        << std::setfill(L'.') << std::right << std::setw(10) << sv;
+        << std::setfill(L'.') << std::left << std::setw(10) << sv;
 
     EXPECT( oss.str() == L"hello\n     hello\nhello\nhello....." );
 }
@@ -1273,9 +1273,9 @@ CASE ( "operator<<: Allows printing a cwstring_span to an output stream" )
     cwstring_span sv = ensure_z( s );
 
     oss << sv << '\n'
-        << std::left << std::setw(10) << sv << '\n'
+        << std::right << std::setw(10) << sv << '\n'
         << sv << '\n'
-        << std::setfill(L'.') << std::right << std::setw(10) << sv;
+        << std::setfill(L'.') << std::left << std::setw(10) << sv;
 
     EXPECT( oss.str() == L"hello\n     hello\nhello\nhello....." );
 }
