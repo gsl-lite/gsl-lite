@@ -5,7 +5,7 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 2.8.12 )
+cmake_minimum_required( VERSION 3.0 )
 
 project( test )
 
@@ -16,59 +16,45 @@ function( enable_msvs_guideline_checker target )
         VS_GLOBAL_RunCodeAnalysis true )
 endfunction()
 
-include_directories  ( "${PROJECT_SOURCE_DIR}/../include/gsl" )
+include_directories( "${PROJECT_SOURCE_DIR}/../include/gsl" )
 
 set( SOURCES gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
 
-add_definitions( -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+set( GSL_CONFIG -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 
 set( HAS_STD_FLAGS  FALSE )
+set( HAS_CPP98_FLAG FALSE )
+set( HAS_CPP03_FLAG FALSE )
 set( HAS_CPP11_FLAG FALSE )
 set( HAS_CPP14_FLAG FALSE )
 set( HAS_CPP17_FLAG FALSE )
-
-set( HAS_MSVC_STD_FLAGS  FALSE )
-set( HAS_MSVC_CPP11_FLAG FALSE )
-set( HAS_MSVC_CPP14_FLAG FALSE )
-set( HAS_MSVC_CPP17_FLAG FALSE )
+set( HAS_CPP20_FLAG FALSE )
 
 if( MSVC )
-    set( HAS_MSVC_STD_FLAGS TRUE )
+    set( HAS_STD_FLAGS TRUE )
+
+    set( STD_OPT     -std: )
+    set( OPTIONS     -W3 -EHsc )
+    set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS -DNOMINMAX ${GSL_CONFIG} )
 
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.00 )
-        set( HAS_MSVC_CPP14_FLAG TRUE )
-        set( HAS_MSVC_CPPLATEST_FLAG TRUE )
+        set( HAS_CPP14_FLAG TRUE )
+        set( HAS_CPPLATEST_FLAG TRUE )
     endif()
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.11 )
-        set( HAS_MSVC_CPP17_FLAG TRUE )
+        set( HAS_CPP17_FLAG TRUE )
     endif()
-
-    add_executable( gsl-lite-cpp98.t ${SOURCES} )
-    target_compile_options( gsl-lite-cpp98.t  PUBLIC )
-
-    if( HAS_MSVC_CPP14_FLAG )
-        add_executable( gsl-lite-cpp14.t ${SOURCES} )
-        target_compile_options( gsl-lite-cpp14.t  PUBLIC -std:c++14 )
-    endif()
-
-    if( HAS_MSVC_CPP17_FLAG )
-        add_executable( gsl-lite-cpp17.t ${SOURCES} )
-        target_compile_options( gsl-lite-cpp17.t  PUBLIC -std:c++17 )
-        enable_msvs_guideline_checker( gsl-lite-cpp17.t )
-    endif()
-
-    if( HAS_MSVC_CPPLATEST_FLAG )
-        add_executable( gsl-lite-cpplatest.t ${SOURCES} )
-        target_compile_options( gsl-lite-cpplatest.t  PUBLIC -std:c++latest )
-    endif()
-
-    add_compile_options( -W3 -EHsc )
-    add_definitions( -D_SCL_SECURE_NO_WARNINGS -DNOMINMAX )
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
 
-    set( HAS_STD_FLAGS TRUE )
+    set( HAS_STD_FLAGS  TRUE )
+    set( HAS_CPP98_FLAG TRUE )
+    set( HAS_CPP03_FLAG TRUE )
+
+    set( STD_OPT     -std= )
+    set( OPTIONS     -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion ${GSL_CONFIG} )
+    set( DEFINITIONS "" )
 
     # GNU: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
@@ -96,59 +82,68 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
         endif()
     endif()
 
-    add_executable( gsl-lite-cpp98.t ${SOURCES} )
-    target_compile_options( gsl-lite-cpp98.t  PUBLIC -std=c++98 )
-
-    add_executable( gsl-lite-cpp03.t ${SOURCES} )
-    target_compile_options( gsl-lite-cpp03.t  PUBLIC -std=c++03 )
-
-    if( HAS_CPP11_FLAG )
-        add_executable( gsl-lite-cpp11.t ${SOURCES} )
-        target_compile_options( gsl-lite-cpp11.t  PUBLIC -std=c++11 )
-    endif()
-
-    if( HAS_CPP14_FLAG )
-        add_executable( gsl-lite-cpp14.t ${SOURCES} )
-        target_compile_options( gsl-lite-cpp14.t  PUBLIC -std=c++14 )
-    endif()
-
-    if( HAS_CPP17_FLAG )
-        add_executable( gsl-lite-cpp17.t ${SOURCES} )
-        target_compile_options( gsl-lite-cpp17.t  PUBLIC -std=c++17 )
-    endif()
-
-    add_compile_options( -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion )
-
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
 # as is
 else()
 # as is
 endif()
 
-if( NOT HAS_STD_FLAGS AND NOT HAS_MSVC_STD_FLAGS )
+# add generic executable, unless -std flags can be specified:
+
+if( NOT HAS_STD_FLAGS )
     add_executable( gsl-lite.t ${SOURCES} )
-    target_link_libraries( gsl-lite.t gsl_lite )
+    target_link_libraries( gsl-lite.t gsl-lite )
+else()
+    # unconditionally add C++98 variant for MSVC:
+    add_executable                ( gsl-lite-cpp98.t ${SOURCES} )
+    target_compile_definitions    ( gsl-lite-cpp98.t PRIVATE ${DEFINITIONS} )
+    target_compile_options        ( gsl-lite-cpp98.t PRIVATE ${OPTIONS} )
+    if( HAS_CPP98_FLAG )
+        target_compile_options    ( gsl-lite-cpp98.t PRIVATE ${STD_OPT}c++98 )
+    endif()
+
+    if( HAS_CPP03_FLAG )
+        add_executable            ( gsl-lite-cpp03.t ${SOURCES} )
+        target_compile_options    ( gsl-lite-cpp03.t PRIVATE ${OPTIONS} ${STD_OPT}c++03 )
+        target_compile_definitions( gsl-lite-cpp03.t PRIVATE ${DEFINITIONS} )
+    endif()
+
+    if( HAS_CPP11_FLAG )
+        add_executable            ( gsl-lite-cpp11.t ${SOURCES} )
+        target_compile_options    ( gsl-lite-cpp11.t PRIVATE ${OPTIONS} ${STD_OPT}c++11 )
+        target_compile_definitions( gsl-lite-cpp11.t PRIVATE ${DEFINITIONS} )
+    endif()
+
+    if( HAS_CPP14_FLAG )
+        add_executable            ( gsl-lite-cpp14.t ${SOURCES} )
+        target_compile_options    ( gsl-lite-cpp14.t PRIVATE ${OPTIONS} ${STD_OPT}c++14 )
+        target_compile_definitions( gsl-lite-cpp14.t PRIVATE ${DEFINITIONS} )
+    endif()
+
+    if( HAS_CPP17_FLAG )
+        add_executable            ( gsl-lite-cpp17.t ${SOURCES} )
+        target_compile_options    ( gsl-lite-cpp17.t PRIVATE ${OPTIONS} ${STD_OPT}c++17 )
+        target_compile_definitions( gsl-lite-cpp17.t PRIVATE ${DEFINITIONS} )
+    endif()
+
+    if( HAS_CPPLATEST_FLAG )
+        add_executable            ( gsl-lite-cpplatest.t ${SOURCES} )
+        target_compile_options    ( gsl-lite-cpplatest.t PRIVATE ${OPTIONS} ${STD_OPT}c++latest )
+        target_compile_definitions( gsl-lite-cpplatest.t PRIVATE ${DEFINITIONS} )
+    endif()
 endif()
 
 # configure unit tests via CTest:
 
 enable_testing()
 
-if( HAS_MSVC_STD_FLAGS )
+if( HAS_STD_FLAGS )
+    # unconditionally add C++98 variant for MSVC:
     add_test(     NAME test-cpp98     COMMAND gsl-lite-cpp98.t )
 
-    if( HAS_MSVC_CPP14_FLAG )
-        add_test( NAME test-cpp14     COMMAND gsl-lite-cpp14.t )
+    if( HAS_CPP03_FLAG )
+        add_test( NAME test-cpp03     COMMAND gsl-lite-cpp03.t )
     endif()
-    if( HAS_MSVC_CPP17_FLAG )
-        add_test( NAME test-cpp17     COMMAND gsl-lite-cpp17.t )
-    endif()
-    if( HAS_MSVC_CPPLATEST_FLAG )
-        add_test( NAME test-cpplatest COMMAND gsl-lite-cpplatest.t )
-    endif()
-elseif( HAS_STD_FLAGS )
-    add_test(     NAME test-cpp98     COMMAND gsl-lite-cpp98.t )
-    add_test(     NAME test-cpp03     COMMAND gsl-lite-cpp03.t )
     if( HAS_CPP11_FLAG )
         add_test( NAME test-cpp11     COMMAND gsl-lite-cpp11.t )
     endif()
@@ -157,6 +152,9 @@ elseif( HAS_STD_FLAGS )
     endif()
     if( HAS_CPP17_FLAG )
         add_test( NAME test-cpp17     COMMAND gsl-lite-cpp17.t )
+    endif()
+    if( HAS_CPPLATEST_FLAG )
+        add_test( NAME test-cpplatest COMMAND gsl-lite-cpplatest.t )
     endif()
 else()
     add_test(     NAME test           COMMAND gsl-lite.t --pass )
