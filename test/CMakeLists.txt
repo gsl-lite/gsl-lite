@@ -10,10 +10,12 @@ cmake_minimum_required( VERSION 3.0 )
 project( test )
 
 function( enable_msvs_guideline_checker target )
-    set_target_properties( ${target} PROPERTIES
+    if( MSVC )
+        set_target_properties( ${target} PROPERTIES
         VS_GLOBAL_EnableCppCoreCheck true
         VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
         VS_GLOBAL_RunCodeAnalysis true )
+    endif()
 endfunction()
 
 include_directories( "${PROJECT_SOURCE_DIR}/../include/gsl" )
@@ -124,6 +126,7 @@ else()
         add_executable            ( gsl-lite-cpp17.t ${SOURCES} )
         target_compile_options    ( gsl-lite-cpp17.t PRIVATE ${OPTIONS} ${STD_OPT}c++17 )
         target_compile_definitions( gsl-lite-cpp17.t PRIVATE ${DEFINITIONS} )
+        enable_msvs_guideline_checker( gsl-lite-cpp17.t )
     endif()
 
     if( HAS_CPPLATEST_FLAG )
