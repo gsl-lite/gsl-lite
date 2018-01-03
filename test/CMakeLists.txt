@@ -9,16 +9,7 @@ cmake_minimum_required( VERSION 3.0 )
 
 project( test )
 
-function( enable_msvs_guideline_checker target )
-    if( MSVC )
-        set_target_properties( ${target} PROPERTIES
-        VS_GLOBAL_EnableCppCoreCheck true
-        VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
-        VS_GLOBAL_RunCodeAnalysis true )
-    endif()
-endfunction()
-
-include_directories( "${PROJECT_SOURCE_DIR}/../include/gsl" )
+set( INCDIRS "${PROJECT_SOURCE_DIR}/../include/gsl" )
 
 set( SOURCES gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
 
@@ -90,49 +81,60 @@ else()
 # as is
 endif()
 
+# enable MS C++ Core Guidelines checker if MSVC:
+
+function( enable_msvs_guideline_checker target )
+    if( MSVC )
+        set_target_properties( ${target} PROPERTIES
+        VS_GLOBAL_EnableCppCoreCheck true
+        VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
+        VS_GLOBAL_RunCodeAnalysis true )
+    endif()
+endfunction()
+
+# make target, compile for given standard if specified:
+
+function( make_target target std )
+    if( std )
+        set( OPTIONAL_STD ${STD_OPT}${std} )
+    endif()
+    add_executable            ( ${target} ${SOURCES}  )
+    target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${OPTIONAL_STD} )
+    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
+    target_include_directories( ${target} PRIVATE ${INCDIRS} )
+endfunction()
+
 # add generic executable, unless -std flags can be specified:
 
 if( NOT HAS_STD_FLAGS )
-    add_executable( gsl-lite.t ${SOURCES} )
-    target_link_libraries( gsl-lite.t gsl-lite )
+    make_target( gsl-lite.t "" )
 else()
-    # unconditionally add C++98 variant for MSVC:
-    add_executable                ( gsl-lite-cpp98.t ${SOURCES} )
-    target_compile_definitions    ( gsl-lite-cpp98.t PRIVATE ${DEFINITIONS} )
-    target_compile_options        ( gsl-lite-cpp98.t PRIVATE ${OPTIONS} )
+    # unconditionally add C++98 variant as MSVC has no option for it:
     if( HAS_CPP98_FLAG )
-        target_compile_options    ( gsl-lite-cpp98.t PRIVATE ${STD_OPT}c++98 )
+        make_target( gsl-lite-cpp98.t c++98 )
+    else()
+        make_target( gsl-lite-cpp98.t "" )
     endif()
 
     if( HAS_CPP03_FLAG )
-        add_executable            ( gsl-lite-cpp03.t ${SOURCES} )
-        target_compile_options    ( gsl-lite-cpp03.t PRIVATE ${OPTIONS} ${STD_OPT}c++03 )
-        target_compile_definitions( gsl-lite-cpp03.t PRIVATE ${DEFINITIONS} )
+        make_target( gsl-lite-cpp03.t c++03 )
     endif()
 
     if( HAS_CPP11_FLAG )
-        add_executable            ( gsl-lite-cpp11.t ${SOURCES} )
-        target_compile_options    ( gsl-lite-cpp11.t PRIVATE ${OPTIONS} ${STD_OPT}c++11 )
-        target_compile_definitions( gsl-lite-cpp11.t PRIVATE ${DEFINITIONS} )
+        make_target( gsl-lite-cpp11.t c++11 )
     endif()
 
     if( HAS_CPP14_FLAG )
-        add_executable            ( gsl-lite-cpp14.t ${SOURCES} )
-        target_compile_options    ( gsl-lite-cpp14.t PRIVATE ${OPTIONS} ${STD_OPT}c++14 )
-        target_compile_definitions( gsl-lite-cpp14.t PRIVATE ${DEFINITIONS} )
+        make_target( gsl-lite-cpp14.t c++14 )
     endif()
 
     if( HAS_CPP17_FLAG )
-        add_executable            ( gsl-lite-cpp17.t ${SOURCES} )
-        target_compile_options    ( gsl-lite-cpp17.t PRIVATE ${OPTIONS} ${STD_OPT}c++17 )
-        target_compile_definitions( gsl-lite-cpp17.t PRIVATE ${DEFINITIONS} )
+        make_target( gsl-lite-cpp17.t c++17 )
         enable_msvs_guideline_checker( gsl-lite-cpp17.t )
     endif()
 
     if( HAS_CPPLATEST_FLAG )
-        add_executable            ( gsl-lite-cpplatest.t ${SOURCES} )
-        target_compile_options    ( gsl-lite-cpplatest.t PRIVATE ${OPTIONS} ${STD_OPT}c++latest )
-        target_compile_definitions( gsl-lite-cpplatest.t PRIVATE ${DEFINITIONS} )
+        make_target( gsl-lite-cpplatest.t c++latest )
     endif()
 endif()
 
