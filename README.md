@@ -260,7 +260,7 @@ Building the tests
 ------------------
 To build the tests you need:
 
-- [CMake](http://cmake.org), version 2.8.7 or later to be installed and in your PATH.
+- [CMake](http://cmake.org), version 3.0 or later to be installed and in your PATH.
 - A [suitable compiler](#reported-to-work-with). 
 
 The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
