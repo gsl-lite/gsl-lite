@@ -14,6 +14,8 @@ set    cvResponses=gsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl_CONFIG_CONTRACT_VIOL
 set spanIndexTypes=std::size_t std::ptrdiff_t
 set   cppStandards=c++14 c++latest
 
+set CppCoreCheckInclude=%VCINSTALLDIR%\Auxiliary\VS\include
+
 call :ForAllCombinations
 endlocal & goto :EOF
 
@@ -54,7 +56,7 @@ goto :EOF
 
 :Compile  contractViolationResponse spanIndexSize [CppStd]
 call t.bat %*
-set compile=cl -EHsc -I../include/gsl %args% -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp
+set compile=cl -EHsc -I../include/gsl -I"%CppCoreCheckInclude%" %args% -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp
 echo %compile% && %compile%
 goto :EOF
 
