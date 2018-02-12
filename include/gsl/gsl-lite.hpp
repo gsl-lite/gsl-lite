@@ -1385,7 +1385,7 @@ public:
     gsl_api gsl_constexpr14 span subspan( index_type offset ) const gsl_noexcept
     {
         Expects( offset <= this->size() );
-        return span( this->data() + offset, this->length() - offset );
+        return span( this->data() + offset, this->size() - offset );
     }
 
     gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const gsl_noexcept
@@ -1473,6 +1473,8 @@ public:
         return narrow_cast<index_type>( last_ - first_ );
     }
 
+    // member length() deprecated since 0.29.0
+    
     gsl_api gsl_constexpr14 index_type length() const gsl_noexcept
     {
         return size();
@@ -1483,6 +1485,8 @@ public:
         return size() * narrow_cast<index_type>( sizeof( element_type ) );
     }
 
+    // member length_bytes() deprecated since 0.29.0
+    
     gsl_api gsl_constexpr14 index_type length_bytes() const gsl_noexcept
     {
         return size_bytes();
