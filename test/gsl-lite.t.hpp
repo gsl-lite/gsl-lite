@@ -22,7 +22,7 @@
 // Limit C++ Core Guidelines checking to GSL Lite:
 
 #if defined(_MSC_VER) && _MSC_VER >= 1910
-# include <CppCoreCheck/Warnings.h>
+# include <CppCoreCheck/warnings.h>
 # pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #endif
 
