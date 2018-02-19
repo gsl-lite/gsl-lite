@@ -1308,6 +1308,8 @@ public:
         , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
 
+    // constructor taking shared_ptr deprecated since 0.29.0
+    
 #if gsl_HAVE_SHARED_PTR
     gsl_api gsl_constexpr14 span( shared_ptr<element_type> const & ptr )
         : first_( ptr.get() )
@@ -1315,6 +1317,8 @@ public:
     {}
 #endif
 
+    // constructors taking unique_ptr deprecated since 0.29.0
+    
 #if gsl_HAVE_UNIQUE_PTR
 # if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
     template< class ArrayElementType = typename std::add_pointer<element_type>::type >
