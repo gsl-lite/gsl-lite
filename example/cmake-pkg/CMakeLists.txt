@@ -1,0 +1,11 @@
+cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
+
+find_package( gsl-lite 0.29 REQUIRED )
+
+project( "package_using_gsl-lite" LANGUAGES CXX )
+
+add_executable(        "package_using_gsl-lite" main.cpp )
+target_link_libraries( "package_using_gsl-lite" PRIVATE gsl-lite::gsl-lite )
+
+enable_testing()
+add_test( NAME test COMMAND package_using_gsl-lite )
