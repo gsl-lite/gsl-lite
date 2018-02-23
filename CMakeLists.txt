@@ -7,6 +7,10 @@
 
 cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
+# gsl-lite version, updated by script/update-version.py:
+
+set( gsl_lite_version "0.28.0" )
+
 # At default, disable building and performing of tests and building of examples:
 
 option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" OFF )
@@ -16,7 +20,7 @@ include( CMakePackageConfigHelpers )
 
 set( package_name "gsl-lite" )
 
-project( ${package_name} VERSION 0.29.0 LANGUAGES CXX )
+project( ${package_name} VERSION ${gsl_lite_version} LANGUAGES CXX )
 
 set(         include_source_dir "${PROJECT_SOURCE_DIR}/include" )
 set(        include_install_dir "include" )
@@ -67,10 +71,11 @@ install(
                "${package_version_file}"
     DESTINATION ${package_config_install_dir} )
 
-# Build and perform tests, unless this is a subproject:
+# If requested, build and perform tests, build examples:
+
+enable_testing()
 
 if ( GSL_LITE_OPT_BUILD_TESTS )
-    enable_testing()
     add_subdirectory( test )
 endif()
 

@@ -1,6 +1,10 @@
 cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
-find_package( gsl-lite 0.29 REQUIRED )
+# gsl-lite version, updated by script/update-version.py:
+
+set( gsl_lite_version "0.28" )
+
+find_package( gsl-lite ${gsl_lite_version} REQUIRED )
 
 project( "package_using_gsl-lite" LANGUAGES CXX )
 

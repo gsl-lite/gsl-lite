@@ -13,12 +13,16 @@ set( INCDIRS "${PROJECT_SOURCE_DIR}/../include/gsl" )
 set( OPTIONS "" )
 set( DEFINITIONS "" )
 
+# Sources (.cpp) and their base names:
+
 set( SOURCES 
     01-basic.cpp 
     02-span.cpp 
 )
 
-# Make target, compile for given standard if specified:
+string( REPLACE ".cpp" "" BASENAMES "${SOURCES}" )
+
+# Function to create a target:
 
 function( make_target source )
     string( REPLACE ".cpp" "" target "${source}" )
@@ -28,7 +32,9 @@ function( make_target source )
     target_include_directories( ${target} PRIVATE ${INCDIRS} )
 endfunction()
 
-string( REPLACE ".cpp" "" BASENAMES "${SOURCES}" )
+# Targets:
+
+enable_testing()
 
 foreach( target ${BASENAMES} )
     make_target( ${target} )
