@@ -36,7 +36,7 @@ matrix:
 
 before_build:
     - mkdir build && cd build
-    - cmake -A %platform% -G "%generator%" ..
+    - cmake -A %platform% -G "%generator%" -DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON ..
 
 build_script:
     - cmake --build . --config %configuration%

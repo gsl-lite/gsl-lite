@@ -7,11 +7,10 @@
 
 cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
-# Disable building and performing of tests if gsl-lite is bundled as subproject:
+# At default, disable building and performing of tests and building of examples:
 
-if( DEFINED PROJECT_NAME )
-  set( IS_SUBPROJECT ON )
-endif()
+option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" OFF )
+option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
 
 include( CMakePackageConfigHelpers )
 
@@ -70,10 +69,13 @@ install(
 
 # Build and perform tests, unless this is a subproject:
 
-if ( NOT IS_SUBPROJECT )
+if ( GSL_LITE_OPT_BUILD_TESTS )
     enable_testing()
     add_subdirectory( test )
-#   add_subdirectory( example )
+endif()
+
+if ( GSL_LITE_OPT_BUILD_EXAMPLES )
+    add_subdirectory( example )
 endif()
 
 # end of file
