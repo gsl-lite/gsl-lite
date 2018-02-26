@@ -7,15 +7,13 @@
 #
 # This code is licensed under the MIT License (MIT).
 #
-# script/install-gsl-pkg.py
+# example/cmake-pkg/use-gsl-pkg.py
 #
 
 from  __future__  import print_function
 
 import argparse
 import os
-import re
-import sys
 
 # gsl-lite version, updated by script/update-version.py:
 
