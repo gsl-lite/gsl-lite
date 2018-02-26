@@ -9,7 +9,7 @@ cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
 project( gsl-lite-test )
 
-set( INCDIRS "${PROJECT_SOURCE_DIR}/../include/gsl" )
+# Test sources:
 
 set( SOURCES 
     gsl-lite.t.cpp 
@@ -119,7 +119,7 @@ function( make_target target std )
     add_executable            ( ${target} ${SOURCES}  )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${OPTIONAL_STD} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
-    target_include_directories( ${target} PRIVATE ${INCDIRS} )
+    target_link_libraries     ( ${target} PRIVATE gsl-lite )
 endfunction()
 
 # Add generic executable, unless -std flags can be specified:

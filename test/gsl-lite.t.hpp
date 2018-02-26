@@ -14,9 +14,9 @@
 // Select GSL Lite for VC6 if compiling with VC6:
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
-# include "gsl-lite-vc6.hpp"
+# include "gsl/gsl-lite-vc6.hpp"
 #else
-# include "gsl-lite.hpp"
+# include "gsl/gsl-lite.hpp"
 #endif
 
 // Limit C++ Core Guidelines checking to GSL Lite:

@@ -9,7 +9,8 @@ cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
 project( gsl-lite-example )
 
-set( INCDIRS "${PROJECT_SOURCE_DIR}/../include/gsl" )
+# Target default options and definitions:
+
 set( OPTIONS "" )
 set( DEFINITIONS "" )
 
@@ -29,7 +30,7 @@ function( make_target source )
     add_executable            ( ${target} ${source}  )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
-    target_include_directories( ${target} PRIVATE ${INCDIRS} )
+    target_link_libraries     ( ${target} PRIVATE gsl-lite )
 endfunction()
 
 # Targets:
