@@ -10,7 +10,7 @@ GSL Lite is based on the [Microsoft Guideline Support Library (GSL)](https://git
 - [In a nutshell](#in-a-nutshell)
 - [License](#license)
 - [Dependencies](#dependencies)
-- [Installation](#installation)
+- [Installation and use](#installation-and-use)
 - [Synopsis](#synopsis)
 - [Features](#features)
 - [Reported to work with](#reported-to-work-with)
@@ -79,11 +79,63 @@ Dependencies
 *gsl-lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
 
 
-Installation
-------------
-*gsl-lite* is a single-file header-only library. Put `gsl-lite.hpp` in the [include](include) folder directly into the project source tree or somewhere reachable from your project.
+Installation and use
+--------------------
+*gsl-lite* is a single-file header-only library. There are various ways to use it in your project. 
 
-Or, if you use the [conan package manager](https://www.conan.io/), follow these steps:
+**Contents**  
+- [As copied header](#as-copied-header)
+- [As external Git project](#as-external-git-project)
+- [As CMake package](#as-cmake-package)
+- [As Conan package](#as-conan-package)
+
+### As copied header
+
+Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. If you like to refer to gsl-lite as `gsl`, also copy the file [`gsl`](include/gsl/gsl). A minimal CMake project using this header might look as follows.
+
+```CMake
+cmake_minimum_required( VERSION 3.0 )
+
+project( use-gsl-lite )
+
+# Provide #include access to gsl-lite as 'gsl/gsl' and as 'gsl/gsl-lite.hpp': 
+
+set( GSL_LITE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include )  # adapt as necessary
+add_library( gsl INTERFACE )
+target_include_directories( gsl INTERFACE ${GSL_LITE_INCLUDE_DIR} )
+
+# Make program executable:
+
+set( SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+add_executable( program ${SOURCES} )
+target_link_libraries( program PRIVATE gsl )
+```
+
+### As external Git project
+
+TBD.
+
+### As CMake package
+
+1. First install the *gsl-lite* CMake package from its source, for example:
+
+		cd ./gsl-lite
+		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX="~/dev/native/gsl-lite/gsl-lite-0.29.0"
+		cmake --build ../_build --target install
+
+	See also [script/install-gsl-pkg.py](script/install-gsl-pkg.py) that can perform these steps for you. It also lets you control compiler and build configuration.
+
+2. Next, you can use the *gsl-lite* CMake package, for example:
+
+		cd ./gsl-lite/example/cmake-pkg
+		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=_stage -Dgsl-lite_DIR="~/dev/native/gsl-lite/gsl-lite-0.29.0/lib/cmake/gsl-lite"
+		cmake --build ../_build
+
+	Here, variable `gsl-lite_DIR` lets you specify the path to the CMake Package Configuration file of *gsl-lite*. See [example/cmake-pkg](example/cmake-pkg) for a complete example.
+
+### As Conan package
+
+For the [conan package manager](https://www.conan.io/), follow these steps:
 
 1. Add *nonstd-lite* to the conan remotes:
 
