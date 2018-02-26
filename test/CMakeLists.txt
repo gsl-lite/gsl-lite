@@ -5,15 +5,30 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
-project( test )
+project( gsl-lite-test )
 
-set( INCDIRS "${PROJECT_SOURCE_DIR}/../include/gsl" )
+# Test sources:
 
-set( SOURCES gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp )
+set( SOURCES 
+    gsl-lite.t.cpp 
+    assert.t.cpp 
+    at.t.cpp 
+    byte.t.cpp 
+    issue.t.cpp 
+    not_null.t.cpp 
+    owner.t.cpp 
+    span.t.cpp 
+    string_span.t.cpp 
+    util.t.cpp 
+)
+
+# Configure gsl-lite for testing:
 
 set( GSL_CONFIG -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+
+# Preset available C++ language compiler flags:
 
 set( HAS_STD_FLAGS  FALSE )
 set( HAS_CPP98_FLAG FALSE )
@@ -22,6 +37,8 @@ set( HAS_CPP11_FLAG FALSE )
 set( HAS_CPP14_FLAG FALSE )
 set( HAS_CPP17_FLAG FALSE )
 set( HAS_CPP20_FLAG FALSE )
+
+# Determine compiler-specifics for MSVC, GNUC, Clang:
 
 if( MSVC )
     set( HAS_STD_FLAGS TRUE )
@@ -46,7 +63,8 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
     set( HAS_CPP03_FLAG TRUE )
 
     set( STD_OPT     -std= )
-    set( OPTIONS     -Wall -Wno-missing-braces -fno-elide-constructors -Wconversion -Wsign-conversion -Wno-string-conversion ${GSL_CONFIG} )
+    set( OPTIONS     -Wall -Wno-missing-braces -fno-elide-constructors 
+                     -Wconversion -Wsign-conversion -Wno-string-conversion ${GSL_CONFIG} )
     set( DEFINITIONS "" )
 
     # GNU: available -std flags depends on version
@@ -81,7 +99,7 @@ else()
 # as is
 endif()
 
-# enable MS C++ Core Guidelines checker if MSVC:
+# Enable MS C++ Core Guidelines checker if MSVC:
 
 function( enable_msvs_guideline_checker target )
     if( MSVC )
@@ -92,7 +110,7 @@ function( enable_msvs_guideline_checker target )
     endif()
 endfunction()
 
-# make target, compile for given standard if specified:
+# Make target, compile for given standard if specified:
 
 function( make_target target std )
     if( std )
@@ -101,10 +119,10 @@ function( make_target target std )
     add_executable            ( ${target} ${SOURCES}  )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${OPTIONAL_STD} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
-    target_include_directories( ${target} PRIVATE ${INCDIRS} )
+    target_link_libraries     ( ${target} PRIVATE gsl-lite )
 endfunction()
 
-# add generic executable, unless -std flags can be specified:
+# Add generic executable, unless -std flags can be specified:
 
 if( NOT HAS_STD_FLAGS )
     make_target( gsl-lite.t "" )
@@ -138,12 +156,12 @@ else()
     endif()
 endif()
 
-# configure unit tests via CTest:
+# Configure unit tests via CTest:
 
 enable_testing()
 
 if( HAS_STD_FLAGS )
-    # unconditionally add C++98 variant for MSVC:
+    # Unconditionally add C++98 variant for MSVC:
     add_test(     NAME test-cpp98     COMMAND gsl-lite-cpp98.t )
 
     if( HAS_CPP03_FLAG )
