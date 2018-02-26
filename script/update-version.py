@@ -21,19 +21,19 @@ import sys
 
 table = (
     # path, substitute find, substitute format
-    ( 'CMakeLists.txt'                  
-        , r'set\W+gsl_lite_version\W+"([0-9]+\.[0-9]+\.[0-9]+)"\W+$'     
+    ( 'CMakeLists.txt'
+        , r'set\W+gsl_lite_version\W+"([0-9]+\.[0-9]+\.[0-9]+)"\W+$'
         , 'set( gsl_lite_version "{major}.{minor}.{patch}" )\n' )
-        
+
     , ( 'example/cmake-pkg/CMakeLists.txt'
-        , r'set\W+gsl_lite_version\W+"([0-9]+\.[0-9]+(\.[0-9]+)?)"\W+$'  
+        , r'set\W+gsl_lite_version\W+"([0-9]+\.[0-9]+(\.[0-9]+)?)"\W+$'
         , 'set( gsl_lite_version "{major}.{minor}" )\n' )
-        
-    , ( 'script/install-gsl-pkg.py'        
+
+    , ( 'script/install-gsl-pkg.py'
         , r'\gsl_lite_version\s+=\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*$'
         , 'gsl_lite_version = "{major}.{minor}.{patch}"\n' )
 
-    , ( 'include/gsl/gsl-lite.hpp'        
+    , ( 'include/gsl/gsl-lite.hpp'
         , r'\#define\s+gsl_lite_VERSION\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*$'
         , '#define  gsl_lite_VERSION "{major}.{minor}.{patch}"\n' )
 )
@@ -69,12 +69,12 @@ def editFileToVersion( version, info, verbose ):
     if verbose:
         print( "- {path} => '{text}':".format( path=in_path, text=new_text.strip('\n') ) )
 
-    writeFile( 
-        out_path, 
-        re.sub( 
+    writeFile(
+        out_path,
+        re.sub(
             ver_re, new_text, readFile( in_path )
-            , count=0, flags=re.MULTILINE 
-        ) 
+            , count=0, flags=re.MULTILINE
+        )
     )
     replaceFile( out_path, in_path )
 
@@ -105,7 +105,7 @@ def editFilesToVersionFromCommandLine():
         help='report the name of the file being processed')
 
     args = parser.parse_args()
-             
+
     editFilesToVersion( args.version[0], table, args.verbose )
 
 

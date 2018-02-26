@@ -14,8 +14,6 @@ from  __future__  import print_function
 
 import argparse
 import os
-import re
-import sys
 
 # gsl-lite version, updated by script/update-version.py:
 
