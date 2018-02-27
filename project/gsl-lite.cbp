@@ -33,9 +33,9 @@
 		<Unit filename="../example/01-basic.cpp" />
 		<Unit filename="../example/02-span.cpp" />
 		<Unit filename="../example/CMakeLists.txt" />
-		<Unit filename="../example/cmake-pkg/01-use-gsl-pkg.py" />
 		<Unit filename="../example/cmake-pkg/CMakeLists.txt" />
 		<Unit filename="../example/cmake-pkg/main.cpp" />
+		<Unit filename="../example/cmake-pkg/use-gsl-pkg.py" />
 		<Unit filename="../gsl-lite.natvis" />
 		<Unit filename="../include/gsl.h" />
 		<Unit filename="../include/gsl.hpp" />
