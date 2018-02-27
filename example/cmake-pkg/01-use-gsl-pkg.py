@@ -133,7 +133,7 @@ def main():
         '--config',
         dest='config',
         metavar='C',
-        help='the CMake configuration (Debug, Release) if different from the default')
+        help='the CMake configuration (Debug, Release) []')
 
     parser.add_argument(
         '--install-prefix',
@@ -148,7 +148,7 @@ def main():
         dest='gsl_lite_dir',
         type=str,
         metavar='D',
-        help='the CMake install prefix if different from the default')
+        help='the CMake install prefix []')
 
     opt = parser.parse_args()
 
