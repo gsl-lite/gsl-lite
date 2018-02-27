@@ -91,7 +91,9 @@ Installation and use
 
 ### As copied header
 
-Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. If you like to refer to gsl-lite as `gsl`, also copy the file [`gsl`](include/gsl/gsl). A minimal CMake project using this header might look as follows.
+Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. If you like to refer to gsl-lite as `gsl`, also copy the file [`gsl`](include/gsl/gsl). A minimal CMake setup using this header might look as follows.
+
+In project root folder:
 
 ```CMake
 cmake_minimum_required( VERSION 3.0 )
@@ -100,13 +102,25 @@ project( use-gsl-lite )
 
 # Provide #include access to gsl-lite as 'gsl/gsl' and as 'gsl/gsl-lite.hpp': 
 
-set( GSL_LITE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include )  # adapt as necessary
+set( GSL_LITE_INCLUDE_DIR include )  # adapt as necessary
 add_library( gsl INTERFACE )
 target_include_directories( gsl INTERFACE ${GSL_LITE_INCLUDE_DIR} )
 
+# Build program from src:
+
+add_subdirectory( src ) 
+```
+
+In folder src:
+
+```CMake
+cmake_minimum_required( VERSION 3.0 )
+
+project( program-using-gsl-lite )
+
 # Make program executable:
 
-set( SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+set( SOURCES main.cpp)
 add_executable( program ${SOURCES} )
 target_link_libraries( program PRIVATE gsl )
 ```
