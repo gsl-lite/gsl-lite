@@ -141,6 +141,18 @@ TBD.
 
 2. Next, you can use the *gsl-lite* CMake package, for example:
 
+	```CMake
+	cmake_minimum_required( VERSION 3.0 )
+	
+	find_package( gsl-lite "0.28" REQUIRED )
+	
+	project( program-using-gsl-lite LANGUAGES CXX )
+	
+	add_executable(        program main.cpp )
+	target_link_libraries( program PRIVATE gsl-lite::gsl-lite )
+	```
+	Configure and build:
+
 		cd ./gsl-lite/example/cmake-pkg
 		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=_stage -Dgsl-lite_DIR="~/dev/native/gsl-lite/gsl-lite-0.29.0/lib/cmake/gsl-lite"
 		cmake --build ../_build
