@@ -13,6 +13,7 @@ GSL Lite is based on the [Microsoft Guideline Support Library (GSL)](https://git
 - [Installation and use](#installation-and-use)
 - [Synopsis](#synopsis)
 - [Features](#features)
+- [Deprecation](#deprecation)
 - [Reported to work with](#reported-to-work-with)
 - [Building the tests](#building-the-tests)
 - [Other GSL implementations](#other-gsl-implementations)
@@ -372,6 +373,26 @@ copy()                      | &nbsp;  | &nbsp;  | &nbsp;  | Copy from source spa
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 
 Note: GSL Lite treats VC12 (VS2013) and VC14 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
+
+
+Deprecation
+---------------------
+The following feature are deprecated since the indicated version.
+
+Version | Feature / Notes |
+-------:|:----------------|
+0.29.0  | span::span( std::shared_ptr<T> const & p ) |
+&nbsp;  | Use span( p.get(), p.get() ? 1 : 0 ) or equivalent |
+0.29.0  | span::span( std::unique_ptr<T> const & p ) |
+&nbsp;  | Use Use span( p.get(), p.get() ? 1 : 0 ) or equivalent  |
+0.29.0  | span::length() |
+&nbsp;  | Use span::size() |
+0.29.0  | span::length_bytes() |
+&nbsp;  | Use span::size_bytes() |
+0.17.0  | member span::as_bytes(), span::as_writeable_bytes() |
+&nbsp;  | &mdash; |
+0.7.0   | gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR |
+&nbsp;  | Use gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR,<br>or consider span(with_container, cont). |
 
 
 Reported to work with
