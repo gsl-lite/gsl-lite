@@ -352,6 +352,7 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
+index                       | &#10003;| &#10003;| &#10003;| type for container indexes, subscripts, sizes |
 byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
 final_action<>              | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
 final_action                | -       | -       | < C++11 | Currently only void(*)() |

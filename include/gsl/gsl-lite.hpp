@@ -414,6 +414,13 @@ struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
 } // namespace detail
 
 //
+// GSL.util: utilities
+//
+
+// index type for all container indexes/subscripts/sizes
+typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
+
+//
 // GSL.owner: ownership pointers
 //
 #if gsl_HAVE_SHARED_PTR
@@ -1197,7 +1204,7 @@ class span
     template< class U > friend class span;
 
 public:
-    typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;  // p0122r3 uses std::ptrdiff_t
+    typedef index index_type;
 
     typedef T element_type;
     typedef T & reference;
