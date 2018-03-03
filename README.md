@@ -378,14 +378,14 @@ Reported to work with
 ---------------------
 The table below mentions the compiler versions *gsl-lite* is reported to work with.
 
-OS        | Compiler   | Versions |
----------:|:-----------|:---------|
-Windows   | Clang/LLVM | ? |
-&nbsp;    | GCC        | 4.8.4, 4.9.2, 5.2.0, 7.2.0 |
-&nbsp;    | Visual C++<br>(Visual Studio)| 6 (6) via header [gsl-lite-vc6.hpp](include/gsl/gsl-lite-vc6.hpp)<br>8 (2005), 10 (2010), 11 (2012),<br>12 (2013), 14 (2015, 2017) |
-GNU/Linux | Clang/LLVM | 3.4 |
-&nbsp;    | GCC        | 5.1 |
-OS X      | ?          | ?   |
+OS           | Compiler   | Where  | Versions |
+------------:|:-----------|-------:|----------|
+**Windows**  | Clang/LLVM | &nbsp; | ? |
+&nbsp;       | GCC        | Local  |4.8.4, 4.9.2, 5.2.0, 7.2.0 |
+&nbsp;       | Visual C++<br>(Visual Studio)| Local<br>Local<br>AppVeyor | 6 (6) via header [gsl-lite-vc6.hpp](include/gsl/gsl-lite-vc6.hpp) (not up to date)<br>8 (2005),<br> 10 (2010), 11 (2012), 12 (2013), 14 (2015), 15 (2017) |
+**GNU/Linux**| Clang/LLVM | Travis | 3.4, 3.4, 3.6, 3.7, 3.8, 3.9, 4.0, 5.0 |
+&nbsp;       | GCC        | Travis | 5.4.1, 6.3.0, 7.2.0 |
+**OS X**     | ?          | &nbsp; | ? |
 
 
 Building the tests
