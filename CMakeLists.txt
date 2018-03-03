@@ -9,7 +9,7 @@ cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
 # gsl-lite version, updated by script/update-version.py:
 
-set( gsl_lite_version "0.28.0" )
+set( gsl_lite_version "0.29.0" )
 
 # At default, disable building and performing of tests and building of examples:
 

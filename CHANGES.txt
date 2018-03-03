@@ -1,5 +1,21 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.29.0 2018-03-03
+
+- Added CMake package, thanks to @FlorianWolters (PR #100, #103).
+- Added CMake option GSL_LITE_OPT_BUILD_TESTS to ./CMakeLists.txt (default off).
+- Added CMake option GSL_LITE_OPT_BUILD_EXAMPLESto ./CMakeLists.txt (default off).
+- Added scipt/install-gsl-pkg.py
+- Added script use-gsl-pkg.py as part of an example that uses the package.
+- Added script/update-version.py to updated gsl-lite's version number in relevant files.
+- Added type `gsl::index` for container indices, subscripts and sizes.
+- Fixed padding of the output stream operator of class `string_span` to pad to the right side.
+- Deprecated span::length() and span::length_bytes() (issue #99).
+- Deprecated constructors span(shared_ptr<element_type> const & ptr) and span(unique_ptr<element_type> const & ptr)` (issue #98).
+- Added documentation section 'Deprecation'.
+- Expanded documentation section 'Installation and use'.
+- Updated documentation section 'Reported to work with'.
+
 version 0.28.0 2018-01-01
 
 - Expand Travis and Appveyor CI compiler matrices and use CMake configuration.
