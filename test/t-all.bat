@@ -56,7 +56,7 @@ goto :EOF
 
 :Compile  contractViolationResponse spanIndexSize [CppStd]
 call t.bat %*
-set compile=cl -EHsc -I../include/gsl -I"%CppCoreCheckInclude%" %args% -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp
+set compile=cl -EHsc -I../include -I"%CppCoreCheckInclude%" %args% -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp
 echo %compile% && %compile%
 goto :EOF
 

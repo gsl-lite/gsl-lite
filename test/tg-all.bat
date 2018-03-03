@@ -54,7 +54,7 @@ setlocal
 REM set FLAG=-Wsign-conversion
 REM set FLAG=-Wshadow
 set EXTRAFLAGS=%FLAG% -Wpedantic -Wconversion -Wctor-dtor-privacy -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wold-style-cast
-set compile=g++ %* -O2 %EXTRAFLAGS% -Wall -Wextra -Wno-unused-parameter -fno-elide-constructors -o gsl-lite.t.exe -I../include/gsl -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp
+set compile=g++ %* -O2 %EXTRAFLAGS% -Wall -Wextra -Wno-unused-parameter -fno-elide-constructors -o gsl-lite.t.exe -I../include -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp
 echo %compile% && %compile%
 endlocal & goto :EOF
 
