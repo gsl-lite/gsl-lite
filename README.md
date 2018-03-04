@@ -199,7 +199,7 @@ This setup brings in more than you need, but also makes it easy to update *gsl-l
 	```CMake
 	cmake_minimum_required( VERSION 3.0 )
 	
-	find_package( gsl-lite "0.28" REQUIRED )
+	find_package( gsl-lite "0.29" REQUIRED )
 	
 	project( program-using-gsl-lite LANGUAGES CXX )
 	
