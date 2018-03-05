@@ -1031,7 +1031,7 @@ CASE( "span<>: Allows to view the elements as read-only bytes" )
 
     gyte * b = is_little_endian() ? le : be;
 
-    span<int> va( a );
+    span<type> va( a );
     span<const gyte> vb( va.as_bytes()  );
     span<const gyte> vc( as_bytes( va ) );
 
@@ -1057,7 +1057,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes" )
     EXPECT( sizeof(type) == size_t( 4 ) );
 
     type  a[] = { 0x0, };
-    span<int> va( a );
+    span<type> va( a );
     span<gyte> vb( va.as_writeable_bytes() );
     span<gyte> vc( as_writeable_bytes(va) );
 
