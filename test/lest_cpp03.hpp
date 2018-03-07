@@ -1,10 +1,10 @@
-// Copyright 2013, 2014, 2015, 2016 by Martin Moene
+// Copyright 2013-2018 by Martin Moene
 //
 // lest is based on ideas by Kevlin Henney, see video at
 // http://skillsmatter.com/podcast/agile-testing/kevlin-henney-rethinking-unit-testing-in-c-plus-plus
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// file LICENSE.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef LEST_LEST_HPP_INCLUDED
 #define LEST_LEST_HPP_INCLUDED
@@ -35,7 +35,7 @@
 # pragma GCC   diagnostic ignored "-Wunused-value"
 #endif
 
-#define  lest_VERSION "1.30.1"
+#define  lest_VERSION "1.32.0"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -51,9 +51,9 @@
 
 #ifndef  lest_FEATURE_TIME
 # if !(defined(__DJGPP__) && defined(__STRICT_ANSI__))
-#  define lest_FEATURE_TIME 1
+#  define lest_FEATURE_TIME  1
 # else
-#  define lest_FEATURE_TIME 0
+#  define lest_FEATURE_TIME  0
 # endif
 #endif
 
@@ -62,7 +62,9 @@
 #endif
 
 #ifdef _WIN32
-# define lest_PLATFORM_IS_WINDOWS 1
+# define lest_PLATFORM_IS_WINDOWS  1
+#else
+# define lest_PLATFORM_IS_WINDOWS  0
 #endif
 
 #if lest_FEATURE_REGEX_SEARCH
@@ -90,6 +92,12 @@
 #endif
 
 #define lest_CPP11_OR_GREATER  ((__cplusplus >= 201103L ) || lest_COMPILER_MSVC_VERSION >= 12)
+
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
+# define lest_nullptr  nullptr
+#else
+# define lest_nullptr  NULL
+#endif
 
 #if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 10
 
@@ -183,7 +191,8 @@ namespace lest
 # define AND_THEN          lest_AND_THEN
 #endif
 
-#define lest_SCENARIO( sketch  )  lest_CASE(    lest::text("Scenario: ") + sketch  )
+#define lest_SCENARIO( specification, sketch  )  \
+                                  lest_CASE(    specification,  lest::text("Scenario: ") + sketch  )
 #define lest_GIVEN(    context )  lest_SETUP(   lest::text(   "Given: ") + context )
 #define lest_WHEN(     story   )  lest_SECTION( lest::text(   " When: ") + story   )
 #define lest_THEN(     story   )  lest_SECTION( lest::text(   " Then: ") + story   )
@@ -328,8 +337,10 @@ struct result
     const bool passed;
     const text decomposition;
 
-    result( bool passed, text decomposition )
-    : passed( passed ), decomposition( decomposition ) {}
+    template< typename T >
+    result( T const & passed, text decomposition )
+    : passed( !!passed ), decomposition( decomposition ) {}
+
     operator bool() { return ! passed; }
 };
 
@@ -885,7 +896,7 @@ struct count : action
 #else
     inline uint64_t current_ticks()
     {
-        timeval t; gettimeofday( &t, NULL );
+        timeval t; gettimeofday( &t, lest_nullptr );
         return static_cast<uint64_t>( t.tv_sec ) * 1000000ull + static_cast<uint64_t>( t.tv_usec );
     }
 #endif
@@ -1036,7 +1047,7 @@ inline void shuffle( tests & specification, options option )
 
 inline int stoi( text num )
 {
-    return static_cast<int>( lest::strtol( num.c_str(), NULL, 10 ) );
+    return static_cast<int>( lest::strtol( num.c_str(), lest_nullptr, 10 ) );
 }
 
 inline bool is_number( text arg )
@@ -1051,7 +1062,7 @@ inline seed_t seed( text opt, text arg )
     // std::time_t: implementation dependent
 
     if ( arg == "time" )
-        return static_cast<seed_t>( time( NULL ) );
+        return static_cast<seed_t>( time( lest_nullptr ) );
 
     if ( is_number( arg ) )
         return seed_t( lest::stoi( arg ) );
