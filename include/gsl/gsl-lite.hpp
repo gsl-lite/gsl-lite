@@ -139,6 +139,14 @@
 # define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
+// Presence of wide character support:
+
+#ifdef __DJGPP__
+# define gsl_HAVE_WCHAR 0
+#else
+# define gsl_HAVE_WCHAR 1
+#endif
+
 // Presence of C++11 language features:
 
 #define gsl_CPP11_10  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10)
@@ -2186,14 +2194,18 @@ gsl_api inline span< const byte > as_bytes( basic_string_span<T> spn ) gsl_noexc
 //
 
 typedef char * zstring;
-typedef wchar_t * zwstring;
 typedef const char * czstring;
+#if gsl_HAVE_WCHAR
+typedef wchar_t * zwstring;
 typedef const wchar_t * cwzstring;
+#endif // gsl_HAVE_WCHAR
 
 typedef basic_string_span< char > string_span;
-typedef basic_string_span< wchar_t > wstring_span;
 typedef basic_string_span< char const > cstring_span;
+#if gsl_HAVE_WCHAR
+typedef basic_string_span< wchar_t > wstring_span;
 typedef basic_string_span< wchar_t const > cwstring_span;
+#endif // gsl_HAVE_WCHAR
 
 // to_string() allow (explicit) conversions from string_span to string
 
@@ -2217,6 +2229,7 @@ gsl_api inline std::string to_string( cstring_span const & spn )
     return std::string( spn.data(), spn.length() );
 }
 
+#if gsl_HAVE_WCHAR
 gsl_api inline std::wstring to_string( wstring_span const & spn )
 {
     return std::wstring( spn.data(), spn.length() );
@@ -2226,6 +2239,7 @@ gsl_api inline std::wstring to_string( cwstring_span const & spn )
 {
     return std::wstring( spn.data(), spn.length() );
 }
+#endif // gsl_HAVE_WCHAR
 
 #endif // to_string()
 
@@ -2285,6 +2299,7 @@ gsl_api std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< cha
     return detail::write_to_stream( os, spn );
 }
 
+#if gsl_HAVE_WCHAR
 template< typename Traits >
 gsl_api std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t, Traits > & os, wstring_span const & spn )
 {
@@ -2296,6 +2311,7 @@ gsl_api std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< 
 {
     return detail::write_to_stream( os, spn );
 }
+#endif // gsl_HAVE_WCHAR
 
 //
 // ensure_sentinel()

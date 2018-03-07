@@ -50,7 +50,11 @@
 #endif
 
 #ifndef  lest_FEATURE_TIME
-# define lest_FEATURE_TIME 1
+# if !(defined(__DJGPP__) && defined(__STRICT_ANSI__))
+#  define lest_FEATURE_TIME 1
+# else
+#  define lest_FEATURE_TIME 0
+# endif
 #endif
 
 #ifndef lest_FEATURE_TIME_PRECISION
