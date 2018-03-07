@@ -68,14 +68,16 @@ def  useGslLitePackage( opt ):
     opt_build_type   = '-DCMAKE_BUILD_TYPE="{config}"'         .format(       config=opt.config       ) if opt.config       else ''
     opt_compiler     = '-DCMAKE_CXX_COMPILER="{compiler}"'     .format(     compiler=opt.compiler     ) if opt.compiler     else ''
     opt_install_pfx  = '-DCMAKE_INSTALL_PREFIX="{install_pfx}"'.format(  install_pfx=opt.install_pfx  ) if opt.install_pfx  else ''
+    opt_cmake_pfx    = '-DCMAKE_PREFIX_PATH="{cmake_pfx}"'     .format(    cmake_pfx=opt.cmake_pfx    ) if opt.cmake_pfx    else ''
     opt_gsl_lite_dir = '-Dgsl-lite_DIR="{gsl_lite_dir}"'       .format( gsl_lite_dir=opt.gsl_lite_dir ) if opt.gsl_lite_dir else ''
 
-    cmake( opt, '-H. {opt_build_folder} {opt_generator} {opt_build_type} {opt_compiler} {opt_install_pfx} {opt_gsl_lite_dir}'.format(
+    cmake( opt, '-H. {opt_build_folder} {opt_generator} {opt_build_type} {opt_compiler} {opt_install_pfx} {opt_cmake_pfx} {opt_gsl_lite_dir}'.format(
         opt_build_folder=opt_build_folder
         , opt_generator=opt_generator
         , opt_build_type=opt_build_type
         , opt_compiler=opt_compiler
         , opt_install_pfx=opt_install_pfx
+        , opt_cmake_pfx=opt_cmake_pfx
         , opt_gsl_lite_dir=opt_gsl_lite_dir ) )
 
     # build & test:
@@ -144,11 +146,18 @@ def main():
         help='the CMake install prefix [{deflt}]'.format( deflt=defInstallPrefix ) )
 
     parser.add_argument(
+        '--cmake-prefix',
+        dest='cmake_pfx',
+        type=str,
+        metavar='P',
+        help='the CMake prefix path []')
+
+    parser.add_argument(
         '--gsl-lite-dir',
         dest='gsl_lite_dir',
         type=str,
         metavar='D',
-        help='the CMake install prefix []')
+        help='the gsl-lite directory []')
 
     opt = parser.parse_args()
 
