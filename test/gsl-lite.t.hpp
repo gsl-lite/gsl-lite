@@ -48,6 +48,7 @@ inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
 }
 #endif
 
+#if gsl_HAVE_WCHAR
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 {
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
@@ -56,6 +57,7 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
     std::copy( text.begin(), text.end(), std::ostream_iterator<char>(os) ); return os;
 #endif
 }
+#endif // gsl_HAVE_WCHAR
 
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
 } // namespace std
