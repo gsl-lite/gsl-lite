@@ -19,8 +19,9 @@
 
 #include <sstream>  // std::ostringstream
 #include <string.h> // strlen()
+
 #if gsl_HAVE_WCHAR
-#include <wchar.h>  // wcslen()
+# include <wchar.h> // wcslen()
 #endif // gsl_HAVE_WCHAR
 
 typedef string_span::index_type index_type;
@@ -344,6 +345,7 @@ CASE( "string_span: Allows to construct a cstring_span from a const container, v
 }
 
 #if gsl_HAVE_WCHAR
+
 CASE( "string_span: Allows to construct a wstring_span from a non-const C-string and size" )
 {
     wchar_t s[] = L"hello";
@@ -602,6 +604,7 @@ CASE( "string_span: Allows to construct a cwstring_span from a const container, 
     EXPECT( sv.length() == index_type( 9 ) );
     EXPECT( std::equal( sv.begin(), sv.end(), vec.begin() ) );
 }
+
 #endif // gsl_HAVE_WCHAR
 
 CASE( "string_span: Allows to copy-construct from another span of the same type" )
@@ -1033,6 +1036,7 @@ CASE( "string_span: Allows to obtain the number of elements via size()" )
 }
 
 #if gsl_HAVE_WCHAR
+
 CASE( "string_span: Allows to obtain the number of bytes via length_bytes()" )
 {
     wchar_t a[] = L"hello";
@@ -1058,6 +1062,7 @@ CASE( "string_span: Allows to obtain the number of bytes via size_bytes()" )
     EXPECT( sa.size_bytes() == index_type( sizeof(wchar_t) * wcslen( a ) ) );
     EXPECT( sb.size_bytes() == index_type( sizeof(wchar_t) * wcslen( b ) ) );
 }
+
 #endif // gsl_HAVE_WCHAR
 
 CASE( "string_span: Allows to view the elements as read-only bytes" )
@@ -1095,6 +1100,7 @@ CASE( "to_string(): Allows to explicitly convert from cstring_span to std::strin
 }
 
 #if gsl_HAVE_WCHAR
+
 CASE( "to_string(): Allows to explicitly convert from wstring_span to std::wstring" )
 {
     wchar_t s[] = L"hello";
@@ -1116,6 +1122,7 @@ CASE( "to_string(): Allows to explicitly convert from cwstring_span to std::wstr
     EXPECT( ws.length() == 5u );
     EXPECT( std::equal( ws.begin(), ws.end(), s ) );
 }
+
 #endif // gsl_HAVE_WCHAR
 
 CASE( "ensure_z(): Disallows to build a string_span from a const C-string" )
@@ -1186,6 +1193,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
 }
 
 #if gsl_HAVE_WCHAR
+
 CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string" )
 {
     wchar_t s[] = L"hello";
@@ -1227,6 +1235,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
     EXPECT( sv.length() == index_type( 5 ) );
     EXPECT( std::wstring( sv.data() ) == std::wstring( s ) );
 }
+
 #endif // gsl_HAVE_WCHAR
 
 CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensure its presence" )
@@ -1265,6 +1274,7 @@ CASE ( "operator<<: Allows printing a cstring_span to an output stream" )
 }
 
 #if gsl_HAVE_WCHAR
+
 CASE ( "operator<<: Allows printing a wstring_span to an output stream" )
 {
     std::wostringstream oss;
@@ -1292,6 +1302,7 @@ CASE ( "operator<<: Allows printing a cwstring_span to an output stream" )
 
     EXPECT( oss.str() == L"hello\n     hello\nhello\nhello....." );
 }
+
 #endif // gsl_HAVE_WCHAR
 
 // end of file
