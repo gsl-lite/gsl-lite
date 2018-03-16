@@ -150,19 +150,21 @@
 // Presence of C++11 language features:
 
 #define gsl_CPP11_10  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 10)
+#define gsl_CPP11_11  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11)
 #define gsl_CPP11_12  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 12)
 #define gsl_CPP11_14  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 14)
 
-#define gsl_HAVE_AUTO     gsl_CPP11_10
-#define gsl_HAVE_NULLPTR  gsl_CPP11_10
+#define gsl_HAVE_AUTO                 gsl_CPP11_10
+#define gsl_HAVE_NULLPTR              gsl_CPP11_10
 
+#define gsl_HAVE_ENUM_CLASS           gsl_CPP11_11
+
+#define gsl_HAVE_ALIAS_TEMPLATE       gsl_CPP11_12
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_12
+#define gsl_HAVE_EXPLICIT_CONVERSION  gsl_CPP11_12
+#define gsl_HAVE_INITIALIZER_LIST     gsl_CPP11_12
 
-#define gsl_HAVE_ALIAS_TEMPLATE       gsl_CPP11_14
 #define gsl_HAVE_CONSTEXPR_11         gsl_CPP11_14
-#define gsl_HAVE_ENUM_CLASS           gsl_CPP11_14
-#define gsl_HAVE_EXPLICIT_CONVERSION  gsl_CPP11_14
-#define gsl_HAVE_INITIALIZER_LIST     gsl_CPP11_14
 #define gsl_HAVE_IS_DEFAULT           gsl_CPP11_14
 #define gsl_HAVE_IS_DELETE            gsl_CPP11_14
 #define gsl_HAVE_NOEXCEPT             gsl_CPP11_14
