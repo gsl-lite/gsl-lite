@@ -827,7 +827,12 @@ gsl_api inline T narrow( U u )
     }
 
 #if gsl_HAVE_TYPE_TRAITS
-    if ( ! details::is_same_signedness<T, U>::value && ( ( t < T() ) != ( u < U() ) ) )
+# if gsl_COMPILER_MSVC_VERSION
+    // Suppress MSVC level 4 warning C4127 (conditional expression is constant)
+    if ( 0, ! details::is_same_signedness<T, U>::value && ( ( t < T() ) != ( u < U() ) ) )
+# else
+    if (    ! details::is_same_signedness<T, U>::value && ( ( t < T() ) != ( u < U() ) ) )
+# endif
 #else
     // Don't assume T() works:
     if ( ( t < 0 ) != ( u < 0 ) )

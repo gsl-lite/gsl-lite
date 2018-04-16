@@ -74,4 +74,10 @@ CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's mo
     std::string str = to_string( span );
 #endif
 }
+
+CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning C4127: conditional expression is constant [.issue #115]" )
+{
+    try { (void) narrow<float>( 1.0 ); } catch(...) {}
+}
+
 // end of file
