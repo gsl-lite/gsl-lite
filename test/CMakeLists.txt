@@ -62,10 +62,18 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
     set( HAS_CPP98_FLAG TRUE )
     set( HAS_CPP03_FLAG TRUE )
 
-    set( STD_OPT     -std= )
-    set( OPTIONS     -Wall -Wno-missing-braces -fno-elide-constructors 
-                     -Wconversion -Wsign-conversion -Wno-string-conversion ${GSL_CONFIG} )
-    set( DEFINITIONS "" )
+    set( STD_OPT  -std= )
+    set( OPTIONS     
+        -O2
+        -Wall
+        -Wno-missing-braces 
+        -Wconversion 
+        -Wsign-conversion 
+        -Wno-string-conversion 
+        -fno-elide-constructors 
+        -fstrict-aliasing -Wstrict-aliasing=2 
+    )
+    set( DEFINITIONS ${GSL_CONFIG} )
 
     # GNU: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )

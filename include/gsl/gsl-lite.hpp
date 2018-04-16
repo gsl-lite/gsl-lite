@@ -139,6 +139,14 @@
 # define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
+// Compiler non-strict aliasing:
+
+#if defined __clang__ || defined __GNUC__
+# define gsl_may_alias  __attribute__((__may_alias__))
+#else
+# define gsl_may_alias
+#endif
+
 // Presence of wide character support:
 
 #ifdef __DJGPP__
@@ -1044,9 +1052,9 @@ gsl_api inline gsl_constexpr14 bool operator>=( not_null<U> const & l, not_null<
 // Byte-specific type.
 //
 #if gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
-  enum class byte : unsigned char {};
+  enum class gsl_may_alias byte : unsigned char {};
 #else
-  struct byte { typedef unsigned char type; type v; };
+  struct gsl_may_alias byte { typedef unsigned char type; type v; };
 #endif
 
 #if gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG

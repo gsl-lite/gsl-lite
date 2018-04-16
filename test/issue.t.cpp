@@ -32,7 +32,7 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
 #endif
 }
 
-CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[.issue #34](GSL #313)" )
+CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[.issue #34](GSL issue #313, PR #390)" )
 {
     struct F {
         static int f( int & i, gsl::byte & r )
