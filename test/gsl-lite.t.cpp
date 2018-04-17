@@ -28,6 +28,12 @@ CASE( "gsl-lite version" "[.version]" )
 CASE( "C++ compiler: compiler version" "[.compiler]" )
 {
 #ifdef gsl_COMPILER_GNUC_VERSION
+    gsl_PRESENT( gsl_COMPILER_CLANG_VERSION );
+#else
+    gsl_ABSENT(  gsl_COMPILER_CLANG_VERSION );
+#endif
+
+#ifdef gsl_COMPILER_GNUC_VERSION
     gsl_PRESENT( gsl_COMPILER_GNUC_VERSION );
 #else
     gsl_ABSENT(  gsl_COMPILER_GNUC_VERSION );
