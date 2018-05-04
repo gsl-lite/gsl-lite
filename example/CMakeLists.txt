@@ -5,7 +5,7 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
 
 project( gsl-lite-example )
 
@@ -31,6 +31,7 @@ function( make_target source )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
     target_link_libraries     ( ${target} PRIVATE gsl-lite )
+    set_target_properties     ( ${target} PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO )
 endfunction()
 
 # Targets:
