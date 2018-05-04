@@ -1324,9 +1324,21 @@ public:
         : first_( cont.data() )
         , last_ ( cont.data() + cont.size() )
     {}
+
+    template< class Cont, class = decltype(std::declval<Cont const &>().data()) >
+    gsl_api gsl_constexpr14 span( Cont const & cont )
+        : first_( cont.data() )
+        , last_ ( cont.data() + cont.size() )
+    {}
 #elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
+        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+    {}
+
+    template< class Cont >
+    gsl_api gsl_constexpr14 span( Cont const & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
         , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
@@ -1334,6 +1346,12 @@ public:
 
     template< class Cont >
     gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
+        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+    {}
+
+    template< class Cont >
+    gsl_api gsl_constexpr14 span( with_container_t, Cont const & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
         , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
     {}
@@ -1855,7 +1873,7 @@ public:
             ! detail::is_std_array< Cont >::value
             && ! detail::is_basic_string_span< Cont >::value
             && std::is_convertible< typename Cont::pointer, pointer >::value
-            && std::is_convertible< typename Cont::pointer, decltype(std::declval<Cont>().data()) >::value
+            && std::is_convertible< typename Cont::pointer, decltype(std::declval<Cont const &>().data()) >::value
         >::type
     >
     gsl_api gsl_constexpr basic_string_span( Cont const & cont )
