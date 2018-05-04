@@ -580,7 +580,9 @@ span<>: Allows to construct from a const C-array with size via decay to pointer 
 span<>: Allows to construct from a std::array<> (C++11)
 span<>: Allows to construct from a std::array<> with const data (C++11)
 span<>: Allows to construct from a container (std::vector<>)
+span<>: Allows to construct from a temporary container (potentially dangerous)
 span<>: Allows to tag-construct from a container (std::vector<>)
+span<>: Allows to tag-construct from a temporary container (potentially dangerous)
 span<>: Allows to construct from an empty gsl::shared_ptr (C++11)
 span<>: Allows to construct from an empty gsl::unique_ptr (C++11)
 span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)
@@ -621,9 +623,9 @@ span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain the number of elements via size()
-span<>: Allows to obtain the number of elements via length()
+span<>: Allows to obtain the number of elements via length()[deprecated]
 span<>: Allows to obtain the number of bytes via size_bytes()
-span<>: Allows to obtain the number of bytes via length_bytes()
+span<>: Allows to obtain the number of bytes via length_bytes()[deprecated]
 span<>: Allows to swap with another span of the same type
 span<>: Allows to view the elements as read-only bytes
 span<>: Allows to view and change the elements as writable bytes
@@ -641,6 +643,7 @@ make_span(): Allows building from a std::array<> (C++11)
 make_span(): Allows building from a const std::array<> (C++11)
 make_span(): Allows building from a container (std::vector<>)
 make_span(): Allows building from a const container (std::vector<>)
+make_span(): Allows building from a temporary container (potentially dangerous)
 make_span(): Allows building from an empty gsl::shared_ptr (C++11)
 make_span(): Allows building from an empty gsl::unique_ptr (C++11)
 make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)
