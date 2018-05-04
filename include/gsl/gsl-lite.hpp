@@ -20,6 +20,7 @@
 #ifndef GSL_GSL_LITE_HPP_INCLUDED
 #define GSL_GSL_LITE_HPP_INCLUDED
 
+#include <algorithm>
 #include <exception>
 #include <iterator>
 #include <limits>
