@@ -1124,7 +1124,7 @@ CASE( "span<>: Allows to view the elements as a span of another type" )
     type2 * b = is_little_endian() ? le : be;
 
     span<type1> va( a );
-#if gsl_COMPILER_MSVC_VERSION == 6
+#if gsl_COMPILER_MSVC_VERSION == 60
     span<type2> vb( va.as_span( type2() ) );
 #else
     span<type2> vb( va.as_span<type2>() );
@@ -1149,7 +1149,7 @@ CASE( "span<>: Allows to change the elements from a span of another type" )
     type1  a[] = { 0x0, };
 
     span<type1> va( a );
-#if gsl_COMPILER_MSVC_VERSION == 6
+#if gsl_COMPILER_MSVC_VERSION == 60
     span<type2> vb( va.as_span( type2() ) );
 #else
     span<type2> vb( va.as_span<type2>() );

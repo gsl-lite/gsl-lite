@@ -18,7 +18,7 @@
 #include "gsl-lite.t.hpp"
 #include <functional>
 
-#define gsl_CPP11_OR_GREATER_WRT_FINAL ( gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 11 )
+#define gsl_CPP11_OR_GREATER_WRT_FINAL ( gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110 )
 
 CASE( "finally: Allows to run lambda on leaving scope" )
 {

@@ -34,7 +34,7 @@ using namespace gsl;
 
 extern lest::tests & specification();
 
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
+#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
 namespace std {
 #else
 namespace lest {
@@ -51,7 +51,7 @@ inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
 #if gsl_HAVE_WCHAR
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 {
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
+#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
     return os << std::string( text.begin(), text.end() );
 #else
     std::copy( text.begin(), text.end(), std::ostream_iterator<char>(os) ); return os;
@@ -59,7 +59,7 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 }
 #endif // gsl_HAVE_WCHAR
 
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 6, 7 )
+#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
 } // namespace std
 #else
 } // namespace lest

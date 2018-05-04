@@ -1155,7 +1155,7 @@ CASE( "ensure_z(): Allows to build a string_span from a non-const C-string" )
 {
     char s[] = "hello";
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
     string_span sv = ensure_z( s );
 #else
     string_span sv = ensure_z( &s[0] );
@@ -1168,7 +1168,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a non-const C-string" )
 {
     char s[] = "hello";
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
     cstring_span sv = ensure_z( s );
 #else
     cstring_span sv = ensure_z( &s[0] );
@@ -1182,7 +1182,7 @@ CASE( "ensure_z(): Allows to build a cstring_span from a const C-string" )
 {
     const char s[] = "hello";
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
     cstring_span sv = ensure_z( s );
 #else
     cstring_span sv = ensure_z( &s[0] );
@@ -1198,7 +1198,7 @@ CASE( "ensure_z(): Allows to build a wstring_span from a non-const wide C-string
 {
     wchar_t s[] = L"hello";
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
     wstring_span sv = ensure_z( s );
 #else
     wstring_span sv = ensure_z( &s[0] );
@@ -1212,7 +1212,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a non-const wide C-strin
 {
     wchar_t s[] = L"hello";
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
     cwstring_span sv = ensure_z( s );
 #else
     cwstring_span sv = ensure_z( &s[0] );
@@ -1226,7 +1226,7 @@ CASE( "ensure_z(): Allows to build a cwstring_span from a const wide C-string" )
 {
     const wchar_t s[] = L"hello";
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
     cwstring_span sv = ensure_z( s );
 #else
     cwstring_span sv = ensure_z( &s[0] );
