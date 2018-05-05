@@ -19,13 +19,14 @@
 
 typedef span<int>::index_type index_type;
 
-static std::vector<int> vector_iota(int n)
+static std::vector<int> vector_iota( int n )
 {
-  std::vector<int> ret;
+  std::vector<int> result;
 
-  for (int i = 0; i < n; ++i)
-    ret.push_back(i);
-  return ret;
+  for ( int i = 0; i < n; ++i )
+    result.push_back( i );
+    
+  return result;
 }
 
 CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
@@ -361,11 +362,7 @@ CASE( "span<>: Allows to construct from a std::array<> with const data (C++11)" 
 
 CASE( "span<>: Allows to construct from a container (std::vector<>)" )
 {
-# if gsl_HAVE_INITIALIZER_LIST
-    std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-#else
-    std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
-#endif
+    std::vector<int> vec = vector_iota(10);
 
 #if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     span<      int> v( vec );
@@ -391,11 +388,7 @@ CASE( "span<>: Allows to construct from a temporary container (potentially dange
 
 CASE( "span<>: Allows to tag-construct from a container (std::vector<>)" )
 {
-# if gsl_HAVE_INITIALIZER_LIST
-    std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-#else
-    std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
-#endif
+    std::vector<int> vec = vector_iota(10);
     span<      int> v( with_container, vec );
     span<const int> w( with_container, vec );
 
@@ -1274,11 +1267,7 @@ CASE( "make_span(): Allows building from a const std::array<> (C++11)" )
 
 CASE( "make_span(): Allows building from a container (std::vector<>)" )
 {
-# if gsl_HAVE_INITIALIZER_LIST
-    std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-#else
-    std::vector<int> vec; {for ( int i = 1; i < 10; ++i ) vec.push_back(i); }
-#endif
+    std::vector<int> vec = vector_iota(10);
     span<int> v = make_span( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
@@ -1286,11 +1275,7 @@ CASE( "make_span(): Allows building from a container (std::vector<>)" )
 
 CASE( "make_span(): Allows building from a const container (std::vector<>)" )
 {
-# if gsl_HAVE_INITIALIZER_LIST
-    const std::vector<int> vec = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
-#else
-    const std::vector<int> vec( 10, 42 );
-#endif
+    const std::vector<int> vec = vector_iota(10);
     span<const int> v = make_span( vec );
 
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
