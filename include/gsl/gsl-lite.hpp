@@ -488,7 +488,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #if gsl_ELIDE_CONTRACT_EXPECTS
 # define Expects( x )  /* Expects elided */
 #elif gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
-# define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ": " gsl_STRINGIFY(__LINE__) );
+# define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) );
 #else
 # define Expects( x )  ::gsl::fail_fast_assert( (x) )
 #endif
@@ -496,7 +496,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #if gsl_ELIDE_CONTRACT_ENSURES
 # define Ensures( x )  /* Ensures elided */
 #elif gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
-# define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ": " gsl_STRINGIFY(__LINE__) );
+# define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) );
 #else
 # define Ensures( x )  ::gsl::fail_fast_assert( (x) )
 #endif
