@@ -404,7 +404,7 @@ CASE( "span<>: Allows to tag-construct from a temporary container (potentially d
     EXPECT( !!"std::array<> is not available (no C++11)" );
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11)" )
+CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE_SHARED_PTR
     span<int> ptr = gsl::shared_ptr<int>( gsl_nullptr );
@@ -418,7 +418,7 @@ CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11)" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11)" )
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE_UNIQUE_PTR
     gsl::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
@@ -966,7 +966,7 @@ CASE( "span<>: Allows to obtain the number of elements via size()" )
     EXPECT(  z.size() == index_type( 0 ) );
 }
 
-CASE( "span<>: Allows to obtain the number of elements via length()" "[deprecated]" )
+CASE( "span<>: Allows to obtain the number of elements via length() " "[deprecated]" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
@@ -994,7 +994,7 @@ CASE( "span<>: Allows to obtain the number of bytes via size_bytes()" )
     EXPECT(  z.size_bytes() == index_type( 0 * sizeof(int) ) );
 }
 
-CASE( "span<>: Allows to obtain the number of bytes via length_bytes()" "[deprecated]" )
+CASE( "span<>: Allows to obtain the number of bytes via length_bytes() " "[deprecated]" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
@@ -1035,7 +1035,7 @@ static bool is_little_endian()
     return 1 != U().c[ sizeof(int) - 1 ];
 }
 
-CASE( "span<>: Allows to view the elements as read-only bytes" )
+CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated as member]" )
 {
 #if gsl_HAVE_SIZED_TYPES
     typedef int32_t type;
@@ -1053,7 +1053,7 @@ CASE( "span<>: Allows to view the elements as read-only bytes" )
     gyte * b = is_little_endian() ? le : be;
 
     span<type> va( a );
-    span<const gyte> vb( va.as_bytes()  );
+    span<const gyte> vb( va.as_bytes()  );  // deprecated since v0.17.0
     span<const gyte> vc( as_bytes( va ) );
 
     EXPECT( vb[0] == b[0] );
