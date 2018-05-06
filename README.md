@@ -1,6 +1,6 @@
 # GSL Lite: Guideline Support Library for C++98, C++11 up
 
-[![Standard](https://img.shields.io/badge/c%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/agauniyal/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion) [![Try it on wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/6qCRm1GGzI5FLAE9) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
+[![Standard](https://img.shields.io/badge/c%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/agauniyal/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion) [![Try it on wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/aYslSjb5RfpmJVgx) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
 
 
 GSL Lite is based on the [Microsoft Guideline Support Library (GSL)](https://github.com/microsoft/gsl). 
@@ -583,8 +583,8 @@ span<>: Allows to construct from a container (std::vector<>)
 span<>: Allows to construct from a temporary container (potentially dangerous)
 span<>: Allows to tag-construct from a container (std::vector<>)
 span<>: Allows to tag-construct from a temporary container (potentially dangerous)
-span<>: Allows to construct from an empty gsl::shared_ptr (C++11)
-span<>: Allows to construct from an empty gsl::unique_ptr (C++11)
+span<>: Allows to construct from an empty gsl::shared_ptr (C++11) [deprecated]
+span<>: Allows to construct from an empty gsl::unique_ptr (C++11) [deprecated]
 span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)
 span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)
 span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)
@@ -623,11 +623,11 @@ span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain the number of elements via size()
-span<>: Allows to obtain the number of elements via length()[deprecated]
+span<>: Allows to obtain the number of elements via length() [deprecated]
 span<>: Allows to obtain the number of bytes via size_bytes()
-span<>: Allows to obtain the number of bytes via length_bytes()[deprecated]
+span<>: Allows to obtain the number of bytes via length_bytes() [deprecated]
 span<>: Allows to swap with another span of the same type
-span<>: Allows to view the elements as read-only bytes
+span<>: Allows to view the elements as read-only bytes [deprecated as member]
 span<>: Allows to view and change the elements as writable bytes
 span<>: Allows to view the elements as a span of another type
 span<>: Allows to change the elements from a span of another type
