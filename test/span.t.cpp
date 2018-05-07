@@ -31,7 +31,7 @@ static std::vector<int> vector_iota( int n )
 
 CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( IS_DELETE )
     span<int> v = 42;
 # endif
@@ -40,7 +40,7 @@ CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl
 
 CASE( "span<>: Disallows construction from a C-array of incompatible type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     short arr[] = { 1, 2, 3, };
     span<int> v = arr;
 #endif
@@ -48,7 +48,7 @@ CASE( "span<>: Disallows construction from a C-array of incompatible type (defin
 
 CASE( "span<>: Disallows construction from a std::array of incompatible type (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( ARRAY )
     std::array<long,3> arr = {{ 1L, 2L, 3L, }};
     span<int> v( arr);
@@ -894,7 +894,7 @@ CASE( "span<>: Allows to compare greater than or equal to another span of the sa
 
 CASE( "span<>: Allows to compare to another span of the same type and different cv-ness (non-standard)" )
 {
-#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     int aa[] = { 1 }, bb[] = { 2 };
     span<         int>  a( aa );
     span<   const int> ca( aa );

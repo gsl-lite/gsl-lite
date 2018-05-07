@@ -28,7 +28,7 @@ typedef string_span::index_type index_type;
 
 CASE( "string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     cstring_span sv = "hello";
 
     string_span v2 = sv;
@@ -37,7 +37,7 @@ CASE( "string_span: Disallows construction of a string_span from a cstring_span 
 
 CASE( "string_span: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     const std::string s = "hello, world";
 
     string_span sv( s );
@@ -918,7 +918,7 @@ CASE( "string_span: Allows to compare empty span to non-empty span" )
 
 CASE( "string_span: Allows to compare a string_span with a cstring_span" )
 {
-#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     char s[] = "hello";
 
     string_span   sv( s, strlen( s ) );
@@ -932,7 +932,7 @@ CASE( "string_span: Allows to compare a string_span with a cstring_span" )
 
 CASE( "string_span: Allows to compare with types convertible to string_span" )
 {
-#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
     char const * phello   = "hello";
     char const   ahello[] = "hello";
@@ -1127,7 +1127,7 @@ CASE( "to_string(): Allows to explicitly convert from cwstring_span to std::wstr
 
 CASE( "ensure_z(): Disallows to build a string_span from a const C-string" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     const char s[] = "hello";
 
     string_span sv = ensure_z( s );
@@ -1140,7 +1140,7 @@ CASE( "ensure_z(): Disallows to build a string_span from a const C-string" )
 #if gsl_HAVE( WCHAR )
 CASE( "ensure_z(): Disallows to build a wstring_span from a const wide C-string" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     const wchar_t s[] = L"hello";
 
     wstring_span sv = ensure_z( s );

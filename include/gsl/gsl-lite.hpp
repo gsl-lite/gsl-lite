@@ -313,7 +313,7 @@
 # define gsl_is_delete_access private
 #endif
 
-#if !gsl_HAVE_NOEXCEPT || gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+#if !gsl_HAVE( NOEXCEPT ) || gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define gsl_noexcept /*noexcept*/
 #else
 # define gsl_noexcept noexcept
@@ -523,7 +523,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 #if gsl_ELIDE_CONTRACT_EXPECTS
 # define Expects( x )  /* Expects elided */
-#elif gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) );
 #else
 # define Expects( x )  ::gsl::fail_fast_assert( (x) )
@@ -531,7 +531,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 #if gsl_ELIDE_CONTRACT_ENSURES
 # define Ensures( x )  /* Ensures elided */
-#elif gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) );
 #else
 # define Ensures( x )  ::gsl::fail_fast_assert( (x) )
@@ -550,7 +550,7 @@ struct fail_fast : public std::logic_error
 
 #if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600 ) && gsl_HAVE( CONSTEXPR_14 )
 
-# if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
 gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const message ) -> void
 {
@@ -570,7 +570,7 @@ gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond ) -> void
 
 #else // workaround
 
-# if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+# if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
 gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const message )
 {
@@ -870,7 +870,7 @@ gsl_api inline T narrow( U u )
 
     if ( static_cast<U>( t ) != u )
     {
-#if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+#if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
         throw narrowing_error();
 #else
         std::terminate();
@@ -889,7 +889,7 @@ gsl_api inline T narrow( U u )
     if ( ( t < 0 ) != ( u < 0 ) )
 #endif
     {
-#if gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V
+#if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
         throw narrowing_error();
 #else
         std::terminate();
@@ -926,7 +926,7 @@ gsl_api inline gsl_constexpr14 typename Cont::value_type & at( Cont & cont, size
     return cont[index];
 }
 
-#if gsl_HAVE( INITIALIZER_LIST
+#if gsl_HAVE( INITIALIZER_LIST )
 
 template< class T >
 gsl_api inline const gsl_constexpr14 T & at( std::initializer_list<T> cont, size_t index )
@@ -1620,7 +1620,7 @@ private:
 
 // span comparison functions
 
-#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator==( span<T> const & l, span<U> const & r )
@@ -1697,7 +1697,7 @@ gsl_api inline OI copy_n( II first, N count, OI result )
 template< class T, class U >
 gsl_api inline void copy( span<T> src, span<U> dest )
 {
-#if gsl_CPP14_OR_GREATER // gsl_HAVE_TYPE_TRAITS (circumvent Travis clang 3.4)
+#if gsl_CPP14_OR_GREATER // gsl_HAVE( TYPE_TRAITS ) (circumvent Travis clang 3.4)
     static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
 #endif
     Expects( dest.size() >= src.size() );
@@ -2133,7 +2133,7 @@ private:
 
 // basic_string_span comparison functions:
 
-#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, U const & u ) gsl_noexcept
@@ -2174,7 +2174,7 @@ gsl_api inline gsl_constexpr14 bool operator<( U const & u, basic_string_span<T>
 }
 #endif
 
-#else //gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#else //gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T >
 gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
@@ -2189,7 +2189,7 @@ gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, b
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#endif // gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator!=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
@@ -2200,7 +2200,7 @@ gsl_api inline gsl_constexpr14 bool operator!=( basic_string_span<T> const & l, 
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator<=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     return !( r < l );
 #else
     basic_string_span< typename detail::add_const<T>::type > rr( r );
@@ -2211,7 +2211,7 @@ gsl_api inline gsl_constexpr14 bool operator<=( basic_string_span<T> const & l, 
 template< class T, class U >
 gsl_api inline gsl_constexpr14 bool operator>( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     return ( r < l );
 #else
     basic_string_span< typename detail::add_const<T>::type > rr( r );

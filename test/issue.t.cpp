@@ -19,7 +19,7 @@
 
 CASE( "span<>: free comparation functions fail for different const-ness" "[.issue #32]" )
 {
-#if gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     char data[] = { 'a', 'b' };
     string_span  a = make_span( data );
     cstring_span b = make_span( data ).last( 1 );
@@ -69,7 +69,7 @@ CASE( "string_span<>: must not include terminating '\\0'" "[.issue #53]" )
 
 CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" "[.issue #53a]" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     cstring_span span = "Hello world";
     std::string str = to_string( span );
 #endif

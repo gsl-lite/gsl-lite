@@ -37,14 +37,14 @@ struct RefCounted
 
 CASE( "not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     not_null< int* > p;
 #endif
 }
 
 CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( NULLPTR )
     not_null< int* > p = nullptr;
 # endif
@@ -55,7 +55,7 @@ CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_
 
 CASE( "not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( UNIQUE_PTR )
     std::unique_ptr< int > up = std::make_unique<int>( 120 );
     not_null< int* > p4 = up;
@@ -65,7 +65,7 @@ CASE( "not_null<>: Disallows construction from a unique pointer to underlying ty
 
 CASE( "not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     MyDerived derived;
     not_null< MyDerived* > p = &derived;
 

@@ -19,7 +19,7 @@
 
 CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
-#if  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#if  gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( TYPE_TRAITS )
     owner<int> p = gsl_nullptr;
 # else
