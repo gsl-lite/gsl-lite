@@ -144,7 +144,7 @@ CASE( "finally: Allows moving final_action to throw" "[.]")
 
 CASE( "on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
-#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 #if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
@@ -167,7 +167,7 @@ CASE( "on_return: Allows to perform action on leaving scope without exception (g
 
 CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
-#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 #if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }

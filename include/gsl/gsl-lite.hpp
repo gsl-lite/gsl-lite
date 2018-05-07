@@ -297,7 +297,7 @@
 # define gsl_explicit /*explicit*/
 #endif
 
-#if gsl_FEATURE_HAVE_IMPLICIT_MACRO
+#if gsl_FEATURE( HAVE_IMPLICIT_MACRO )
 # define implicit /*implicit*/
 #endif
 
@@ -506,7 +506,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 #define gsl_HAVE_OWNER_TEMPLATE  gsl_HAVE_ALIAS_TEMPLATE
 
-#if gsl_FEATURE_HAVE_OWNER_MACRO
+#if gsl_FEATURE( HAVE_OWNER_MACRO )
 # if gsl_HAVE( OWNER_TEMPLATE )
 #  define Owner(t)  ::gsl::owner<t>
 # else
@@ -657,7 +657,7 @@ gsl_api inline final_action<F> finally( F && action ) gsl_noexcept
     return final_action<F>( std::forward<F>( action ) );
 }
 
-#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 template< class F >
 class final_action_return : public final_action<F>
@@ -729,7 +729,7 @@ gsl_api inline final_action_error<F> on_error( F && action ) gsl_noexcept
     return final_action_error<F>( std::forward<F>( action ) );
 }
 
-#endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 #else // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110
 
@@ -781,7 +781,7 @@ gsl_api inline final_action finally( F const & f )
     return final_action(( f ));
 }
 
-#if gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 class final_action_return : public final_action
 {
@@ -829,7 +829,7 @@ gsl_api inline final_action_error on_error( F const & action )
     return final_action_error( action );
 }
 
-#endif // gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 #endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 110
 
@@ -1718,6 +1718,8 @@ gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
+#if gsl_FEATURE_TO_STD( MAKE_SPAN )
+
 template< class T >
 gsl_api inline gsl_constexpr14 span<T> make_span( T * first, T * last )
 {
@@ -1780,6 +1782,9 @@ gsl_api inline span<const T> make_span( std::vector<T> const & cont )
 }
 #endif
 
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+#endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
+
 template< class Ptr >
 gsl_api inline span<typename Ptr::element_type> make_span( Ptr & ptr )
 {
@@ -1791,6 +1796,11 @@ span<typename Ptr::element_type> make_span( Ptr & ptr, typename span<typename Pt
 {
     return span<typename Ptr::element_type>( ptr, count);
 }
+
+#endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
+
+#if gsl_FEATURE_TO_STD( BYTE_SPAN )
+#endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 //
 // basic_string_span:
