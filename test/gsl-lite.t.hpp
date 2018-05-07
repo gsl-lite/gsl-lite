@@ -40,7 +40,7 @@ namespace std {
 namespace lest {
 #endif
 
-#if gsl_HAVE_ARRAY
+#if gsl_HAVE( ARRAY )
 template< typename T, std::size_t N >
 inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
 {
@@ -48,7 +48,7 @@ inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
 }
 #endif
 
-#if gsl_HAVE_WCHAR
+#if gsl_HAVE( WCHAR )
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 {
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
@@ -57,7 +57,7 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
     std::copy( text.begin(), text.end(), std::ostream_iterator<char>(os) ); return os;
 #endif
 }
-#endif // gsl_HAVE_WCHAR
+#endif // gsl_HAVE( WCHAR )
 
 #if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
 } // namespace std

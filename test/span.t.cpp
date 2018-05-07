@@ -32,7 +32,7 @@ static std::vector<int> vector_iota( int n )
 CASE( "span<>: Disallows construction from a temporary value (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# if gsl_HAVE_IS_DELETE
+# if gsl_HAVE( IS_DELETE )
     span<int> v = 42;
 # endif
 #endif
@@ -49,7 +49,7 @@ CASE( "span<>: Disallows construction from a C-array of incompatible type (defin
 CASE( "span<>: Disallows construction from a std::array of incompatible type (C++11) (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# if gsl_HAVE_ARRAY
+# if gsl_HAVE( ARRAY )
     std::array<long,3> arr = {{ 1L, 2L, 3L, }};
     span<int> v( arr);
 # endif
@@ -58,7 +58,7 @@ CASE( "span<>: Disallows construction from a std::array of incompatible type (C+
 
 CASE( "span<>: Terminates construction from a nullptr and a non-zero size (C++11)" )
 {
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     struct F { static void blow() { span<int> v( nullptr, 42 ); } };
 
     EXPECT_THROWS( F::blow() );
@@ -156,7 +156,7 @@ CASE( "span<>: Allows to default-construct" )
 
 CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 {
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     span<      int> v( nullptr, 0 );
     span<const int> w( nullptr, 0 );
 
@@ -169,7 +169,7 @@ CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 
 CASE( "span<>: Allows to construct from a l-value (C++11)" )
 {
-#if gsl_HAVE_IS_DELETE
+#if gsl_HAVE( IS_DELETE )
     int x = 0;
 
     span<      int> v( x );
@@ -184,7 +184,7 @@ CASE( "span<>: Allows to construct from a l-value (C++11)" )
 
 CASE( "span<>: Allows to construct from a const l-value (C++11)" )
 {
-#if gsl_HAVE_IS_DELETE
+#if gsl_HAVE( IS_DELETE )
     const int x = 0;
 
     span<const int> v( x );
@@ -334,7 +334,7 @@ CASE( "span<>: Allows to construct from a const C-array with size via decay to p
 
 CASE( "span<>: Allows to construct from a std::array<> (C++11)" )
 {
-# if gsl_HAVE_ARRAY
+# if gsl_HAVE( ARRAY )
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<      int> v( arr );
@@ -349,7 +349,7 @@ CASE( "span<>: Allows to construct from a std::array<> (C++11)" )
 
 CASE( "span<>: Allows to construct from a std::array<> with const data (C++11)" )
 {
-# if gsl_HAVE_ARRAY
+# if gsl_HAVE( ARRAY )
     std::array<const int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<const int> v( arr );
@@ -364,7 +364,7 @@ CASE( "span<>: Allows to construct from a container (std::vector<>)" )
 {
     std::vector<int> vec = vector_iota(10);
 
-#if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
     span<      int> v( vec );
     span<const int> w( vec );
 
@@ -377,7 +377,7 @@ CASE( "span<>: Allows to construct from a container (std::vector<>)" )
 
 CASE( "span<>: Allows to construct from a temporary container (potentially dangerous)" )
 {
-#if gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR || gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
     std::vector<int> vec = vector_iota( 10 );
 
     EXPECT( std::equal( vec.begin(), vec.end(), span<const int>( vector_iota(10) ).begin() ) );
@@ -406,7 +406,7 @@ CASE( "span<>: Allows to tag-construct from a temporary container (potentially d
 
 CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[deprecated]" )
 {
-#if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE( SHARED_PTR )
     span<int> ptr = gsl::shared_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
@@ -420,7 +420,7 @@ CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[dep
 
 CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[deprecated]" )
 {
-#if gsl_HAVE_UNIQUE_PTR
+#if gsl_HAVE( UNIQUE_PTR )
     gsl::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
@@ -434,7 +434,7 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[dep
 
 CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)" )
 {
-#if gsl_HAVE_UNIQUE_PTR
+#if gsl_HAVE( UNIQUE_PTR )
     gsl::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
 
     span<int> s( ptr, 0 );
@@ -448,7 +448,7 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)"
 
 CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)" )
 {
-#if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE( SHARED_PTR )
     shared_ptr<int> ptr = gsl::make_shared<int>( 4 );
 
     span<int> s( ptr );
@@ -463,8 +463,8 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)" )
 
 CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)" )
 {
-#if gsl_HAVE_UNIQUE_PTR
-# if gsl_HAVE_MAKE_UNIQUE
+#if gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( MAKE_UNIQUE )
     gsl::unique_ptr<int> ptr = std::make_unique<int>( 4 );
 #else
     gsl::unique_ptr<int> ptr = unique_ptr<int>( new int( 4 ) );
@@ -482,8 +482,8 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)" )
 
 CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11)" )
 {
-#if gsl_HAVE_UNIQUE_PTR
-# if gsl_HAVE_MAKE_UNIQUE
+#if gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( MAKE_UNIQUE )
     gsl::unique_ptr<size_t[]> arr = make_unique<size_t[]>( 4 );
 #else
     gsl::unique_ptr<size_t[]> arr = unique_ptr<size_t[]>( new size_t[4] );
@@ -927,7 +927,7 @@ CASE( "span<>: Allows to compare empty spans as equal" )
     EXPECT( p == q );
     EXPECT( p == r );
 
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     span<int> s( nullptr, 0 );
     span<int> t( nullptr, 0 );
 
@@ -1037,7 +1037,7 @@ static bool is_little_endian()
 
 CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated as member]" )
 {
-#if gsl_HAVE_SIZED_TYPES
+#if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type;
 #else
     typedef int type;
@@ -1068,7 +1068,7 @@ CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated as 
 
 CASE( "span<>: Allows to view and change the elements as writable bytes" )
 {
-#if gsl_HAVE_SIZED_TYPES
+#if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type;
 #else
     typedef int type;
@@ -1100,7 +1100,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes" )
 
 CASE( "span<>: Allows to view the elements as a span of another type" )
 {
-#if gsl_HAVE_SIZED_TYPES
+#if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type1;
     typedef int16_t type2;
 #else
@@ -1129,7 +1129,7 @@ CASE( "span<>: Allows to view the elements as a span of another type" )
 
 CASE( "span<>: Allows to change the elements from a span of another type" )
 {
-#if gsl_HAVE_SIZED_TYPES
+#if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type1;
     typedef int16_t type2;
 #else
@@ -1241,7 +1241,7 @@ CASE( "make_span(): Allows building from a const C-array" )
 
 CASE( "make_span(): Allows building from a std::array<> (C++11)" )
 {
-# if gsl_HAVE_ARRAY
+# if gsl_HAVE( ARRAY )
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<int> v = make_span( arr );
@@ -1254,7 +1254,7 @@ CASE( "make_span(): Allows building from a std::array<> (C++11)" )
 
 CASE( "make_span(): Allows building from a const std::array<> (C++11)" )
 {
-# if gsl_HAVE_ARRAY
+# if gsl_HAVE( ARRAY )
     const std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<const int> v = make_span( arr );
@@ -1290,7 +1290,7 @@ CASE( "make_span(): Allows building from a temporary container (potentially dang
 
 CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
 {
-# if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::shared_ptr<int>( gsl_nullptr );
 
     auto s = make_span( ptr );
@@ -1304,7 +1304,7 @@ CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
 
 CASE( "make_span(): Allows building from an empty gsl::unique_ptr (C++11)" )
 {
-# if gsl_HAVE_UNIQUE_PTR
+#if gsl_HAVE( UNIQUE_PTR )
     auto ptr = gsl::unique_ptr<int>( gsl_nullptr );
 
     auto s = make_span( ptr );
@@ -1318,7 +1318,7 @@ CASE( "make_span(): Allows building from an empty gsl::unique_ptr (C++11)" )
 
 CASE( "make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)" )
 {
-# if gsl_HAVE_UNIQUE_PTR
+#if gsl_HAVE( UNIQUE_PTR )
     auto arr = std::unique_ptr<int[]>( gsl_nullptr );
 
     auto s = make_span( arr, 0 );
@@ -1332,7 +1332,7 @@ CASE( "make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)
 
 CASE( "make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)" )
 {
-# if gsl_HAVE_SHARED_PTR
+#if gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::make_shared<int>( 4 );
 
     auto s = make_span( ptr );
@@ -1347,12 +1347,12 @@ CASE( "make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)" )
 
 CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
 {
-# if gsl_HAVE_UNIQUE_PTR
-# if gsl_HAVE_MAKE_UNIQUE
+#if  gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( MAKE_UNIQUE )
     auto ptr = gsl::make_unique<int>( 4 );
-#else
+# else
     auto ptr = gsl::unique_ptr<int>( new int(4) );
-#endif
+# endif
 
     auto s = make_span( ptr );
 
@@ -1366,12 +1366,12 @@ CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
 
 CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++11)" )
 {
-# if gsl_HAVE_UNIQUE_PTR
-# if gsl_HAVE_MAKE_UNIQUE
+#if  gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( MAKE_UNIQUE )
     auto arr = std::make_unique<size_t[]>(4);
-#else
+# else
     auto arr = std::unique_ptr<size_t[]>( new size_t[4] );
-#endif
+# endif
     for ( size_t i = 0; i < 4; i++ )
         arr[i] = i + 1;
 

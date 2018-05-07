@@ -20,7 +20,7 @@
 CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# if gsl_HAVE_TYPE_TRAITS
+# if gsl_HAVE( TYPE_TRAITS )
     owner<int> p = gsl_nullptr;
 # else
     EXPECT( !!"owner<> alias template restricted to pointer type is not available." );
@@ -30,14 +30,14 @@ CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFI
 
 CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 {
-#if gsl_HAVE_OWNER_TEMPLATE
+#if gsl_HAVE( OWNER_TEMPLATE )
     struct F { static void incr( int * i ) { *i += 1; } };
 
     owner<int*> p = new int( 120 );
 
     EXPECT( (p != NULL) );
     EXPECT(  p != nullptr_void() );
-# if gsl_HAVE_NULLPTR
+# if gsl_HAVE( NULLPTR )
     EXPECT(  p != nullptr );
 # endif
     EXPECT( *p == 120 );
@@ -60,7 +60,7 @@ CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
 
     EXPECT( (p != NULL) );
     EXPECT(  p != nullptr_void() );
-# if gsl_HAVE_NULLPTR
+# if gsl_HAVE( NULLPTR )
     EXPECT(  p != nullptr );
 # endif
     EXPECT( *p == 120 );

@@ -97,13 +97,16 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
 
 CASE( "Presence of C++ library features" "[.stdlibrary]" )
 {
+    gsl_PRESENT( gsl_HAVE_ADD_CONST );
     gsl_PRESENT( gsl_HAVE_ADDRESSOF );
     gsl_PRESENT( gsl_HAVE_ARRAY );
     gsl_PRESENT( gsl_HAVE_CONTAINER_DATA_METHOD );
     gsl_PRESENT( gsl_HAVE_MAKE_SHARED );
     gsl_PRESENT( gsl_HAVE_MAKE_UNIQUE );
+    gsl_PRESENT( gsl_HAVE_REMOVE_CONST );
     gsl_PRESENT( gsl_HAVE_SHARED_PTR );
     gsl_PRESENT( gsl_HAVE_SIZED_TYPES );
+    gsl_PRESENT( gsl_HAVE_TR1_ADD_CONST );
     gsl_PRESENT( gsl_HAVE_TYPE_TRAITS );
     gsl_PRESENT( gsl_HAVE_UNIQUE_PTR );
 

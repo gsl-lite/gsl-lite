@@ -26,7 +26,7 @@ CASE( "at(): Terminates access to non-existing C-array elements" )
 
 CASE( "at(): Terminates access to non-existing std::array elements (C++11)" )
 {
-#if gsl_HAVE_ARRAY
+#if gsl_HAVE( ARRAY )
     std::array<int, 4> a = {{ 1, 2, 3, 4 }};
 
     EXPECT_THROWS( at(a, 4) );
@@ -51,7 +51,7 @@ CASE( "at(): Terminates access to non-existing std::initializer_list elements (C
 {
 // Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
 
-#if gsl_HAVE_INITIALIZER_LIST && ( !gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_GNUC_VERSION >= 473 )
+#if gsl_HAVE( INITIALIZER_LIST ) && ( !gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_GNUC_VERSION >= 473 )
     std::initializer_list<int> a = { 1, 2, 3, 4 };
 
     EXPECT_THROWS( at(a, 4) );
@@ -80,7 +80,7 @@ CASE( "at(): Allows to access existing C-array elements" )
 
 CASE( "at(): Allows to access existing std::array elements (C++11)" )
 {
-#if gsl_HAVE_ARRAY
+#if gsl_HAVE( ARRAY )
     std::array<size_t, 4> a = {{ 1, 2, 3, 4 }};
 
     for ( size_t i = 0; i < 4; ++i )
@@ -107,7 +107,7 @@ CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 {
 // Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
 
-#if gsl_HAVE_INITIALIZER_LIST && ( !gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_GNUC_VERSION >= 473 )
+#if gsl_HAVE( INITIALIZER_LIST ) && ( !gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_GNUC_VERSION >= 473 )
     std::initializer_list<size_t> a = { 1, 2, 3, 4 };
 
     for ( size_t i = 0; i < 4; ++i )

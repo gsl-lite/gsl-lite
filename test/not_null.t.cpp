@@ -45,7 +45,7 @@ CASE( "not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_CO
 CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# if gsl_HAVE_NULLPTR
+# if gsl_HAVE( NULLPTR )
     not_null< int* > p = nullptr;
 # endif
     not_null< int* > p = NULL;
@@ -56,7 +56,7 @@ CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_
 CASE( "not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# if gsl_HAVE_UNIQUE_PTR
+# if gsl_HAVE( UNIQUE_PTR )
     std::unique_ptr< int > up = std::make_unique<int>( 120 );
     not_null< int* > p4 = up;
 # endif
@@ -76,7 +76,7 @@ CASE( "not_null<>: Disallows assignment from unrelated pointers (define gsl_CONF
 
 CASE( "not_null<>: Terminates construction from a null pointer value" )
 {
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     struct F { static void blow() { int * z = nullptr; not_null<int*> p(z); } };
 #else
     struct F { static void blow() { int * z = NULL; not_null<int*> p(z); } };
@@ -87,7 +87,7 @@ CASE( "not_null<>: Terminates construction from a null pointer value" )
 
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value" )
 {
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     struct F { static void blow() { MyDerived * z = nullptr; not_null<MyBase*> p(z); } };
 #else
     struct F { static void blow() { MyDerived * z = NULL; not_null<MyBase*> p(z); } };
@@ -100,7 +100,7 @@ CASE( "not_null<>: Terminates assignment from a null pointer value" )
 {
     int i = 12;
     not_null<int*> p = &i;
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     int * z = nullptr;
 #else
     int * z = NULL;
@@ -111,7 +111,7 @@ CASE( "not_null<>: Terminates assignment from a null pointer value" )
 
 CASE( "not_null<>: Terminates assignment from related pointer types for null pointer value" )
 {
-#if gsl_HAVE_NULLPTR
+#if gsl_HAVE( NULLPTR )
     MyDerived * z = nullptr;
 #else
     MyDerived * z = NULL;
