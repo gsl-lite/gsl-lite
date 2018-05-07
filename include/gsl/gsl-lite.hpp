@@ -59,6 +59,18 @@
 
 // Configuration:
 
+#ifndef  gsl_FEATURE_WITH_CONTAINER_TO_STD
+# define gsl_FEATURE_WITH_CONTAINER_TO_STD  99
+#endif
+
+#ifndef  gsl_FEATURE_MAKE_SPAN_TO_STD
+# define gsl_FEATURE_MAKE_SPAN_TO_STD  99
+#endif
+
+#ifndef  gsl_FEATURE_BYTE_SPAN_TO_STD
+# define gsl_FEATURE_BYTE_SPAN_TO_STD  99
+#endif
+
 #ifndef  gsl_FEATURE_HAVE_IMPLICIT_MACRO
 # define gsl_FEATURE_HAVE_IMPLICIT_MACRO  1
 #endif
