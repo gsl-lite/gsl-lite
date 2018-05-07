@@ -127,7 +127,7 @@
 #define gsl_CPP20_OR_GREATER  (__cplusplus >= 202000L || gsl_MSVC_LANG >= 202000L )
 
 // half-open range [lo..hi):
-#define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
+#define gsl_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
 #if defined( _MSC_VER ) && !defined( __clang__ )
 # define gsl_COMPILER_MSVC_VERSION ( _MSC_VER / 10 - 10 * ( 5 + ( _MSC_VER < 1900 ) ) )
@@ -135,7 +135,7 @@
 # define gsl_COMPILER_MSVC_VERSION 0
 #endif
 
-#define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * major + minor ) + patch )
+#define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
 #if defined __clang__
 # define gsl_COMPILER_CLANG_VERSION gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
