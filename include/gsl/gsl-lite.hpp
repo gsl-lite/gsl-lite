@@ -204,6 +204,7 @@
 
 #define gsl_CPP17_00  (gsl_CPP17_OR_GREATER)
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_00
+#define gsl_HAVE_ADDRESSOF  gsl_CPP17_00
 
 // Presence of C++ library features:
 
@@ -246,6 +247,12 @@
 // For the rest, consider VC12, VC14 as C++11 for GSL Lite.
 
 // C++ feature usage:
+
+#if gsl_HAVE_ADDRESSOF
+# define gsl_ADDRESSOF(x)  std::addressof(x)
+#else
+# define gsl_ADDRESSOF(x)  (&x)
+#endif
 
 #if gsl_HAVE_CONSTEXPR_11
 # define gsl_constexpr constexpr
@@ -1310,8 +1317,8 @@ public:
 
     template< class U, size_t N >
     gsl_api gsl_constexpr14 span( U (&arr)[N] ) gsl_noexcept
-        : first_( &arr[0] )
-        , last_ ( &arr[0] + N )
+        : first_( gsl_ADDRESSOF( arr[0] ) )
+        , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
     {}
 
 #if gsl_HAVE_ARRAY
@@ -1344,27 +1351,27 @@ public:
 #elif gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
-        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont const & cont )
-        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 #endif
 
     template< class Cont >
     gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
-        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
     template< class Cont >
     gsl_api gsl_constexpr14 span( with_container_t, Cont const & cont )
-        : first_( cont.size() == 0 ? gsl_nullptr : &cont[0] )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : &cont[0] + cont.size() )
+        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
+        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
     // constructor taking shared_ptr deprecated since 0.29.0
@@ -1701,7 +1708,7 @@ gsl_api inline gsl_constexpr14 span<T> make_span( T * ptr, typename span<T>::ind
 template< class T, size_t N >
 gsl_api inline gsl_constexpr14 span<T> make_span( T (&arr)[N] )
 {
-    return span<T>( &arr[0], N );
+    return span<T>( gsl_ADDRESSOF( arr[0] ), N );
 }
 
 #if gsl_HAVE_ARRAY
@@ -1842,7 +1849,7 @@ public:
 
     template< std::size_t N >
     gsl_api gsl_constexpr basic_string_span( element_type (&arr)[N] )
-    : span_( remove_z( &arr[0], N ) )
+    : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
     {}
 
 #if gsl_HAVE_ARRAY
@@ -1950,13 +1957,13 @@ public:
     template< class CharTraits, class Allocator >
     gsl_api gsl_constexpr basic_string_span(
         std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > & str )
-    : span_( &str[0], str.length() )
+    : span_( gsl_ADDRESSOF( str[0] ), str.length() )
     {}
 
     template< class CharTraits, class Allocator >
     gsl_api gsl_constexpr basic_string_span(
         std::basic_string< typename detail::remove_const<element_type>::type, CharTraits, Allocator > const & str )
-    : span_( &str[0], str.length() )
+    : span_( gsl_ADDRESSOF( str[0] ), str.length() )
     {}
 
     // destruction, assignment:
@@ -2085,13 +2092,13 @@ private:
     template< size_t N >
     gsl_api static gsl_constexpr14 span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> & arr )
     {
-        return remove_z( &arr[0], narrow_cast< std::size_t >( N ) );
+        return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
     }
 
     template< size_t N >
     gsl_api static gsl_constexpr14 span_type remove_z( std::array<typename detail::remove_const<element_type>::type, N> const & arr )
     {
-        return remove_z( &arr[0], narrow_cast< std::size_t >( N ) );
+        return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
     }
 #endif
 
@@ -2405,7 +2412,7 @@ gsl_api inline span<T> ensure_z( T * const & sz, size_t max = std::numeric_limit
 template< class T, size_t N >
 gsl_api inline span<T> ensure_z( T (&sz)[N] )
 {
-    return ensure_z( &sz[0], N );
+    return ensure_z( gsl_ADDRESSOF( sz[0] ), N );
 }
 
 # if gsl_HAVE_TYPE_TRAITS
