@@ -114,6 +114,90 @@ CASE( "Presence of C++ library features" "[.stdlibrary]" )
 #endif
 }
 
+CASE( "gsl-lite configuration" "[.gsl-configuration]" )
+{
+//#ifdef gsl_api
+//    gsl_PRESENT( gsl_api );
+//#else
+//    gsl_ABSENT(  gsl_api );
+//#endif
+
+#ifdef gsl_CONFIG_CONTRACT_LEVEL_ON
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_ON );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_ON );
+#endif
+
+#ifdef gsl_CONFIG_CONTRACT_LEVEL_OFF
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_OFF );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_OFF );
+#endif
+
+#ifdef gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY );
+#endif
+
+#ifdef gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY );
+#endif
+
+#ifdef gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES );
+#endif
+
+#ifdef gsl_CONFIG_CONTRACT_VIOLATION_THROWS
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_VIOLATION_THROWS );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_VIOLATION_THROWS );
+#endif
+}
+
+CASE( "gsl-lite features" "[.gsl-features]" )
+{
+#ifdef gsl_FEATURE_WITH_CONTAINER_TO_STD
+    gsl_PRESENT( gsl_FEATURE_WITH_CONTAINER_TO_STD );
+#else
+    gsl_ABSENT(  gsl_FEATURE_WITH_CONTAINER_TO_STD );
+#endif
+
+#ifdef gsl_FEATURE_MAKE_SPAN_TO_STD
+    gsl_PRESENT( gsl_FEATURE_MAKE_SPAN_TO_STD );
+#else
+    gsl_ABSENT(  gsl_FEATURE_MAKE_SPAN_TO_STD );
+#endif
+
+#ifdef gsl_FEATURE_BYTE_SPAN_TO_STD
+    gsl_PRESENT( gsl_FEATURE_BYTE_SPAN_TO_STD );
+#else
+    gsl_ABSENT(  gsl_FEATURE_BYTE_SPAN_TO_STD );
+#endif
+
+#ifdef gsl_FEATURE_HAVE_IMPLICIT_MACRO
+    gsl_PRESENT( gsl_FEATURE_HAVE_IMPLICIT_MACRO );
+#else
+    gsl_ABSENT(  gsl_FEATURE_HAVE_IMPLICIT_MACRO );
+#endif
+
+#ifdef gsl_FEATURE_HAVE_OWNER_MACRO
+    gsl_PRESENT( gsl_FEATURE_HAVE_OWNER_MACRO );
+#else
+    gsl_ABSENT(  gsl_FEATURE_HAVE_OWNER_MACRO );
+#endif
+
+#ifdef gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+    gsl_PRESENT( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD );
+#else
+    gsl_ABSENT(  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD );
+#endif
+}
+
 int main( int argc, char * argv[] )
 {
     return lest::run( specification(), argc, argv );
