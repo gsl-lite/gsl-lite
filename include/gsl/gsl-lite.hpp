@@ -113,18 +113,19 @@
 #endif
 
 // Compiler detection (C++20 is speculative):
-// Note: MSVC supports C++14 since it supports C++17.
+// Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
-#ifdef _MSVC_LANG
-# define gsl_MSVC_LANG  _MSVC_LANG
-#else
-# define gsl_MSVC_LANG  0
+#if defined _MSVC_LANG
+# define gsl_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
+#else 
+# define gsl_CPLUSPLUS  __cplusplus
 #endif
 
-#define gsl_CPP11_OR_GREATER  (__cplusplus >= 201103L || gsl_MSVC_LANG >= 201103L )
-#define gsl_CPP14_OR_GREATER  (__cplusplus >= 201402L || gsl_MSVC_LANG >= 201703L )
-#define gsl_CPP17_OR_GREATER  (__cplusplus >= 201703L || gsl_MSVC_LANG >= 201703L )
-#define gsl_CPP20_OR_GREATER  (__cplusplus >= 202000L || gsl_MSVC_LANG >= 202000L )
+#define gsl_CPP98_OR_GREATER  ( gsl_CPLUSPLUS >= 199711L )
+#define gsl_CPP11_OR_GREATER  ( gsl_CPLUSPLUS >= 201103L )
+#define gsl_CPP14_OR_GREATER  ( gsl_CPLUSPLUS >= 201402L )
+#define gsl_CPP17_OR_GREATER  ( gsl_CPLUSPLUS >= 201703L )
+#define gsl_CPP20_OR_GREATER  ( gsl_CPLUSPLUS >= 202000L )
 
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )

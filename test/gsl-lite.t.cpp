@@ -49,6 +49,7 @@ CASE( "C++ compiler: compiler version" "[.compiler]" )
 CASE( "__cplusplus" "[.stdc++]" )
 {
     gsl_PRESENT( __cplusplus );
+    gsl_PRESENT( gsl_CPLUSPLUS );
 }
 
 CASE( "_MSVC_LANG" "[.stdc++]" )
