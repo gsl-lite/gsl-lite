@@ -127,6 +127,10 @@
 #define gsl_CPP17_OR_GREATER  ( gsl_CPLUSPLUS >= 201703L )
 #define gsl_CPP20_OR_GREATER  ( gsl_CPLUSPLUS >= 202000L )
 
+// C++ language version (represent 98 as 3):
+
+#define gsl_CPLUSPLUS_V  ( gsl_CPLUSPLUS / 100 - (gsl_CPLUSPLUS > 200000 ? 2000 : 1994) )
+
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
@@ -157,6 +161,15 @@
 #else
 # define gsl_may_alias
 #endif
+
+// Presence of gsl, language and library features:
+
+#define gsl_IN_STD( v )  ( (v) == 98 || (v) >= gsl_CPLUSPLUS_V )
+
+#define gsl_FEATURE_TO_STD( feature )  ( gsl_IN_STD( gsl_FEATURE( feature##_TO_STD ) ) )
+#define gsl_FEATURE(        feature )  ( gsl_FEATURE_##feature )
+#define gsl_CONFIG(         feature )  ( gsl_CONFIG_##feature )
+#define gsl_HAVE(           feature )  ( gsl_HAVE_##feature )
 
 // Presence of wide character support:
 
