@@ -1305,4 +1305,13 @@ CASE ( "operator<<: Allows printing a cwstring_span to an output stream" )
 
 #endif // gsl_HAVE( WCHAR )
 
+#if ! gsl_HAVE( WCHAR )
+
+CASE( "string_span: wstring_span and cwstring_span not available (wchar_t not available)" )
+{
+    EXPECT( true );
+}
+#endif // gsl_HAVE( WCHAR )
+
+
 // end of file
