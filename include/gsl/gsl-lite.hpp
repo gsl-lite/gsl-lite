@@ -1272,6 +1272,8 @@ public:
     typedef index index_type;
 
     typedef T element_type;
+    typedef typename details::remove_cv< T >::type value_type;
+
     typedef T & reference;
     typedef T * pointer;
     typedef T const * const_pointer;
