@@ -439,7 +439,7 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[dep
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)" )
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
     gsl::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
@@ -453,7 +453,7 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)"
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)" )
+CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( SHARED_PTR )
     shared_ptr<int> ptr = gsl::make_shared<int>( 4 );
@@ -468,7 +468,7 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)" )
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
 # if gsl_HAVE( MAKE_UNIQUE )
@@ -487,7 +487,7 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)" )
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11)" )
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
 # if gsl_HAVE( MAKE_UNIQUE )
@@ -1192,6 +1192,20 @@ CASE( "span<>: Allows to copy a span to another span of a different element type
     }
 }
 
+#if ! gsl_FEATURE_TO_STD( BYTE_SPAN )
+
+CASE( "make_span(): unavailable (gsl_FEATURE_MAKE_SPAN=0)" )
+{
+    EXPECT( !!"(avoid warning)" );  // suppress: unused parameter 'lest_env' [-Wunused-parameter]
+}
+
+#else
+
+CASE( "make_span(): (gsl_FEATURE_MAKE_SPAN=1)" )
+{
+    EXPECT( !!"(avoid warning)" );  // suppress: unused parameter 'lest_env' [-Wunused-parameter]
+}
+
 CASE( "make_span(): Allows to build from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
@@ -1320,7 +1334,7 @@ CASE( "make_span(): Allows to tag-build from a temporary container (potentially 
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11)" )
+CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::shared_ptr<int>( gsl_nullptr );
@@ -1334,7 +1348,7 @@ CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11)" )
+CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
     auto ptr = gsl::unique_ptr<int>( gsl_nullptr );
@@ -1348,7 +1362,7 @@ CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11)" )
+CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
     auto arr = std::unique_ptr<int[]>( gsl_nullptr );
@@ -1362,7 +1376,7 @@ CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11)
 #endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11)" )
+CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "[deprecated]" )
 {
 #if gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::make_shared<int>( 4 );
@@ -1377,7 +1391,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11)" )
+CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "[deprecated]" )
 {
 #if  gsl_HAVE( UNIQUE_PTR )
 # if gsl_HAVE( MAKE_UNIQUE )
@@ -1396,7 +1410,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11)" )
+CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
 {
 #if  gsl_HAVE( UNIQUE_PTR )
 # if gsl_HAVE( MAKE_UNIQUE )
@@ -1417,5 +1431,52 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
 }
+
+#endif // gsl_FEATURE( BYTE_SPAN )
+
+#if ! gsl_FEATURE_TO_STD( BYTE_SPAN )
+
+CASE( "byte_span(): unavailable (gsl_FEATURE_BYTE_SPAN=0)" )
+{
+    EXPECT( !!"(avoid warning)" );  // suppress: unused parameter 'lest_env' [-Wunused-parameter]
+}
+
+#else
+
+CASE( "byte_span() (gsl_FEATURE_BYTE_SPAN=1)" )
+{
+    EXPECT( !!"(avoid warning)" );  // suppress: unused parameter 'lest_env' [-Wunused-parameter]
+}
+
+CASE( "byte_span(): Allows to build a span of std::byte from a single object (C++17)" )
+{
+#if gsl_HAVE( BYTE )
+    int x = std::numeric_limits<int>::max();
+
+    span<std::byte> spn = byte_span( x );
+
+    EXPECT( spn.size() == std::ptrdiff_t( sizeof x ) );
+    EXPECT( spn[0]     == std::byte( 0xff ) );
+#else
+    EXPECT( !!"std::byte is not available (no C++17)" );
+#endif
+}
+
+CASE( "byte_span(): Allows to build a span of const std::byte from a single const object (C++17)" )
+{
+#if gsl_HAVE( BYTE )
+    const int x = std::numeric_limits<int>::max();
+
+    span<const std::byte> spn = byte_span( x );
+
+    EXPECT( spn.size() == std::ptrdiff_t( sizeof x ) );
+    EXPECT( spn[0]     == std::byte( 0xff ) );
+#else
+    EXPECT( !!"std::byte is not available (no C++17)" );
+#endif
+}
+
+#endif // span_PROVIDE( BYTE_SPAN )
+
 
 // end of file
