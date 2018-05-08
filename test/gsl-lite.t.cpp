@@ -101,6 +101,7 @@ CASE( "Presence of C++ library features" "[.stdlibrary]" )
     gsl_PRESENT( gsl_HAVE_ADDRESSOF );
     gsl_PRESENT( gsl_HAVE_ARRAY );
     gsl_PRESENT( gsl_HAVE_CONTAINER_DATA_METHOD );
+    gsl_PRESENT( gsl_HAVE_STD_DATA );
     gsl_PRESENT( gsl_HAVE_MAKE_SHARED );
     gsl_PRESENT( gsl_HAVE_MAKE_UNIQUE );
     gsl_PRESENT( gsl_HAVE_REMOVE_CONST );

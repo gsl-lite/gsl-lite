@@ -191,47 +191,7 @@
 # define gsl_HAVE_WCHAR 1
 #endif
 
-// Presence of C++11 language features:
-
-#define gsl_CPP11_10  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 100)
-#define gsl_CPP11_11  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110)
-#define gsl_CPP11_12  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
-#define gsl_CPP11_14  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
-
-#define gsl_HAVE_AUTO                 gsl_CPP11_10
-#define gsl_HAVE_NULLPTR              gsl_CPP11_10
-
-#define gsl_HAVE_ENUM_CLASS           gsl_CPP11_11
-
-#define gsl_HAVE_ALIAS_TEMPLATE       gsl_CPP11_12
-#define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_12
-#define gsl_HAVE_EXPLICIT_CONVERSION  gsl_CPP11_12
-#define gsl_HAVE_INITIALIZER_LIST     gsl_CPP11_12
-
-#define gsl_HAVE_CONSTEXPR_11         gsl_CPP11_14
-#define gsl_HAVE_IS_DEFAULT           gsl_CPP11_14
-#define gsl_HAVE_IS_DELETE            gsl_CPP11_14
-#define gsl_HAVE_NOEXCEPT             gsl_CPP11_14
-
-#if gsl_CPP11_OR_GREATER
-// see above
-#endif
-
-// Presence of C++14 language features:
-
-#define gsl_CPP14_00  (gsl_CPP14_OR_GREATER)
-#define gsl_CPP14_14  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
-
-#define gsl_HAVE_CONSTEXPR_14   gsl_CPP14_00
-#define gsl_HAVE_DECLTYPE_AUTO  gsl_CPP14_14
-
-// Presence of C++17 language features:
-
-#define gsl_CPP17_00  (gsl_CPP17_OR_GREATER)
-#define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_00
-#define gsl_HAVE_ADDRESSOF  gsl_CPP17_00
-
-// Presence of C++ library features:
+// Presence of language & library features:
 
 #ifdef _HAS_CPP0X
 # define gsl_HAS_CPP0X  _HAS_CPP0X
@@ -239,25 +199,67 @@
 # define gsl_HAS_CPP0X  0
 #endif
 
-#define gsl_CPP11_LA                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110)
-#define gsl_HAVE_ARRAY                  gsl_CPP11_LA
-#define gsl_HAVE_TR1_TYPE_TRAITS        gsl_CPP11_LA
+#define gsl_CPP11_100  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 100)
+#define gsl_CPP11_110  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110)
+#define gsl_CPP11_120  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
+#define gsl_CPP11_140  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
 
-#define gsl_CPP11_LB                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140 || (gsl_COMPILER_MSVC_VERSION >= 90 && gsl_HAS_CPP0X))
-#define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_LB
+#define gsl_CPP14_000  (gsl_CPP14_OR_GREATER)
+#define gsl_CPP14_120  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
+#define gsl_CPP14_140  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
 
-#define gsl_CPP11_LC                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
-#define gsl_HAVE_SIZED_TYPES            gsl_CPP11_LC
+#define gsl_CPP17_000  (gsl_CPP17_OR_GREATER)
 
-#define gsl_CPP11_LD                   (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140 || (gsl_COMPILER_MSVC_VERSION >= 100 && gsl_HAS_CPP0X))
-#define gsl_HAVE_MAKE_SHARED            gsl_CPP11_LD
-#define gsl_HAVE_SHARED_PTR             gsl_CPP11_LD
-#define gsl_HAVE_UNIQUE_PTR             gsl_CPP11_LD
+#define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VERSION >=  90 && gsl_HAS_CPP0X))
+#define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VERSION >= 100 && gsl_HAS_CPP0X))
 
-#define gsl_CPP14_LA                   (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
-#define gsl_HAVE_MAKE_UNIQUE            gsl_CPP14_LA
+// Presence of C++11 language features:
 
-#define gsl_HAVE_TYPE_TRAITS           (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110)
+#define gsl_HAVE_AUTO                   gsl_CPP11_100
+#define gsl_HAVE_NULLPTR                gsl_CPP11_100
+
+#define gsl_HAVE_ENUM_CLASS             gsl_CPP11_110
+
+#define gsl_HAVE_ALIAS_TEMPLATE         gsl_CPP11_120
+#define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_120
+#define gsl_HAVE_EXPLICIT_CONVERSION    gsl_CPP11_120
+#define gsl_HAVE_INITIALIZER_LIST       gsl_CPP11_120
+
+#define gsl_HAVE_CONSTEXPR_11           gsl_CPP11_140
+#define gsl_HAVE_IS_DEFAULT             gsl_CPP11_140
+#define gsl_HAVE_IS_DELETE              gsl_CPP11_140
+#define gsl_HAVE_NOEXCEPT               gsl_CPP11_140
+
+#if gsl_CPP11_OR_GREATER
+// see above
+#endif
+
+// Presence of C++14 language features:
+
+#define gsl_HAVE_CONSTEXPR_14           gsl_CPP14_000
+#define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
+
+// Presence of C++17 language features:
+
+#define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
+#define gsl_HAVE_ADDRESSOF              gsl_CPP17_000
+
+// Presence of C++ library features:
+
+#define gsl_HAVE_ARRAY                  gsl_CPP11_110
+#define gsl_HAVE_TYPE_TRAITS            gsl_CPP11_110
+#define gsl_HAVE_TR1_TYPE_TRAITS        gsl_CPP11_110
+
+#define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_140_CPP0X_90
+#define gsl_HAVE_STD_DATA               gsl_CPP17_000
+
+#define gsl_HAVE_SIZED_TYPES            gsl_CPP11_140
+
+#define gsl_HAVE_MAKE_SHARED            gsl_CPP11_140_CPP0X_100
+#define gsl_HAVE_SHARED_PTR             gsl_CPP11_140_CPP0X_100
+#define gsl_HAVE_UNIQUE_PTR             gsl_CPP11_140_CPP0X_100
+
+#define gsl_HAVE_MAKE_UNIQUE            gsl_CPP14_120
 
 #define gsl_HAVE_ADD_CONST              gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_INTEGRAL_CONSTANT      gsl_HAVE_TYPE_TRAITS
