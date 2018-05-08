@@ -950,8 +950,8 @@ gsl_api inline gsl_constexpr14 T & at( std::array<T, N> & arr, size_t index )
 }
 #endif
 
-template< class Cont >
-gsl_api inline gsl_constexpr14 typename Cont::value_type & at( Cont & cont, size_t index )
+template< class Container >
+gsl_api inline gsl_constexpr14 typename Container::value_type & at( Container & cont, size_t index )
 {
     Expects( index < cont.size() );
     return cont[index];
@@ -1438,14 +1438,14 @@ public:
     
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
-    template< class Cont >
-    gsl_api gsl_constexpr14 span( Cont & cont )
+    template< class Container >
+    gsl_api gsl_constexpr14 span( Container & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
-    template< class Cont >
-    gsl_api gsl_constexpr14 span( Cont const & cont )
+    template< class Container >
+    gsl_api gsl_constexpr14 span( Container const & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
@@ -1454,14 +1454,14 @@ public:
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-    template< class Cont >
-    gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
+    template< class Container >
+    gsl_api gsl_constexpr14 span( with_container_t, Container & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
-    template< class Cont >
-    gsl_api gsl_constexpr14 span( with_container_t, Cont const & cont )
+    template< class Container >
+    gsl_api gsl_constexpr14 span( with_container_t, Container const & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
@@ -1845,16 +1845,16 @@ gsl_api inline gsl_constexpr14 span<const T> make_span( std::array<T,N> const & 
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( AUTO )
 
-template< class Cont >
-gsl_api inline gsl_constexpr14 auto make_span( Cont & cont ) -> span< typename Cont::value_type >
+template< class Container >
+gsl_api inline gsl_constexpr14 auto make_span( Container & cont ) -> span< typename Container::value_type >
 {
-    return span< typename Cont::value_type >( cont );
+    return span< typename Container::value_type >( cont );
 }
 
-template< class Cont >
-gsl_api inline gsl_constexpr14 auto make_span( Cont const & cont ) -> span< const typename Cont::value_type >
+template< class Container >
+gsl_api inline gsl_constexpr14 auto make_span( Container const & cont ) -> span< const typename Container::value_type >
 {
-    return span< const typename Cont::value_type >( cont );
+    return span< const typename Container::value_type >( cont );
 }
 
 #else
@@ -1996,42 +1996,42 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template<
-        class Cont,
+        class Container,
         class = typename std::enable_if<
-            ! details::is_std_array< Cont >::value
-            && ! details::is_basic_string_span< Cont >::value
-            && std::is_convertible< typename Cont::pointer, pointer >::value
-            && std::is_convertible< typename Cont::pointer, decltype(std::declval<Cont>().data()) >::value
+            ! details::is_std_array< Container >::value
+            && ! details::is_basic_string_span< Container >::value
+            && std::is_convertible< typename Container::pointer, pointer >::value
+            && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
         >::type
     >
-    gsl_api gsl_constexpr basic_string_span( Cont & cont )
+    gsl_api gsl_constexpr basic_string_span( Container & cont )
     : span_( ( cont ) )
     {}
 
     // Exclude: array, [basic_string,] basic_string_span
 
     template<
-        class Cont,
+        class Container,
         class = typename std::enable_if<
-            ! details::is_std_array< Cont >::value
-            && ! details::is_basic_string_span< Cont >::value
-            && std::is_convertible< typename Cont::pointer, pointer >::value
-            && std::is_convertible< typename Cont::pointer, decltype(std::declval<Cont const &>().data()) >::value
+            ! details::is_std_array< Container >::value
+            && ! details::is_basic_string_span< Container >::value
+            && std::is_convertible< typename Container::pointer, pointer >::value
+            && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
         >::type
     >
-    gsl_api gsl_constexpr basic_string_span( Cont const & cont )
+    gsl_api gsl_constexpr basic_string_span( Container const & cont )
     : span_( ( cont ) )
     {}
 
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
-    template< class Cont >
-    gsl_api gsl_constexpr basic_string_span( Cont & cont )
+    template< class Container >
+    gsl_api gsl_constexpr basic_string_span( Container & cont )
     : span_( cont )
     {}
 
-    template< class Cont >
-    gsl_api gsl_constexpr basic_string_span( Cont const & cont )
+    template< class Container >
+    gsl_api gsl_constexpr basic_string_span( Container const & cont )
     : span_( cont )
     {}
 
@@ -2046,8 +2046,8 @@ public:
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-    template< class Cont >
-    gsl_api gsl_constexpr14 basic_string_span( with_container_t, Cont & cont )
+    template< class Container >
+    gsl_api gsl_constexpr14 basic_string_span( with_container_t, Container & cont )
     : span_( with_container, cont )
     {}
 #endif
@@ -2545,9 +2545,9 @@ gsl_api inline span<T> ensure_z( T (&sz)[N] )
 
 # if gsl_HAVE( TYPE_TRAITS )
 
-template< class Cont >
-gsl_api inline span< typename std::remove_pointer<typename Cont::pointer>::type >
-ensure_z( Cont & cont )
+template< class Container >
+gsl_api inline span< typename std::remove_pointer<typename Container::pointer>::type >
+ensure_z( Container & cont )
 {
     return ensure_z( cont.data(), cont.length() );
 }
