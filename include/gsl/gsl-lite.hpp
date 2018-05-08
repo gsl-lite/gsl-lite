@@ -240,12 +240,14 @@
 #define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
 
 // Presence of C++17 language features:
+// MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
 
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
-#define gsl_HAVE_ADDRESSOF              gsl_CPP17_000
+#define gsl_HAVE_DEDUCTION_GUIDES      (gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 999 ) )
 
 // Presence of C++ library features:
 
+#define gsl_HAVE_ADDRESSOF              gsl_CPP17_000
 #define gsl_HAVE_ARRAY                  gsl_CPP11_110
 #define gsl_HAVE_TYPE_TRAITS            gsl_CPP11_110
 #define gsl_HAVE_TR1_TYPE_TRAITS        gsl_CPP11_110
@@ -1684,6 +1686,27 @@ private:
     pointer first_;
     pointer last_;
 };
+
+// class template argument deduction guides:
+
+#if gsl_HAVE( DEDUCTION_GUIDES )   // gsl_CPP17_OR_GREATER
+
+template< class T, size_t N >
+span( T (&)[N] ) -> span<T /*, N*/>;
+
+template< class T, size_t N >
+span( std::array<T, N> & ) -> span<T /*, N*/>;
+
+template< class T, size_t N >
+span( std::array<T, N> const & ) -> span<const T /*, N*/>;
+
+template< class Container >
+span( Container& ) -> span<typename Container::value_type>;
+
+template< class Container >
+span( Container const & ) -> span<const typename Container::value_type>;
+
+#endif // gsl_HAVE( DEDUCTION_GUIDES )
 
 // span comparison functions
 
