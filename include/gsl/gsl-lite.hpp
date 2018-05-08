@@ -1251,14 +1251,13 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
     return to_byte( ~to_uchar( b ) );
 }
 
-// tag to select span constructor taking a container (prevent ms-gsl warning C26426):
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-#if gsl_CPP14_OR_GREATER
-struct with_container_t{ constexpr with_container_t() noexcept {} };
-const with_container_t with_container;
-#else
-struct with_container_t{ with_container_t(){} };
-const with_container_t with_container;
+// Tag to select span constructor taking a container (prevent ms-gsl warning C26426):
+
+struct with_container_t { gsl_constexpr with_container_t() gsl_noexcept {} };
+const  gsl_constexpr   with_container_t with_container;
+
 #endif
 
 //
@@ -1387,6 +1386,8 @@ public:
     {}
 #endif
 
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+
     template< class Cont >
     gsl_api gsl_constexpr14 span( with_container_t, Cont & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
@@ -1398,6 +1399,8 @@ public:
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
+
+#endif
 
     // constructor taking shared_ptr deprecated since 0.29.0
     
@@ -1954,10 +1957,13 @@ public:
 
 #endif
 
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+
     template< class Cont >
     gsl_api gsl_constexpr14 basic_string_span( with_container_t, Cont & cont )
     : span_( with_container, cont )
     {}
+#endif
 
 #if gsl_HAVE( IS_DEFAULT )
 # if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
