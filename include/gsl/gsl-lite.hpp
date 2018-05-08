@@ -395,6 +395,11 @@ gsl_DISABLE_MSVC_WARNINGS( 26410 26415 26418 26472 26439 26440 26473 26481 26482
 
 namespace gsl {
 
+// forward declare span<>:
+
+template< class T >
+class span;
+
 namespace details {
 
 // C++11 emulation:
@@ -461,18 +466,40 @@ typedef integral_constant< false > false_type;
 
 #endif
 
+#if gsl_HAVE( TYPE_TRAITS )
+
+template< class Q >
+struct is_span_oracle : std::false_type{};
+
+template< class T>
+struct is_span_oracle< span<T> > : std::true_type{};
+
+template< class Q >
+struct is_span : is_span_oracle< typename std::remove_cv<Q>::type >{};
+
+template< class Q >
+struct is_std_array_oracle : std::false_type{};
+
 #if gsl_HAVE( ARRAY )
 
-template< class T >
-struct is_std_array_oracle : false_type {};
-
-template< class T, std::size_t N >
-struct is_std_array_oracle< std::array<T, N> > : true_type {};
-
-template< class T >
-struct is_std_array : is_std_array_oracle< typename remove_cv<T>::type > {};
+template< class T, std::size_t Extent >
+struct is_std_array_oracle< std::array<T, Extent> > : std::true_type{};
 
 #endif
+
+template< class Q >
+struct is_std_array : is_std_array_oracle< typename std::remove_cv<Q>::type >{};
+
+template< class Q >
+struct is_array : std::false_type {};
+
+template< class T >
+struct is_array<T[]> : std::true_type {};
+
+template< class T, std::size_t N >
+struct is_array<T[N]> : std::true_type {};
+
+#endif // gsl_HAVE( TYPE_TRAITS )
 
 } // namespace details
 
@@ -939,9 +966,6 @@ gsl_api inline const gsl_constexpr14 T & at( std::initializer_list<T> cont, size
 #endif
 
 template< class T >
-class span;
-
-template< class T >
 gsl_api inline gsl_constexpr14 T & at( span<T> s, size_t index )
 {
     return s.at( index );
@@ -1262,6 +1286,31 @@ const  gsl_constexpr   with_container_t with_container;
 
 #endif
 
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
+namespace details {
+
+// Can construct from containers that:
+
+template< 
+    class Container, class ElementType 
+    , class = typename std::enable_if<
+        ! details::is_span< Container >::value &&
+        ! details::is_array< Container >::value &&
+        ! details::is_std_array< Container >::value &&
+          std::is_convertible<typename std::remove_pointer<decltype(std::declval<Container>().data())>::type(*)[], ElementType(*)[] >::value
+    >::type
+#if gsl_HAVE( STD_DATA )
+      // data(cont) and size(cont) well-formed:
+    , class = decltype( std::data( std::declval<Container>() ) )
+    , class = decltype( std::size( std::declval<Container>() ) )
+#endif
+>
+struct can_construct_span_from : details::true_type{};
+
+} // namespace details
+#endif
+
 //
 // span<> - A 1D view of contiguous T's, replace (*,len).
 //
@@ -1364,19 +1413,29 @@ public:
 #endif
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
-    // SFINAE enable only if Cont has a data() member function
-    template< class Cont, class = decltype(std::declval<Cont>().data()) >
-    gsl_api gsl_constexpr14 span( Cont & cont )
+    template< class Container
+        , class = typename std::enable_if<
+            details::can_construct_span_from< Container, element_type >::value
+        >::type
+    >
+    gsl_api gsl_constexpr14 span( Container & cont )
         : first_( cont.data() )
         , last_ ( cont.data() + cont.size() )
     {}
 
-    template< class Cont, class = decltype(std::declval<Cont const &>().data()) >
-    gsl_api gsl_constexpr14 span( Cont const & cont )
+    template< class Container
+        , class = typename std::enable_if<
+            std::is_const< element_type >::value &&
+            details::can_construct_span_from< Container, element_type >::value
+        >::type
+    >
+    gsl_api gsl_constexpr14 span( Container const & cont )
         : first_( cont.data() )
         , last_ ( cont.data() + cont.size() )
     {}
+    
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
+
     template< class Cont >
     gsl_api gsl_constexpr14 span( Cont & cont )
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
@@ -1388,6 +1447,7 @@ public:
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
+
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
