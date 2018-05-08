@@ -1192,7 +1192,7 @@ CASE( "span<>: Allows to copy a span to another span of a different element type
     }
 }
 
-CASE( "make_span(): Allows building from two pointers" )
+CASE( "make_span(): Allows to build from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -1201,7 +1201,7 @@ CASE( "make_span(): Allows building from two pointers" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "make_span(): Allows building from two const pointers" )
+CASE( "make_span(): Allows to build from two const pointers" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -1210,7 +1210,7 @@ CASE( "make_span(): Allows building from two const pointers" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "make_span(): Allows building from a non-null pointer and a size" )
+CASE( "make_span(): Allows to build from a non-null pointer and a size" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -1219,7 +1219,7 @@ CASE( "make_span(): Allows building from a non-null pointer and a size" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "make_span(): Allows building from a non-null const pointer and a size" )
+CASE( "make_span(): Allows to build from a non-null const pointer and a size" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -1228,7 +1228,7 @@ CASE( "make_span(): Allows building from a non-null const pointer and a size" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "make_span(): Allows building from a C-array" )
+CASE( "make_span(): Allows to build from a C-array" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -1237,7 +1237,7 @@ CASE( "make_span(): Allows building from a C-array" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "make_span(): Allows building from a const C-array" )
+CASE( "make_span(): Allows to build from a const C-array" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
@@ -1246,7 +1246,7 @@ CASE( "make_span(): Allows building from a const C-array" )
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
 }
 
-CASE( "make_span(): Allows building from a std::array<> (C++11)" )
+CASE( "make_span(): Allows to build from a std::array<> (C++11)" )
 {
 # if gsl_HAVE( ARRAY )
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
@@ -1259,7 +1259,7 @@ CASE( "make_span(): Allows building from a std::array<> (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows building from a const std::array<> (C++11)" )
+CASE( "make_span(): Allows to build from a const std::array<> (C++11)" )
 {
 # if gsl_HAVE( ARRAY )
     const std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
@@ -1272,7 +1272,7 @@ CASE( "make_span(): Allows building from a const std::array<> (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows building from a container (std::vector<>)" )
+CASE( "make_span(): Allows to build from a container (std::vector<>)" )
 {
     std::vector<int> vec = vector_iota(10);
     span<int> v = make_span( vec );
@@ -1280,7 +1280,7 @@ CASE( "make_span(): Allows building from a container (std::vector<>)" )
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-CASE( "make_span(): Allows building from a const container (std::vector<>)" )
+CASE( "make_span(): Allows to build from a const container (std::vector<>)" )
 {
     const std::vector<int> vec = vector_iota(10);
     span<const int> v = make_span( vec );
@@ -1288,7 +1288,7 @@ CASE( "make_span(): Allows building from a const container (std::vector<>)" )
     EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
 }
 
-CASE( "make_span(): Allows building from a temporary container (potentially dangerous)" )
+CASE( "make_span(): Allows to build from a temporary container (potentially dangerous)" )
 {
     std::vector<int> vec = vector_iota(10);
 
@@ -1320,7 +1320,7 @@ CASE( "make_span(): Allows to tag-build from a temporary container (potentially 
 #endif
 }
 
-CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
+CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11)" )
 {
 #if gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::shared_ptr<int>( gsl_nullptr );
@@ -1334,7 +1334,7 @@ CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows building from an empty gsl::unique_ptr (C++11)" )
+CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11)" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
     auto ptr = gsl::unique_ptr<int>( gsl_nullptr );
@@ -1348,7 +1348,7 @@ CASE( "make_span(): Allows building from an empty gsl::unique_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)" )
+CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11)" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
     auto arr = std::unique_ptr<int[]>( gsl_nullptr );
@@ -1362,7 +1362,7 @@ CASE( "make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)
 #endif
 }
 
-CASE( "make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)" )
+CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11)" )
 {
 #if gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::make_shared<int>( 4 );
@@ -1377,7 +1377,7 @@ CASE( "make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
+CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11)" )
 {
 #if  gsl_HAVE( UNIQUE_PTR )
 # if gsl_HAVE( MAKE_UNIQUE )
@@ -1396,7 +1396,7 @@ CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)" )
 #endif
 }
 
-CASE( "make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++11)" )
+CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11)" )
 {
 #if  gsl_HAVE( UNIQUE_PTR )
 # if gsl_HAVE( MAKE_UNIQUE )
