@@ -1295,6 +1295,31 @@ CASE( "make_span(): Allows building from a temporary container (potentially dang
     EXPECT( std::equal( vec.begin(), vec.end(), make_span( vector_iota( 10 ) ).begin() ) );
 }
 
+CASE( "make_span(): Allows to tag-build from a container (std::vector<>)" )
+{
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+    std::vector<int> vec = vector_iota(10);
+    span<      int> v = make_span( with_container, vec );
+    span<const int> w = make_span( with_container, vec );
+
+    EXPECT( std::equal( v.begin(), v.end(), vec.begin() ) );
+    EXPECT( std::equal( w.begin(), w.end(), vec.begin() ) );
+#else
+    EXPECT( !!"with_container is not available (gsl_FEATURE_WITH_CONTAINER_TO_STD)" );
+#endif
+}
+
+CASE( "make_span(): Allows to tag-build from a temporary container (potentially dangerous)" )
+{
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+    std::vector<int> vec = vector_iota(10);
+
+    EXPECT( std::equal( vec.begin(), vec.end(), make_span( with_container, vector_iota( 10 ) ).begin() ) );
+#else
+    EXPECT( !!"with_container is not available (gsl_FEATURE_WITH_CONTAINER_TO_STD)" );
+#endif
+}
+
 CASE( "make_span(): Allows building from an empty gsl::shared_ptr (C++11)" )
 {
 #if gsl_HAVE( SHARED_PTR )

@@ -1873,6 +1873,21 @@ gsl_api inline span<const T> make_span( std::vector<T> const & cont )
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+
+template< class Container >
+inline gsl_constexpr span<typename Container::value_type>
+make_span( with_container_t, Container & cont ) gsl_noexcept
+{
+    return span< typename Container::value_type >( with_container, cont );
+}
+
+template< class Container >
+inline gsl_constexpr span<const typename Container::value_type>
+make_span( with_container_t, Container const & cont ) gsl_noexcept
+{
+    return span< const typename Container::value_type >( with_container, cont );
+}
+
 #endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 template< class Ptr >
