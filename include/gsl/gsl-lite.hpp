@@ -86,7 +86,7 @@
 // Configuration: Other
 
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
-# define gsl_CONFIG_DEPRECATE_TO_LEVEL  99
+# define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 #endif
 
 #ifndef  gsl_CONFIG_SPAN_INDEX_TYPE
