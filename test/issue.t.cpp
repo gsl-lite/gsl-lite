@@ -19,6 +19,7 @@
 
 CASE( "span<>: free comparation functions fail for different const-ness" "[.issue #32]" )
 {
+#if gsl_FEATURE_TO_STD( MAKE_SPAN )
 #if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     char data[] = { 'a', 'b' };
     string_span  a = make_span( data );
@@ -29,6 +30,9 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
     EXPECT( a != b );
 #else
     EXPECT( !!"span<>: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
+#endif
+#else
+    EXPECT( !!"span<>: make_span() is not available (gsl_FEATURE_MAKE_SPAN_TO_STD)" );
 #endif
 }
 

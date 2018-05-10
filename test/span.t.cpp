@@ -1273,7 +1273,7 @@ CASE( "span<>: Allows to copy a span to another span of a different element type
     }
 }
 
-#if ! gsl_FEATURE_TO_STD( BYTE_SPAN )
+#if ! gsl_FEATURE_TO_STD( MAKE_SPAN )
 
 CASE( "make_span(): unavailable (gsl_FEATURE_MAKE_SPAN=0)" )
 {
@@ -1537,7 +1537,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++
 #endif
 }
 
-#endif // gsl_FEATURE( BYTE_SPAN )
+#endif // gsl_FEATURE( MAKE_SPAN )
 
 #if ! gsl_FEATURE_TO_STD( BYTE_SPAN )
 
