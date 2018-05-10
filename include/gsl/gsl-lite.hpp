@@ -1969,14 +1969,14 @@ make_span( std::vector<T> const & cont )
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 template< class Container >
-inline gsl_constexpr span<typename Container::value_type>
+gsl_api inline gsl_constexpr span<typename Container::value_type>
 make_span( with_container_t, Container & cont ) gsl_noexcept
 {
     return span< typename Container::value_type >( with_container, cont );
 }
 
 template< class Container >
-inline gsl_constexpr span<const typename Container::value_type>
+gsl_api inline gsl_constexpr span<const typename Container::value_type>
 make_span( with_container_t, Container const & cont ) gsl_noexcept
 {
     return span< const typename Container::value_type >( with_container, cont );
@@ -1992,7 +1992,7 @@ make_span( Ptr & ptr )
 }
 
 template< class Ptr >
-span<typename Ptr::element_type>
+gsl_api inline span<typename Ptr::element_type>
 make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
 {
     return span<typename Ptr::element_type>( ptr, count);
@@ -2003,14 +2003,14 @@ make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type coun
 #if gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 template< class T >
-inline gsl_constexpr span<byte>
+gsl_api inline gsl_constexpr span<byte>
 byte_span( T & t ) gsl_noexcept
 {
     return span<byte>( reinterpret_cast<byte *>( &t ), sizeof(T) );
 }
 
 template< class T >
-inline gsl_constexpr span<const byte>
+gsl_api inline gsl_constexpr span<const byte>
 byte_span( T const & t ) gsl_noexcept
 {
     return span<const byte>( reinterpret_cast<byte const *>( &t ), sizeof(T) );
