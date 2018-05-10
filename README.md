@@ -249,6 +249,15 @@ Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is define
 
 ### Feature selection macros
 
+\-D<b>gsl\_FEATURE\_WITH\_CONTAINER\_TO\_STD</b>=99
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`. Default is 99 for inclusion with any standard.
+
+\-D<b>gsl\_FEATURE\_MAKE\_SPAN\_TO\_STD</b>=99
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` builder functions. Default is 99 for inclusion with any standard.
+
+\-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` builder functions. Default is 99 for inclusion with any standard.
+
 \-D<b>gsl\_FEATURE\_HAVE\_IMPLICIT\_MACRO</b>=1  
 Define this macro to 0 to omit the `implicit` macro. Default is 1.
 
@@ -292,6 +301,9 @@ Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS.
 Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
 
 ### Other configuration macros
+
+\-D<b>gsl\_CONFIG\_DEPRECATE\_TO\_LEVEL</b>=0
+Define this to and including the level you want deprecation; see table [Deprecation](#deprecation) below. Default is 0 for no deprecation.
 
 \-D<b>gsl\_CONFIG\_SPAN\_INDEX\_TYPE</b>=size_t
 Define this macro to the type to use for indices in `span` and `basic_string_span`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl lite* is `size_t`.
@@ -380,20 +392,28 @@ Deprecation
 ---------------------
 The following feature are deprecated since the indicated version.
 
-Version | Feature / Notes |
--------:|:----------------|
-0.29.0  | span::span( std::shared_ptr<T> const & p ) |
-&nbsp;  | Use span( p.get(), p.get() ? 1 : 0 ) or equivalent |
-0.29.0  | span::span( std::unique_ptr<T> const & p ) |
-&nbsp;  | Use Use span( p.get(), p.get() ? 1 : 0 ) or equivalent  |
-0.29.0  | span::length() |
-&nbsp;  | Use span::size() |
-0.29.0  | span::length_bytes() |
-&nbsp;  | Use span::size_bytes() |
-0.17.0  | member span::as_bytes(), span::as_writeable_bytes() |
-&nbsp;  | &mdash; |
-0.7.0   | gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR |
-&nbsp;  | Use gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR,<br>or consider span(with_container, cont). |
+Version | Level | Feature / Notes |
+-------:|:-----:|:----------------|
+0.31.0  |   5   | span( std::nullptr_t, index_type ); ) |
+&nbsp;  |&nbsp; | span( pointer, index_type ) is used |
+0.31.0  |   5   | span( U *, index_type size ); ) |
+&nbsp;  |&nbsp; | span( pointer, index_type ) is used |
+0.31.0  |   5   | span( U (&arr)[N] ); ) |
+&nbsp;  |&nbsp; | span( element_type (&arr)[N] ) is used |
+0.31.0  |   5   | span( std::array< U, N > [const] & arr ); ) |
+&nbsp;  |&nbsp; | span( std::array< value_type, N > [const] & arr ) is used |
+0.29.0  |   4   | span::span( std::shared_ptr<T> const & p ) |
+&nbsp;  |&nbsp; | Use span( p.get(), p.get() ? 1 : 0 ) or equivalent |
+0.29.0  |   4   | span::span( std::unique_ptr<T> const & p ) |
+&nbsp;  |&nbsp; | Use Use span( p.get(), p.get() ? 1 : 0 ) or equivalent  |
+0.29.0  |   3   | span::length() |
+&nbsp;  |&nbsp; | Use span::size() |
+0.29.0  |   3   | span::length_bytes() |
+&nbsp;  |&nbsp; | Use span::size_bytes() |
+0.17.0  |   2   | member span::as_bytes(), span::as_writeable_bytes() |
+&nbsp;  |&nbsp; | &mdash; |
+0.7.0   |   1   | gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR |
+&nbsp;  |&nbsp; | Use gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR,<br>or consider span(with_container, cont). |
 
 
 Reported to work with
