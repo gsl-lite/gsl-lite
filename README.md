@@ -364,7 +364,7 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-index                       | &#10003;| &#10003;| &#10003;| type for container indexes, subscripts, sizes |
+index                       | &#10003;| &#10003;| &#10003;| type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
 byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
 final_action<>              | &#10003;| &#10003;| >=C++11 | Action at the end of a scope |
 final_action                | -       | -       | < C++11 | Currently only void(*)() |
@@ -584,8 +584,8 @@ span<>: Terminates creation of a sub span outside the span
 span<>: Terminates access outside the span
 span<>: Allows to default-construct
 span<>: Allows to construct from a nullptr and a zero size (C++11)
-span<>: Allows to construct from a l-value (C++11)
-span<>: Allows to construct from a const l-value (C++11)
+span<>: Allows to construct from a single object (C++11)
+span<>: Allows to construct from a const single object (C++11)
 span<>: Allows to construct from two pointers
 span<>: Allows to construct from two pointers to const
 span<>: Allows to construct from a non-null pointer and a size
@@ -598,17 +598,17 @@ span<>: Allows to construct from a const C-array
 span<>: Allows to construct from a C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows to construct from a const C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows to construct from a std::array<> (C++11)
-span<>: Allows to construct from a std::array<> with const data (C++11)
+span<>: Allows to construct from a std::array<> with const data (C++11) [deprecated-5]
 span<>: Allows to construct from a container (std::vector<>)
 span<>: Allows to construct from a temporary container (potentially dangerous)
 span<>: Allows to tag-construct from a container (std::vector<>)
 span<>: Allows to tag-construct from a temporary container (potentially dangerous)
-span<>: Allows to construct from an empty gsl::shared_ptr (C++11) [deprecated]
-span<>: Allows to construct from an empty gsl::unique_ptr (C++11) [deprecated]
-span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11)
-span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11)
-span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11)
-span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11)
+span<>: Allows to construct from an empty gsl::shared_ptr (C++11) [deprecated-4]
+span<>: Allows to construct from an empty gsl::unique_ptr (C++11) [deprecated-4]
+span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11) [deprecated-4]
+span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) [deprecated-4]
+span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) [deprecated-4]
+span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11) [deprecated-4]
 span<>: Allows to copy-construct from another span of the same type
 span<>: Allows to copy-construct from another span of a compatible type
 span<>: Allows to move-construct from another span of the same type (C++11)
@@ -643,33 +643,39 @@ span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain the number of elements via size()
-span<>: Allows to obtain the number of elements via length() [deprecated]
+span<>: Allows to obtain the number of elements via length() [deprecated-3]
 span<>: Allows to obtain the number of bytes via size_bytes()
-span<>: Allows to obtain the number of bytes via length_bytes() [deprecated]
+span<>: Allows to obtain the number of bytes via length_bytes() [deprecated-3]
 span<>: Allows to swap with another span of the same type
-span<>: Allows to view the elements as read-only bytes [deprecated as member]
-span<>: Allows to view and change the elements as writable bytes
+span<>: Allows to view the elements as read-only bytes [deprecated-2 as member]
+span<>: Allows to view and change the elements as writable bytes [deprecated-2 as member]
 span<>: Allows to view the elements as a span of another type
 span<>: Allows to change the elements from a span of another type
 span<>: Allows to copy a span to another span of the same element type
 span<>: Allows to copy a span to another span of a different element type
-make_span(): Allows building from two pointers
-make_span(): Allows building from two const pointers
-make_span(): Allows building from a non-null pointer and a size
-make_span(): Allows building from a non-null const pointer and a size
-make_span(): Allows building from a C-array
-make_span(): Allows building from a const C-array
-make_span(): Allows building from a std::array<> (C++11)
-make_span(): Allows building from a const std::array<> (C++11)
-make_span(): Allows building from a container (std::vector<>)
-make_span(): Allows building from a const container (std::vector<>)
-make_span(): Allows building from a temporary container (potentially dangerous)
-make_span(): Allows building from an empty gsl::shared_ptr (C++11)
-make_span(): Allows building from an empty gsl::unique_ptr (C++11)
-make_span(): Allows building from an empty gsl::unique_ptr (array, C++11)
-make_span(): Allows building from a non-empty gsl::shared_ptr (C++11)
-make_span(): Allows building from a non-empty gsl::unique_ptr (C++11)
-make_span(): Allows building from a non-empty gsl::unique_ptr (array, C++11)
+make_span(): (gsl_FEATURE_MAKE_SPAN=1)
+make_span(): Allows to build from two pointers
+make_span(): Allows to build from two const pointers
+make_span(): Allows to build from a non-null pointer and a size
+make_span(): Allows to build from a non-null const pointer and a size
+make_span(): Allows to build from a C-array
+make_span(): Allows to build from a const C-array
+make_span(): Allows to build from a std::array<> (C++11)
+make_span(): Allows to build from a const std::array<> (C++11)
+make_span(): Allows to build from a container (std::vector<>)
+make_span(): Allows to build from a const container (std::vector<>)
+make_span(): Allows to build from a temporary container (potentially dangerous)
+make_span(): Allows to tag-build from a container (std::vector<>)
+make_span(): Allows to tag-build from a temporary container (potentially dangerous)
+make_span(): Allows to build from an empty gsl::shared_ptr (C++11) [deprecated-4]
+make_span(): Allows to build from an empty gsl::unique_ptr (C++11) [deprecated-4]
+make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11) [deprecated-4]
+make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) [deprecated-4]
+make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) [deprecated-4]
+make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11) [deprecated-4]
+byte_span() (gsl_FEATURE_BYTE_SPAN=1)
+byte_span(): Allows to build a span of gsl::byte from a single object
+byte_span(): Allows to build a span of const gsl::byte from a single const object
 string_span: Disallows construction of a string_span from a cstring_span (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Disallows construction of a string_span from a const std::string (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 string_span: Allows to default-construct
