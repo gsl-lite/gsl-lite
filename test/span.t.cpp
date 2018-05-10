@@ -25,7 +25,7 @@ static std::vector<int> vector_iota( int n )
 
   for ( int i = 0; i < n; ++i )
     result.push_back( i );
-    
+
   return result;
 }
 
@@ -156,7 +156,8 @@ CASE( "span<>: Allows to default-construct" )
 
 CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 {
-#if gsl_HAVE( NULLPTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 5 )
+#if  gsl_HAVE( NULLPTR )
     span<      int> v( nullptr, 0 );
     span<const int> w( nullptr, 0 );
 
@@ -165,11 +166,15 @@ CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"construction from nullptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 5)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from a l-value (C++11)" )
+CASE( "span<>: Allows to construct from a single object (C++11)" )
 {
-#if gsl_HAVE( IS_DELETE )
+#if !gsl_DEPRECATE_TO_LEVEL( 5 )
+#if  gsl_HAVE( IS_DELETE )
     int x = 0;
 
     span<      int> v( x );
@@ -180,11 +185,15 @@ CASE( "span<>: Allows to construct from a l-value (C++11)" )
 #else
     EXPECT( !!"=delete is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"construction from a single object is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 5)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from a const l-value (C++11)" )
+CASE( "span<>: Allows to construct from a const single object (C++11)" )
 {
-#if gsl_HAVE( IS_DELETE )
+#if !gsl_DEPRECATE_TO_LEVEL( 5 )
+#if  gsl_HAVE( IS_DELETE )
     const int x = 0;
 
     span<const int> v( x );
@@ -192,6 +201,9 @@ CASE( "span<>: Allows to construct from a const l-value (C++11)" )
     EXPECT( v.size() == index_type( 1 ) );
 #else
     EXPECT( !!"=delete is not available (no C++11)" );
+#endif
+#else
+    EXPECT( !!"construction from a const single object is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 5)" );
 #endif
 }
 
@@ -337,19 +349,25 @@ CASE( "span<>: Allows to construct from a std::array<> (C++11)" )
 # if gsl_HAVE( ARRAY )
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
-    span<      int> v( arr );
-    span<const int> w( arr );
+    span<int> v( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
+
+#if !gsl_DEPRECATE_TO_LEVEL( 5 )
+    span<const int> w( arr );
+
     EXPECT( std::equal( w.begin(), w.end(), arr.begin() ) );
+#endif
+
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
 #endif
 }
 
-CASE( "span<>: Allows to construct from a std::array<> with const data (C++11)" )
+CASE( "span<>: Allows to construct from a std::array<> with const data (C++11) " "[deprecated-5]" )
 {
-# if gsl_HAVE( ARRAY )
+#if !gsl_DEPRECATE_TO_LEVEL( 5 )
+#if  gsl_HAVE( ARRAY )
     std::array<const int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<const int> v( arr );
@@ -357,6 +375,9 @@ CASE( "span<>: Allows to construct from a std::array<> with const data (C++11)" 
     EXPECT( std::equal( v.begin(), v.end(), arr.begin() ) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
+#endif
+#else
+    EXPECT( !!"construction from const data is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 5)" );
 #endif
 }
 
@@ -411,9 +432,10 @@ CASE( "span<>: Allows to tag-construct from a temporary container (potentially d
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[deprecated]" )
+CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( SHARED_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( SHARED_PTR )
     span<int> ptr = gsl::shared_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
@@ -423,11 +445,15 @@ CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[dep
 #else
     EXPECT( !!"gsl::shared_ptr is not available" );
 #endif
+#else
+    EXPECT( !!"construction from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[deprecated]" )
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( UNIQUE_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( UNIQUE_PTR )
     gsl::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
@@ -437,11 +463,15 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[dep
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
+#else
+    EXPECT( !!"construction from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
+CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( UNIQUE_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( UNIQUE_PTR )
     gsl::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
 
     span<int> s( ptr, 0 );
@@ -451,11 +481,15 @@ CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11) 
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
+#else
+    EXPECT( !!"construction from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[deprecated]" )
+CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( SHARED_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( SHARED_PTR )
     shared_ptr<int> ptr = gsl::make_shared<int>( 4 );
 
     span<int> s( ptr );
@@ -466,12 +500,16 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[
 #else
     EXPECT( !!"gsl::shared_ptr is not available" );
 #endif
+#else
+    EXPECT( !!"construction from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) " "[deprecated]" )
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( UNIQUE_PTR )
-# if gsl_HAVE( MAKE_UNIQUE )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( UNIQUE_PTR )
+#if  gsl_HAVE( MAKE_UNIQUE )
     gsl::unique_ptr<int> ptr = std::make_unique<int>( 4 );
 #else
     gsl::unique_ptr<int> ptr = unique_ptr<int>( new int( 4 ) );
@@ -485,12 +523,16 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) " "[
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
 #endif
+#else
+    EXPECT( !!"construction from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
+CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( UNIQUE_PTR )
-# if gsl_HAVE( MAKE_UNIQUE )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( UNIQUE_PTR )
+#if  gsl_HAVE( MAKE_UNIQUE )
     gsl::unique_ptr<size_t[]> arr = make_unique<size_t[]>( 4 );
 #else
     gsl::unique_ptr<size_t[]> arr = unique_ptr<size_t[]>( new size_t[4] );
@@ -507,6 +549,9 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
     EXPECT( s[1]     == 2u              );
 #else
     EXPECT( !!"gsl::unique_ptr is not available" );
+#endif
+#else
+    EXPECT( !!"construction from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
@@ -934,7 +979,7 @@ CASE( "span<>: Allows to compare empty spans as equal" )
     EXPECT( p == q );
     EXPECT( p == r );
 
-#if gsl_HAVE( NULLPTR )
+#if gsl_HAVE( NULLPTR ) && ! gsl_DEPRECATE_TO_LEVEL( 5 )
     span<int> s( nullptr, 0 );
     span<int> t( nullptr, 0 );
 
@@ -973,8 +1018,9 @@ CASE( "span<>: Allows to obtain the number of elements via size()" )
     EXPECT(  z.size() == index_type( 0 ) );
 }
 
-CASE( "span<>: Allows to obtain the number of elements via length() " "[deprecated]" )
+CASE( "span<>: Allows to obtain the number of elements via length() " "[deprecated-3]" )
 {
+#if !gsl_DEPRECATE_TO_LEVEL( 3 )
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
@@ -985,6 +1031,9 @@ CASE( "span<>: Allows to obtain the number of elements via length() " "[deprecat
     EXPECT( va.length() == index_type( gsl_DIMENSION_OF( a ) ) );
     EXPECT( vb.length() == index_type( gsl_DIMENSION_OF( b ) ) );
     EXPECT(  z.length() == index_type( 0 ) );
+#else
+    EXPECT( !!"length() is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 3)" );
+#endif
 }
 
 CASE( "span<>: Allows to obtain the number of bytes via size_bytes()" )
@@ -1001,8 +1050,9 @@ CASE( "span<>: Allows to obtain the number of bytes via size_bytes()" )
     EXPECT(  z.size_bytes() == index_type( 0 * sizeof(int) ) );
 }
 
-CASE( "span<>: Allows to obtain the number of bytes via length_bytes() " "[deprecated]" )
+CASE( "span<>: Allows to obtain the number of bytes via length_bytes() " "[deprecated-3]" )
 {
+#if !gsl_DEPRECATE_TO_LEVEL( 3 )
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
 
@@ -1013,6 +1063,9 @@ CASE( "span<>: Allows to obtain the number of bytes via length_bytes() " "[depre
     EXPECT( va.length_bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
     EXPECT( vb.length_bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
     EXPECT(  z.length_bytes() == index_type( 0 * sizeof(int) ) );
+#else
+    EXPECT( !!"length_bytes() is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 3)" );
+#endif
 }
 
 CASE( "span<>: Allows to swap with another span of the same type" )
@@ -1042,7 +1095,7 @@ static bool is_little_endian()
     return 1 != U().c[ sizeof(int) - 1 ];
 }
 
-CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated as member]" )
+CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated-2 as member]" )
 {
 #if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type;
@@ -1060,20 +1113,26 @@ CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated as 
     gyte * b = is_little_endian() ? le : be;
 
     span<type> va( a );
-    span<const gyte> vb( va.as_bytes()  );  // deprecated since v0.17.0
     span<const gyte> vc( as_bytes( va ) );
 
-    EXPECT( vb[0] == b[0] );
     EXPECT( vc[0] == b[0] );
-    EXPECT( vb[1] == b[1] );
     EXPECT( vc[1] == b[1] );
-    EXPECT( vb[2] == b[2] );
     EXPECT( vc[2] == b[2] );
-    EXPECT( vb[3] == b[3] );
     EXPECT( vc[3] == b[3] );
+
+#if !gsl_DEPRECATE_TO_LEVEL( 2 )
+    span<const gyte> vb( va.as_bytes()  );  // deprecated since v0.17.0
+
+    EXPECT( vb[0] == b[0] );
+    EXPECT( vb[1] == b[1] );
+    EXPECT( vb[2] == b[2] );
+    EXPECT( vb[3] == b[3] );
+#else
+    EXPECT( !!"span<>::as_bytes() is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 2)" );
+#endif
 }
 
-CASE( "span<>: Allows to view and change the elements as writable bytes" )
+CASE( "span<>: Allows to view and change the elements as writable bytes " "[deprecated-2 as member]" )
 {
 #if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type;
@@ -1084,25 +1143,47 @@ CASE( "span<>: Allows to view and change the elements as writable bytes" )
 
     EXPECT( sizeof(type) == size_t( 4 ) );
 
-    type  a[] = { 0x0, };
-    span<type> va( a );
-    span<gyte> vb( va.as_writeable_bytes() );
-    span<gyte> vc( as_writeable_bytes(va) );
-
-    for ( size_t i = 0; i < sizeof(type); ++i )
     {
-        EXPECT( vb[i] == to_byte(0) );
-        EXPECT( vc[i] == to_byte(0) );
+        type  a[] = { 0x0, };
+        span<type> va( a );
+        span<gyte> vc( as_writeable_bytes(va) );
+
+        for ( size_t i = 0; i < sizeof(type); ++i )
+        {
+            EXPECT( vc[i] == to_byte(0) );
+        }
+
+        vc[0] = to_byte(0x42);
+
+        EXPECT( vc[0] == to_byte(0x42) );
+        for ( size_t i = 1; i < sizeof(type); ++i )
+        {
+            EXPECT( vc[i] == to_byte(0) );
+        }
     }
 
-    vb[0] = to_byte(0x42);
-
-    EXPECT( vb[0] == to_byte(0x42) );
-    for ( size_t i = 1; i < sizeof(type); ++i )
+#if !gsl_DEPRECATE_TO_LEVEL( 2 )
     {
-        EXPECT( vb[i] == to_byte(0) );
-        EXPECT( vc[i] == to_byte(0) );
+        type  a[] = { 0x0, };
+        span<type> va( a );
+        span<gyte> vb( va.as_writeable_bytes() );
+
+        for ( size_t i = 0; i < sizeof(type); ++i )
+        {
+            EXPECT( vb[i] == to_byte(0) );
+        }
+
+        vb[0] = to_byte(0x42);
+
+        EXPECT( vb[0] == to_byte(0x42) );
+        for ( size_t i = 1; i < sizeof(type); ++i )
+        {
+            EXPECT( vb[i] == to_byte(0) );
+        }
     }
+#else
+    EXPECT( !!"as_bytes() is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 2)" );
+#endif
 }
 
 CASE( "span<>: Allows to view the elements as a span of another type" )
@@ -1262,7 +1343,7 @@ CASE( "make_span(): Allows to build from a const C-array" )
 
 CASE( "make_span(): Allows to build from a std::array<> (C++11)" )
 {
-# if gsl_HAVE( ARRAY )
+#if gsl_HAVE( ARRAY )
     std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<int> v = make_span( arr );
@@ -1275,7 +1356,7 @@ CASE( "make_span(): Allows to build from a std::array<> (C++11)" )
 
 CASE( "make_span(): Allows to build from a const std::array<> (C++11)" )
 {
-# if gsl_HAVE( ARRAY )
+#if gsl_HAVE( ARRAY )
     const std::array<int,9> arr = {{ 1, 2, 3, 4, 5, 6, 7, 8, 9, }};
 
     span<const int> v = make_span( arr );
@@ -1334,9 +1415,10 @@ CASE( "make_span(): Allows to tag-build from a temporary container (potentially 
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11) " "[deprecated]" )
+CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( SHARED_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::shared_ptr<int>( gsl_nullptr );
 
     auto s = make_span( ptr );
@@ -1346,11 +1428,15 @@ CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11) " "[de
 #else
     EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"make_span() from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11) " "[deprecated]" )
+CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( UNIQUE_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( UNIQUE_PTR )
     auto ptr = gsl::unique_ptr<int>( gsl_nullptr );
 
     auto s = make_span( ptr );
@@ -1360,11 +1446,15 @@ CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11) " "[de
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
+CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( UNIQUE_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( UNIQUE_PTR )
     auto arr = std::unique_ptr<int[]>( gsl_nullptr );
 
     auto s = make_span( arr, 0 );
@@ -1374,11 +1464,15 @@ CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11)
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "[deprecated]" )
+CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
 {
-#if gsl_HAVE( SHARED_PTR )
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+#if  gsl_HAVE( SHARED_PTR )
     auto ptr = gsl::make_shared<int>( 4 );
 
     auto s = make_span( ptr );
@@ -1389,16 +1483,20 @@ CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "
 #else
     EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "[deprecated]" )
+CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
 {
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
-# if gsl_HAVE( MAKE_UNIQUE )
+#if  gsl_HAVE( MAKE_UNIQUE )
     auto ptr = gsl::make_unique<int>( 4 );
-# else
+#else
     auto ptr = gsl::unique_ptr<int>( new int(4) );
-# endif
+#endif
 
     auto s = make_span( ptr );
 
@@ -1408,16 +1506,20 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
 #endif
+#else
+    EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
+#endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated]" )
+CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
-# if gsl_HAVE( MAKE_UNIQUE )
+#if  gsl_HAVE( MAKE_UNIQUE )
     auto arr = std::make_unique<size_t[]>(4);
-# else
+#else
     auto arr = std::unique_ptr<size_t[]>( new size_t[4] );
-# endif
+#endif
     for ( size_t i = 0; i < 4; i++ )
         arr[i] = i + 1;
 
@@ -1429,6 +1531,9 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++
     EXPECT( s[1]     == 2u              );
 #else
     EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+#endif
+#else
+    EXPECT( !!"make_span() from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
@@ -1448,32 +1553,24 @@ CASE( "byte_span() (gsl_FEATURE_BYTE_SPAN=1)" )
     EXPECT( !!"(avoid warning)" );  // suppress: unused parameter 'lest_env' [-Wunused-parameter]
 }
 
-CASE( "byte_span(): Allows to build a span of std::byte from a single object (C++17)" )
+CASE( "byte_span(): Allows to build a span of gsl::byte from a single object" )
 {
-#if gsl_HAVE( BYTE )
     int x = std::numeric_limits<int>::max();
 
-    span<std::byte> spn = byte_span( x );
+    span<gsl::byte> spn = byte_span( x );
 
-    EXPECT( spn.size() == std::ptrdiff_t( sizeof x ) );
-    EXPECT( spn[0]     == std::byte( 0xff ) );
-#else
-    EXPECT( !!"std::byte is not available (no C++17)" );
-#endif
+    EXPECT( spn.size() == index_type( sizeof x ) );
+    EXPECT( spn[0]     == to_byte( 0xff ) );
 }
 
-CASE( "byte_span(): Allows to build a span of const std::byte from a single const object (C++17)" )
+CASE( "byte_span(): Allows to build a span of const gsl::byte from a single const object" )
 {
-#if gsl_HAVE( BYTE )
     const int x = std::numeric_limits<int>::max();
 
-    span<const std::byte> spn = byte_span( x );
+    span<const gsl::byte> spn = byte_span( x );
 
-    EXPECT( spn.size() == std::ptrdiff_t( sizeof x ) );
-    EXPECT( spn[0]     == std::byte( 0xff ) );
-#else
-    EXPECT( !!"std::byte is not available (no C++17)" );
-#endif
+    EXPECT( spn.size() == index_type( sizeof x ) );
+    EXPECT( spn[0]     == to_byte( 0xff ) );
 }
 
 #endif // span_PROVIDE( BYTE_SPAN )
