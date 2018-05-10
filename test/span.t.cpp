@@ -156,18 +156,14 @@ CASE( "span<>: Allows to default-construct" )
 
 CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 {
-#if !gsl_DEPRECATE_TO_LEVEL( 5 )
 #if  gsl_HAVE( NULLPTR )
-    span<      int> v( nullptr, 0 );
-    span<const int> w( nullptr, 0 );
+    span<      int> v( nullptr, index_type( 0 ) );
+    span<const int> w( nullptr, index_type( 0 ) );
 
     EXPECT( v.size() == index_type( 0 ) );
     EXPECT( w.size() == index_type( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
-#endif
-#else
-    EXPECT( !!"construction from nullptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 5)" );
 #endif
 }
 
