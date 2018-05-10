@@ -253,10 +253,10 @@ Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is define
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`. Default is 99 for inclusion with any standard.
 
 \-D<b>gsl\_FEATURE\_MAKE\_SPAN\_TO\_STD</b>=99
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` builder functions. Default is 99 for inclusion with any standard.
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` creator functions. Default is 99 for inclusion with any standard.
 
 \-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` builder functions. Default is 99 for inclusion with any standard.
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. Default is 99 for inclusion with any standard.
 
 \-D<b>gsl\_FEATURE\_HAVE\_IMPLICIT\_MACRO</b>=1  
 Define this macro to 0 to omit the `implicit` macro. Default is 1.
@@ -395,13 +395,13 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
-0.31.0  |   5   | span( std::nullptr_t, index_type ); ) |
+0.31.0  |   5   | span( std::nullptr_t, index_type ) |
 &nbsp;  |&nbsp; | span( pointer, index_type ) is used |
-0.31.0  |   5   | span( U *, index_type size ); ) |
+0.31.0  |   5   | span( U *, index_type size ) |
 &nbsp;  |&nbsp; | span( pointer, index_type ) is used |
-0.31.0  |   5   | span( U (&arr)[N] ); ) |
+0.31.0  |   5   | span( U (&arr)[N] ) |
 &nbsp;  |&nbsp; | span( element_type (&arr)[N] ) is used |
-0.31.0  |   5   | span( std::array< U, N > [const] & arr ); ) |
+0.31.0  |   5   | span( std::array< U, N > [const] & arr ) |
 &nbsp;  |&nbsp; | span( std::array< value_type, N > [const] & arr ) is used |
 0.29.0  |   4   | span::span( std::shared_ptr<T> const & p ) |
 &nbsp;  |&nbsp; | Use span( p.get(), p.get() ? 1 : 0 ) or equivalent |
