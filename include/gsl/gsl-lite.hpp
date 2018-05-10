@@ -1997,15 +1997,15 @@ make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type coun
 #if gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 template< class T >
-inline gsl_constexpr auto
-byte_span( T & t ) gsl_noexcept -> span<byte>
+inline gsl_constexpr span<byte>
+byte_span( T & t ) gsl_noexcept
 {
     return span<byte>( reinterpret_cast<byte *>( &t ), sizeof(T) );
 }
 
 template< class T >
-inline gsl_constexpr auto
-byte_span( T const & t ) gsl_noexcept -> span<const byte>
+inline gsl_constexpr span<const byte>
+byte_span( T const & t ) gsl_noexcept
 {
     return span<const byte>( reinterpret_cast<byte const *>( &t ), sizeof(T) );
 }
