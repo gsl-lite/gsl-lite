@@ -1,5 +1,26 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.31.0 2018-05-10
+
+- Change span towards proposal p0122r7 (issue #118).
+- Add gsl_lite_MAJOR, gsl_lite_MINOR, gsl_lite_PATCH, script/update-version.py.
+- Add configuration selector gsl_CONFIG_DEPRECATE_TO_LEVEL.
+- Add feature selector gsl_FEATURE_WITH_CONTAINER_TO_STD.
+- Add feature selector gsl_FEATURE_MAKE_SPAN_TO_STD.
+- Add feature selector gsl_FEATURE_BYTE_SPAN_TO_STD.
+- Add macros gsl_FEATURE(), gsl_CONFIG(), gsl_HAVE().
+- Add macro gsl_ADDRESSOF(x).
+- Add span::value_type.
+- Add details::can_construct_span_from<>.
+- Add convertible constraint to span C-array constructor.
+- Add class template argument deduction guides for span.
+- Add make_span( with_container_t, ...) creator functions.
+- Add byte_span() creator functions.
+- Use C++11 constexpr where possible.
+- Parenthesize macro arguments.
+- Omit macros min(), max() via -DNOMINMAX.
+- Update t-all.bat for various configuration and feature selections.
+
 version 0.30.0 2018-05-06
 
 - Add support for DJGPP cross compiler is introduced (PR #107, thanks to Tomáš Zeman, @zemasoft).

@@ -17,7 +17,7 @@ import os
 
 # gsl-lite version, updated by script/update-version.py:
 
-gsl_lite_version = "0.29.0"
+gsl_lite_version = "0.31.0"
 
 # Config:
 

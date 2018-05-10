@@ -1,6 +1,6 @@
 # GSL Lite: Guideline Support Library for C++98, C++11 up
 
-[![Standard](https://img.shields.io/badge/c%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/agauniyal/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion) [![Try it on wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/aYslSjb5RfpmJVgx) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
+[![Standard](https://img.shields.io/badge/c%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/agauniyal/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion) [![Try it on wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/mA7Nf0zN51ZR9vRf) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
 
 
 GSL Lite is based on the [Microsoft Guideline Support Library (GSL)](https://github.com/microsoft/gsl). 
@@ -322,7 +322,7 @@ Define this macro to 1 to experience the by-design compile-time errors of the GS
 
 Features
 --------
-See also section [GSL: Guideline support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines [2]. 
+See also section [GSL: Guideline support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines [9]. 
 
 Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 ----------------------------|:-------:|:-------:|:-------:|:------|
@@ -345,12 +345,13 @@ wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style 
 czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
 cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len) |
+span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0123) |
 span_p<>                    | &#10003;| -       | -       | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
 make_span()                 | -       | &#10003;| &#10003;| Create a span |
+byte_span()                 | -       | -       | &#10003;| Create a span of bytes from a single object |
 as_bytes()                  | -       | &#10003;| &#10003;| A span as bytes |
 as_writeable_bytes          | -       | &#10003;| &#10003;| A span as writeable bytes |
-basic_string_span<>         | -       | &#10003;| &#10003;| See also propasal [p0123](http://wg21.link/p0123) |
+basic_string_span<>         | -       | &#10003;| &#10003;| See also proposal [p0123](http://wg21.link/p0123) |
 string_span                 | &#10003;| &#10003;| &#10003;| basic_string_span&lt;char> |
 wstring_span                | -       | &#10003;| &#10003;| basic_string_span&lt;wchar_t > |
 cstring_span                | &#10003;| &#10003;| &#10003;| basic_string_span&lt;const char> |
@@ -390,7 +391,7 @@ Note: GSL Lite treats VC12 (VS2013) and VC14 (VS2015) as C++11 (gsl_CPP11_OR_GRE
 
 Deprecation
 ---------------------
-The following feature are deprecated since the indicated version.
+The following features are deprecated since the indicated version. See macro [`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#other-configuration-macros) on how to control deprecation using the indicated level.
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
@@ -474,26 +475,35 @@ Other GSL implementations
 
 Notes and references
 --------------------
-### References
-[1] [Standard C++ Foundation](https://isocpp.org/).  
-[2] Standard C++ Foundation. [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines).  
-[3] Microsoft. [Guideline Support Library (GSL)](https://github.com/microsoft/gsl).  
-[4] Bjarne Stroustrup. [Writing good C++14 (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Stroustrup%20-%20CppCon%202015%20keynote.pdf) &mdash; [Video](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A). CppCon 2015.  
-[5] Herb Sutter. [Writing good C++14&hellip; By default (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Sutter%20-%20CppCon%202015%20day%202%20plenary%20.pdf) &mdash; [Video](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015.  
-[6] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
-[7] Bjarne Stroustrup et al. [A brief introduction to C++’s model for type- and resource-safety](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Introduction%20to%20type%20and%20resource%20safety.pdf).  
-[8] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). 21 Sep 2015.
+### Proposals, specification
+[1] [span on cppreference](http://en.cppreference.com/w/cpp/string/span).  
+[2] [span in C++20 Working Draft](http://eel.is/c++draft/views).  
+[3] [p0091 - Template argument deduction for class templates](http://wg21.link/p0091).  
+[4] [p0122 - span: bounds-safe views for sequences of objects](http://wg21.link/p0122).  
+[5] [p0123 - string_span: bounds-safe views for sequences of characters ](http://wg21.link/p0123).  
+[6] [p0298 - A byte type definition](http://wg21.link/p0298).  
+[7] [p0805 - Comparing Containers](http://wg21.link/p0805).  
+
+### Articles
+[8] [Standard C++ Foundation](https://isocpp.org/).  
+[9] Standard C++ Foundation. [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines).  
+[10] Microsoft. [Guideline Support Library (GSL)](https://github.com/microsoft/gsl).  
+[11] Bjarne Stroustrup. [Writing good C++14 (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Stroustrup%20-%20CppCon%202015%20keynote.pdf) &mdash; [Video](https://www.youtube.com/watch?t=9&v=1OEu9C51K2A). CppCon 2015.  
+[12] Herb Sutter. [Writing good C++14&hellip; By default (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Sutter%20-%20CppCon%202015%20day%202%20plenary%20.pdf) &mdash; [Video](https://www.youtube.com/watch?v=hEx5DNLWGgA). CppCon 2015.  
+[13] Gabriel Dos Reis. [Contracts for Dependable C++ (PDF)](https://github.com/isocpp/CppCoreGuidelines/raw/master/talks/Contracts-for-Dependable-C%2B%2B.pdf)  &mdash; Video. CppCon 2015.  
+[14] Bjarne Stroustrup et al. [A brief introduction to C++’s model for type- and resource-safety](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Introduction%20to%20type%20and%20resource%20safety.pdf).  
+[15] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). 21 Sep 2015.
 
 ### Compiler feature testing
-[9] cppreference.com. [Feature Test Recommendations](http://en.cppreference.com/w/cpp/experimental/feature_test).  
-[10] cppreference.com. [Feature testing macros](http://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros).  
+[16] cppreference.com. [Feature Test Recommendations](http://en.cppreference.com/w/cpp/experimental/feature_test).  
+[17] cppreference.com. [Feature testing macros](http://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros).  
 
 ### C++ features in various Visual C++ compilers
-[11] Visual CPP Team. [C++0x Core Language Features In VC10: The Table](http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx). Microsoft. 6 April 2010.  
-[12] Visual CPP Team. [C++11 Features in Visual C++ 11](http://blogs.msdn.com/b/vcblog/archive/2011/09/12/10209291.aspx). Microsoft. 12 September 2011.  
-[13] Joel Coehoorn. [C++11 features in Visual Studio 2012](http://stackoverflow.com/a/7422058/437272). StackOverflow. 14 September 2011.  
-[14] Stephan T. Lavavej. [C++11/14 Features In Visual Studio 14 CTP3](http://blogs.msdn.com/b/vcblog/archive/2014/08/21/c-11-14-features-in-visual-studio-14-ctp3.aspx). Microsoft. 21 August 2014.  
-[15] Stephan T. Lavavej. [C++11/14/17 Features In VS 2015 RTM](http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx). Microsoft. 19 June 2015.  
+[18] Visual CPP Team. [C++0x Core Language Features In VC10: The Table](http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx). Microsoft. 6 April 2010.  
+[19] Visual CPP Team. [C++11 Features in Visual C++ 11](http://blogs.msdn.com/b/vcblog/archive/2011/09/12/10209291.aspx). Microsoft. 12 September 2011.  
+[20] Joel Coehoorn. [C++11 features in Visual Studio 2012](http://stackoverflow.com/a/7422058/437272). StackOverflow. 14 September 2011.  
+[21] Stephan T. Lavavej. [C++11/14 Features In Visual Studio 14 CTP3](http://blogs.msdn.com/b/vcblog/archive/2014/08/21/c-11-14-features-in-visual-studio-14-ctp3.aspx). Microsoft. 21 August 2014.  
+[22] Stephan T. Lavavej. [C++11/14/17 Features In VS 2015 RTM](http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx). Microsoft. 19 June 2015.  
 
 Appendix
 --------
