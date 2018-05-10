@@ -1620,7 +1620,7 @@ public:
 
     gsl_api gsl_constexpr14 span subspan( index_type offset ) const gsl_noexcept
     {
-        Expects( offset <= this->size() );
+        Expects( 0 <= offset && offset <= this->size() );
         return span( this->data() + offset, this->size() - offset );
     }
 
