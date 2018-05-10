@@ -1418,7 +1418,13 @@ public:
         , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
     {}
 #else
-    template< size_t N >
+    template< size_t N
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        , class = typename std::enable_if<
+            std::is_convertible<value_type(*)[], element_type(*)[] >::value
+        >::type
+# endif
+    >
     gsl_api gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
         : first_( gsl_ADDRESSOF( arr[0] ) )
         , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
