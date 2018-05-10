@@ -34,8 +34,16 @@ table = (
         , 'gsl_lite_version = "{major}.{minor}.{patch}"\n' )
 
     , ( 'include/gsl/gsl-lite.hpp'
-        , r'\#define\s+gsl_lite_VERSION\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*$'
-        , '#define  gsl_lite_VERSION "{major}.{minor}.{patch}"\n' )
+        , r'\#define\s+gsl_lite_MAJOR\s+[0-9]+\s*$'
+        , '#define  gsl_lite_MAJOR  {major}' )
+
+    , ( 'include/gsl/gsl-lite.hpp'
+        , r'\#define\s+gsl_lite_MINOR\s+[0-9]+\s*$'
+        , '#define  gsl_lite_MINOR  {minor}' )
+
+    , ( 'include/gsl/gsl-lite.hpp'
+        , r'\#define\s+gsl_lite_PATCH\s+[0-9]+\s*$'
+        , '#define  gsl_lite_PATCH  {patch}' )
 )
 
 # End configuration.
