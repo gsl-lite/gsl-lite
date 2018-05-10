@@ -1,5 +1,21 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.30.0 2018-05-06
+
+- Add support for DJGPP cross compiler is introduced (PR #107, thanks to Tomáš Zeman, @zemasoft).
+- Add Readme.md to example/cmake-pkg.
+- Update lest test framework to v1.33.1.
+- Allow strict aliasing with Clang and GNUC for gsl::byte (issue #114).
+- Enable differentiating between MSVC 14.0 (VS 2015) and 14.1 (VS 2017), also report clang version.
+- Remove the space after ':' in FILE: LINE in reported locations (issue #112).
+- Avoid MSVC level 4 warning C4127: conditional expression is constant (issue #115, thanks to @kpeace)
+- Add a constructor to allow rvalue to const lvalue conversion (issue #113, PR #117, thanks to @theodelrieu )
+- Enable owner alias template for VC12 (Issue #111, thanks to @sg-james)
+- Fix omission of #include <algorithm>
+- Fix clang compilation by specifying C++ standard
+- Fix gsl-lite version in section "As CMake package"
+- Fix type in a test of span has been correced (PR #105, thanks to Tomáš Zeman, @zemasoft)
+
 version 0.29.0 2018-03-03
 
 - Added CMake package, thanks to @FlorianWolters (PR #100, #103).
