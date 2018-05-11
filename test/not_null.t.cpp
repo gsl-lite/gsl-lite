@@ -46,10 +46,10 @@ CASE( "not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( NULLPTR )
-    not_null< int* > p = nullptr;
+    not_null< int* > p( nullptr );
 # endif
-    not_null< int* > p = NULL;
-    not_null< std::vector<char>* > q = 0;
+    not_null< int* > q( NULL );
+    not_null< std::vector<char>* > r( 0 );
 #endif
 }
 
@@ -57,8 +57,8 @@ CASE( "not_null<>: Disallows construction from a unique pointer to underlying ty
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
 # if gsl_HAVE( UNIQUE_PTR )
-    std::unique_ptr< int > up = std::make_unique<int>( 120 );
-    not_null< int* > p4 = up;
+    std::unique_ptr< int > up( new int(120) );
+    not_null< int* > p4( up );
 # endif
 #endif
 }
@@ -67,10 +67,10 @@ CASE( "not_null<>: Disallows assignment from unrelated pointers (define gsl_CONF
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     MyDerived derived;
-    not_null< MyDerived* > p = &derived;
+    not_null< MyDerived* > p( &derived );
 
-    not_null< Unrelated* > r = p;
-    not_null< Unrelated* > s = reinterpret_cast< Unrelated* >( p );
+    not_null< Unrelated* > r( p );
+    not_null< Unrelated* > s( reinterpret_cast< Unrelated* >( p ) );
 #endif
 }
 
