@@ -1013,15 +1013,19 @@ public:
     }
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api gsl_constexpr   not_null( not_null const & other ) = default;
-    gsl_api gsl_constexpr   not_null( not_null &&      other ) = default;
     gsl_api                ~not_null() = default;
-    gsl_api                 not_null & operator=( not_null const & other ) = default;
+    gsl_api gsl_constexpr   not_null( not_null &&      other ) = default;
+    gsl_api gsl_constexpr   not_null( not_null const & other ) = default;
     gsl_api                 not_null & operator=( not_null &&      other ) = default;
+    gsl_api                 not_null & operator=( not_null const & other ) = default;
 #else
-    gsl_api gsl_constexpr   not_null( not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api                ~not_null() {};
+    gsl_api gsl_constexpr   not_null( not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
+# if gsl_HAVE( RVALUE_REFERENCE )
+    gsl_api gsl_constexpr   not_null( not_null && other ) : ptr_( std::move( other.get() ) ) {}
+    gsl_api                 not_null & operator=( not_null && other ) { ptr_ = std::move( other.get() ); return *this; }
+# endif
 #endif
 
     template< class U
