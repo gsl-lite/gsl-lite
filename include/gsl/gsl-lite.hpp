@@ -93,6 +93,10 @@
 # define gsl_CONFIG_SPAN_INDEX_TYPE  size_t
 #endif
 
+#ifndef  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
+# define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  0
+#endif
+
 #ifndef  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
 # define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0
 #endif
@@ -995,6 +999,12 @@ gsl_api inline gsl_constexpr T & at( span<T> s, size_t index )
 template< class T >
 class not_null
 {
+#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+# define gsl_not_null_explicit  explicit
+#else
+# define gsl_not_null_explicit  /*explicit*/
+#endif
+
 #if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     typedef T const & get_result_t;
 #else
@@ -1011,17 +1021,19 @@ public:
         , class Dummy = typename std::enable_if<std::is_constructible<T, U>::value>::type
 #endif
     >
+    gsl_api gsl_constexpr14 gsl_not_null_explicit 
 #if gsl_HAVE( RVALUE_REFERENCE )
-    gsl_api gsl_constexpr14 gsl_explicit not_null( U && u )
+    not_null( U && u )
     : ptr_( std::forward<U>( u ) )
 #else
-    gsl_api gsl_constexpr14 gsl_explicit not_null( U const & u )
+    not_null( U const & u )
     : ptr_( u )
 #endif
     {
         Expects( ptr_ != gsl_nullptr );
     }
-
+#undef gsl_not_null_explicit
+    
 #if gsl_HAVE( IS_DEFAULT )
     gsl_api                ~not_null() = default;
     gsl_api gsl_constexpr   not_null( not_null &&      other ) = default;

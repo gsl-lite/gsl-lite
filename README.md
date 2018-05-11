@@ -308,6 +308,9 @@ Define this to and including the level you want deprecation; see table [Deprecat
 \-D<b>gsl\_CONFIG\_SPAN\_INDEX\_TYPE</b>=size_t  
 Define this macro to the type to use for indices in `span` and `basic_string_span`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl lite* is `size_t`.
 
+\-D<b>gsl\_CONFIG\_NOT\_NULL\_EXPLICIT\_CTOR</b>=0  
+Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in M-GSL the constructor is explicit.
+
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_GET_BY\_CONST\_REF</b>=0  
 Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T`. Default is 0 for `T`.
 
