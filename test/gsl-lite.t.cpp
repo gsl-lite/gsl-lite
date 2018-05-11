@@ -87,7 +87,7 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
     gsl_PRESENT( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG );
     gsl_PRESENT( gsl_HAVE_ENUM_CLASS );
     gsl_PRESENT( gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE );
-    gsl_PRESENT( gsl_HAVE_EXPLICIT_CONVERSION );
+    gsl_PRESENT( gsl_HAVE_EXPLICIT );
     gsl_PRESENT( gsl_HAVE_INITIALIZER_LIST );
     gsl_PRESENT( gsl_HAVE_IS_DEFAULT );
     gsl_PRESENT( gsl_HAVE_IS_DELETE );

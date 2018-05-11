@@ -234,7 +234,7 @@
 
 #define gsl_HAVE_ALIAS_TEMPLATE         gsl_CPP11_120
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_120
-#define gsl_HAVE_EXPLICIT_CONVERSION    gsl_CPP11_120
+#define gsl_HAVE_EXPLICIT               gsl_CPP11_120
 #define gsl_HAVE_INITIALIZER_LIST       gsl_CPP11_120
 
 #define gsl_HAVE_CONSTEXPR_11           gsl_CPP11_140
@@ -307,7 +307,7 @@
 # define gsl_constexpr14 /*constexpr*/
 #endif
 
-#if gsl_HAVE( EXPLICIT_CONVERSION )
+#if gsl_HAVE( EXPLICIT )
 # define gsl_explicit explicit
 #else
 # define gsl_explicit /*explicit*/
@@ -1101,7 +1101,6 @@ not_null<T> operator+( not_null<T> const &, std::ptrdiff_t ) gsl_is_delete;
 
 template< class T >
 not_null<T> operator+( std::ptrdiff_t, not_null<T> const & ) gsl_is_delete;
-
 
 // not_null comparisons
 
