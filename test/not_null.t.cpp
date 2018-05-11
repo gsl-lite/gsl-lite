@@ -29,7 +29,7 @@ template<typename T>
 struct RefCounted
 {
     RefCounted( T * p ) : p_( p ) {}
-    operator T *() { return p_; }
+    operator T *() const { return p_; }
     T * p_;
 };
 
