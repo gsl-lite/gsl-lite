@@ -1006,32 +1006,26 @@ public:
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 #endif
 
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
-    template< class U, class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
+    template< class U
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type
+#endif
+    >
     gsl_api gsl_constexpr not_null( not_null<U> const & other )
     : ptr_( other.get() )
     {}
 
-    template< class U, class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type >
+    template< class U
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type 
+#endif
+    >
     gsl_api not_null & operator=( not_null<U> const & other )
     {
         ptr_ = other.get();
         return *this;
     }
-#else
-    template< class U >
-    gsl_api gsl_constexpr not_null( not_null<U> const & other )
-    : ptr_( other.get() )
-    {}
-
-    template< class U >
-    gsl_api gsl_constexpr not_null & operator=( not_null<U> const & other )
-    {
-        ptr_ = other.get();
-        return *this;
-    }
-#endif
 
     gsl_api gsl_constexpr14 T get() const
     {
