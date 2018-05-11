@@ -93,6 +93,7 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
     gsl_PRESENT( gsl_HAVE_IS_DELETE );
     gsl_PRESENT( gsl_HAVE_NOEXCEPT );
     gsl_PRESENT( gsl_HAVE_NULLPTR );
+    gsl_PRESENT( gsl_HAVE_RVALUE_REFERENCE );
     gsl_PRESENT( gsl_HAVE_WCHAR );
 }
 

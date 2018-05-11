@@ -224,6 +224,7 @@
 
 #define gsl_HAVE_AUTO                   gsl_CPP11_100
 #define gsl_HAVE_NULLPTR                gsl_CPP11_100
+#define gsl_HAVE_RVALUE_REFERENCE       gsl_CPP11_100
 
 #define gsl_HAVE_ENUM_CLASS             gsl_CPP11_110
 
@@ -991,8 +992,25 @@ template< class T >
 class not_null
 {
 public:
-    gsl_api gsl_constexpr14 not_null(             T t ) : ptr_ ( t ){ Expects( ptr_ != gsl_nullptr ); }
-    gsl_api                 not_null & operator=( T t ) { ptr_ = t ;  Expects( ptr_ != gsl_nullptr ); return *this; }
+#if gsl_HAVE( TYPE_TRAITS )
+    static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
+#endif
+
+    template< class U
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type
+#endif
+    >
+#if gsl_HAVE( RVALUE_REFERENCE )
+    gsl_api gsl_constexpr14 gsl_explicit not_null( U && u ) 
+    : ptr_ ( std::forward<U>( u ) )
+#else
+    gsl_api gsl_constexpr14 gsl_explicit not_null( U u ) 
+    : ptr_ ( u )
+#endif
+    { 
+        Expects( ptr_ != gsl_nullptr ); 
+    }
 
 #if gsl_HAVE( IS_DEFAULT )
     gsl_api gsl_constexpr   not_null( not_null const & other ) = default;
@@ -1006,10 +1024,9 @@ public:
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 #endif
 
-
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type
+        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type
 #endif
     >
     gsl_api gsl_constexpr not_null( not_null<U> const & other )
@@ -1018,7 +1035,7 @@ public:
 
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value, void>::type 
+        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type 
 #endif
     >
     gsl_api not_null & operator=( not_null<U> const & other )
