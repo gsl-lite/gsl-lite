@@ -93,6 +93,10 @@
 # define gsl_CONFIG_SPAN_INDEX_TYPE  size_t
 #endif
 
+#ifndef  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
+# define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0
+#endif
+
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
@@ -991,6 +995,12 @@ gsl_api inline gsl_constexpr T & at( span<T> s, size_t index )
 template< class T >
 class not_null
 {
+#if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    typedef T const & get_result_t;
+#else
+    typedef T get_result_t;
+#endif
+
 public:
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
@@ -1002,14 +1012,14 @@ public:
 #endif
     >
 #if gsl_HAVE( RVALUE_REFERENCE )
-    gsl_api gsl_constexpr14 gsl_explicit not_null( U && u ) 
+    gsl_api gsl_constexpr14 gsl_explicit not_null( U && u )
     : ptr_ ( std::forward<U>( u ) )
 #else
-    gsl_api gsl_constexpr14 gsl_explicit not_null( U u ) 
+    gsl_api gsl_constexpr14 gsl_explicit not_null( U u )
     : ptr_ ( u )
 #endif
-    { 
-        Expects( ptr_ != gsl_nullptr ); 
+    {
+        Expects( ptr_ != gsl_nullptr );
     }
 
 #if gsl_HAVE( IS_DEFAULT )
@@ -1039,7 +1049,7 @@ public:
 
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type 
+        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type
 #endif
     >
     gsl_api not_null & operator=( not_null<U> const & other )
@@ -1048,14 +1058,15 @@ public:
         return *this;
     }
 
-    gsl_api gsl_constexpr14 T get() const
+    gsl_api gsl_constexpr14 get_result_t get() const
     {
+        // Without cheating and changing ptr_ from the outside, this check is superfluous:
         Ensures( ptr_ != gsl_nullptr );
         return ptr_;
     }
 
-    gsl_api gsl_constexpr      operator T() const { return get(); }
-    gsl_api gsl_constexpr T    operator->() const { return get(); }
+    gsl_api gsl_constexpr operator get_result_t  () const { return get(); }
+    gsl_api gsl_constexpr get_result_t operator->() const { return get(); }
 
 #if gsl_HAVE( DECLTYPE_AUTO )
     gsl_api gsl_constexpr decltype(auto) operator*() const { return *get(); }
@@ -1641,8 +1652,8 @@ public:
 
     gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const gsl_noexcept
     {
-        Expects( 
-            0 <= offset && offset <= this->size() && 
+        Expects(
+            0 <= offset && offset <= this->size() &&
             0 <= count  && count + offset <= this->size() );
         return span( this->data() + offset, count );
     }
