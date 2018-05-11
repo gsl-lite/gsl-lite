@@ -249,13 +249,13 @@ Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is define
 
 ### Feature selection macros
 
-\-D<b>gsl\_FEATURE\_WITH\_CONTAINER\_TO\_STD</b>=99
+\-D<b>gsl\_FEATURE\_WITH\_CONTAINER\_TO\_STD</b>=99  
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`. Default is 99 for inclusion with any standard.
 
-\-D<b>gsl\_FEATURE\_MAKE\_SPAN\_TO\_STD</b>=99
+\-D<b>gsl\_FEATURE\_MAKE\_SPAN\_TO\_STD</b>=99  
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` creator functions. Default is 99 for inclusion with any standard.
 
-\-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99
+\-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99  
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. Default is 99 for inclusion with any standard.
 
 \-D<b>gsl\_FEATURE\_HAVE\_IMPLICIT\_MACRO</b>=1  
@@ -302,13 +302,13 @@ Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
 
 ### Other configuration macros
 
-\-D<b>gsl\_CONFIG\_DEPRECATE\_TO\_LEVEL</b>=0
+\-D<b>gsl\_CONFIG\_DEPRECATE\_TO\_LEVEL</b>=0  
 Define this to and including the level you want deprecation; see table [Deprecation](#deprecation) below. Default is 0 for no deprecation.
 
-\-D<b>gsl\_CONFIG\_SPAN\_INDEX\_TYPE</b>=size_t
+\-D<b>gsl\_CONFIG\_SPAN\_INDEX\_TYPE</b>=size_t  
 Define this macro to the type to use for indices in `span` and `basic_string_span`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl lite* is `size_t`.
 
-\-D<b>gsl\_CONFIG\_NOT\_NULL\_GET_BY\_CONST\_REF</b>=0
+\-D<b>gsl\_CONFIG\_NOT\_NULL\_GET_BY\_CONST\_REF</b>=0  
 Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T`. Default is 0 for `T`.
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
