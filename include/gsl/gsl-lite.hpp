@@ -1047,17 +1047,6 @@ public:
     : ptr_( other.get() )
     {}
 
-    template< class U
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type
-#endif
-    >
-    gsl_api not_null & operator=( not_null<U> const & other )
-    {
-        ptr_ = other.get();
-        return *this;
-    }
-
     gsl_api gsl_constexpr14 get_result_t get() const
     {
         // Without cheating and changing ptr_ from the outside, this check is superfluous:
