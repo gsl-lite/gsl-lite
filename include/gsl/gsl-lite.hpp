@@ -998,7 +998,7 @@ public:
 
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        , class Dummy = typename std::enable_if<std::is_convertible<U, T>::value>::type
+        , class Dummy = typename std::enable_if<std::is_constructible<T, U>::value>::type
 #endif
     >
 #if gsl_HAVE( RVALUE_REFERENCE )
