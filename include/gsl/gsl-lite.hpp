@@ -1013,10 +1013,10 @@ public:
     >
 #if gsl_HAVE( RVALUE_REFERENCE )
     gsl_api gsl_constexpr14 gsl_explicit not_null( U && u )
-    : ptr_ ( std::forward<U>( u ) )
+    : ptr_( std::forward<U>( u ) )
 #else
-    gsl_api gsl_constexpr14 gsl_explicit not_null( U u )
-    : ptr_ ( u )
+    gsl_api gsl_constexpr14 gsl_explicit not_null( U const & u )
+    : ptr_( u )
 #endif
     {
         Expects( ptr_ != gsl_nullptr );
