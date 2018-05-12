@@ -1000,9 +1000,9 @@ template< class T >
 class not_null
 {
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# define gsl_not_null_explicit  explicit
+# define gsl_not_null_explicit   explicit
 #else
-# define gsl_not_null_explicit  /*explicit*/
+# define gsl_not_null_explicit /*explicit*/
 #endif
 
 #if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
@@ -1098,6 +1098,28 @@ gsl_is_delete_access:
 
 private:
     T ptr_;
+};
+
+// not_null with implicit constructor, allowing copy-initialization:
+
+template< class T >
+class not_null_ic : public not_null<T>
+{
+public:
+    template< class U
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        , class Dummy = typename std::enable_if<std::is_constructible<T, U>::value>::type
+#endif
+    >
+    gsl_api gsl_constexpr14
+#if gsl_HAVE( RVALUE_REFERENCE )
+    not_null_ic( U && u )
+    : not_null<T>( std::forward<U>( u ) )
+#else
+    not_null_ic( U const & u )
+    : not_null<T>( u )
+#endif
+    {}
 };
 
 // more not_null unwanted operators

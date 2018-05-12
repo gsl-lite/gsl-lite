@@ -309,10 +309,10 @@ Define this to and including the level you want deprecation; see table [Deprecat
 Define this macro to the type to use for indices in `span` and `basic_string_span`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl lite* is `size_t`.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_EXPLICIT\_CTOR</b>=0  
-Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in M-GSL the constructor is explicit.
+Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl lite*-specific `not_null`-derived class `not_null_ic`.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_GET_BY\_CONST\_REF</b>=0  
-Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T`. Default is 0 for `T`.
+Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`. 
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
@@ -334,7 +334,8 @@ Feature / library           | GSL     | M-GSL   | GSL-Lite| Notes |
 ----------------------------|:-------:|:-------:|:-------:|:------|
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 **1.1 Indirection**         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-not_null<>                  | &#10003;| &#10003;| &#10003;| Wrap any indirection and enforce non-null |
+not_null<>                  | &#10003;| &#10003;| &#10003;| Wrap any indirection and enforce non-null,<br>see also [Other configuration macros](#other-configuration-macros) |
+not_null_ic<>               | -       | -       | &#10003;| not_null with implicit constructor, allowing [copy-initialization](https://en.cppreference.com/w/cpp/language/copy_initialization) |
 **1.2 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 owner<>                     | &#10003;| &#10003;| >=C++11 | Owned raw pointers |
 Owner()                     | -       | -       | &#10003;| Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
