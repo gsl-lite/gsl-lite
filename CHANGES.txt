@@ -1,5 +1,19 @@
 Changes for GSL Lite – Guideline Support Library for C++98/03 and later
 
+version 0.32.0 2018-05-12
+
+* Review not_null (issue #122)
+* Add not_null_ic with implicit constructor, allowing copy-initialization
+* Enable making not_null constructor explicit via gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR, default 0 (breaking, issue #46)
+* Enable not_null get() return by const & via gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF (via M-GSL PR 651 @xaxxon, PR 675 @ericLemanissier).
+* Change constraint on not_null construction from is_convertible to is_constructible (via M-GSL PR 650, @xaxxon)
+* Change to take not_null constructor argument by const & when rvalue references are not available.
+* Add not_null non-is-default rvalue reference copy-constructor, copy-assignment.
+* Remove not_null converting assignment operator.
+* Rename to gsl_HAVE_EXPLICIT.
+* Adapt several compile-time tests for not_null with explicit constructor.
+* Fix GNUC C++98 compilation by making RefCounted conversion function const in not_null.t.cpp.
+
 version 0.31.0 2018-05-10
 
 - Change span towards proposal p0122r7 (issue #118).
