@@ -576,6 +576,12 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # define Expects( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
+#if gsl_ELIDE_CONTRACT_EXPECTS
+# define gsl_EXPECTS_UNUSED_PARAM( x )  /* Make param unnamed if Expects elided */
+#else
+# define gsl_EXPECTS_UNUSED_PARAM( x )  x
+#endif
+
 #if gsl_ELIDE_CONTRACT_ENSURES
 # define Ensures( x )  /* Ensures elided */
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
@@ -1407,7 +1413,7 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
 #if gsl_HAVE( NULLPTR )
-    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
+    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type gsl_EXPECTS_UNUSED_PARAM( size_in ) )
         : first_( nullptr )
         , last_ ( nullptr )
     {
