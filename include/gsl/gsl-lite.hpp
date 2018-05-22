@@ -224,6 +224,7 @@
 #define gsl_CPP14_140  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
 
 #define gsl_CPP17_000  (gsl_CPP17_OR_GREATER)
+#define gsl_CPP17_140  (gsl_CPP17_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
 
 #define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VERSION >=  90 && gsl_HAS_CPP0X))
 #define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VERSION >= 100 && gsl_HAS_CPP0X))
@@ -278,6 +279,8 @@
 #define gsl_HAVE_UNIQUE_PTR             gsl_CPP11_140_CPP0X_100
 
 #define gsl_HAVE_MAKE_UNIQUE            gsl_CPP14_120
+
+#define gsl_HAVE_UNCAUGHT_EXCEPTIONS    gsl_CPP17_140
 
 #define gsl_HAVE_ADD_CONST              gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_INTEGRAL_CONSTANT      gsl_HAVE_TYPE_TRAITS
@@ -649,19 +652,19 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond ) gsl_noexcept
 namespace details {
 // Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
 // Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
-#if defined(_MSC_VER) && _MSC_VER < 1900
+#if gsl_HAVE( UNCAUGHT_EXCEPTIONS )
+    inline unsigned char uncaught_exceptions() {
+        return std::uncaught_exceptions();
+    }
+#elif gsl_COMPILER_MSVC_VERSION
     extern "C" char * __cdecl _getptd();
     inline unsigned char uncaught_exceptions() {
         return *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90));
     }
-#elif (defined(__GNUG__) || defined(__CLANG__)) && __cplusplus < 201700L
+#elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_CLANG_VERSION
     extern "C" char * __cxa_get_globals();
     inline unsigned char uncaught_exceptions() {
         return *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*));
-    }
-#else
-    inline unsigned char uncaught_exceptions() {
-        return std::uncaught_exceptions();
     }
 #endif
 }
