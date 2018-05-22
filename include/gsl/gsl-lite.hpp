@@ -644,6 +644,29 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond ) gsl_noexcept
 // GSL.util: utilities
 //
 
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+
+namespace details {
+// Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
+// Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
+#if defined(_MSC_VER) && _MSC_VER < 1900
+    extern "C" char * __cdecl _getptd();
+    inline unsigned char uncaught_exceptions() {
+        return *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90));
+    }
+#elif (defined(__GNUG__) || defined(__CLANG__)) && __cplusplus < 201700L
+    extern "C" char * __cxa_get_globals();
+    inline unsigned char uncaught_exceptions() {
+        return *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*));
+    }
+#else
+    inline unsigned char uncaught_exceptions() {
+        return std::uncaught_exceptions();
+    }
+#endif
+}
+#endif
+
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110
 
 template< class F >
@@ -697,26 +720,6 @@ gsl_api inline final_action<F> finally( F && action ) gsl_noexcept
 }
 
 #if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-
-namespace details {
-// Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
-// Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
-#if defined(_MSC_VER) && _MSC_VER < 1900
-    extern "C" char * __cdecl _getptd();
-    inline unsigned char uncaught_exceptions() {
-        return *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90));
-    }
-#elif (defined(__GNUG__) || defined(__CLANG__)) && __cplusplus < 201700L
-    extern "C" char * __cxa_get_globals();
-    inline unsigned char uncaught_exceptions() {
-        return *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*));
-    }
-#else
-    inline unsigned char uncaught_exceptions() {
-        return std::uncaught_exceptions();
-    }
-#endif
-}
 
 template< class F >
 class final_action_return : public final_action<F>
