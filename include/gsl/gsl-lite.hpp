@@ -874,7 +874,8 @@ class final_action_return : public final_action
 {
 public:
     gsl_api explicit final_action_return( Action action )
-        : final_action( action ), exception_count(details::uncaught_exceptions())
+        : final_action( action )
+        , exception_count( details::uncaught_exceptions() )
     {}
 
     gsl_api ~final_action_return()
@@ -898,11 +899,10 @@ gsl_api inline final_action_return on_return( F const & action )
 
 class final_action_error : public final_action
 {
-private:
-    unsigned char exception_count;
 public:
     gsl_api explicit final_action_error( Action action )
-        : final_action( action ), exception_count(details::uncaught_exceptions())
+        : final_action( action )
+        , exception_count( details::uncaught_exceptions() )
     {}
 
     gsl_api ~final_action_error()
@@ -913,6 +913,9 @@ public:
 
 private:
     gsl_api final_action_error & operator=( final_action_error const & );
+
+private:
+    unsigned char exception_count;
 };
 
 template< class F >
