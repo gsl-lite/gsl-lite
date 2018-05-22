@@ -649,23 +649,38 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond ) gsl_noexcept
 
 #if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-namespace details {
 // Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
 // Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
+
+namespace details {
+
+inline unsigned char to_uchar( unsigned x ) gsl_noexcept
+{
+    return static_cast<unsigned char>( x );
+}
+
 #if gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-    inline unsigned char uncaught_exceptions() {
-        return std::uncaught_exceptions();
-    }
+
+inline unsigned char uncaught_exceptions() gsl_noexcept
+{
+    return to_uchar( std::uncaught_exceptions() );
+}
+
 #elif gsl_COMPILER_MSVC_VERSION
-    extern "C" char * __cdecl _getptd();
-    inline unsigned char uncaught_exceptions() {
-        return *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90));
-    }
-#elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_CLANG_VERSION
-    extern "C" char * __cxa_get_globals();
-    inline unsigned char uncaught_exceptions() {
-        return *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*));
-    }
+
+extern "C" char * __cdecl _getptd();
+inline unsigned char uncaught_exceptions() gsl_noexcept
+{
+    return to_uchar( *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90) ) );
+}
+
+#elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION
+
+extern "C" char * __cxa_get_globals();
+inline unsigned char uncaught_exceptions() gsl_noexcept
+{
+    return to_uchar( *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*) ) );
+}
 #endif
 }
 #endif
@@ -727,15 +742,15 @@ gsl_api inline final_action<F> finally( F && action ) gsl_noexcept
 template< class F >
 class final_action_return : public final_action<F>
 {
-private:
-    unsigned char exception_count;
 public:
     gsl_api explicit final_action_return( F && action ) gsl_noexcept
-        : final_action<F>( std::move( action ) ), exception_count(details::uncaught_exceptions())
+        : final_action<F>( std::move( action ) )
+        , exception_count( details::uncaught_exceptions() )
     {}
 
     gsl_api final_action_return( final_action_return && other ) gsl_noexcept
-        : final_action<F>( std::move( other ) ), exception_count(details::uncaught_exceptions())
+        : final_action<F>( std::move( other ) )
+        , exception_count( details::uncaught_exceptions() )
     {}
 
     gsl_api ~final_action_return() override
@@ -747,6 +762,9 @@ public:
 gsl_is_delete_access:
     gsl_api final_action_return( final_action_return const & ) gsl_is_delete;
     gsl_api final_action_return & operator=( final_action_return const & ) gsl_is_delete;
+
+private:
+    unsigned char exception_count;
 };
 
 template< class F >
@@ -764,15 +782,15 @@ gsl_api inline final_action_return<F> on_return( F && action ) gsl_noexcept
 template< class F >
 class final_action_error : public final_action<F>
 {
-private:
-    unsigned char exception_count;
 public:
     gsl_api explicit final_action_error( F && action ) gsl_noexcept
-        : final_action<F>( std::move( action ) ), exception_count(details::uncaught_exceptions())
+        : final_action<F>( std::move( action ) )
+        , exception_count( details::uncaught_exceptions() )
     {}
 
     gsl_api final_action_error( final_action_error && other ) gsl_noexcept
-        : final_action<F>( std::move( other ) ), exception_count(details::uncaught_exceptions())
+        : final_action<F>( std::move( other ) )
+        , exception_count( details::uncaught_exceptions() )
     {}
 
     gsl_api ~final_action_error() override
@@ -784,6 +802,9 @@ public:
 gsl_is_delete_access:
     gsl_api final_action_error( final_action_error const & ) gsl_is_delete;
     gsl_api final_action_error & operator=( final_action_error const & ) gsl_is_delete;
+
+private:
+    unsigned char exception_count;
 };
 
 template< class F >
@@ -849,8 +870,6 @@ gsl_api inline final_action finally( F const & f )
 
 class final_action_return : public final_action
 {
-private:
-    unsigned char exception_count;
 public:
     gsl_api explicit final_action_return( Action action )
         : final_action( action ), exception_count(details::uncaught_exceptions())
@@ -864,6 +883,9 @@ public:
 
 private:
     gsl_api final_action_return & operator=( final_action_return const & );
+
+private:
+    unsigned char exception_count;
 };
 
 template< class F >
