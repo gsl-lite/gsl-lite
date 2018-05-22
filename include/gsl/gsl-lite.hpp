@@ -138,7 +138,7 @@
 # error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS and gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES may be defined.
 #endif
 
-// Compiler detection (C++20 is speculative):
+// C++ language version detection (C++20 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
 #if defined _MSVC_LANG
@@ -288,8 +288,6 @@
 #define gsl_HAVE_TR1_INTEGRAL_CONSTANT  gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_TR1_REMOVE_CONST       gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_TR1_REMOVE_REFERENCE   gsl_HAVE_TR1_TYPE_TRAITS
-
-// For the rest, consider VC12, VC14 as C++11 for GSL Lite.
 
 // C++ feature usage:
 
