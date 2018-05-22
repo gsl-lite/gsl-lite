@@ -681,18 +681,6 @@ protected:
         invoke_ = false;
     }
 
-#if gsl_CPP17_OR_GREATER
-    gsl_api int uncaught_exceptions() gsl_noexcept
-    {
-        return std::uncaught_exceptions();
-    }
-#else
-    gsl_api int uncaught_exceptions()
-    {
-        return std::uncaught_exception() ? 1 : 0;
-    }
-#endif
-
 private:
     F action_;
     bool invoke_;
@@ -712,21 +700,43 @@ gsl_api inline final_action<F> finally( F && action ) gsl_noexcept
 
 #if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
+namespace details {
+// Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
+// Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
+#if defined(_MSC_VER) && _MSC_VER < 1900
+    extern "C" char * __cdecl _getptd();
+    inline unsigned char uncaught_exceptions() {
+        return *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90));
+    }
+#elif (defined(__GNUG__) || defined(__CLANG__)) && __cplusplus < 201700L
+    extern "C" char * __cxa_get_globals();
+    inline unsigned char uncaught_exceptions() {
+        return *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*));
+    }
+#else
+    inline unsigned char uncaught_exceptions() {
+        return std::uncaught_exceptions();
+    }
+#endif
+}
+
 template< class F >
 class final_action_return : public final_action<F>
 {
+private:
+    unsigned char exception_count;
 public:
     gsl_api explicit final_action_return( F && action ) gsl_noexcept
-        : final_action<F>( std::move( action ) )
+        : final_action<F>( std::move( action ) ), exception_count(details::uncaught_exceptions())
     {}
 
     gsl_api final_action_return( final_action_return && other ) gsl_noexcept
-        : final_action<F>( std::move( other ) )
+        : final_action<F>( std::move( other ) ), exception_count(details::uncaught_exceptions())
     {}
 
     gsl_api ~final_action_return() override
     {
-        if ( this->uncaught_exceptions() )
+        if ( details::uncaught_exceptions() != exception_count )
             this->dismiss();
     }
 
@@ -750,18 +760,20 @@ gsl_api inline final_action_return<F> on_return( F && action ) gsl_noexcept
 template< class F >
 class final_action_error : public final_action<F>
 {
+private:
+    unsigned char exception_count;
 public:
     gsl_api explicit final_action_error( F && action ) gsl_noexcept
-        : final_action<F>( std::move( action ) )
+        : final_action<F>( std::move( action ) ), exception_count(details::uncaught_exceptions())
     {}
 
     gsl_api final_action_error( final_action_error && other ) gsl_noexcept
-        : final_action<F>( std::move( other ) )
+        : final_action<F>( std::move( other ) ), exception_count(details::uncaught_exceptions())
     {}
 
     gsl_api ~final_action_error() override
     {
-        if ( ! this->uncaught_exceptions() )
+        if ( details::uncaught_exceptions() == exception_count )
             this->dismiss();
     }
 
@@ -815,11 +827,6 @@ protected:
         invoke_ = false;
     }
 
-    gsl_api int uncaught_exceptions()
-    {
-        return std::uncaught_exception() ? 1 : 0;
-    }
-
 private:
     gsl_api final_action & operator=( final_action const & );
 
@@ -838,14 +845,16 @@ gsl_api inline final_action finally( F const & f )
 
 class final_action_return : public final_action
 {
+private:
+    unsigned char exception_count;
 public:
     gsl_api explicit final_action_return( Action action )
-        : final_action( action )
+        : final_action( action ), exception_count(details::uncaught_exceptions())
     {}
 
     gsl_api ~final_action_return()
     {
-        if ( this->uncaught_exceptions() )
+        if ( details::uncaught_exceptions() != exception_count )
             this->dismiss();
     }
 
@@ -861,14 +870,16 @@ gsl_api inline final_action_return on_return( F const & action )
 
 class final_action_error : public final_action
 {
+private:
+    unsigned char exception_count;
 public:
     gsl_api explicit final_action_error( Action action )
-        : final_action( action )
+        : final_action( action ), exception_count(details::uncaught_exceptions())
     {}
 
     gsl_api ~final_action_error()
     {
-        if ( ! this->uncaught_exceptions() )
+        if ( details::uncaught_exceptions() == exception_count )
             this->dismiss();
     }
 
