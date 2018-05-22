@@ -158,8 +158,12 @@ CASE( "on_return: Allows to perform action on leaving scope without exception (g
         static void fail() { try { final_action_return _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
     };
 #endif
+    struct G {
+        ~G() { F::pass(); }
+    };
     { g_i = 0; F::pass(); EXPECT( g_i == 1 ); }
     { g_i = 0; F::fail(); EXPECT( g_i == 0 ); }
+    { g_i = 0; try { G g; throw std::exception(); } catch (...) {}; EXPECT( g_i == 1 ); }
 #else
     EXPECT( !!"on_return not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
 #endif
@@ -181,8 +185,12 @@ CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl
         static void fail() { try { final_action_error _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
     };
 #endif
+    struct G {
+        ~G() { F::pass(); }
+    };
     { g_i = 0; F::pass(); EXPECT( g_i == 0 ); }
     { g_i = 0; F::fail(); EXPECT( g_i == 1 ); }
+    { g_i = 0; try { G g; throw std::exception(); } catch (...) {}; EXPECT( g_i == 0 ); }
 #else
     EXPECT( !!"on_error not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
 #endif
