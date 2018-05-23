@@ -237,6 +237,7 @@ Synopsis
 
 **Contents**  
 - [API macro](#api-macro)
+- [Standard selection macro](#standard-selection-macro)
 - [Feature selection macros](#feature-selection-macros)
 - [Contract violation response macros](#contract-violation-response-macros)
 - [Microsoft GSL compatibility macros](#microsoft-gsl-compatibility-macros)
