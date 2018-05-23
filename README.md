@@ -247,6 +247,11 @@ Synopsis
 \-D<b>gsl\_api</b>=""  
 Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform. Define this macro to specify your own function decoration. 
 
+### Standard selection macro
+
+\-D<b>gsl\_CPLUSPLUS</b>=199711L
+Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cpluplus` macro correctly.
+
 ### Feature selection macros
 
 \-D<b>gsl\_FEATURE\_WITH\_CONTAINER\_TO\_STD</b>=99  
