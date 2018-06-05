@@ -358,7 +358,7 @@ wzstring                    | -       | &#10003;| &#10003;| a wchar_t* (C-style 
 czstring                    | &#10003;| &#10003;| &#10003;| a const char* (C-style string) |
 cwzstring                   | -       | &#10003;| &#10003;| a const wchar_t* (C-style string) |
 **2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
-span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0123) |
+span<>                      | &#10003;| &#10003;| 1D views| A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0122) |
 span_p<>                    | &#10003;| -       | -       | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
 make_span()                 | -       | &#10003;| &#10003;| Create a span |
 byte_span()                 | -       | -       | &#10003;| Create a span of bytes from a single object |
