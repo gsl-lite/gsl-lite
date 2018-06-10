@@ -7,7 +7,7 @@
 
 cmake_minimum_required( VERSION 3.1 FATAL_ERROR )
 
-project( gsl-lite-example )
+project( gsl-lite-example LANGUAGES CXX )
 
 # Target default options and definitions:
 

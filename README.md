@@ -117,7 +117,7 @@ In folder src:
 ```CMake
 cmake_minimum_required( VERSION 3.0 )
 
-project( program-using-gsl-lite )
+project( program-using-gsl-lite LANGUAGES CXX )
 
 # Make program executable:
 
@@ -172,7 +172,7 @@ In folder src:
 ```CMake
 cmake_minimum_required( VERSION 3.0 )
 
-project( program-using-gsl-lite )
+project( program-using-gsl-lite LANGUAGES CXX )
 
 # Make program executable:
 

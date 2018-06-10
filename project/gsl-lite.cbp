@@ -5,6 +5,11 @@
 		<Option title="GSL lite" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option show_notes="0">
+			<notes>
+				<![CDATA[No single official propoasal.]]>
+			</notes>
+		</Option>
 		<Build>
 			<Target title="Release">
 				<Option output="bin/Release/optional3" prefix_auto="1" extension_auto="1" />
