@@ -97,7 +97,7 @@ Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [incl
 In project root folder:
 
 ```CMake
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.5 )
 
 project( use-gsl-lite LANGUAGES CXX )
 
@@ -115,7 +115,7 @@ add_subdirectory( src )
 In folder src:
 
 ```CMake
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.5 )
 
 project( program-using-gsl-lite LANGUAGES CXX )
 
@@ -131,7 +131,7 @@ target_link_libraries( program PRIVATE gsl )
 Another approach is to automatically fetch the entire *gsl-lite* repository from github and configure it as an external project.
 
 ```CMake
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.5 )
 
 project( use-gsl-lite LANGUAGES CXX )
 
@@ -170,7 +170,7 @@ add_subdirectory( src )
 
 In folder src:
 ```CMake
-cmake_minimum_required( VERSION 3.0 )
+cmake_minimum_required( VERSION 3.5 )
 
 project( program-using-gsl-lite LANGUAGES CXX )
 
@@ -197,7 +197,7 @@ This setup brings in more than you need, but also makes it easy to update *gsl-l
 2. Next, you can use the *gsl-lite* CMake package, for example:
 
 	```CMake
-	cmake_minimum_required( VERSION 3.0 )
+	cmake_minimum_required( VERSION 3.5 )
 	
 	find_package( gsl-lite "0.29" REQUIRED )
 	
