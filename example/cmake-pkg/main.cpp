@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-// Guideline Support Library (GSL)
+// Guidelines Support Library (GSL)
 #include <gsl/gsl>
 
 void not_null_example( const gsl::not_null<const std::string *> arg )

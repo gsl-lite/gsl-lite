@@ -1,4 +1,4 @@
-Changes for GSL Lite – Guideline Support Library for C++98/03 and later
+Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
 
 version 0.32.0 2018-05-12
 
