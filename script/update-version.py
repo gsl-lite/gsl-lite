@@ -43,7 +43,7 @@ table = (
 
     , ( 'include/gsl/gsl-lite.hpp'
         , r'\#define\s+gsl_lite_PATCH\s+[0-9]+\s*$'
-        , '#define  gsl_lite_PATCH  {patch}' )
+        , '#define  gsl_lite_PATCH  {patch}\n' )
 )
 
 # End configuration.
