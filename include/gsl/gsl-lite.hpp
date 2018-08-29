@@ -2184,7 +2184,7 @@ public:
 #endif
 
     gsl_api gsl_constexpr basic_string_span( pointer ptr )
-    : span_( remove_z( ptr, std::numeric_limits<index_type>::max() ) )
+    : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
     {}
 
     gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
@@ -2731,7 +2731,7 @@ gsl_api std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< 
 namespace details {
 
 template< class T, class SizeType, const T Sentinel >
-gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
+gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_limits<SizeType>::max)() )
 {
     typedef T * pointer;
 
@@ -2755,7 +2755,7 @@ gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = std::numeric_lim
 //
 
 template< class T >
-gsl_api inline span<T> ensure_z( T * const & sz, size_t max = std::numeric_limits<size_t>::max() )
+gsl_api inline span<T> ensure_z( T * const & sz, size_t max = (std::numeric_limits<size_t>::max)() )
 {
     return details::ensure_sentinel<T, size_t, 0>( sz, max );
 }

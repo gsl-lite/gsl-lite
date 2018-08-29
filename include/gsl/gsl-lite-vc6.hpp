@@ -655,7 +655,7 @@ namespace detail {
 template<class T, class SizeType, const T Sentinel>
 struct ensure
 {
-    static span<T> sentinel( T * seq, SizeType max = std::numeric_limits<SizeType>::max() )
+    static span<T> sentinel( T * seq, SizeType max = (std::numeric_limits<SizeType>::max)() )
     {
         typedef T * pointer;
         typedef typename std::iterator_traits<pointer>::difference_type difference_type;
@@ -679,7 +679,7 @@ struct ensure
 //
 
 template< typename T >
-span<T> ensure_z( T * sz, size_t max = std::numeric_limits<size_t>::max() )
+span<T> ensure_z( T * sz, size_t max = (std::numeric_limits<size_t>::max)() )
 {
     return detail::ensure<T, size_t, 0>::sentinel( sz, max );
 }

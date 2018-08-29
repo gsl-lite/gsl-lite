@@ -1551,7 +1551,7 @@ CASE( "byte_span() (gsl_FEATURE_BYTE_SPAN=1)" )
 
 CASE( "byte_span(): Allows to build a span of gsl::byte from a single object" )
 {
-    int x = std::numeric_limits<int>::max();
+    int x = (std::numeric_limits<int>::max)();
 
     span<gsl::byte> spn = byte_span( x );
 
@@ -1561,7 +1561,7 @@ CASE( "byte_span(): Allows to build a span of gsl::byte from a single object" )
 
 CASE( "byte_span(): Allows to build a span of const gsl::byte from a single const object" )
 {
-    const int x = std::numeric_limits<int>::max();
+    const int x = (std::numeric_limits<int>::max)();
 
     span<const gsl::byte> spn = byte_span( x );
 
