@@ -1725,7 +1725,7 @@ public:
     {
         Expects(
             0 <= offset && offset <= this->size() &&
-            0 <= count  && count + offset <= this->size() );
+            0 <= count  && count <= this->size() - offset );
         return span( this->data() + offset, count );
     }
 
