@@ -14,7 +14,7 @@ echo g++ %version%: %std% %args%
 
 REM set FLAG=-Wsign-conversion
 REM set FLAG=-Wshadow
-set EXTRAFLAGS=%FLAG% -Wundef -Wpedantic -Wconversion -Wctor-dtor-privacy -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wold-style-cast
+set EXTRAFLAGS=%FLAG% -Wundef -Wpedantic -Wconversion -Wsign-conversion -Wctor-dtor-privacy -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wold-style-cast
 
 g++ -std=%std% -O2 %EXTRAFLAGS% -Wall -Wextra -Wno-unused-parameter -fno-elide-constructors -o gsl-lite.t.exe -I../include -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp && gsl-lite.t.exe
 
