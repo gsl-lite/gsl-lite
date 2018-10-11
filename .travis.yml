@@ -156,6 +156,6 @@ script:
   - export CXX=${COMPILER}
   - JOBS=2 # Travis machines have 2 cores.
   - mkdir build && cd build
-  - cmake -G "Unix Makefiles" ..
+  - cmake -G "Unix Makefiles" -DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON ..
   - cmake --build . -- -j${JOBS}
   - ctest --output-on-failure -j${JOBS}
