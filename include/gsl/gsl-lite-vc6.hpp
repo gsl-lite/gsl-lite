@@ -89,7 +89,7 @@
 #endif
 
 // half-open range [lo..hi):
-#define gsl_BETWEEN( v, lo, hi ) ( lo <= v && v < hi )
+#define gsl_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
 // Presence of C++ language features:
 
