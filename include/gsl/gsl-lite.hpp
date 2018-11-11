@@ -143,7 +143,7 @@
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
 #ifndef   gsl_CPLUSPLUS
-# ifdef  _MSVC_LANG
+# if defined(_MSVC_LANG ) && !defined(__clang__)
 #  define gsl_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
 # else
 #  define gsl_CPLUSPLUS  __cplusplus
@@ -163,10 +163,12 @@
 // half-open range [lo..hi):
 #define gsl_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
-#if defined( _MSC_VER ) && !defined( __clang__ )
-# define gsl_COMPILER_MSVC_VERSION ( _MSC_VER / 10 - 10 * ( 5 + ( _MSC_VER < 1900 ) ) )
+#if defined(_MSC_VER ) && !defined(__clang__)
+# define gsl_COMPILER_MSVC_VER      (_MSC_VER )
+# define gsl_COMPILER_MSVC_VERSION  (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
 #else
-# define gsl_COMPILER_MSVC_VERSION 0
+# define gsl_COMPILER_MSVC_VER      0
+# define gsl_COMPILER_MSVC_VERSION  0
 #endif
 
 #define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
@@ -217,20 +219,20 @@
 # define gsl_HAS_CPP0X  0
 #endif
 
-#define gsl_CPP11_100  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 100)
-#define gsl_CPP11_110  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110)
-#define gsl_CPP11_120  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
-#define gsl_CPP11_140  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
+#define gsl_CPP11_100  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
+#define gsl_CPP11_110  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1700)
+#define gsl_CPP11_120  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
+#define gsl_CPP11_140  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
 
 #define gsl_CPP14_000  (gsl_CPP14_OR_GREATER)
-#define gsl_CPP14_120  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
-#define gsl_CPP14_140  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
+#define gsl_CPP14_120  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
+#define gsl_CPP14_140  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
 
 #define gsl_CPP17_000  (gsl_CPP17_OR_GREATER)
-#define gsl_CPP17_140  (gsl_CPP17_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 140)
+#define gsl_CPP17_140  (gsl_CPP17_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
 
-#define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VERSION >=  90 && gsl_HAS_CPP0X))
-#define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VERSION >= 100 && gsl_HAS_CPP0X))
+#define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1500 && gsl_HAS_CPP0X))
+#define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1600 && gsl_HAS_CPP0X))
 
 // Presence of C++11 language features:
 

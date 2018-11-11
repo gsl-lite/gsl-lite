@@ -75,14 +75,16 @@
 
 // Compiler detection:
 
-#if defined(_MSC_VER)
-# define gsl_COMPILER_MSVC_VERSION   (_MSC_VER / 100 - 5 - (_MSC_VER < 1900))
+#if defined(_MSC_VER ) && !defined(__clang__)
+# define gsl_COMPILER_MSVC_VER      (_MSC_VER )
+# define gsl_COMPILER_MSVC_VERSION  (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
 #else
+# define gsl_COMPILER_MSVC_VER       0
 # define gsl_COMPILER_MSVC_VERSION   0
 # define gsl_COMPILER_NON_MSVC       1
 #endif
 
-#if gsl_COMPILER_MSVC_VERSION != 6
+#if gsl_COMPILER_MSVC_VERSION != 60
 # error GSL Lite: this header is for Visual C++ 6
 #endif
 
