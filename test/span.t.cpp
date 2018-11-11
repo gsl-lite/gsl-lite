@@ -571,7 +571,7 @@ CASE( "span<>: Allows to copy-construct from another span of a compatible type" 
     span<const int> w( arr );
 
     span<const volatile int> x( v );
-    span<const volatile int> y( v );
+    span<const volatile int> y( w );
 
     EXPECT( std::equal( x.begin(), x.end(), arr ) );
     EXPECT( std::equal( y.begin(), y.end(), arr ) );
