@@ -27,7 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define  lest_VERSION "1.33.1"
+#define  lest_VERSION "1.33.4"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -71,26 +71,26 @@
 
 // Compiler warning suppression:
 
-#ifdef __clang__
+#if defined (__clang__)
 # pragma clang diagnostic ignored "-Waggregate-return"
 # pragma clang diagnostic ignored "-Woverloaded-shift-op-parentheses"
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wdate-time"
-#elif defined __GNUC__
+#elif defined (__GNUC__)
 # pragma GCC   diagnostic ignored "-Waggregate-return"
 # pragma GCC   diagnostic push
 #endif
 
 // Suppress shadow and unused-value warning for sections:
 
-#if defined __clang__
+#if defined (__clang__)
 # define lest_SUPPRESS_WSHADOW    _Pragma( "clang diagnostic push" ) \
                                   _Pragma( "clang diagnostic ignored \"-Wshadow\"" )
 # define lest_SUPPRESS_WUNUSED    _Pragma( "clang diagnostic push" ) \
                                   _Pragma( "clang diagnostic ignored \"-Wunused-value\"" )
 # define lest_RESTORE_WARNINGS    _Pragma( "clang diagnostic pop"  )
 
-#elif defined __GNUC__
+#elif defined (__GNUC__)
 # define lest_SUPPRESS_WSHADOW    _Pragma( "GCC diagnostic push" ) \
                                   _Pragma( "GCC diagnostic ignored \"-Wshadow\"" )
 # define lest_SUPPRESS_WUNUSED    _Pragma( "GCC diagnostic push" ) \
@@ -112,13 +112,13 @@
 
 #define lest_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * major + minor ) + patch )
 
-#if defined __clang__
+#if defined (__clang__)
 # define lest_COMPILER_CLANG_VERSION lest_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
 #else
 # define lest_COMPILER_CLANG_VERSION 0
 #endif
 
-#if defined __GNUC__
+#if defined (__GNUC__)
 # define lest_COMPILER_GNUC_VERSION lest_COMPILER_VERSION( __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ )
 #else
 # define lest_COMPILER_GNUC_VERSION 0
@@ -138,6 +138,20 @@
 #define lest_CPP14_OR_GREATER  (__cplusplus >= 201402L || lest_MSVC_LANG >= 201703L )
 #define lest_CPP17_OR_GREATER  (__cplusplus >= 201703L || lest_MSVC_LANG >= 201703L )
 #define lest_CPP20_OR_GREATER  (__cplusplus >= 202000L || lest_MSVC_LANG >= 202000L )
+
+#ifndef  __has_cpp_attribute
+# define __has_cpp_attribute(name)  0
+#endif
+
+// Indicate argument as possibly unused, if possible:
+
+#if __has_cpp_attribute(maybe_unused) && lest_CPP17_OR_GREATER
+# define lest_MAYBE_UNUSED(ARG)  [[maybe_unused]] ARG
+#elif defined (__GNUC__)
+# define lest_MAYBE_UNUSED(ARG)  ARG __attribute((unused))
+#else
+# define lest_MAYBE_UNUSED(ARG)  ARG
+#endif
 
 // Presence of language and library features:
 
@@ -251,7 +265,7 @@ namespace lest
 #define lest_CASE( specification, proposition ) \
     static void lest_FUNCTION( lest::env & ); \
     namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
-    static void lest_FUNCTION( lest::env & lest_env )
+    static void lest_FUNCTION( lest_MAYBE_UNUSED( lest::env & lest_env ) )
 
 #define lest_ADD_TEST( specification, test ) \
     specification.push_back( test )
@@ -894,7 +908,11 @@ inline bool select( text name, texts include )
 
 inline int indefinite( int repeat ) { return repeat == -1; }
 
-typedef unsigned long seed_t;
+#if lest_CPP11_OR_GREATER
+typedef typename std::mt19937::result_type seed_t;
+#else
+typedef unsigned int seed_t;
+#endif
 
 struct options
 {
@@ -929,12 +947,13 @@ struct env
 
     env & operator()( text test )
     {
-        testing = test; return *this;
+        clear(); testing = test; return *this;
     }
 
     bool abort() { return opt.abort; }
     bool pass()  { return opt.pass; }
 
+    void clear() { ctx.clear(); }
     void pop()   { ctx.pop_back(); }
     void push( text proposition ) { ctx.push_back( proposition ); }
 
@@ -1226,7 +1245,7 @@ inline void shuffle( tests & specification, options option )
 #if lest_CPP11_OR_GREATER
     std::shuffle( specification.begin(), specification.end(), std::mt19937( option.seed ) );
 #else
-    lest::srand( static_cast<unsigned int>( option.seed ) );
+    lest::srand( option.seed );
 
     rng generator;
     std::random_shuffle( specification.begin(), specification.end(), generator );
@@ -1468,9 +1487,9 @@ int run(  C const & specification, std::ostream & os = std::cout )
 
 } // namespace lest
 
-#ifdef __clang__
+#if defined (__clang__)
 # pragma clang diagnostic pop
-#elif defined __GNUC__
+#elif defined (__GNUC__)
 # pragma GCC   diagnostic pop
 #endif
 
