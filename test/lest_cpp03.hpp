@@ -27,7 +27,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define  lest_VERSION "1.33.4"
+#define  lest_VERSION "1.33.5"
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -909,7 +909,7 @@ inline bool select( text name, texts include )
 inline int indefinite( int repeat ) { return repeat == -1; }
 
 #if lest_CPP11_OR_GREATER
-typedef typename std::mt19937::result_type seed_t;
+typedef std::mt19937::result_type seed_t;
 #else
 typedef unsigned int seed_t;
 #endif
