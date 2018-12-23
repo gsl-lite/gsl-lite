@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.hpp"
 
+using namespace gsl;
+
 typedef span<int>::index_type index_type;
 
 static std::vector<int> vector_iota( int n )
@@ -76,7 +78,7 @@ CASE( "span<>: Terminates construction from two pointers in the wrong order" )
 
 CASE( "span<>: Terminates construction from a null pointer and a non-zero size" )
 {
-    struct F { static void blow() { int * p = NULL; span<int> v( p, 42 ); } };
+    struct F { static void blow() { int * p = gsl_nullptr; span<int> v( p, 42 ); } };
 
     EXPECT_THROWS( F::blow() );
 }
@@ -267,7 +269,7 @@ CASE( "span<>: Allows to construct from any pointer and a zero size" )
 {
     struct F {
         static void null() {
-            int * p = NULL; span<int> v( p, index_type( 0 ) );
+            int * p = gsl_nullptr; span<int> v( p, index_type( 0 ) );
         }
         static void nonnull() {
             int i = 7; int * p = &i; span<int> v( p, index_type( 0 ) );

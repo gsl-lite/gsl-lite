@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.hpp"
 
+using namespace gsl;
+
 // Use gsl::byte instead of plain byte to prevent collisions with
 // other byte declarations, such as in rpcndr.h (Windows kit).
 

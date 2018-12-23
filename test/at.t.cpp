@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.hpp"
 
+using namespace gsl;
+
 CASE( "at(): Terminates access to non-existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };

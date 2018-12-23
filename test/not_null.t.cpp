@@ -18,6 +18,8 @@
 #include "gsl-lite.t.hpp"
 #include <vector>
 
+using namespace gsl;
+
 namespace {
 
 struct MyBase {};

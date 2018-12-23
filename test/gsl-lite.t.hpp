@@ -26,9 +26,20 @@
 # pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #endif
 
-#include "lest_cpp03.hpp"
+// Compiler warning suppression for usage of lest:
 
-using namespace gsl;
+#ifdef __clang__
+# pragma clang diagnostic ignored "-Wstring-conversion"
+# pragma clang diagnostic ignored "-Wunused-parameter"
+# pragma clang diagnostic ignored "-Wunused-template"
+# pragma clang diagnostic ignored "-Wunused-function"
+# pragma clang diagnostic ignored "-Wunused-member-function"
+#elif defined __GNUC__
+# pragma GCC   diagnostic ignored "-Wunused-parameter"
+# pragma GCC   diagnostic ignored "-Wunused-function"
+#endif
+
+#include "lest_cpp03.hpp"
 
 #define CASE( name ) lest_CASE( specification(), name )
 
@@ -67,7 +78,7 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 
 namespace gsl {
 
-inline const void * nullptr_void() { return 0; }
+inline const void * nullptr_void() { return gsl_nullptr; }
 
 // use oparator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
@@ -84,6 +95,11 @@ inline std::ostream & operator<<( std::ostream & os, span<T> s )
 }
 
 } // namespace gsl
+
+inline void suppress_warning_unused_template_ensure_sentinel()
+{
+    (void) gsl::ensure_z( "zero-terminated" );
+}
 
 #endif // GSL_TEST_GSL_LITE_HPP_INCLUDED
 

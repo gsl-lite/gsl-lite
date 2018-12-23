@@ -24,6 +24,8 @@
 # include <wchar.h> // wcslen()
 #endif
 
+using namespace gsl;
+
 typedef string_span::index_type index_type;
 
 template< typename T >

@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.hpp"
 
+using namespace gsl;
+
 CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if  gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )

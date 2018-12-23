@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.hpp"
 
+using namespace gsl;
+
 CASE( "span<>: free comparation functions fail for different const-ness" "[.issue #32]" )
 {
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )

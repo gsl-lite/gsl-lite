@@ -1634,7 +1634,7 @@ public:
 #if gsl_HAVE( SHARED_PTR )
     gsl_api gsl_constexpr span( shared_ptr<element_type> const & ptr )
         : first_( ptr.get() )
-        , last_ ( ptr.get() ? ptr.get() + 1 : 0 )
+        , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
     {}
 #endif
 
@@ -1653,7 +1653,7 @@ public:
 
     gsl_api gsl_constexpr span( unique_ptr<element_type> const & ptr )
         : first_( ptr.get() )
-        , last_ ( ptr.get() ? ptr.get() + 1 : 0 )
+        , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
     {}
 #endif
 
