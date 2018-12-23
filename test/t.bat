@@ -5,12 +5,20 @@
 
 set args=%*
 
-set CppCoreCheckInclude=%VCINSTALLDIR%\Auxiliary\VS\include
-
 call :CompilerVersion version
 echo VC%version%: %args%
 
-cl -EHsc -I../include -I"%CppCoreCheckInclude%" %args% -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp && gsl-lite.t.exe
+set unit_config=^
+    -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD ^
+    -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS 
+
+set msvc_defines=^
+    -D_CRT_SECURE_NO_WARNINGS ^
+    -D_SCL_SECURE_NO_WARNINGS
+
+set CppCoreCheckInclude=%VCINSTALLDIR%\Auxiliary\VS\include
+
+cl -EHsc %unit_config% %msvc_defines% -I../include -I"%CppCoreCheckInclude%" %args% gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp && gsl-lite.t.exe
 
 endlocal & goto :EOF
 
