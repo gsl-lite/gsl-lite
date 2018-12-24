@@ -1,4 +1,6 @@
-version: '1.0.{build}'
+version: "{branch} #{build}"
+
+shallow_clone: true
 
 image:
     - Visual Studio 2017
@@ -40,4 +42,6 @@ before_build:
 
 build_script:
     - cmake --build . --config %configuration%
+
+test_script:
     - ctest --output-on-failure -C %configuration%
