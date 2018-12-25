@@ -18,7 +18,7 @@ project(
 #   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
     LANGUAGES CXX )
 
-set( ${PROJECT_NAME}_version "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}" )
+message( STATUS "${PROJECT_NAME} version: '${${PROJECT_NAME}_VERSION}'")
 
 # Toplevel or subproject:
 
