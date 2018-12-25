@@ -39,11 +39,11 @@ set( package_name "gsl-lite" )
 
 set(         include_source_dir "${PROJECT_SOURCE_DIR}/include" )
 set(        include_install_dir "include" )
-set( package_config_install_dir "lib/cmake/${PROJECT_NAME}" )
-set(        package_config_file "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake" )
-set(       package_version_file "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake" )
-set(        package_export_name "${PROJECT_NAME}Targets" )
-set(          package_namespace "${PROJECT_NAME}::" )
+set( package_config_install_dir "lib/cmake/${package_name}" )
+set(        package_config_file "${PROJECT_BINARY_DIR}/${package_name}Config.cmake" )
+set(       package_version_file "${PROJECT_BINARY_DIR}/${package_name}ConfigVersion.cmake" )
+set(        package_export_name "${package_name}Targets" )
+set(          package_namespace "${package_name}::" )
 
 # Interface library:
 
