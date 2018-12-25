@@ -1,5 +1,7 @@
 # Copyright 2015-2018 by Martin Moene
 #
+# https://github.com/martinmoene/gsl-lite
+#
 # gsl-lite is based on GSL: Guidelines Support Library,
 # https://github.com/microsoft/gsl
 #
@@ -7,20 +9,33 @@
 
 cmake_minimum_required( VERSION 3.0 FATAL_ERROR )
 
-# gsl-lite version, updated by script/update-version.py:
+# gsl-lite project and version, updated by script/update-version.py:
 
-set( gsl_lite_version "0.32.0" )
+project(
+    gsl_lite
+    VERSION 0.32.0
+    DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
+#   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
+    LANGUAGES CXX )
 
-# At default, disable building and performing of tests and building of examples:
+set( ${PROJECT_NAME}_version "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}" )
 
-option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" OFF )
+# Toplevel or subproject:
+
+if ( CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR )
+    set( gsl_IS_TOPLEVEL_PROJECT TRUE )
+else()
+    set( gsl_IS_TOPLEVEL_PROJECT FALSE )
+endif()
+
+# If toplevel project, enable building and performing of tests, disable building of examples:
+
+option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
 option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
 
 include( CMakePackageConfigHelpers )
 
 set( package_name "gsl-lite" )
-
-project( ${package_name} VERSION ${gsl_lite_version} LANGUAGES CXX )
 
 set(         include_source_dir "${PROJECT_SOURCE_DIR}/include" )
 set(        include_install_dir "include" )
@@ -32,18 +47,18 @@ set(          package_namespace "${PROJECT_NAME}::" )
 
 # Interface library:
 
-add_library(                
+add_library(
     ${package_name} INTERFACE )
-    
-target_include_directories( 
+
+target_include_directories(
     ${package_name} INTERFACE "$<BUILD_INTERFACE:${include_source_dir}>" )
-    
-target_sources(             
+
+target_sources(
     ${package_name} INTERFACE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/gsl-lite.natvis>" )
 
 # Package configuration:
 
-configure_package_config_file( 
+configure_package_config_file(
    "${PROJECT_SOURCE_DIR}/cmake/PackageConfig.cmake.in"
     ${package_config_file} INSTALL_DESTINATION ${package_config_install_dir} )
 
@@ -61,7 +76,7 @@ install(
     EXPORT      ${package_export_name}
     NAMESPACE   ${package_namespace}
     DESTINATION ${package_config_install_dir} )
-    
+
 install(
     DIRECTORY  "${include_source_dir}/"
     DESTINATION ${include_install_dir} )
