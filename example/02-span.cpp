@@ -12,7 +12,7 @@ void bad( int * arr, size_t num )
     std::cout << ++line << ": ";
     for ( size_t i = 0; i != num; ++i )
     {
-        std::cout << (i==0 ? "[":"") << arr[i] << (i!=num-1 ? ", ":"]\n"); 
+        std::cout << (i==0 ? "[":"") << arr[i] << (i!=num-1 ? ", ":"]\n");
     }
 }
 
@@ -21,29 +21,29 @@ void good( span<int> arr )
     std::cout << ++line << ": ";
     for ( size_t i = 0; i != arr.size(); ++i )
     {
-        std::cout << (i==0 ? "[":"") << arr[i] << (i!=arr.size()-1 ? ", ":"]\n"); 
+        std::cout << (i==0 ? "[":"") << arr[i] << (i!=arr.size()-1 ? ", ":"]\n");
     }
 }
 
 int main()
 {
     int arr[] = { 1, 2, 3, 4, 5, };
-    
+
     good( arr );                        // 1. Good: deduce length
 
 #if gsl_CPP11_OR_GREATER
     std::array<int, 6> ary = { 1, 2, 3, 4, 5, 6, };
     std::vector<int>   vec = { 1, 2, 3, 4, 5, 6, 7, };
 
-    good( ary );                        // 2. Good: single function handles 
-    good( vec );                        // 3.   C-array, std::array and containers such as std::vector 
+    good( ary );                        // 2. Good: single function handles
+    good( vec );                        // 3.   C-array, std::array and containers such as std::vector
 #else
     line += 2;
 #endif
 
-    bad(  arr, gsl_DIMENSION_OF(arr) ); // 4. Avoid: specify elements and length separately
-    bad(  arr, 3 );                     // 5. Avoid, but not wrong
-    bad(  arr, 7 );                     // 6. Wrong, array length exceeded
+    bad( arr, gsl_DIMENSION_OF(arr) ); // 4. Avoid: specify elements and length separately
+    bad( arr, 3 );                      // 5. Avoid, but not wrong
+    bad( arr, 7 );                      // 6. Wrong, array length exceeded
 
 #if gsl_CPP11_OR_GREATER
     good( { arr, 3 } );                 // 7. Avoid, but not wrong
@@ -64,4 +64,4 @@ int main()
 #if 0
 cl -EHsc -I../include/gsl 02-span.cpp && 02-span.exe
 g++ -std=c++11 -Wall -I../include/gsl -o 02-span.exe 02-span.cpp && 02-span.exe
-#endif 
+#endif

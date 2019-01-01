@@ -18,7 +18,13 @@ project(
 #   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
     LANGUAGES CXX )
 
-message( STATUS "${PROJECT_NAME} version: '${${PROJECT_NAME}_VERSION}'")
+# Package information:
+
+set( unit_name       "gsl"               CACHE STRING "Name of the unit" )
+set( package_name    "${unit_name}-lite" CACHE STRING "Name of the package" )
+set( package_version "${${PROJECT_NAME}_VERSION}" )
+
+message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '${package_version}'")
 
 # Toplevel or subproject:
 
@@ -33,69 +39,91 @@ endif()
 option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
 option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
 
+# If requested, build and perform tests, build examples:
+
+if ( GSL_LITE_OPT_BUILD_TESTS )
+    enable_testing()
+    add_subdirectory( test )
+endif()
+
+if ( GSL_LITE_OPT_BUILD_EXAMPLES )
+    enable_testing()
+    add_subdirectory( example )
+endif()
+
+#
+# Interface, installation and packaging
+#
+
+# CMake helpers:
+
+include( GNUInstallDirs )
 include( CMakePackageConfigHelpers )
-
-set( package_name "gsl-lite" )
-
-set(         include_source_dir "${PROJECT_SOURCE_DIR}/include" )
-set(        include_install_dir "include" )
-set( package_config_install_dir "lib/cmake/${package_name}" )
-set(        package_config_file "${PROJECT_BINARY_DIR}/${package_name}Config.cmake" )
-set(       package_version_file "${PROJECT_BINARY_DIR}/${package_name}ConfigVersion.cmake" )
-set(        package_export_name "${package_name}Targets" )
-set(          package_namespace "${package_name}::" )
 
 # Interface library:
 
 add_library(
     ${package_name} INTERFACE )
 
+add_library(
+    ${package_name}::${package_name} ALIAS ${package_name} )
+
 target_include_directories(
-    ${package_name} INTERFACE "$<BUILD_INTERFACE:${include_source_dir}>" )
+    ${package_name}
+    INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
 
 target_sources(
-    ${package_name} INTERFACE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/gsl-lite.natvis>" )
+    ${package_name}
+    INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis>" )
 
 # Package configuration:
+# Note: package_name and package_target are used in package_config_in
+
+set( package_folder         "${package_name}" )
+set( package_nspace         "${package_name}::" )
+set( package_target         "${package_name}-targets" )
+set( package_config         "${package_name}-config.cmake" )
+set( package_config_in      "${package_name}-config.cmake.in" )
+set( package_config_version "${package_name}-config-version.cmake" )
 
 configure_package_config_file(
-   "${PROJECT_SOURCE_DIR}/cmake/PackageConfig.cmake.in"
-    ${package_config_file} INSTALL_DESTINATION ${package_config_install_dir} )
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${package_config_in}"
+    "${CMAKE_CURRENT_BINARY_DIR}/${package_config}"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_folder}"
+)
 
 write_basic_package_version_file(
-    ${package_version_file} COMPATIBILITY SameMajorVersion )
+    "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}"
+    VERSION       ${package_version}
+    COMPATIBILITY SameMajorVersion
+)
 
 # Installation:
 
 install(
-    TARGETS     ${package_name}
-    EXPORT      ${package_export_name}
-    INCLUDES DESTINATION ${include_install_dir} )
+    TARGETS      ${package_name}
+    EXPORT       ${package_target}
+#   INCLUDES DESTINATION "${...}"  # already set via target_include_directories()
+)
 
 install(
-    EXPORT      ${package_export_name}
-    NAMESPACE   ${package_namespace}
-    DESTINATION ${package_config_install_dir} )
+    EXPORT       ${package_target}
+    NAMESPACE    ${package_nspace}
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_folder}"
+)
 
 install(
-    DIRECTORY  "${include_source_dir}/"
-    DESTINATION ${include_install_dir} )
+    FILES       "${CMAKE_CURRENT_BINARY_DIR}/${package_config}"
+                "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_folder}"
+)
 
 install(
-    FILES      "${package_config_file}"
-               "${package_version_file}"
-    DESTINATION ${package_config_install_dir} )
-
-# If requested, build and perform tests, build examples:
-
-enable_testing()
-
-if ( GSL_LITE_OPT_BUILD_TESTS )
-    add_subdirectory( test )
-endif()
-
-if ( GSL_LITE_OPT_BUILD_EXAMPLES )
-    add_subdirectory( example )
-endif()
+    DIRECTORY   "${CMAKE_SOURCE_DIR}/include"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
 
 # end of file

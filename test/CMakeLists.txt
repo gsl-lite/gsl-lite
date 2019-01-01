@@ -9,6 +9,11 @@ cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project( gsl-lite-test LANGUAGES CXX )
 
+set( PACKAGE   ${package_name} )
+set( PROGRAM   ${unit_name}-lite )
+
+message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")
+
 # Test sources:
 
 set( SOURCES
@@ -42,7 +47,7 @@ set( HAS_CPPLATEST_FLAG FALSE )
 
 if( MSVC )
     message( STATUS "Matched: MSVC")
-    
+
     set( HAS_STD_FLAGS TRUE )
 
     set( OPTIONS     -W3 -EHsc )
@@ -77,7 +82,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     # GNU: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
         message( STATUS "Matched: GNU")
-    
+
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8.0 )
             set( HAS_CPP11_FLAG TRUE )
         endif()
@@ -91,7 +96,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     # AppleClang: available -std flags depends on version
     elseif( CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" )
         message( STATUS "Matched: AppleClang")
-    
+
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0.0 )
             set( HAS_CPP11_FLAG TRUE )
         endif()
@@ -105,7 +110,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     # Clang: available -std flags depends on version
     elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
         message( STATUS "Matched: Clang")
-    
+
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3.0 )
             set( HAS_CPP11_FLAG TRUE )
         endif()
@@ -142,13 +147,14 @@ function( make_target target std )
     message( STATUS "Make target: '${std}'" )
 
     add_executable            ( ${target} ${SOURCES}  )
+    target_link_libraries     ( ${target} PRIVATE ${PACKAGE} )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
-    target_link_libraries     ( ${target} PRIVATE gsl-lite )
+
     if( std )
         if( MSVC )
             target_compile_options( ${target} PRIVATE -std:c++${std} )
-        else()    
+        else()
             # Necessary for clang 3.x:
             target_compile_options( ${target} PRIVATE -std=c++${std} )
             # Ok for clang 4 and later:
@@ -162,30 +168,30 @@ endfunction()
 # Add generic executable, unless -std flags can be specified:
 
 if( NOT HAS_STD_FLAGS )
-    make_target( gsl-lite.t "" )
+    make_target( ${PROGRAM}.t "" )
 else()
     # unconditionally add C++98 variant as MSVC has no option for it:
     if( HAS_CPP98_FLAG )
-        make_target( gsl-lite-cpp98.t 98 )
+        make_target( ${PROGRAM}-cpp98.t 98 )
     else()
-        make_target( gsl-lite-cpp98.t "" )
+        make_target( ${PROGRAM}-cpp98.t "" )
     endif()
 
     if( HAS_CPP11_FLAG )
-        make_target( gsl-lite-cpp11.t 11 )
+        make_target( ${PROGRAM}-cpp11.t 11 )
     endif()
 
     if( HAS_CPP14_FLAG )
-        make_target( gsl-lite-cpp14.t 14 )
+        make_target( ${PROGRAM}-cpp14.t 14 )
     endif()
 
     if( HAS_CPP17_FLAG )
-        make_target( gsl-lite-cpp17.t 17 )
-        enable_msvs_guideline_checker( gsl-lite-cpp17.t )
+        make_target( ${PROGRAM}-cpp17.t 17 )
+        enable_msvs_guideline_checker( ${PROGRAM}-cpp17.t )
     endif()
 
     if( HAS_CPPLATEST_FLAG )
-        make_target( gsl-lite-cpplatest.t latest )
+        make_target( ${PROGRAM}-cpplatest.t latest )
     endif()
 endif()
 
@@ -195,25 +201,25 @@ enable_testing()
 
 if( HAS_STD_FLAGS )
     # Unconditionally add C++98 variant for MSVC:
-    add_test(     NAME test-cpp98     COMMAND gsl-lite-cpp98.t )
+    add_test(     NAME test-cpp98     COMMAND ${PROGRAM}-cpp98.t )
 
     if( HAS_CPP11_FLAG )
-        add_test( NAME test-cpp11     COMMAND gsl-lite-cpp11.t )
+        add_test( NAME test-cpp11     COMMAND ${PROGRAM}-cpp11.t )
     endif()
     if( HAS_CPP14_FLAG )
-        add_test( NAME test-cpp14     COMMAND gsl-lite-cpp14.t )
+        add_test( NAME test-cpp14     COMMAND ${PROGRAM}-cpp14.t )
     endif()
     if( HAS_CPP17_FLAG )
-        add_test( NAME test-cpp17     COMMAND gsl-lite-cpp17.t )
+        add_test( NAME test-cpp17     COMMAND ${PROGRAM}-cpp17.t )
     endif()
     if( HAS_CPPLATEST_FLAG )
-        add_test( NAME test-cpplatest COMMAND gsl-lite-cpplatest.t )
+        add_test( NAME test-cpplatest COMMAND ${PROGRAM}-cpplatest.t )
     endif()
 else()
-    add_test(     NAME test           COMMAND gsl-lite.t --pass )
-    add_test(     NAME list_version   COMMAND gsl-lite.t --version )
-    add_test(     NAME list_tags      COMMAND gsl-lite.t --list-tags )
-    add_test(     NAME list_tests     COMMAND gsl-lite.t --list-tests )
+    add_test(     NAME test           COMMAND ${PROGRAM}. --pass )
+    add_test(     NAME list_version   COMMAND ${PROGRAM}. --version )
+    add_test(     NAME list_tags      COMMAND ${PROGRAM}. --list-tags )
+    add_test(     NAME list_tests     COMMAND ${PROGRAM}. --list-tests )
 endif()
 
 # end of file
