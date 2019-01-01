@@ -152,6 +152,11 @@ matrix:
       compiler: clang
       env: COMPILER='clang++'
 
+  allow_failures:
+    - osx_image: xcode10
+
+  fast_finish: true
+
 script:
   - export CXX=${COMPILER}
   - JOBS=2 # Travis machines have 2 cores.
