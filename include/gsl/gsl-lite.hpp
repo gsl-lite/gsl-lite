@@ -195,7 +195,7 @@
 
 // Presence of gsl, language and library features:
 
-#define gsl_IN_STD( v )  ( (v) == 98 || (v) >= gsl_CPLUSPLUS_V )
+#define gsl_IN_STD( v )  ( ((v) == 98 ? 3 : (v)) >= gsl_CPLUSPLUS_V )
 
 #define gsl_DEPRECATE_TO_LEVEL( level )  ( level <= gsl_CONFIG_DEPRECATE_TO_LEVEL )
 #define gsl_FEATURE_TO_STD(   feature )  ( gsl_IN_STD( gsl_FEATURE( feature##_TO_STD ) ) )
@@ -1072,7 +1072,7 @@ public:
         , class Dummy = typename std::enable_if<std::is_constructible<T, U>::value>::type
 #endif
     >
-    gsl_api gsl_constexpr14 gsl_not_null_explicit 
+    gsl_api gsl_constexpr14 gsl_not_null_explicit
 #if gsl_HAVE( RVALUE_REFERENCE )
     not_null( U && u )
     : ptr_( std::forward<U>( u ) )
@@ -1084,7 +1084,7 @@ public:
         Expects( ptr_ != gsl_nullptr );
     }
 #undef gsl_not_null_explicit
-    
+
 #if gsl_HAVE( IS_DEFAULT )
     gsl_api                ~not_null() = default;
     gsl_api gsl_constexpr   not_null( not_null &&      other ) = default;
