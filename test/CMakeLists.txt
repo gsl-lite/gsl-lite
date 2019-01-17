@@ -9,7 +9,8 @@ cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project( gsl-lite-test LANGUAGES CXX )
 
-set( PACKAGE   ${package_name} )
+set( unit_name "gsl" )
+set( PACKAGE   ${unit_name}-lite )
 set( PROGRAM   ${unit_name}-lite )
 
 message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")

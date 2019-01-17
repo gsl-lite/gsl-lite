@@ -9,7 +9,8 @@ cmake_minimum_required( VERSION 3.5 )
 
 project( gsl-lite-example LANGUAGES CXX )
 
-set( PACKAGE ${package_name} )
+set( unit_name "gsl" )
+set( PACKAGE   ${unit_name}-lite )
 
 message( STATUS "Subproject '${PROJECT_NAME}'")
 
