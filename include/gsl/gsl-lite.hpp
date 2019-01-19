@@ -1196,31 +1196,31 @@ gsl_api inline gsl_constexpr bool operator==( not_null<T> const & l, not_null<U>
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator< ( not_null<U> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr bool operator< ( not_null<T> const & l, not_null<U> const & r )
 {
     return l.get() < r.get();
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator!=( not_null<U> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr bool operator!=( not_null<T> const & l, not_null<U> const & r )
 {
     return !( l == r );
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator<=( not_null<U> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr bool operator<=( not_null<T> const & l, not_null<U> const & r )
 {
     return !( r < l );
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator> ( not_null<U> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr bool operator> ( not_null<T> const & l, not_null<U> const & r )
 {
     return ( r < l );
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator>=( not_null<U> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr bool operator>=( not_null<T> const & l, not_null<U> const & r )
 {
     return !( l < r );
 }
