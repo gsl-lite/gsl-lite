@@ -37,6 +37,10 @@ table = (
         , r'\gsl_lite_version\s+=\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*$'
         , 'gsl_lite_version = "{major}.{minor}.{patch}"\n' )
 
+    , ( 'conanfile.py'
+        , r'version\s+=\s+"([0-9]+\.[0-9]+\.[0-9]+)"\s*$'
+        , 'version = "{major}.{minor}.{patch}"' )
+
     , ( 'include/gsl/gsl-lite.hpp'
         , r'\#define\s+gsl_lite_MAJOR\s+[0-9]+\s*$'
         , '#define  gsl_lite_MAJOR  {major}' )
