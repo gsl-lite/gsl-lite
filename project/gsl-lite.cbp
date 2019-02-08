@@ -55,6 +55,7 @@
 		<Unit filename="../include/gsl/gsl-lite.hpp" />
 		<Unit filename="../script/install-gsl-pkg.py" />
 		<Unit filename="../script/update-version.py" />
+		<Unit filename="../script/upload-conan.py" />
 		<Unit filename="../test/CMakeLists.txt" />
 		<Unit filename="../test/assert.t.cpp" />
 		<Unit filename="../test/at.t.cpp" />
