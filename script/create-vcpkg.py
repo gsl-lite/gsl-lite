@@ -50,7 +50,9 @@ vcpkg_from_github(
     SHA512 {sha}
 )
 
-file(INSTALL ${{SOURCE_PATH}}/include/ DESTINATION ${{CURRENT_PACKAGES_DIR}}/include)
+# To allow side-by-side use with ms-gsl, only provide include/gsl/gsl-lite.hpp:
+
+file(INSTALL ${{SOURCE_PATH}}/include/gsl/gsl-lite.hpp DESTINATION ${{CURRENT_PACKAGES_DIR}}/include/gsl)
 file(INSTALL ${{SOURCE_PATH}}/{lic} DESTINATION ${{CURRENT_PACKAGES_DIR}}/share/{prj} RENAME copyright)"""
 
 tpl_vcpkg_note_sha =\
