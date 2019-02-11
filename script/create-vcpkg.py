@@ -21,7 +21,7 @@ cfg_github_user    = 'martinmoene'
 
 cfg_conanfile      = 'conanfile.py'
 cfg_readme         = 'Readme.md'
-cfg_license        = 'LICENSE.txt'
+cfg_license        = 'LICENSE'
 cfg_ref_prefix     = 'v'
 
 cfg_sha512            = 'dadeda'
@@ -53,6 +53,18 @@ vcpkg_from_github(
 file(INSTALL ${{SOURCE_PATH}}/include/ DESTINATION ${{CURRENT_PACKAGES_DIR}}/include)
 file(INSTALL ${{SOURCE_PATH}}/{lic} DESTINATION ${{CURRENT_PACKAGES_DIR}}/share/{prj} RENAME copyright)"""
 
+tpl_vcpkg_note_sha =\
+"""
+Next actions:
+- Obtain package SHA: 'vcpkg install {prj}', copy SHA mentioned in 'Actual hash: [...]'
+- Add SHA to package: 'script\create-vcpkg --sha={sha}'
+- Install package   : 'vcpkg install {prj}'"""
+
+tpl_vcpkg_note_install =\
+"""
+Next actions:
+- Install package: 'vcpkg install {prj}'"""
+
 # End of vcpkg templates
 
 def versionFrom( filename ):
@@ -71,7 +83,7 @@ def descriptionFrom( filename ):
 
 def vcpkgRootFrom( path ):
     return path if path else './vcpkg'
-     
+
 def to_ref( version ):
     """Add prefix to version/tag, like v1.2.3"""
     return cfg_ref_prefix + version
@@ -94,7 +106,7 @@ def createControl( args ):
          print( output )
     os.makedirs( os.path.dirname( control_path( args ) ), exist_ok=True )
     with open( control_path( args ), 'w') as f:
-        print( output, file=f )        
+        print( output, file=f )
 
 def createPortfile( args ):
     """Create vcpkg portfile"""
@@ -106,14 +118,23 @@ def createPortfile( args ):
         print( output )
     os.makedirs( os.path.dirname( portfile_path( args ) ), exist_ok=True )
     with open( portfile_path( args ), 'w') as f:
-        print( output, file=f )        
+        print( output, file=f )
+
+def printNotes( args ):
+    if args.sha == cfg_sha512:
+        print( tpl_vcpkg_note_sha.
+            format( prj=args.project, sha='...' ) )
+    else:
+        print( tpl_vcpkg_note_install.
+            format( prj=args.project ) )
 
 def createVcpkg( args ):
     print( "Creating vcpkg for '{usr}/{prj}', version '{ver}' in folder '{vcpkg}':".
         format( usr=args.user, prj=args.project, ver=args.version, vcpkg=args.vcpkg_root, ) )
     createControl( args )
     createPortfile( args )
-    
+    printNotes( args )
+
 def createVcpkgFromCommandLine():
     """Collect arguments from the commandline and create vcpkg."""
 
