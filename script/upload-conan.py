@@ -30,7 +30,7 @@ tpl_conan_upload  = 'conan upload --remote {usr} {prj}/{ver}@{usr}/{chn}'
 
 def versionFrom( filename ):
     """Obtain version from  conanfile.py"""
-    with file( filename ) as f:
+    with open( filename ) as f:
         content = f.read()
         version = re.search(r'version\s=\s"(.*)"', content).group(1)
     return version
@@ -42,7 +42,7 @@ def createConanPackage( args ):
         print( "> {}".format(cmd) )
     if not args.dry_run:
         subprocess.call( cmd, shell=False )
-    
+
 def uploadConanPackage( args ):
     """Create conan package and upload it."""
     cmd = tpl_conan_upload.format(prj=args.project, usr=args.user, chn=args.channel, ver=args.version)
@@ -50,14 +50,14 @@ def uploadConanPackage( args ):
         print( "> {}".format(cmd) )
     if not args.dry_run:
         subprocess.call( cmd, shell=False )
-    
+
 def uploadToConan( args ):
     """Create conan package and upload it."""
     print( "Updating project '{prj}' to user '{usr}', channel '{chn}', version {ver}:".
         format(prj=args.project, usr=args.user, chn=args.channel, ver=args.version) )
     createConanPackage( args )
     uploadConanPackage( args )
-    
+
 def uploadToConanFromCommandLine():
     """Collect arguments from the commandline and create conan package and upload it."""
 
