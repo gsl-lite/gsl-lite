@@ -18,8 +18,9 @@ import subprocess
 
 cfg_github_project = 'gsl-lite'
 cfg_github_user    = 'martinmoene'
+cfg_description    = '(unused)'
 
-cfg_conanfile      = 'conanfile.py'
+cfg_cmakelists     = 'CMakeLists.txt'
 cfg_readme         = 'Readme.md'
 cfg_license        = 'LICENSE'
 cfg_ref_prefix     = 'v'
@@ -70,17 +71,17 @@ Next actions:
 # End of vcpkg templates
 
 def versionFrom( filename ):
-    """Obtain version from conanfile.py"""
+    """Obtain version from CMakeLists.txt"""
     with open( filename, 'r' ) as f:
         content = f.read()
-        version = re.search(r'version\s=\s"(.*)"', content).group(1)
+        version = re.search(r'VERSION\s(\d+\.\d+\.\d+)', content).group(1)
     return version
 
 def descriptionFrom( filename ):
-    """Obtain description from first line of Readme.md"""
+    """Obtain description from CMakeLists.txt"""
     with open( filename, 'r' ) as f:
-        content = f.readline()
-        description = re.search(r'[^a-zA-Z]*(.*)', content).group(1)
+        content = f.read()
+        description = re.search(r'DESCRIPTION\s"(.*)"', content).group(1)
     return description if description else cfg_vcpkg_description
 
 def vcpkgRootFrom( path ):
@@ -169,15 +170,16 @@ def createVcpkgFromCommandLine():
         '--description',
         metavar='d',
         type=str,
-        default=descriptionFrom( cfg_readme ),
-        help='vcpkg description [from Readme.md]')
+#       default=cfg_description,
+        default=descriptionFrom( cfg_cmakelists ),
+        help='vcpkg description [from ' + cfg_cmakelists + ']')
 
     parser.add_argument(
         '--version',
         metavar='v',
         type=str,
-        default=versionFrom( cfg_conanfile ),
-        help='version number [from conanfile.py]')
+        default=versionFrom( cfg_cmakelists ),
+        help='version number [from ' + cfg_cmakelists + ']')
 
     parser.add_argument(
         '--sha',
