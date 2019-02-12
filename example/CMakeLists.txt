@@ -5,7 +5,9 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.5 )
+if( NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION )
+    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+endif()
 
 project( gsl-lite-example LANGUAGES CXX )
 
