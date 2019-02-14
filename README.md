@@ -520,6 +520,13 @@ Notes and references
 
 Appendix
 --------
+
+**Contents**  
+- [A.1 Extract Boost smart pointers](#a1)
+- [A.2 Compile-time information](#a2)
+- [A.3 GSL Lite test specification](#a3)
+
+<a id="a1"></a>
 ### A.1 Extract Boost smart pointers
 
 To obtain a subset of Boost only containing the smart pointers, use the [bcp command](http://www.boost.org/doc/libs/1_59_0/tools/bcp/doc/html/index.html) like:
@@ -528,7 +535,13 @@ To obtain a subset of Boost only containing the smart pointers, use the [bcp com
 
 The smart pointers of Boost 1.51 can be used with VC6.
 
-### A.2 GSL Lite test specification
+<a id="a2"></a>
+### A.2 Compile-time information
+
+The version of *gsl lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
+
+<a id="a3"></a>
+### A.3 GSL Lite test specification
 
 ```
 Expects(): Allows a true expression
