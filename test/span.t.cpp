@@ -1002,7 +1002,7 @@ CASE( "span<>: Allows to test for empty span via empty(), non-empty case" )
     EXPECT_NOT( v.empty() );
 }
 
-CASE( "span<>: Allows to obtain the number of elements via size()" )
+CASE( "span<>: Allows to obtain the number of elements via size(), as configured" )
 {
     int a[] = { 1, 2, 3, };
     int b[] = { 1, 2, 3, 4, 5, };
@@ -1014,6 +1014,20 @@ CASE( "span<>: Allows to obtain the number of elements via size()" )
     EXPECT( va.size() == index_type( gsl_DIMENSION_OF( a ) ) );
     EXPECT( vb.size() == index_type( gsl_DIMENSION_OF( b ) ) );
     EXPECT(  z.size() == index_type( 0 ) );
+}
+
+CASE( "span<>: Allows to obtain the number of elements via ssize(), signed" )
+{
+    int a[] = { 1, 2, 3, };
+    int b[] = { 1, 2, 3, 4, 5, };
+
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
+
+    EXPECT( va.ssize() == gsl_DIMENSION_OF( a ) );
+    EXPECT( vb.ssize() == gsl_DIMENSION_OF( b ) );
+    EXPECT(  z.ssize() == 0 );
 }
 
 CASE( "span<>: Allows to obtain the number of elements via length() " "[deprecated-3]" )
@@ -1242,7 +1256,7 @@ CASE( "span<>: Allows to change the elements from a span of another type" )
     {for ( size_t i = 1; i < sizeof(type2); ++i ) EXPECT( vb[i] == type2(0) ); }
 }
 
-CASE( "span<>: Allows to copy a span to another span of the same element type" )
+CASE( "copy(): Allows to copy a span to another span of the same element type" )
 {
     int a[] = { 1, 2, 3,       };
     int b[] = { 0, 0, 0, 0, 0, };
@@ -1255,7 +1269,7 @@ CASE( "span<>: Allows to copy a span to another span of the same element type" )
     EXPECT( src == dst.subspan( 0, src.size() ) );
 }
 
-CASE( "span<>: Allows to copy a span to another span of a different element type" )
+CASE( "copy(): Allows to copy a span to another span of a different element type" )
 {
     char a[] = { 'a', 'b', 'c',       };
     int  b[] = {  0 ,  0 ,  0 , 0, 0, };
@@ -1269,6 +1283,34 @@ CASE( "span<>: Allows to copy a span to another span of a different element type
     {
         EXPECT( src[i] == dst[i] );
     }
+}
+
+CASE( "size(): Allows to obtain the number of elements in span via size(span), unsigned" )
+{
+    int a[] = { 1, 2, 3, };
+    int b[] = { 1, 2, 3, 4, 5, };
+
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
+
+    EXPECT( size( va ) == std::size_t( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( size( vb ) == std::size_t( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( size( z  ) == std::size_t( 0 ) );
+}
+
+CASE( "ssize(): Allows to obtain the number of elements in span via ssize(span), signed" )
+{
+    int a[] = { 1, 2, 3, };
+    int b[] = { 1, 2, 3, 4, 5, };
+
+    span<int> z;
+    span<int> va( a );
+    span<int> vb( b );
+
+    EXPECT( ssize( va ) == gsl_DIMENSION_OF( a ) );
+    EXPECT( ssize( vb ) == gsl_DIMENSION_OF( b ) );
+    EXPECT( ssize( z  ) == 0 );
 }
 
 #if ! gsl_FEATURE_TO_STD( MAKE_SPAN )

@@ -1738,6 +1738,11 @@ public:
         return narrow_cast<index_type>( last_ - first_ );
     }
 
+    gsl_api gsl_constexpr std::ptrdiff_t ssize() const gsl_noexcept
+    {
+        return narrow_cast<std::ptrdiff_t>( last_ - first_ );
+    }
+
     gsl_api gsl_constexpr index_type size_bytes() const gsl_noexcept
     {
         return size() * narrow_cast<index_type>( sizeof( element_type ) );
@@ -1950,6 +1955,18 @@ gsl_api inline gsl_constexpr bool operator>=( span<T> const & l, span<U> const &
 }
 
 // span algorithms
+
+template< class T >
+gsl_api inline gsl_constexpr std::size_t size( span<T> const & spn )
+{
+    return static_cast<std::size_t>( spn.size() );
+}
+
+template< class T >
+gsl_api inline gsl_constexpr std::ptrdiff_t ssize( span<T> const & spn )
+{
+    return spn.ssize();
+}
 
 namespace details {
 

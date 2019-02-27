@@ -396,6 +396,8 @@ implicit                    | &#10003;| -       | &#10003;| Symmetric with expli
 move_owner                  | ?       | -       | -       | ... |
 **5. Algorithms**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 copy()                      | &nbsp;  | &nbsp;  | &nbsp;  | Copy from source span to destination span |
+size()                      | &nbsp;  | &nbsp;  | &nbsp;  | Size of span, unsigned |
+ssize()                     | &nbsp;  | &nbsp;  | &nbsp;  | Size of span, signed |
 **6. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 
@@ -678,7 +680,8 @@ span<>: Allows to compare to another span of the same type and different cv-ness
 span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
-span<>: Allows to obtain the number of elements via size()
+span<>: Allows to obtain the number of elements via size(), as configured
+span<>: Allows to obtain the number of elements via ssize(), signed
 span<>: Allows to obtain the number of elements via length() [deprecated-3]
 span<>: Allows to obtain the number of bytes via size_bytes()
 span<>: Allows to obtain the number of bytes via length_bytes() [deprecated-3]
@@ -687,8 +690,10 @@ span<>: Allows to view the elements as read-only bytes [deprecated-2 as member]
 span<>: Allows to view and change the elements as writable bytes [deprecated-2 as member]
 span<>: Allows to view the elements as a span of another type
 span<>: Allows to change the elements from a span of another type
-span<>: Allows to copy a span to another span of the same element type
-span<>: Allows to copy a span to another span of a different element type
+copy(): Allows to copy a span to another span of the same element type
+copy(): Allows to copy a span to another span of a different element type
+size(): Allows to obtain the number of elements in span via size(span), unsigned
+ssize(): Allows to obtain the number of elements in span via ssize(span), signed
 make_span(): (gsl_FEATURE_MAKE_SPAN=1)
 make_span(): Allows to build from two pointers
 make_span(): Allows to build from two const pointers
