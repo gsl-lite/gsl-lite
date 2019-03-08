@@ -1,4 +1,42 @@
-Changes for GSL Lite – Guidelines Support Library for C++98/03 and later
+Changes for GSL Lite ï¿½ Guidelines Support Library for C++98/03 and later
+
+version 0.33.0 2019-03-08
+
+Additions:
+- Add script/create-cov-rpt.py to create OpenCppCoverage report (nonstd-lite project issue 29)
+- Add script/create-vcpkg.py (nonstd-lite-project issue 28)
+- Add script/upload-conan.py (nonstd-lite-project issue 26)
+- Add conanfile.py, edit it from script/update-version.py (nonstd-lite-project issue 26)
+- Add CMake installation and config-file packaging; Let tests and example use gsl-lite interface library
+- Add "LANGUAGES CXX" to CMake project
+- Add GNUC -Wsign-conversion warning to CMake configuration
+- Add AppleClang to CMake configuration
+- Add OSX to Travis configuration
+- Add TOC entry for Standard selection macro (#128, thanks to @egarrulo)
+- Add span::ssize(), ssize(span), size(span) (#144)
+- Add test/tc-cl.bat
+
+Changes:
+- Rename "Guideline support library" to "Guidelines -" (#134)
+- Align Appveyor configuration (plan 9, nonstd-lite-project issue 14)
+- Align CMakefiles.txt (plan 8, nonstd-lite-project issue 13)
+- Align test scripts (nonstd-lite-project issue 12)
+- Align badges in readme (nonstd-lite-project issue 3)
+- Obviate need for -DNOMINMAX with MSVC (nonstd-lite issue 16)
+- Prevent and suppress warnings from clang
+- Let ctest produce output on failure
+- Update lest test framework to v1.35.0.
+
+Fixes:
+- Fix CMake install command (expected-lite issue 25, thanks to @rmorozov)
+- Fix clashing CMake cached variable, use 'gsl' for namespace and package folder (thanks to @rmorozov)
+- Fix template argument in not_null<> comparison operators (#143, thanks @stohrendorf)
+- Fix macro gsl_IN_STD (#142, thanks to @Flamefire)
+- Fix possible int overflow in nonstd::span::subspan() range (issue #138, thanks to @fefe17)
+- Fix link to P0122 (#130, thanks to @alexeyr)
+- Fix for misleading __cplusplus of GCC 4.7.0 and earlier (#127, thanks to @egarrulo)
+- Fix final_action_return() and final_action_error() during stack unwinding (#126, thanks to @patstew)
+- Fix unused parameter if Expects elided via new macro gsl_EXPECTS_UNUSED_PARAM (#123, #124, thanks to @kugelrund)
 
 version 0.32.0 2018-05-12
 
@@ -37,7 +75,7 @@ version 0.31.0 2018-05-10
 
 version 0.30.0 2018-05-06
 
-- Add support for DJGPP cross compiler is introduced (PR #107, thanks to Tomáš Zeman, @zemasoft).
+- Add support for DJGPP cross compiler is introduced (PR #107, thanks to Tomï¿½ Zeman, @zemasoft).
 - Add Readme.md to example/cmake-pkg.
 - Update lest test framework to v1.33.1.
 - Allow strict aliasing with Clang and GNUC for gsl::byte (issue #114).
@@ -49,7 +87,7 @@ version 0.30.0 2018-05-06
 - Fix omission of #include <algorithm>
 - Fix clang compilation by specifying C++ standard
 - Fix gsl-lite version in section "As CMake package"
-- Fix type in a test of span has been correced (PR #105, thanks to Tomáš Zeman, @zemasoft)
+- Fix type in a test of span has been correced (PR #105, thanks to Tomï¿½ Zeman, @zemasoft)
 
 version 0.29.0 2018-03-03
 
@@ -213,7 +251,7 @@ version 0.12.0 2016-10-08
 - Deprecate span::size_type (issue #42).
 - Make span's stream output for tests more container-like.
 - Make operations on byte C++11 constexpr except for op=() variants.
-- Rename “Guidelines support library" to "Guideline -" (issue #39).
+- Rename ï¿½Guidelines support library" to "Guideline -" (issue #39).
 - Add tests for C++11 constexpr-ness.
 - Add copy algorithm for span (issue #36).
 - Add GSL version by Vicente J. Botet Escriba to Readme.
