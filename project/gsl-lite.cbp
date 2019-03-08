@@ -53,6 +53,7 @@
 		<Unit filename="../include/gsl/gsl-lite-vc6.hpp" />
 		<Unit filename="../include/gsl/gsl-lite.h" />
 		<Unit filename="../include/gsl/gsl-lite.hpp" />
+		<Unit filename="../script/create-cov-rpt.py" />
 		<Unit filename="../script/create-vcpkg.py" />
 		<Unit filename="../script/install-gsl-pkg.py" />
 		<Unit filename="../script/update-version.py" />
