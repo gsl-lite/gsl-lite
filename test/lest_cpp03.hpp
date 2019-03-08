@@ -27,7 +27,11 @@
 #include <cstdlib>
 #include <ctime>
 
-#define  lest_VERSION "1.33.5"
+#define lest_MAJOR  1
+#define lest_MINOR  35
+#define lest_PATCH  0
+
+#define  lest_VERSION  lest_STRINGIFY(lest_MAJOR) "." lest_STRINGIFY(lest_MINOR) "." lest_STRINGIFY(lest_PATCH)
 
 #ifndef  lest_FEATURE_COLOURISE
 # define lest_FEATURE_COLOURISE 0
@@ -101,6 +105,11 @@
 # define lest_SUPPRESS_WUNUSED    /*empty*/
 # define lest_RESTORE_WARNINGS    /*empty*/
 #endif
+
+// Stringify:
+
+#define lest_STRINGIFY(  x )  lest_STRINGIFY_( x )
+#define lest_STRINGIFY_( x )  #x
 
 // Compiler versions:
 
@@ -289,7 +298,7 @@ namespace lest
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
                 throw lest::failure( lest_LOCATION, #expr, score.decomposition ); \
             else if ( lest_env.pass() ) \
-                lest::report( lest_env.os, lest::passing( lest_LOCATION, #expr, score.decomposition ), lest_env.context() ); \
+                lest::report( lest_env.os, lest::passing( lest_LOCATION, #expr, score.decomposition, lest_env.zen() ), lest_env.context() ); \
         } \
         catch(...) \
         { \
@@ -304,7 +313,7 @@ namespace lest
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
             { \
                 if ( lest_env.pass() ) \
-                    lest::report( lest_env.os, lest::passing( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ), lest_env.context() ); \
+                    lest::report( lest_env.os, lest::passing( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ), lest_env.zen() ), lest_env.context() ); \
             } \
             else \
                 throw lest::failure( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ); \
@@ -470,8 +479,8 @@ struct success : message
 
 struct passing : success
 {
-    passing( location where_, text expr_, text decomposition_)
-    : success( "passed", where_, expr_ + " for " + decomposition_) {}
+    passing( location where_, text expr_, text decomposition_, bool zen )
+    : success( "passed", where_, expr_ + (zen ? "":" for " + decomposition_) ) {}
 };
 
 struct got_none : success
@@ -601,21 +610,20 @@ inline void inform( location where, text expr )
 
 inline bool unprintable( char c ) { return 0 <= c && c < ' '; }
 
-template< typename T >
-inline std::string to_string( T const & value );
+inline std::string to_hex_string(char c)
+{
+    std::ostringstream os;
+    os << "\\x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>( static_cast<unsigned char>(c) );
+    return os.str();
+};
 
-#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 100
-inline std::string to_string( std::nullptr_t const &     ) { return "nullptr"; }
-#endif
-inline std::string to_string( std::string    const & txt ) { return "\"" + txt + "\"" ; }
-inline std::string to_string( char const *   const & txt ) { return "\"" + std::string( txt ) + "\"" ; }
-
-inline std::string to_string(          char  const & chr )
+inline std::string transformed( char chr )
 {
     struct Tr { char chr; char const * str; } table[] =
     {
-        {'\r', "'\\r'" }, {'\f', "'\\f'" },
-        {'\n', "'\\n'" }, {'\t', "'\\t'" },
+        {'\\', "\\\\" },
+        {'\r', "\\r"  }, {'\f', "\\f" },
+        {'\n', "\\n"  }, {'\t', "\\t" },
     };
 
     for ( Tr * pos = table; pos != table + lest_DIMENSION_OF( table ); ++pos )
@@ -624,10 +632,26 @@ inline std::string to_string(          char  const & chr )
             return pos->str;
     }
 
-    return unprintable( chr )
-        ? to_string<unsigned int>( static_cast<unsigned int>( chr ) )
-        : "\'" + std::string( 1, chr ) + "\'";
+    return unprintable( chr  ) ? to_hex_string( chr ) : std::string( 1, chr );
 }
+
+inline std::string make_tran_string( std::string const & txt )
+{
+    std::ostringstream os;
+    for( std::string::const_iterator pos = txt.begin(); pos != txt.end(); ++pos )
+        os << transformed( *pos );
+    return os.str();
+}
+
+template< typename T >
+inline std::string to_string( T const & value );
+
+#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 100
+inline std::string to_string( std::nullptr_t const &     ) { return "nullptr"; }
+#endif
+inline std::string to_string( std::string    const & txt ) { return "\"" + make_tran_string(                 txt   ) + "\""; }
+inline std::string to_string( char const *   const & txt ) { return "\"" + make_tran_string(                 txt   ) + "\""; }
+inline std::string to_string(          char  const & chr ) { return  "'" + make_tran_string( std::string( 1, chr ) ) +  "'"; }
 
 inline std::string to_string(   signed char const & chr ) { return to_string( static_cast<char const &>( chr ) ); }
 inline std::string to_string( unsigned char const & chr ) { return to_string( static_cast<char const &>( chr ) ); }
@@ -918,7 +942,7 @@ struct options
 {
     options()
     : help(false), abort(false), count(false), list(false), tags(false), time(false)
-    , pass(false), lexical(false), random(false), verbose(false), version(false), repeat(1), seed(0) {}
+    , pass(false), zen(false), lexical(false), random(false), verbose(false), version(false), repeat(1), seed(0) {}
 
     bool help;
     bool abort;
@@ -927,6 +951,7 @@ struct options
     bool tags;
     bool time;
     bool pass;
+    bool zen;
     bool lexical;
     bool random;
     bool verbose;
@@ -952,6 +977,7 @@ struct env
 
     bool abort() { return opt.abort; }
     bool pass()  { return opt.pass; }
+    bool zen()   { return opt.zen; }
 
     void clear() { ctx.clear(); }
     void pop()   { ctx.pop_back(); }
@@ -1320,6 +1346,7 @@ split_arguments( texts args )
             else if ( opt == "-l"      || "--list-tests" == opt ) { option.list    =  true; continue; }
             else if ( opt == "-t"      || "--time"       == opt ) { option.time    =  true; continue; }
             else if ( opt == "-p"      || "--pass"       == opt ) { option.pass    =  true; continue; }
+            else if ( opt == "-z"      || "--pass-zen"   == opt ) { option.zen     =  true; continue; }
             else if ( opt == "-v"      || "--verbose"    == opt ) { option.verbose =  true; continue; }
             else if (                     "--version"    == opt ) { option.version =  true; continue; }
             else if ( opt == "--order" && "declared"     == val ) { /* by definition */   ; continue; }
@@ -1331,6 +1358,8 @@ split_arguments( texts args )
         }
         in.push_back( arg );
     }
+    option.pass = option.pass || option.zen;
+
     return std::make_pair( option, in );
 }
 
@@ -1346,6 +1375,7 @@ inline int usage( std::ostream & os )
         "  -g, --list-tags    list tags of selected tests\n"
         "  -l, --list-tests   list selected tests\n"
         "  -p, --pass         also report passing tests\n"
+        "  -z, --pass-zen     ... without expansion\n"
 #if lest_FEATURE_TIME
         "  -t, --time         list duration of selected tests\n"
 #endif
