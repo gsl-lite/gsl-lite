@@ -83,7 +83,7 @@ target_sources(
 # Package configuration:
 # Note: package_name and package_target are used in package_config_in
 
-set( package_folder         "${package_nspace}" )
+set( package_folder         "${package_name}" )
 set( package_target         "${package_name}-targets" )
 set( package_config         "${package_name}-config.cmake" )
 set( package_config_in      "${package_name}-config.cmake.in" )
