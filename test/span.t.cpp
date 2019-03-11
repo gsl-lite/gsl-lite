@@ -20,6 +20,8 @@
 using namespace gsl;
 
 typedef span<int>::index_type index_type;
+typedef std::ptrdiff_t        size_type;
+
 
 static std::vector<int> vector_iota( int n )
 {
@@ -1025,8 +1027,8 @@ CASE( "span<>: Allows to obtain the number of elements via ssize(), signed" )
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( va.ssize() == gsl_DIMENSION_OF( a ) );
-    EXPECT( vb.ssize() == gsl_DIMENSION_OF( b ) );
+    EXPECT( va.ssize() == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( vb.ssize() == size_type( gsl_DIMENSION_OF( b ) ) );
     EXPECT(  z.ssize() == 0 );
 }
 
@@ -1308,8 +1310,8 @@ CASE( "ssize(): Allows to obtain the number of elements in span via ssize(span),
     span<int> va( a );
     span<int> vb( b );
 
-    EXPECT( ssize( va ) == gsl_DIMENSION_OF( a ) );
-    EXPECT( ssize( vb ) == gsl_DIMENSION_OF( b ) );
+    EXPECT( ssize( va ) == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( ssize( vb ) == size_type( gsl_DIMENSION_OF( b ) ) );
     EXPECT( ssize( z  ) == 0 );
 }
 
