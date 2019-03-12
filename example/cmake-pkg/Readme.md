@@ -3,10 +3,10 @@ File: gsl-lite/example/cmake-pkg/Readme.md
 One example of installing gsl-lite package (on Windows):
 ```
 prompt> cd ...\gsl-lite
-prompt> script\install-gsl-pkg.py --install-prefix d:\dev2
+prompt> script\install-gsl-pkg.py --install-prefix d:/dev2
 Installing gsl-lite package:
 
-cmake -H. -B"./cmake-pkg-install" -G"Unix Makefiles"  -DCMAKE_CXX_COMPILER="g++" -DCMAKE_INSTALL_PREFIX="d:\dev2"
+cmake -H. -B"./cmake-pkg-install" -G"Unix Makefiles"  -DCMAKE_CXX_COMPILER="g++" -DCMAKE_INSTALL_PREFIX="d:/dev2"
 -- Configuring done
 -- Generating done
 -- Build files have been written to: D:/Own/Martin/Cloud/Dropbox/Project/GitHub-Pre/IsoCpp/gsl-lite/cmake-pkg-install
@@ -28,10 +28,10 @@ Install the project...
 Use package:
 ```
 prompt> cd example/cmake-pkg
-prompt> use-gsl-pkg.py --cmake-prefix "D:/dev2/lib/cmake"
+prompt> use-gsl-pkg.py --cmake-prefix d:/dev2
 Using gsl-lite package:
 
-cmake -H. -B"./cmake-pkg-build" -G"Unix Makefiles"  -DCMAKE_CXX_COMPILER="g++" -DCMAKE_INSTALL_PREFIX="_stage" -DCMAKE_PREFIX_PATH="D:/dev2/lib/cmake"
+cmake -H. -B"./cmake-pkg-build" -G"Unix Makefiles"  -DCMAKE_CXX_COMPILER="g++" -DCMAKE_INSTALL_PREFIX="_stage" -DCMAKE_PREFIX_PATH="d:/dev2"
 -- The CXX compiler identification is GNU 7.2.0
 -- Check for working CXX compiler: C:/MinGW/bin/g++.exe
 -- Check for working CXX compiler: C:/MinGW/bin/g++.exe -- works

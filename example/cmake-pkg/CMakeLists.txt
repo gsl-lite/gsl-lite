@@ -11,7 +11,7 @@ find_package( gsl-lite ${gsl_lite_version} REQUIRED )
 project( "package_using_gsl-lite" LANGUAGES CXX )
 
 add_executable(        "package_using_gsl-lite" main.cpp )
-target_link_libraries( "package_using_gsl-lite" PRIVATE gsl-lite::gsl-lite )
+target_link_libraries( "package_using_gsl-lite" PRIVATE gsl::gsl-lite )
 
 enable_testing()
 add_test( NAME test COMMAND package_using_gsl-lite )

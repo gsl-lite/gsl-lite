@@ -189,7 +189,7 @@ This setup brings in more than you need, but also makes it easy to update *gsl-l
 1. First install the *gsl-lite* CMake package from its source, for example:
 
 		cd ./gsl-lite
-		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX="~/dev/native/gsl-lite/gsl-lite-0.29.0"
+		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX="~/dev"
 		cmake --build ../_build --target install
 
 	See also [script/install-gsl-pkg.py](script/install-gsl-pkg.py) that can perform these steps for you. It also lets you control compiler and build configuration.
@@ -199,20 +199,20 @@ This setup brings in more than you need, but also makes it easy to update *gsl-l
 	```CMake
 	cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 	
-	find_package( gsl-lite "0.29" REQUIRED )
+	find_package( gsl-lite "0.33" REQUIRED )
 	
 	project( program-using-gsl-lite LANGUAGES CXX )
 	
 	add_executable(        program main.cpp )
-	target_link_libraries( program PRIVATE gsl-lite::gsl-lite )
+	target_link_libraries( program PRIVATE gsl::gsl-lite )
 	```
 	Configure and build:
 
 		cd ./gsl-lite/example/cmake-pkg
-		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=_stage -Dgsl-lite_DIR="~/dev/native/gsl-lite/gsl-lite-0.29.0/lib/cmake/gsl-lite"
+		cmake -H. -B../_build -G"Unix Makefiles" -DCMAKE_INSTALL_PREFIX=_stage -DCMAKE_PREFIX_PATH="~/dev"
 		cmake --build ../_build
 
-	Here, variable `gsl-lite_DIR` lets you specify the path to the CMake Package Configuration file of *gsl-lite*. See [example/cmake-pkg](example/cmake-pkg) for a complete example.
+	See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
 
 ### As Conan package
 
@@ -225,7 +225,7 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.26.0@nonstd-lite/stable
+        gsl-lite/0.33.0@nonstd-lite/stable 
 
 3. Run conan's install command:
 
