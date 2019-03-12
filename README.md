@@ -89,6 +89,7 @@ Installation and use
 - [As external Git project](#as-external-git-project)
 - [As CMake package](#as-cmake-package)
 - [As Conan package](#as-conan-package)
+- [As Conda package](#as-conda-package)
 
 ### As copied header
 
@@ -230,6 +231,28 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 3. Run conan's install command:
 
         conan install
+
+### As Conda package
+
+1. For the [conda package manager](https://conda.io), first use **one of these options** to install `gsl-lite` from the [`conda-forge`](https://conda-forge.org/) channel:
+
+ * Install it in the current environment:
+
+        conda install -c conda-forge gsl-lite
+
+ * Install it in a different environment (named `env_name` in this example):
+
+        conda install -n env_name -c conda-forge gsl-lite
+
+ * Create a new environment containing *gsl-lite* (and possibly other packages, appended at the end of the command):
+
+        conda create -n env_name -c conda-forge gsl-lite cmake
+
+ * Add it to an already existing [`environment.yml`](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) file, and update the environment using:
+
+        conda env update
+
+2. Then activate the environment using `conda activate env_name` (if not already activated) and proceed using the instructions from step 2 of ["As CMake package"](#as-cmake-package). Note that it's also useful to have the `cmake` package in the same environment, and explicitly passing `-DCMAKE_INSTALL_PREFIX` is not necessary.
 
 
 Synopsis
