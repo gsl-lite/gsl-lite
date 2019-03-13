@@ -72,12 +72,12 @@
 # define gsl_FEATURE_BYTE_SPAN_TO_STD  99
 #endif
 
-#ifndef  gsl_FEATURE_HAVE_IMPLICIT_MACRO
-# define gsl_FEATURE_HAVE_IMPLICIT_MACRO  1
+#ifndef  gsl_FEATURE_IMPLICIT_MACRO
+# define gsl_FEATURE_IMPLICIT_MACRO  1
 #endif
 
-#ifndef  gsl_FEATURE_HAVE_OWNER_MACRO
-# define gsl_FEATURE_HAVE_OWNER_MACRO  1
+#ifndef  gsl_FEATURE_OWNER_MACRO
+# define gsl_FEATURE_OWNER_MACRO  1
 #endif
 
 #ifndef  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
@@ -350,7 +350,7 @@
 # define gsl_explicit /*explicit*/
 #endif
 
-#if gsl_FEATURE( HAVE_IMPLICIT_MACRO )
+#if gsl_FEATURE( IMPLICIT_MACRO )
 # define implicit /*implicit*/
 #endif
 
@@ -596,7 +596,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 #define gsl_HAVE_OWNER_TEMPLATE  gsl_HAVE_ALIAS_TEMPLATE
 
-#if gsl_FEATURE( HAVE_OWNER_MACRO )
+#if gsl_FEATURE( OWNER_MACRO )
 # if gsl_HAVE( OWNER_TEMPLATE )
 #  define Owner(t)  ::gsl::owner<t>
 # else

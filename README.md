@@ -287,10 +287,10 @@ Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to incl
 \-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99  
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. Default is 99 for inclusion with any standard.
 
-\-D<b>gsl\_FEATURE\_HAVE\_IMPLICIT\_MACRO</b>=1  
+\-D<b>gsl\_FEATURE\_IMPLICIT\_MACRO</b>=1  
 Define this macro to 0 to omit the `implicit` macro. Default is 1.
 
-\-D<b>gsl\_FEATURE\_HAVE\_OWNER\_MACRO</b>=1  
+\-D<b>gsl\_FEATURE\_OWNER\_MACRO</b>=1  
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
 
 \-D<b>gsl\_FEATURE\_EXPERIMENTAL\_RETURN\_GUARD</b>=0  

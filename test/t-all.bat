@@ -32,8 +32,8 @@ set gslFeatures=^
     "gsl_FEATURE_WITH_CONTAINER_TO_STD=0" ^
     "gsl_FEATURE_MAKE_SPAN_TO_STD=0" ^
     "gsl_FEATURE_BYTE_SPAN_TO_STD=0" ^
-    "gsl_FEATURE_HAVE_IMPLICIT_MACRO=0" ^
-    "gsl_FEATURE_HAVE_OWNER_MACRO=0" ^
+    "gsl_FEATURE_IMPLICIT_MACRO=0" ^
+    "gsl_FEATURE_OWNER_MACRO=0" ^
     "gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1" 
 
 set cppStandards=^

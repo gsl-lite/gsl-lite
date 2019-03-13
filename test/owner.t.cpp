@@ -55,7 +55,7 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 
 CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
 {
-#if gsl_FEATURE( HAVE_OWNER_MACRO )
+#if gsl_FEATURE( OWNER_MACRO )
     struct F { static void incr( int * i ) { *i += 1; } };
 
     Owner(int*) p = new int( 120 );

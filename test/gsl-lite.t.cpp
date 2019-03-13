@@ -185,16 +185,16 @@ CASE( "gsl-lite features" "[.gsl-features]" )
     gsl_ABSENT(  gsl_FEATURE_BYTE_SPAN_TO_STD );
 #endif
 
-#ifdef gsl_FEATURE_HAVE_IMPLICIT_MACRO
-    gsl_PRESENT( gsl_FEATURE_HAVE_IMPLICIT_MACRO );
+#ifdef gsl_FEATURE_IMPLICIT_MACRO
+    gsl_PRESENT( gsl_FEATURE_IMPLICIT_MACRO );
 #else
-    gsl_ABSENT(  gsl_FEATURE_HAVE_IMPLICIT_MACRO );
+    gsl_ABSENT(  gsl_FEATURE_IMPLICIT_MACRO );
 #endif
 
-#ifdef gsl_FEATURE_HAVE_OWNER_MACRO
-    gsl_PRESENT( gsl_FEATURE_HAVE_OWNER_MACRO );
+#ifdef gsl_FEATURE_OWNER_MACRO
+    gsl_PRESENT( gsl_FEATURE_OWNER_MACRO );
 #else
-    gsl_ABSENT(  gsl_FEATURE_HAVE_OWNER_MACRO );
+    gsl_ABSENT(  gsl_FEATURE_OWNER_MACRO );
 #endif
 
 #ifdef gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD

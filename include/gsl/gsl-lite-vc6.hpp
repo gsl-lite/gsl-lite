@@ -33,20 +33,20 @@
 
 // Configuration:
 
-#ifndef  gsl_FEATURE_HAVE_IMPLICIT_MACRO
-# define gsl_FEATURE_HAVE_IMPLICIT_MACRO  1
+#ifndef  gsl_FEATURE_IMPLICIT_MACRO
+# define gsl_FEATURE_IMPLICIT_MACRO  1
 #endif
 
-#ifndef  gsl_FEATURE_HAVE_OWNER_MACRO
-# define gsl_FEATURE_HAVE_OWNER_MACRO  1
+#ifndef  gsl_FEATURE_OWNER_MACRO
+# define gsl_FEATURE_OWNER_MACRO  1
 #endif
 
-#ifndef  gsl_FEATURE_HAVE_SHARED_PTR
-# define gsl_FEATURE_HAVE_SHARED_PTR  0
+#ifndef  gsl_FEATURE_SHARED_PTR
+# define gsl_FEATURE_SHARED_PTR  0
 #endif
 
-#ifndef  gsl_FEATURE_HAVE_UNIQUE_PTR
-# define gsl_FEATURE_HAVE_UNIQUE_PTR  0
+#ifndef  gsl_FEATURE_UNIQUE_PTR
+# define gsl_FEATURE_UNIQUE_PTR  0
 #endif
 
 #ifndef  gsl_CONFIG_THROWS_FOR_TESTING
@@ -95,17 +95,17 @@
 
 // C++ feature usage:
 
-#if gsl_FEATURE_HAVE_IMPLICIT_MACRO
+#if gsl_FEATURE_IMPLICIT_MACRO
 # define implicit
 #endif
 
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
 
-#if gsl_FEATURE_HAVE_SHARED_PTR
+#if gsl_FEATURE_SHARED_PTR
 # include gsl_CONFIG_SHARED_PTR_INCLUDE
 #endif
 
-#if gsl_FEATURE_HAVE_UNIQUE_PTR
+#if gsl_FEATURE_UNIQUE_PTR
 # include gsl_CONFIG_UNIQUE_PTR_INCLUDE
 #endif
 
@@ -115,10 +115,10 @@ namespace gsl {
 // GSL.owner: ownership pointers
 //
 // ToDo:
-#if gsl_FEATURE_HAVE_SHARED_PTR
+#if gsl_FEATURE_SHARED_PTR
   using gsl_CONFIG_SHARED_PTR_DECL;
 #endif
-#if gsl_FEATURE_HAVE_UNIQUE_PTR
+#if gsl_FEATURE_UNIQUE_PTR
   using gsl_CONFIG_UNIQUE_PTR_DECL;
 #endif
 
@@ -126,7 +126,7 @@ template< class T > struct owner { typedef T type; };
 
 #define gsl_HAVE_OWNER_TEMPLATE  0
 
-#if gsl_FEATURE_HAVE_OWNER_MACRO
+#if gsl_FEATURE_OWNER_MACRO
 # define Owner(t)  ::gsl::owner<t>::type
 #endif
 
