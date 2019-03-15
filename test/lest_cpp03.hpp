@@ -29,7 +29,7 @@
 
 #define lest_MAJOR  1
 #define lest_MINOR  35
-#define lest_PATCH  0
+#define lest_PATCH  1
 
 #define  lest_VERSION  lest_STRINGIFY(lest_MAJOR) "." lest_STRINGIFY(lest_MINOR) "." lest_STRINGIFY(lest_PATCH)
 
@@ -133,20 +133,24 @@
 # define lest_COMPILER_GNUC_VERSION 0
 #endif
 
-// C++ language support detection (C++20 is speculative):
-// Note: MSVC supports C++14 since it supports C++17.
+// C++ language version detection (C++20 is speculative):
+// Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
-#ifdef _MSVC_LANG
-# define lest_MSVC_LANG  _MSVC_LANG
-#else
-# define lest_MSVC_LANG  0
+#ifndef   lest_CPLUSPLUS
+# if defined(_MSVC_LANG ) && !defined(__clang__)
+#  define lest_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
+# else
+#  define lest_CPLUSPLUS  __cplusplus
+# endif
 #endif
 
-#define lest_CPP11             (__cplusplus == 201103L )
-#define lest_CPP11_OR_GREATER  (__cplusplus >= 201103L || lest_MSVC_LANG >= 201103L || lest_COMPILER_MSVC_VERSION >= 120 )
-#define lest_CPP14_OR_GREATER  (__cplusplus >= 201402L || lest_MSVC_LANG >= 201703L )
-#define lest_CPP17_OR_GREATER  (__cplusplus >= 201703L || lest_MSVC_LANG >= 201703L )
-#define lest_CPP20_OR_GREATER  (__cplusplus >= 202000L || lest_MSVC_LANG >= 202000L )
+#define lest_CPP98_OR_GREATER  ( lest_CPLUSPLUS >= 199711L )
+#define lest_CPP11_OR_GREATER  ( lest_CPLUSPLUS >= 201103L || lest_COMPILER_MSVC_VERSION >= 120 )
+#define lest_CPP14_OR_GREATER  ( lest_CPLUSPLUS >= 201402L )
+#define lest_CPP17_OR_GREATER  ( lest_CPLUSPLUS >= 201703L )
+#define lest_CPP20_OR_GREATER  ( lest_CPLUSPLUS >= 202000L )
+
+#define lest_CPP11_100  (lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 100)
 
 #ifndef  __has_cpp_attribute
 # define __has_cpp_attribute(name)  0
@@ -168,7 +172,8 @@
 
 // Presence of C++11 language features:
 
-#define lest_HAVE_NULLPTR  ( lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 100 )
+#define lest_HAVE_NOEXCEPT ( lest_CPP11_100 )
+#define lest_HAVE_NULLPTR  ( lest_CPP11_100 )
 
 // C++ feature usage:
 
@@ -180,7 +185,7 @@
 
 // Additional includes and tie:
 
-#if lest_CPP11_OR_GREATER || lest_COMPILER_MSVC_VERSION >= 100
+#if lest_CPP11_100
 
 # include <cstdint>
 # include <random>
@@ -234,7 +239,7 @@ namespace lest
 #  pragma GCC diagnostic pop
 # endif
 
-#endif // lest_CPP11_OR_GREATER
+#endif // lest_CPP11_100
 
 namespace lest
 {
@@ -615,7 +620,7 @@ inline std::string to_hex_string(char c)
     std::ostringstream os;
     os << "\\x" << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>( static_cast<unsigned char>(c) );
     return os.str();
-};
+}
 
 inline std::string transformed( char chr )
 {
@@ -1486,7 +1491,7 @@ template< typename C > char const * const *   text_end( C const & c ) { return t
 template< typename C > tests make_tests( C const & c ) { return make_tests( test_begin( c ), test_end( c ) ); }
 template< typename C > texts make_texts( C const & c ) { return make_texts( text_begin( c ), text_end( c ) ); }
 
-inline int run( tests const & specification, int argc, char * argv[], std::ostream & os = std::cout )
+inline int run( tests const & specification, int argc, char ** argv, std::ostream & os = std::cout )
 {
     return run( specification, make_texts( argv + 1, argv + argc ), os  );
 }
@@ -1504,7 +1509,7 @@ int run(  C const & specification, texts args, std::ostream & os = std::cout )
 }
 
 template< typename C >
-int run(  C const & specification, int argc, char * argv[], std::ostream & os = std::cout )
+int run(  C const & specification, int argc, char ** argv, std::ostream & os = std::cout )
 {
     return run( make_tests( specification ), argv, argc, os  );
 }
