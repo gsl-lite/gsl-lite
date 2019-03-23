@@ -21,7 +21,15 @@ import sys
 
 table = (
     # path, substitute find, substitute format
-    ( 'CMakeLists.txt'
+    ( 'Readme.md'
+        , r'find_package\( gsl-lite "([0-9]+\.[0-9]+)" REQUIRED \)'
+        , 'find_package( gsl-lite "{major}.{minor}" REQUIRED )' )
+
+    , ( 'Readme.md'
+        , r'gsl-lite/([0-9]+\.[0-9]+\.[0-9]+)@nonstd-lite/'
+        , 'gsl-lite/{major}.{minor}.{patch}@nonstd-lite/' )
+
+    , ( 'CMakeLists.txt'
         , r'\W{2,4}VERSION\W+([0-9]+\.[0-9]+\.[0-9]+)\W*$'
         , '    VERSION {major}.{minor}.{patch}' )
 
