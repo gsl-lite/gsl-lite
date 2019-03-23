@@ -17,6 +17,7 @@ class GslLiteConan(ConanFile):
     def package(self):
         """Provide pkg/include/gsl/*.hpp"""
         self.copy("*.hpp")
+        self.copy("include/gsl/gsl")
 
     def package_info(self):
         self.info.header_only()

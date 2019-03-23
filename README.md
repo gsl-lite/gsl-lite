@@ -221,12 +221,12 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 
 1. Add *nonstd-lite* to the conan remotes:
 
-        conan remote add nonstd-lite https://api.bintray.com/conan/agauniyal/nonstd-lite
+        conan remote add nonstd-lite https://api.bintray.com/conan/martinmoene/nonstd-lite
 
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.33.0@nonstd-lite/stable 
+        gsl-lite/0.34.0@nonstd-lite/stable
 
 3. Run conan's install command:
 
