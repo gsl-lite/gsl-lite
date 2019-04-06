@@ -318,6 +318,17 @@ Define this macro to call `std::terminate()` on a GSL contract violation in `Exp
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
 Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and throw a std::exception-derived exception `narrowing_error` on discarding  information in `narrow`.
 
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
+Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects` and `Ensures`, and call `std::terminate()` on discarding  information in `narrow`. The user is expected to supply a definition matching the following signature:
+
+```Cpp
+namespace gsl {
+	gsl_api gsl_constexpr14 void fail_fast_assert_handler(
+		char const * const expression, char const * const message,
+		char const * const file, int line );
+}
+```
+
 ### Microsoft GSL compatibility macros
 
 \-D<b>GSL_UNENFORCED_ON_CONTRACT_VIOLATION</b>  

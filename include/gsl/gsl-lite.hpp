@@ -126,17 +126,20 @@
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
 #endif
 
-#if   !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS     ) && \
-      !defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
-# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
-#elif  defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS     ) && \
-      !defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+#if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined ( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 # define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
-#elif !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS     ) && \
-       defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
 # define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
+# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
+# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 1
 #else
-# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS and gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES may be defined.
+# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
+# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -615,6 +618,8 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # define Expects( x )  /* Expects elided */
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) );
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define Expects( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ );
 #else
 # define Expects( x )  ::gsl::fail_fast_assert( (x) )
 #endif
@@ -629,6 +634,8 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # define Ensures( x )  /* Ensures elided */
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) );
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ );
 #else
 # define Ensures( x )  ::gsl::fail_fast_assert( (x) )
 #endif
@@ -653,6 +660,18 @@ gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * co
     !cond ? throw fail_fast( message ) : 0;
 }
 
+# elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+
+// Should be defined by user
+gsl_api gsl_constexpr14 auto fail_fast_assert_handler(char const * const expression, char const * const message, char const * const file, int line) -> void;
+
+gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line ) -> void
+{
+	struct F { static gsl_constexpr14 void f() {}; };
+
+	!cond ? fail_fast_assert_handler( expression, message, file, line ) : F::f();
+}
+
 # else
 
 gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond ) -> void
@@ -672,6 +691,17 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * co
 {
     if ( !cond )
         throw fail_fast( message );
+}
+
+# elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+
+// Should be defined by user
+gsl_api gsl_constexpr14 void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
+
+gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
+{
+	if ( !cond )
+		fail_fast_assert_handler( expression, message, file, line );
 }
 
 # else
