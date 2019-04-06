@@ -11,7 +11,8 @@ call :CompilerVersion compiler_version
 
 set cvResponses=^
     gsl_CONFIG_CONTRACT_VIOLATION_THROWS ^
-    gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
+    gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ^
+    gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER
 
 set spanIndexTypes=^
     std::size_t ^
