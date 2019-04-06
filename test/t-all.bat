@@ -14,7 +14,7 @@ set cvResponses=^
     gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 
 set spanIndexTypes=^
-    std::size_t 
+    std::size_t ^
     std::ptrdiff_t
 
 set gslFeatures=^
