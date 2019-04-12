@@ -2860,6 +2860,65 @@ ensure_z( Container & cont )
 }
 # endif
 
+//
+// basic_zstring_span<> - A view of continguos null-terminated characters, replace (*,len).
+//
+
+template <typename T>
+class basic_zstring_span {
+public:
+    typedef T element_type;
+    typedef span<T> span_type;
+
+    typedef typename span_type::index_type index_type;
+    typedef typename span_type::difference_type difference_type;
+
+    typedef basic_string_span<element_type> string_span_type;
+
+    gsl_api gsl_constexpr14 basic_zstring_span(span_type s)
+        : span_(s)
+    {
+        // expects a zero-terminated span
+        Expects(s[s.size() - 1] == '\0');
+    }
+
+#if gsl_HAVE( IS_DEFAULT )
+    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) = default;
+    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span &&      other) = default;
+    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other) = default;
+    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other) = default;
+#else
+    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
+    gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other) { span_ = other.span_; return *this; }
+#endif
+
+    gsl_api gsl_constexpr bool empty() const gsl_noexcept { return span_.size() == 0; }
+
+    gsl_api gsl_constexpr string_span_type as_string_span() const gsl_noexcept
+    {
+        const index_type sz = span_.size();
+        return string_span_type( span_.data(), sz > 1 ? sz - 1 : 0 );
+    }
+    gsl_api gsl_constexpr string_span_type ensure_z() const { return gsl::ensure_z(span_.data(), span_.size()); }
+
+    gsl_api gsl_constexpr const element_type* assume_z() const gsl_noexcept { return span_.data(); }
+
+private:
+    span_type span_;
+};
+
+//
+// zString types:
+//
+
+typedef basic_zstring_span< char > zstring_span;
+typedef basic_zstring_span< char const > czstring_span;
+
+#if gsl_HAVE( WCHAR )
+typedef basic_zstring_span< wchar_t> wzstring_span;
+typedef basic_zstring_span< wchar_t const > cwzstring_span;
+#endif
+
 } // namespace gsl
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
