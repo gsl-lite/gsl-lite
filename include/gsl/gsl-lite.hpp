@@ -1230,7 +1230,7 @@ class not_null_ic : public not_null<T>
 public:
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-        gsl_REQUIRES_T(( std::is_constructible<T, U>::value )) 
+        gsl_REQUIRES_T(( std::is_constructible<T, U>::value ))
 #endif
     >
     gsl_api gsl_constexpr14
@@ -1649,8 +1649,8 @@ public:
     {}
 
     template< class Container
-        gsl_REQUIRES_T(( 
-            std::is_const< element_type >::value 
+        gsl_REQUIRES_T((
+            std::is_const< element_type >::value
             && detail::can_construct_span_from< Container, element_type >::value
         ))
     >
@@ -2559,7 +2559,7 @@ gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
-    gsl_REQUIRES_T(( !detail::is_basic_string_span<U>::value )) 
+    gsl_REQUIRES_T(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -2861,11 +2861,12 @@ ensure_z( Container & cont )
 # endif
 
 //
-// basic_zstring_span<> - A view of continguos null-terminated characters, replace (*,len).
+// basic_zstring_span<> - A view of contiguous null-terminated characters, replace (*,len).
 //
 
 template <typename T>
-class basic_zstring_span {
+class basic_zstring_span
+{
 public:
     typedef T element_type;
     typedef span<T> span_type;
@@ -2892,16 +2893,26 @@ public:
     gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other) { span_ = other.span_; return *this; }
 #endif
 
-    gsl_api gsl_constexpr bool empty() const gsl_noexcept { return span_.size() == 0; }
+    gsl_api gsl_constexpr bool empty() const gsl_noexcept
+    {
+        return span_.size() == 0;
+    }
 
     gsl_api gsl_constexpr string_span_type as_string_span() const gsl_noexcept
     {
         const index_type sz = span_.size();
         return string_span_type( span_.data(), sz > 1 ? sz - 1 : 0 );
     }
-    gsl_api gsl_constexpr string_span_type ensure_z() const { return gsl::ensure_z(span_.data(), span_.size()); }
 
-    gsl_api gsl_constexpr const element_type* assume_z() const gsl_noexcept { return span_.data(); }
+    gsl_api gsl_constexpr string_span_type ensure_z() const
+    {
+        return gsl::ensure_z(span_.data(), span_.size());
+    }
+
+    gsl_api gsl_constexpr const element_type* assume_z() const gsl_noexcept
+    {
+        return span_.data();
+    }
 
 private:
     span_type span_;
@@ -2915,7 +2926,7 @@ typedef basic_zstring_span< char > zstring_span;
 typedef basic_zstring_span< char const > czstring_span;
 
 #if gsl_HAVE( WCHAR )
-typedef basic_zstring_span< wchar_t> wzstring_span;
+typedef basic_zstring_span< wchar_t > wzstring_span;
 typedef basic_zstring_span< wchar_t const > cwzstring_span;
 #endif
 
