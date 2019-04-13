@@ -403,6 +403,10 @@ string_span                 | &#10003;| &#10003;| &#10003;| basic_string_span&lt
 wstring_span                | -       | &#10003;| &#10003;| basic_string_span&lt;wchar_t > |
 cstring_span                | &#10003;| &#10003;| &#10003;| basic_string_span&lt;const char> |
 cwstring_span               | -       | &#10003;| &#10003;| basic_string_span&lt;const wchar_t > |
+zstring_span                | -       | &#10003;| &#10003;| basic_zstring_span&lt;char> |
+wzstring_span               | -       | &#10003;| &#10003;| basic_zstring_span&lt;wchar_t > |
+czstring_span               | -       | &#10003;| &#10003;| basic_zstring_span&lt;const char> |
+cwzstring_span              | -       | &#10003;| &#10003;| basic_zstring_span&lt;const wchar_t > |
 ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_span or cwstring_span |
 to_string()                 | -       | &#10003;| &#10003;| Convert a string_span to std::string or std::wstring |
 **2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
