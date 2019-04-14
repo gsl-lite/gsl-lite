@@ -834,6 +834,14 @@ string_span: Allows to obtain the number of elements via size()
 string_span: Allows to obtain the number of bytes via length_bytes()
 string_span: Allows to obtain the number of bytes via size_bytes()
 string_span: Allows to view the elements as read-only bytes
+zstring_span: Allows to construct a zstring_span from a zero-terminated empty string (via span)
+zstring_span: Allows to construct a zstring_span from a zero-terminated non-empty string (via span)
+zstring_span: Terminates construction of a zstring_span from a non-zero-terminated string (via span)
+zstring_span: Allows to construct a wzstring_span from a zero-terminated empty string (via span)
+zstring_span: Allows to construct a wzstring_span from a zero-terminated non-empty string (via span)
+zstring_span: Terminates construction of a wzstring_span from a non-zero-terminated string (via span)
+zstring_span: Allows to use a zstring_span with a legacy API via member assume_z()
+zstring_span: Allows to use a wzstring_span with a legacy API via member assume_z()
 to_string(): Allows to explicitly convert from string_span to std::string
 to_string(): Allows to explicitly convert from cstring_span to std::string
 to_string(): Allows to explicitly convert from wstring_span to std::wstring

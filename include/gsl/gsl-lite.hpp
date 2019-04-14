@@ -2874,23 +2874,24 @@ public:
     typedef typename span_type::index_type index_type;
     typedef typename span_type::difference_type difference_type;
 
+    typedef element_type * czstring_type;
     typedef basic_string_span<element_type> string_span_type;
 
-    gsl_api gsl_constexpr14 basic_zstring_span(span_type s)
-        : span_(s)
+    gsl_api gsl_constexpr14 basic_zstring_span( span_type s )
+        : span_( s )
     {
         // expects a zero-terminated span
-        Expects(s[s.size() - 1] == '\0');
+        Expects( s[s.size() - 1] == '\0');
     }
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) = default;
-    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span &&      other) = default;
-    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other) = default;
-    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other) = default;
+    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other ) = default;
+    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span &&      other ) = default;
+    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other ) = default;
+    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other ) = default;
 #else
     gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
-    gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other) { span_ = other.span_; return *this; }
+    gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other ) { span_ = other.span_; return *this; }
 #endif
 
     gsl_api gsl_constexpr bool empty() const gsl_noexcept
@@ -2909,7 +2910,7 @@ public:
         return gsl::ensure_z(span_.data(), span_.size());
     }
 
-    gsl_api gsl_constexpr const element_type* assume_z() const gsl_noexcept
+    gsl_api gsl_constexpr czstring_type assume_z() const gsl_noexcept
     {
         return span_.data();
     }
