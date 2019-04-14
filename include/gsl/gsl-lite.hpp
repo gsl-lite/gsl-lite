@@ -2901,8 +2901,7 @@ public:
 
     gsl_api gsl_constexpr string_span_type as_string_span() const gsl_noexcept
     {
-        const index_type sz = span_.size();
-        return string_span_type( span_.data(), sz > 1 ? sz - 1 : 0 );
+        return string_span_type( span_.data(), span_.size() > 1 ? span_.size() - 1 : 0 );
     }
 
     gsl_api gsl_constexpr string_span_type ensure_z() const
