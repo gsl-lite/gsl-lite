@@ -1,4 +1,4 @@
-from conans import ConanFile
+from conans import ConanFile, CMake
 
 class GslLiteConan(ConanFile):
     version = "0.34.0"
@@ -6,8 +6,8 @@ class GslLiteConan(ConanFile):
     description = "A single-file header-only version of ISO C++ Guidelines Support Library (GSL) for C++98, C++11 and later"
     license = "MIT License. https://opensource.org/licenses/MIT"
     url = "https://github.com/martinmoene/gsl-lite.git"
-    exports_sources = "include/gsl/*", "include/*", "LICENSE"
-    build_policy = "missing"    
+    exports_sources = "include/gsl/*", "CMakeLists.txt", "cmake/*", "LICENSE"
+    build_policy = "missing"
     author = "Martin Moene"
 
     def build(self):
@@ -15,9 +15,12 @@ class GslLiteConan(ConanFile):
         pass
 
     def package(self):
-        """Provide pkg/include/gsl/*.hpp"""
-        self.copy("*.hpp")
-        self.copy("include/gsl/gsl")
+        """Run CMake install"""
+        cmake = CMake(self)
+        cmake.definitions["GSL_LITE_OPT_BUILD_TESTS"] = "OFF"
+        cmake.definitions["GSL_LITE_OPT_BUILD_EXAMPLES"] = "OFF"
+        cmake.configure()
+        cmake.install()
 
     def package_info(self):
         self.info.header_only()
