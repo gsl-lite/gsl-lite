@@ -1072,43 +1072,43 @@ gsl_api inline T narrow( U u )
 //
 
 template< class T, size_t N >
-gsl_api inline gsl_constexpr14 T & at( T(&arr)[N], size_t index )
+gsl_api inline gsl_constexpr14 T & at( T(&arr)[N], size_t pos )
 {
-    Expects( index < N );
-    return arr[index];
+    Expects( pos < N );
+    return arr[pos];
 }
 
 #if gsl_HAVE( ARRAY )
 
 template< class T, size_t N >
-gsl_api inline gsl_constexpr14 T & at( std::array<T, N> & arr, size_t index )
+gsl_api inline gsl_constexpr14 T & at( std::array<T, N> & arr, size_t pos )
 {
-    Expects( index < N );
-    return arr[index];
+    Expects( pos < N );
+    return arr[pos];
 }
 #endif
 
 template< class Container >
-gsl_api inline gsl_constexpr14 typename Container::value_type & at( Container & cont, size_t index )
+gsl_api inline gsl_constexpr14 typename Container::value_type & at( Container & cont, size_t pos )
 {
-    Expects( index < cont.size() );
-    return cont[index];
+    Expects( pos < cont.size() );
+    return cont[pos];
 }
 
 #if gsl_HAVE( INITIALIZER_LIST )
 
 template< class T >
-gsl_api inline const gsl_constexpr14 T & at( std::initializer_list<T> cont, size_t index )
+gsl_api inline const gsl_constexpr14 T & at( std::initializer_list<T> cont, size_t pos )
 {
-    Expects( index < cont.size() );
-    return *( cont.begin() + index );
+    Expects( pos < cont.size() );
+    return *( cont.begin() + pos );
 }
 #endif
 
 template< class T >
-gsl_api inline gsl_constexpr T & at( span<T> s, size_t index )
+gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 {
-    return s.at( index );
+    return s.at( pos );
 }
 
 //
@@ -1816,20 +1816,20 @@ public:
 
     // 26.7.3.5 Element access [span.elem]
 
-    gsl_api gsl_constexpr reference operator[]( index_type index ) const
+    gsl_api gsl_constexpr reference operator[]( index_type pos ) const
     {
-       return at( index );
+       return at( pos );
     }
 
-    gsl_api gsl_constexpr reference operator()( index_type index ) const
+    gsl_api gsl_constexpr reference operator()( index_type pos ) const
     {
-       return at( index );
+       return at( pos );
     }
 
-    gsl_api gsl_constexpr14 reference at( index_type index ) const
+    gsl_api gsl_constexpr14 reference at( index_type pos ) const
     {
-       Expects( index < size() );
-       return first_[ index ];
+       Expects( pos < size() );
+       return first_[ pos ];
     }
 
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
