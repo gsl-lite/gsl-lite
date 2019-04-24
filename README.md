@@ -274,7 +274,7 @@ Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is define
 ### Standard selection macro
 
 \-D<b>gsl\_CPLUSPLUS</b>=199711L  
-Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cpluplus` macro correctly.
+Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
 
 ### Feature selection macros
 
