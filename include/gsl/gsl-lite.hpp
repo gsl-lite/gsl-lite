@@ -73,7 +73,7 @@
 #endif
 
 #ifndef  gsl_FEATURE_IMPLICIT_MACRO
-# define gsl_FEATURE_IMPLICIT_MACRO  1
+# define gsl_FEATURE_IMPLICIT_MACRO  0
 #endif
 
 #ifndef  gsl_FEATURE_OWNER_MACRO

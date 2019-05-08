@@ -287,8 +287,8 @@ Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to incl
 \-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99  
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. Default is 99 for inclusion with any standard.
 
-\-D<b>gsl\_FEATURE\_IMPLICIT\_MACRO</b>=1  
-Define this macro to 0 to omit the `implicit` macro. Default is 1.
+\-D<b>gsl\_FEATURE\_IMPLICIT\_MACRO</b>=0  
+Define this macro to 1 to provide the `implicit` macro. Default is 0.
 
 \-D<b>gsl\_FEATURE\_OWNER\_MACRO</b>=1  
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
@@ -430,7 +430,8 @@ on_error()                  | -       | -       | >=C++11 | Make a final_action_
 on_error()                  | -       | -       | < C++11 | Make a final_action_error, [experimental](#feature-selection-macros) |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
-implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
+[[implicit]]                | &#10003;| -       | C++??   | Symmetric with explicit |
+implicit                    | -       | -       | &#10003;| Macro, see [Feature selection macros](#feature-selection-macros) |
 move_owner                  | ?       | -       | -       | ... |
 **5. Algorithms**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 copy()                      | &nbsp;  | &nbsp;  | &nbsp;  | Copy from source span to destination span |
