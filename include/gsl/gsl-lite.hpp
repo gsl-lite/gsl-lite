@@ -667,9 +667,9 @@ gsl_api gsl_constexpr14 auto fail_fast_assert_handler(char const * const express
 
 gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line ) -> void
 {
-	struct F { static gsl_constexpr14 void f() {}; };
+    struct F { static gsl_constexpr14 void f() {}; };
 
-	!cond ? fail_fast_assert_handler( expression, message, file, line ) : F::f();
+    !cond ? fail_fast_assert_handler( expression, message, file, line ) : F::f();
 }
 
 # else
@@ -700,8 +700,8 @@ gsl_api gsl_constexpr14 void fail_fast_assert_handler( char const * const expres
 
 gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
-	if ( !cond )
-		fail_fast_assert_handler( expression, message, file, line );
+    if ( !cond )
+        fail_fast_assert_handler( expression, message, file, line );
 }
 
 # else
