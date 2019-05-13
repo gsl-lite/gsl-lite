@@ -190,6 +190,19 @@ CASE( "span<>: Allows to construct from a single object (C++11)" )
 #endif
 }
 
+CASE( "span<>: Allows to construct from an initializer list (C++11)" )
+{
+#if  gsl_HAVE( IS_DELETE )
+    std::initializer_list<int> x = {0, 1, 2};
+
+    span<const int> v( x );
+
+    EXPECT( v.size() == index_type( 3 ) );
+#else
+    EXPECT( !!"=delete is not available (no C++11)" );
+#endif
+}
+
 CASE( "span<>: Allows to construct from a const single object (C++11)" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 5 )

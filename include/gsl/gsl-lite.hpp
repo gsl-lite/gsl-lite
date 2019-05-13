@@ -418,6 +418,11 @@
 # include <cstdint>
 #endif
 
+#if gsl_HAVE( INITIALIZER_LIST )
+# include <initializer_list>
+#endif
+
+
 // MSVC warning suppression macros:
 
 #if gsl_COMPILER_MSVC_VERSION >= 140
@@ -562,6 +567,51 @@ template< class T, std::size_t N >
 struct is_array<T[N]> : std11::true_type {};
 
 #endif // gsl_HAVE( TYPE_TRAITS )
+
+#if gsl_HAVE ( STD_DATA )
+
+using std::data;
+using std::size;
+
+#elif gsl_CPP11_OR_GREATER
+
+template < class C >
+gsl_constexpr auto data( C& c ) -> decltype( c.data() )
+{
+    return c.data();
+}
+
+template < class C >
+gsl_constexpr auto data( const C& c ) -> decltype( c.data() )
+{
+    return c.data();
+}
+
+template < class T, std::size_t N >
+gsl_constexpr T* data( T (&array)[N] ) gsl_noexcept
+{
+    return array;
+}
+
+template < class E >
+gsl_constexpr const E* data( std::initializer_list<E> il ) gsl_noexcept
+{
+    return il.begin();
+}
+
+template < class C >
+gsl_constexpr auto size( const C& c ) -> decltype( c.size() )
+{
+    return c.size();
+}
+
+template < class T, std::size_t N >
+gsl_constexpr std::size_t size( T (&)[N] ) gsl_noexcept
+{
+    return N;
+}
+
+#endif
 
 } // namespace detail
 
@@ -1476,13 +1526,11 @@ template< class Container, class ElementType
         ! detail::is_span< Container >::value
         && ! detail::is_array< Container >::value
         && ! detail::is_std_array< Container >::value
-        && std::is_convertible<typename std::remove_pointer<decltype(std::declval<Container>().data())>::type(*)[], ElementType(*)[] >::value
+        && std::is_convertible<typename std::remove_pointer<decltype(detail::data(std::declval<Container>()))>::type(*)[], ElementType(*)[] >::value
     ))
-#if gsl_HAVE( STD_DATA )
       // data(cont) and size(cont) well-formed:
-    , class = decltype( std::data( std::declval<Container>() ) )
-    , class = decltype( std::size( std::declval<Container>() ) )
-#endif
+    , class = decltype( detail::data( std::declval<Container>() ) )
+    , class = decltype( detail::size( std::declval<Container>() ) )
 >
 struct can_construct_span_from : std11::true_type{};
 
@@ -1641,22 +1689,22 @@ public:
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container
-        gsl_REQUIRES_T(( detail::can_construct_span_from< Container, element_type >::value ))
+        gsl_REQUIRES_T(( detail::can_construct_span_from< Container &, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container & cont )
-        : first_( cont.data() )
-        , last_ ( cont.data() + cont.size() )
+        : first_( detail::data(cont) )
+        , last_ ( detail::data(cont) + detail::size(cont) )
     {}
 
     template< class Container
         gsl_REQUIRES_T((
             std::is_const< element_type >::value
-            && detail::can_construct_span_from< Container, element_type >::value
+            && detail::can_construct_span_from< Container const &, element_type >::value
         ))
     >
     gsl_api gsl_constexpr span( Container const & cont )
-        : first_( cont.data() )
-        , last_ ( cont.data() + cont.size() )
+        : first_( detail::data(cont) )
+        , last_ ( detail::data(cont) + detail::size(cont) )
     {}
 
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
@@ -2112,14 +2160,14 @@ make_span( std::array<T,N> const & arr )
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( AUTO )
 
-template< class Container, class = decltype(std::declval<Container>().data()) >
+template< class Container, class = decltype(detail::data(std::declval<Container>())) >
 gsl_api inline gsl_constexpr auto
 make_span( Container & cont ) -> span< typename Container::value_type >
 {
     return span< typename Container::value_type >( cont );
 }
 
-template< class Container, class = decltype(std::declval<Container>().data()) >
+template< class Container, class = decltype(detail::data(std::declval<Container>())) >
 gsl_api inline gsl_constexpr auto
 make_span( Container const & cont ) -> span< const typename Container::value_type >
 {
@@ -2303,7 +2351,7 @@ public:
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
-            && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
+            && std::is_convertible< typename Container::pointer, decltype(detail::data(std::declval<Container>())) >::value
         ))
     >
     gsl_api gsl_constexpr basic_string_span( Container & cont )
@@ -2317,7 +2365,7 @@ public:
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
-            && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
+            && std::is_convertible< typename Container::pointer, decltype(detail::data(std::declval<Container const &>())) >::value
         ))
     >
     gsl_api gsl_constexpr basic_string_span( Container const & cont )
@@ -2856,7 +2904,7 @@ template< class Container >
 gsl_api inline span< typename std::remove_pointer<typename Container::pointer>::type >
 ensure_z( Container & cont )
 {
-    return ensure_z( cont.data(), cont.length() );
+    return ensure_z( detail::data(cont), detail::size(cont) );
 }
 # endif
 
