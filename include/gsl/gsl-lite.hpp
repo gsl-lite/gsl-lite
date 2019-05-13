@@ -408,6 +408,10 @@
 # include <array>
 #endif
 
+#if gsl_HAVE( INITIALIZER_LIST )
+# include <initializer_list>
+#endif
+
 #if gsl_HAVE( TYPE_TRAITS )
 # include <type_traits>
 #elif gsl_HAVE( TR1_TYPE_TRAITS )
@@ -453,6 +457,57 @@ namespace gsl {
 
 template< class T >
 class span;
+
+// C++17 emulation:
+
+namespace std17 {
+
+#if gsl_HAVE( STD_DATA )
+
+using std::data;
+using std::size;
+
+#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
+template< typename T, size_t N >
+inline gsl_constexpr auto size( const T(&)[N] ) gsl_noexcept -> size_t
+{
+    return N;
+}
+
+template< typename C >
+inline gsl_constexpr auto size( C const & cont ) -> decltype( cont.size() )
+{
+    return cont.size();
+}
+
+template< typename T, size_t N >
+inline gsl_constexpr auto data( T(&arr)[N] ) gsl_noexcept -> T*
+{
+    return &arr[0];
+}
+
+template< typename C >
+inline gsl_constexpr auto data( C & cont ) -> decltype( cont.data() )
+{
+    return cont.data();
+}
+
+template< typename C >
+inline gsl_constexpr auto data( C const & cont ) -> decltype( cont.data() )
+{
+    return cont.data();
+}
+
+template< typename E >
+inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E const *
+{
+    return il.begin();
+}
+
+#endif // span_HAVE( DATA )
+
+} // namespace std17
 
 // C++11 emulation:
 
@@ -1471,18 +1526,17 @@ namespace detail {
 
 // Can construct from containers that:
 
-template< class Container, class ElementType
-    gsl_REQUIRES_T((
-        ! detail::is_span< Container >::value
-        && ! detail::is_array< Container >::value
-        && ! detail::is_std_array< Container >::value
-        && std::is_convertible<typename std::remove_pointer<decltype(std::declval<Container>().data())>::type(*)[], ElementType(*)[] >::value
-    ))
-#if gsl_HAVE( STD_DATA )
-      // data(cont) and size(cont) well-formed:
-    , class = decltype( std::data( std::declval<Container>() ) )
-    , class = decltype( std::size( std::declval<Container>() ) )
-#endif
+template<
+    class Container, class ElementType
+        gsl_REQUIRES_T((
+            ! detail::is_span< Container >::value
+            && ! detail::is_array< Container >::value
+            && ! detail::is_std_array< Container >::value
+            && (std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<Container&>() ) )>::type(*)[], ElementType(*)[] >::value)
+        ))
+        // data(cont) and size(cont) well-formed:
+        , class = decltype( std17::data( std::declval<Container>() ) )
+        , class = decltype( std17::size( std::declval<Container>() ) )
 >
 struct can_construct_span_from : std11::true_type{};
 
@@ -1644,8 +1698,8 @@ public:
         gsl_REQUIRES_T(( detail::can_construct_span_from< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container & cont )
-        : first_( cont.data() )
-        , last_ ( cont.data() + cont.size() )
+        : first_( std17::data( cont ) )
+        , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
 
     template< class Container
@@ -1655,8 +1709,8 @@ public:
         ))
     >
     gsl_api gsl_constexpr span( Container const & cont )
-        : first_( cont.data() )
-        , last_ ( cont.data() + cont.size() )
+        : first_( std17::data( cont ) )
+        , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
 
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
@@ -2112,18 +2166,18 @@ make_span( std::array<T,N> const & arr )
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( AUTO )
 
-template< class Container, class = decltype(std::declval<Container>().data()) >
+template< class Container, class EP = decltype( std17::data(std::declval<Container&>())) >
 gsl_api inline gsl_constexpr auto
-make_span( Container & cont ) -> span< typename Container::value_type >
+make_span( Container & cont ) -> span< typename std::remove_pointer<EP>::type >
 {
-    return span< typename Container::value_type >( cont );
+    return span< typename std::remove_pointer<EP>::type >( cont );
 }
 
-template< class Container, class = decltype(std::declval<Container>().data()) >
+template< class Container, class EP = decltype( std17::data(std::declval<Container&>())) >
 gsl_api inline gsl_constexpr auto
-make_span( Container const & cont ) -> span< const typename Container::value_type >
+make_span( Container const & cont ) -> span< const typename std::remove_pointer<EP>::type >
 {
-    return span< const typename Container::value_type >( cont );
+    return span< const typename std::remove_pointer<EP>::type >( cont );
 }
 
 #else

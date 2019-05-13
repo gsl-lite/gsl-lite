@@ -674,6 +674,7 @@ span<>: Allows to construct from a C-array
 span<>: Allows to construct from a const C-array
 span<>: Allows to construct from a C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows to construct from a const C-array with size via decay to pointer (potentially dangerous)
+span<>: Allows to construct from a std::initializer_list<> (C++11)
 span<>: Allows to construct from a std::array<> (C++11)
 span<>: Allows to construct from a std::array<> with const data (C++11) [deprecated-5]
 span<>: Allows to construct from a container (std::vector<>)
@@ -740,6 +741,7 @@ make_span(): Allows to build from a non-null pointer and a size
 make_span(): Allows to build from a non-null const pointer and a size
 make_span(): Allows to build from a C-array
 make_span(): Allows to build from a const C-array
+make_span(): Allows building from a std::initializer_list<> (C++11)
 make_span(): Allows to build from a std::array<> (C++11)
 make_span(): Allows to build from a const std::array<> (C++11)
 make_span(): Allows to build from a container (std::vector<>)
