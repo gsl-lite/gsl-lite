@@ -7,6 +7,7 @@ class GslLiteConan(ConanFile):
     license = "MIT License. https://opensource.org/licenses/MIT"
     url = "https://github.com/martinmoene/gsl-lite.git"
     exports_sources = "include/gsl/*", "CMakeLists.txt", "cmake/*", "LICENSE"
+    settings = "compiler", "build_type", "arch"
     build_policy = "missing"
     author = "Martin Moene"
 
