@@ -1133,18 +1133,15 @@ gsl_api inline gsl_constexpr14 T & at( T(&arr)[N], size_t pos )
     return arr[pos];
 }
 
-#if gsl_HAVE( ARRAY )
-
-template< class T, size_t N >
-gsl_api inline gsl_constexpr14 T & at( std::array<T, N> & arr, size_t pos )
-{
-    Expects( pos < N );
-    return arr[pos];
-}
-#endif
-
 template< class Container >
 gsl_api inline gsl_constexpr14 typename Container::value_type & at( Container & cont, size_t pos )
+{
+    Expects( pos < cont.size() );
+    return cont[pos];
+}
+
+template< class Container >
+gsl_api inline gsl_constexpr14 typename Container::value_type const & at( Container const & cont, size_t pos )
 {
     Expects( pos < cont.size() );
     return cont[pos];
