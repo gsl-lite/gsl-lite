@@ -1150,7 +1150,7 @@ gsl_api inline gsl_constexpr14 typename Container::value_type const & at( Contai
 #if gsl_HAVE( INITIALIZER_LIST )
 
 template< class T >
-gsl_api inline const gsl_constexpr14 T & at( std::initializer_list<T> cont, size_t pos )
+gsl_api inline const gsl_constexpr14 T at( std::initializer_list<T> cont, size_t pos )
 {
     Expects( pos < cont.size() );
     return *( cont.begin() + pos );
