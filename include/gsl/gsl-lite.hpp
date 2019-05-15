@@ -458,64 +458,6 @@ namespace gsl {
 template< class T >
 class span;
 
-// C++17 emulation:
-
-namespace std17 {
-
-#if gsl_CPP11_120
-
-template< class...>
-using void_t = void;
-
-#endif
-
-#if gsl_HAVE( STD_DATA )
-
-using std::data;
-using std::size;
-
-#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
-
-template< class T, size_t N >
-inline gsl_constexpr auto size( const T(&)[N] ) gsl_noexcept -> size_t
-{
-    return N;
-}
-
-template< class C >
-inline gsl_constexpr auto size( C const & cont ) -> decltype( cont.size() )
-{
-    return cont.size();
-}
-
-template< class T, size_t N >
-inline gsl_constexpr auto data( T(&arr)[N] ) gsl_noexcept -> T*
-{
-    return &arr[0];
-}
-
-template< class C >
-inline gsl_constexpr auto data( C & cont ) -> decltype( cont.data() )
-{
-    return cont.data();
-}
-
-template< class C >
-inline gsl_constexpr auto data( C const & cont ) -> decltype( cont.data() )
-{
-    return cont.data();
-}
-
-template< class E >
-inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E const *
-{
-    return il.begin();
-}
-
-#endif // span_HAVE( DATA )
-
-} // namespace std17
-
 // C++11 emulation:
 
 namespace std11 {
@@ -582,9 +524,67 @@ typedef integral_constant< bool, false > false_type;
 
 #endif
 
-template< bool v > struct bool_constant : integral_constant<bool, v>{};
-
 } // namespace std11
+
+// C++17 emulation:
+
+namespace std17 {
+
+template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
+
+#if gsl_CPP11_120
+
+template< class...>
+using void_t = void;
+
+#endif
+
+#if gsl_HAVE( STD_DATA )
+
+using std::data;
+using std::size;
+
+#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
+template< class T, size_t N >
+inline gsl_constexpr auto size( const T(&)[N] ) gsl_noexcept -> size_t
+{
+    return N;
+}
+
+template< class C >
+inline gsl_constexpr auto size( C const & cont ) -> decltype( cont.size() )
+{
+    return cont.size();
+}
+
+template< class T, size_t N >
+inline gsl_constexpr auto data( T(&arr)[N] ) gsl_noexcept -> T*
+{
+    return &arr[0];
+}
+
+template< class C >
+inline gsl_constexpr auto data( C & cont ) -> decltype( cont.data() )
+{
+    return cont.data();
+}
+
+template< class C >
+inline gsl_constexpr auto data( C const & cont ) -> decltype( cont.data() )
+{
+    return cont.data();
+}
+
+template< class E >
+inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E const *
+{
+    return il.begin();
+}
+
+#endif // span_HAVE( DATA )
+
+} // namespace std17
 
 namespace detail {
 
@@ -595,40 +595,40 @@ namespace detail {
 #if gsl_HAVE( TYPE_TRAITS )
 
 template< class Q >
-struct is_span_oracle : std11::false_type{};
+struct is_span_oracle : std::false_type{};
 
 template< class T>
-struct is_span_oracle< span<T> > : std11::true_type{};
+struct is_span_oracle< span<T> > : std::true_type{};
 
 template< class Q >
-struct is_span : is_span_oracle< typename std11::remove_cv<Q>::type >{};
+struct is_span : is_span_oracle< typename std::remove_cv<Q>::type >{};
 
 template< class Q >
-struct is_std_array_oracle : std11::false_type{};
+struct is_std_array_oracle : std::false_type{};
 
 #if gsl_HAVE( ARRAY )
 
 template< class T, std::size_t Extent >
-struct is_std_array_oracle< std::array<T, Extent> > : std11::true_type{};
+struct is_std_array_oracle< std::array<T, Extent> > : std::true_type{};
 
 #endif
 
 template< class Q >
-struct is_std_array : is_std_array_oracle< typename std11::remove_cv<Q>::type >{};
+struct is_std_array : is_std_array_oracle< typename std::remove_cv<Q>::type >{};
 
 template< class Q >
-struct is_array : std11::false_type{};
+struct is_array : std::false_type{};
 
 template< class T >
-struct is_array<T[]> : std11::true_type{};
+struct is_array<T[]> : std::true_type{};
 
 template< class T, std::size_t N >
-struct is_array<T[N]> : std11::true_type{};
+struct is_array<T[N]> : std::true_type{};
 
 #if gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
 
 template< class, class = void >
-struct has_size_and_data : std11::false_type{};
+struct has_size_and_data : std::false_type{};
 
 template< class C >
 struct has_size_and_data
@@ -636,7 +636,7 @@ struct has_size_and_data
     C, std17::void_t<
         decltype( std17::size(std::declval<C>()) ),
         decltype( std17::data(std::declval<C>()) ) >
-> : std11::true_type{};
+> : std::true_type{};
 
 template< class, class, class = void >
 struct is_compatible_element : std::false_type {};
@@ -649,16 +649,16 @@ struct is_compatible_element
 > : std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >{};
 
 template< class C >
-struct is_container : std11::bool_constant
+struct is_container : std17::bool_constant
 <
-    ! detail::is_span< C >::value
-    && ! detail::is_array< C >::value
-    && ! detail::is_std_array< C >::value
-    &&   detail::has_size_and_data< C >::value
+    ! is_span< C >::value
+    && ! is_array< C >::value
+    && ! is_std_array< C >::value
+    &&   has_size_and_data< C >::value
 >{};
 
 template< class C, class E >
-struct is_compatible_container : std11::bool_constant
+struct is_compatible_container : std17::bool_constant
 <
     is_container<C>::value
     && is_compatible_element<C,E>::value
@@ -669,16 +669,16 @@ struct is_compatible_container : std11::bool_constant
 template<
     class C, class E
         gsl_REQUIRES_T((
-            ! detail::is_span< C >::value
-            && ! detail::is_array< C >::value
-            && ! detail::is_std_array< C >::value
+            ! is_span< C >::value
+            && ! is_array< C >::value
+            && ! is_std_array< C >::value
             && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >::value)
-        //  &&   detail::has_size_and_data< C >::value
+        //  &&   has_size_and_data< C >::value
         ))
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
-struct is_compatible_container : std11::true_type{};
+struct is_compatible_container : std::true_type{};
 
 #endif // gsl_CPP11_140
 
