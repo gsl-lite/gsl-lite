@@ -462,6 +462,17 @@ class span;
 
 namespace std17 {
 
+#if gsl_CPP17_OR_GREATER
+
+using std::void_t;
+
+#else
+
+template< class...>
+using void_t = void;
+
+#endif
+
 #if gsl_HAVE( STD_DATA )
 
 using std::data;
@@ -469,37 +480,37 @@ using std::size;
 
 #elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
-template< typename T, size_t N >
+template< class T, size_t N >
 inline gsl_constexpr auto size( const T(&)[N] ) gsl_noexcept -> size_t
 {
     return N;
 }
 
-template< typename C >
+template< class C >
 inline gsl_constexpr auto size( C const & cont ) -> decltype( cont.size() )
 {
     return cont.size();
 }
 
-template< typename T, size_t N >
+template< class T, size_t N >
 inline gsl_constexpr auto data( T(&arr)[N] ) gsl_noexcept -> T*
 {
     return &arr[0];
 }
 
-template< typename C >
+template< class C >
 inline gsl_constexpr auto data( C & cont ) -> decltype( cont.data() )
 {
     return cont.data();
 }
 
-template< typename C >
+template< class C >
 inline gsl_constexpr auto data( C const & cont ) -> decltype( cont.data() )
 {
     return cont.data();
 }
 
-template< typename E >
+template< class E >
 inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E const *
 {
     return il.begin();
@@ -608,13 +619,23 @@ template< class Q >
 struct is_std_array : is_std_array_oracle< typename std11::remove_cv<Q>::type >{};
 
 template< class Q >
-struct is_array : std11::false_type {};
+struct is_array : std11::false_type{};
 
 template< class T >
-struct is_array<T[]> : std11::true_type {};
+struct is_array<T[]> : std11::true_type{};
 
 template< class T, std::size_t N >
-struct is_array<T[N]> : std11::true_type {};
+struct is_array<T[N]> : std11::true_type{};
+
+template< class, class = void >
+struct has_size_and_data : std11::false_type{};
+
+template< class T >
+struct has_size_and_data<
+    T, std17::void_t<
+        decltype( std17::size(std::declval<T>()) ),
+        decltype( std17::data(std::declval<T>()) ) >
+> : std11::true_type{};
 
 #endif // gsl_HAVE( TYPE_TRAITS )
 
@@ -1529,11 +1550,9 @@ template<
             ! detail::is_span< Container >::value
             && ! detail::is_array< Container >::value
             && ! detail::is_std_array< Container >::value
-            && (std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<Container&>() ) )>::type(*)[], ElementType(*)[] >::value)
+            &&   detail::has_size_and_data< Container >::value
+            && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<Container&>() ) )>::type(*)[], ElementType(*)[] >::value)
         ))
-        // data(cont) and size(cont) well-formed:
-        , class = decltype( std17::data( std::declval<Container>() ) )
-        , class = decltype( std17::size( std::declval<Container>() ) )
 >
 struct can_construct_span_from : std11::true_type{};
 
