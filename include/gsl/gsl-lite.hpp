@@ -462,11 +462,7 @@ class span;
 
 namespace std17 {
 
-#if gsl_CPP17_OR_GREATER
-
-using std::void_t;
-
-#else
+#if gsl_CPP11_120
 
 template< class...>
 using void_t = void;
@@ -580,11 +576,13 @@ using std::tr1::false_type;
 
 #else
 
-template< int v > struct integral_constant { enum { value = v }; };
-typedef integral_constant< true  > true_type;
-typedef integral_constant< false > false_type;
+template< class T, T v > struct integral_constant { enum { value = v }; };
+typedef integral_constant< bool, true  > true_type;
+typedef integral_constant< bool, false > false_type;
 
 #endif
+
+template< bool v > struct bool_constant : integral_constant<bool, v>{};
 
 } // namespace std11
 
@@ -627,15 +625,62 @@ struct is_array<T[]> : std11::true_type{};
 template< class T, std::size_t N >
 struct is_array<T[N]> : std11::true_type{};
 
+#if gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
+
 template< class, class = void >
 struct has_size_and_data : std11::false_type{};
 
-template< class T >
-struct has_size_and_data<
-    T, std17::void_t<
-        decltype( std17::size(std::declval<T>()) ),
-        decltype( std17::data(std::declval<T>()) ) >
+template< class C >
+struct has_size_and_data
+<
+    C, std17::void_t<
+        decltype( std17::size(std::declval<C>()) ),
+        decltype( std17::data(std::declval<C>()) ) >
 > : std11::true_type{};
+
+template< class, class, class = void >
+struct is_compatible_element : std::false_type {};
+
+template< class C, class E >
+struct is_compatible_element
+<
+    C, E, std17::void_t<
+        decltype( std17::data(std::declval<C>()) ) >
+> : std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >{};
+
+template< class C >
+struct is_container : std11::bool_constant
+<
+    ! detail::is_span< C >::value
+    && ! detail::is_array< C >::value
+    && ! detail::is_std_array< C >::value
+    &&   detail::has_size_and_data< C >::value
+>{};
+
+template< class C, class E >
+struct is_compatible_container : std11::bool_constant
+<
+    is_container<C>::value
+    && is_compatible_element<C,E>::value
+>{};
+
+#else // gsl_CPP11_140
+
+template<
+    class C, class E
+        gsl_REQUIRES_T((
+            ! detail::is_span< C >::value
+            && ! detail::is_array< C >::value
+            && ! detail::is_std_array< C >::value
+            && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >::value)
+        //  &&   detail::has_size_and_data< C >::value
+        ))
+        , class = decltype( std17::size(std::declval<C>()) )
+        , class = decltype( std17::data(std::declval<C>()) )
+>
+struct is_compatible_container : std11::true_type{};
+
+#endif // gsl_CPP11_140
 
 #endif // gsl_HAVE( TYPE_TRAITS )
 
@@ -1538,28 +1583,6 @@ const  gsl_constexpr   with_container_t with_container;
 
 #endif
 
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
-
-namespace detail {
-
-// Can construct from containers that:
-
-template<
-    class Container, class ElementType
-        gsl_REQUIRES_T((
-            ! detail::is_span< Container >::value
-            && ! detail::is_array< Container >::value
-            && ! detail::is_std_array< Container >::value
-            &&   detail::has_size_and_data< Container >::value
-            && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<Container&>() ) )>::type(*)[], ElementType(*)[] >::value)
-        ))
->
-struct can_construct_span_from : std11::true_type{};
-
-} // namespace detail
-
-#endif
-
 //
 // span<> - A 1D view of contiguous T's, replace (*,len).
 //
@@ -1711,7 +1734,7 @@ public:
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container
-        gsl_REQUIRES_T(( detail::can_construct_span_from< Container, element_type >::value ))
+        gsl_REQUIRES_T(( detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container & cont )
         : first_( std17::data( cont ) )
@@ -1721,7 +1744,7 @@ public:
     template< class Container
         gsl_REQUIRES_T((
             std::is_const< element_type >::value
-            && detail::can_construct_span_from< Container, element_type >::value
+            && detail::is_compatible_container< Container, element_type >::value
         ))
     >
     gsl_api gsl_constexpr span( Container const & cont )
