@@ -96,7 +96,7 @@ configure_package_config_file(
 )
 
 configure_file(
-   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${package_name}-config-version.cmake.in"
+   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${package_config_version}.in"
    "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}" @ONLY
 )
 
