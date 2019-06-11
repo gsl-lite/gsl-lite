@@ -770,45 +770,9 @@ struct fail_fast : public std::logic_error
     : std::logic_error( message ) {}
 };
 
-// workaround for gcc 5 throw/terminate constexpr bug:
-
-#if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600 ) && gsl_HAVE( CONSTEXPR_14 )
-
 # if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
-gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const message ) -> void
-{
-    !cond ? throw fail_fast( message ) : 0;
-}
-
-# elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-
-// Should be defined by user
-gsl_api gsl_constexpr14 auto fail_fast_assert_handler(char const * const expression, char const * const message, char const * const file, int line) -> void;
-
-gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line ) -> void
-{
-    struct F { static gsl_constexpr14 void f() {}; };
-
-    !cond ? fail_fast_assert_handler( expression, message, file, line ) : F::f();
-}
-
-# else
-
-gsl_api inline gsl_constexpr14 auto fail_fast_assert( bool cond ) -> void
-{
-    struct F { static gsl_constexpr14 void f(){}; };
-
-    !cond ? std::terminate() : F::f();
-}
-
-# endif
-
-#else // workaround
-
-# if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-
-gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const message )
+gsl_api inline void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
@@ -817,9 +781,9 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * co
 # elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
 
 // Should be defined by user
-gsl_api gsl_constexpr14 void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
+gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
 
-gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
+gsl_api inline void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
         fail_fast_assert_handler( expression, message, file, line );
@@ -827,14 +791,13 @@ gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond, char const * co
 
 # else
 
-gsl_api inline gsl_constexpr14 void fail_fast_assert( bool cond ) gsl_noexcept
+gsl_api inline void fail_fast_assert( bool cond ) gsl_noexcept
 {
     if ( !cond )
         std::terminate();
 }
 
 # endif
-#endif // workaround
 
 //
 // GSL.util: utilities
