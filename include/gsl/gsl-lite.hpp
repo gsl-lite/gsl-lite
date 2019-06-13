@@ -793,8 +793,12 @@ gsl_api inline void fail_fast_assert( bool cond, char const * const expression, 
 
 gsl_api inline void fail_fast_assert( bool cond ) gsl_noexcept
 {
+#ifdef __CUDA_ARCH__
+    assert(cond);
+#else // __CUDA_ARCH__
     if ( !cond )
         std::terminate();
+#endif // __CUDA_ARCH__
 }
 
 # endif
