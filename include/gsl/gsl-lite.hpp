@@ -440,13 +440,13 @@
 // - C26410: gsl::r.32: the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
 // - C26415: gsl::r.30: smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
 // - C26418: gsl::r.36: shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
-// - C26472, gsl::t.1 : don't use a static_cast for arithmetic conversions;
+// - C26472: gsl::t.1 : don't use a static_cast for arithmetic conversions;
 //                      use brace initialization, gsl::narrow_cast or gsl::narow
-// - C26439, gsl::f.6 : special function 'function' can be declared 'noexcept'
-// - C26440, gsl::f.6 : function 'function' can be declared 'noexcept'
+// - C26439: gsl::f.6 : special function 'function' can be declared 'noexcept'
+// - C26440: gsl::f.6 : function 'function' can be declared 'noexcept'
 // - C26473: gsl::t.1 : don't cast between pointer types where the source type and the target type are the same
 // - C26481: gsl::b.1 : don't use pointer arithmetic. Use span instead
-// - C26482, gsl::b.2 : only index into arrays using constant expressions
+// - C26482: gsl::b.2 : only index into arrays using constant expressions
 // - C26446: gdl::b.4 : prefer to use gsl::at() instead of unchecked subscript operator
 // - C26490: gsl::t.1 : don't use reinterpret_cast
 // - C26487: gsl::l.4 : don't return a pointer '(<some number>'s result)' that may be invalid
