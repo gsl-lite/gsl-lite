@@ -447,9 +447,11 @@
 // - C26473: gsl::t.1 : don't cast between pointer types where the source type and the target type are the same
 // - C26481: gsl::b.1 : don't use pointer arithmetic. Use span instead
 // - C26482, gsl::b.2 : only index into arrays using constant expressions
+// - C26446: gdl::b.4 : prefer to use gsl::at() instead of unchecked subscript operator
 // - C26490: gsl::t.1 : don't use reinterpret_cast
+// - C26487: gsl::l.4 : don't return a pointer '(<some number>'s result)' that may be invalid
 
-gsl_DISABLE_MSVC_WARNINGS( 26410 26415 26418 26472 26439 26440 26473 26481 26482 26490 )
+gsl_DISABLE_MSVC_WARNINGS( 26410 26415 26418 26472 26439 26440 26473 26481 26482 26446 26490 26487 )
 
 namespace gsl {
 
