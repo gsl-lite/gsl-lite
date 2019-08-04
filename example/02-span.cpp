@@ -32,7 +32,7 @@ int main()
     good( arr );                        // 1. Good: deduce length
 
 #if gsl_CPP11_OR_GREATER
-    std::array<int, 6> ary = { 1, 2, 3, 4, 5, 6, };
+    std::array<int, 6> ary = {{ 1, 2, 3, 4, 5, 6, }};
     std::vector<int>   vec = { 1, 2, 3, 4, 5, 6, 7, };
 
     good( ary );                        // 2. Good: single function handles
@@ -41,7 +41,7 @@ int main()
     line += 2;
 #endif
 
-    bad( arr, gsl_DIMENSION_OF(arr) ); // 4. Avoid: specify elements and length separately
+    bad( arr, gsl_DIMENSION_OF(arr) );  // 4. Avoid: specify elements and length separately
     bad( arr, 3 );                      // 5. Avoid, but not wrong
     bad( arr, 7 );                      // 6. Wrong, array length exceeded
 
@@ -58,7 +58,11 @@ int main()
     good( s.last   ( 3    ) );          // 10. Fine
     good( s.subspan( 1    ) );          // 11. Fine
     good( s.subspan( 1, 3 ) );          // 12. Fine
+
+#ifdef DEBUG
     good( s.subspan( 1, 5 ) );          // 13. Run-time error, terminate
+#endif
+
 }
 
 #if 0

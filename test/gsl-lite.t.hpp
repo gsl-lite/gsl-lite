@@ -31,7 +31,9 @@
 #ifdef __clang__
 # pragma clang diagnostic ignored "-Wstring-conversion"
 # pragma clang diagnostic ignored "-Wunused-parameter"
+#ifndef __APPLE_CC__
 # pragma clang diagnostic ignored "-Wunused-template"
+#endif
 # pragma clang diagnostic ignored "-Wunused-function"
 # pragma clang diagnostic ignored "-Wunused-member-function"
 #elif defined __GNUC__

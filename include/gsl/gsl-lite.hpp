@@ -1295,7 +1295,9 @@ gsl_is_delete_access:
     // unwanted operators...pointers only point to single objects!
     gsl_api not_null & operator++() gsl_is_delete;
     gsl_api not_null & operator--() gsl_is_delete;
+// warning: overloaded 'operator++' returns a non-constant object instead of a constant object type [cert-dcl21-cpp]
     gsl_api not_null   operator++( int ) gsl_is_delete;
+// warning: overloaded 'operator--' returns a non-constant object instead of a constant object type [cert-dcl21-cpp]
     gsl_api not_null   operator--( int ) gsl_is_delete;
     gsl_api not_null & operator+ ( size_t ) gsl_is_delete;
     gsl_api not_null & operator+=( size_t ) gsl_is_delete;

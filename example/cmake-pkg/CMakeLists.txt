@@ -1,5 +1,5 @@
 if( NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION )
-    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+    cmake_minimum_required( VERSION 3.13 FATAL_ERROR )
 endif()
 
 # gsl-lite version, updated by script/update-version.py:
@@ -10,7 +10,7 @@ find_package( gsl-lite ${gsl_lite_version} REQUIRED )
 
 project( "package_using_gsl-lite" LANGUAGES CXX )
 
-add_executable(        "package_using_gsl-lite" main.cpp )
+add_executable( "package_using_gsl-lite" main.cpp )
 target_link_libraries( "package_using_gsl-lite" PRIVATE gsl::gsl-lite )
 
 enable_testing()

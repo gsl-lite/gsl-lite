@@ -7,15 +7,14 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.13 FATAL_ERROR )
 
 # gsl-lite project and version, updated by script/update-version.py:
 
-project(
-    gsl_lite
+project( gsl_lite
     VERSION 0.34.0
-#   DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
-#   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
+    # DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
+    # HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
     LANGUAGES CXX )
 
 # Package information:
@@ -25,11 +24,11 @@ set( package_nspace  "gsl" )
 set( package_name    "${unit_name}-lite" )
 set( package_version "${${PROJECT_NAME}_VERSION}" )
 
-message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '${package_version}'")
+message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '${package_version}'" )
 
 # Toplevel or subproject:
 
-if ( CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME )
+if( CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME )
     set( gsl_IS_TOPLEVEL_PROJECT TRUE )
 else()
     set( gsl_IS_TOPLEVEL_PROJECT FALSE )
@@ -42,12 +41,12 @@ option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
 
 # If requested, build and perform tests, build examples:
 
-if ( GSL_LITE_OPT_BUILD_TESTS )
+if( GSL_LITE_OPT_BUILD_TESTS )
     enable_testing()
     add_subdirectory( test )
 endif()
 
-if ( GSL_LITE_OPT_BUILD_EXAMPLES )
+if( GSL_LITE_OPT_BUILD_EXAMPLES )
     enable_testing()
     add_subdirectory( example )
 endif()
@@ -63,22 +62,22 @@ include( CMakePackageConfigHelpers )
 
 # Interface library:
 
-add_library(
-    ${package_name} INTERFACE )
+add_library( ${package_name} INTERFACE )
 
-add_library(
-    ${package_nspace}::${package_name} ALIAS ${package_name} )
+add_library( ${package_nspace}::${package_name} ALIAS ${package_name} )
 
 target_include_directories(
     ${package_name}
     INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
 
 target_sources(
     ${package_name}
     INTERFACE
-        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis>" )
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis>"
+)
 
 # Package configuration:
 # Note: package_name and package_target are used in package_config_in
@@ -96,8 +95,8 @@ configure_package_config_file(
 )
 
 configure_file(
-   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${package_config_version}.in"
-   "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}" @ONLY
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${package_config_version}.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}" @ONLY
 )
 
 # Installation:
