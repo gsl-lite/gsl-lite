@@ -7,7 +7,7 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.13 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.9 FATAL_ERROR )
 
 # gsl-lite project and version, updated by script/update-version.py:
 
