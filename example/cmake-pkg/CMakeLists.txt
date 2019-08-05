@@ -1,5 +1,5 @@
 if( NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION )
-    cmake_minimum_required( VERSION 3.9 FATAL_ERROR )
+    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 endif()
 
 # gsl-lite version, updated by script/update-version.py:
