@@ -356,13 +356,13 @@ auto median( It first, It last )
 ```
 
 
-It is possible to selectively disable either pre- or postcondition checking with the following macros:
+It is possible to enable only precondition or only postcondition checking with one of the following macros:
 
 \-D<b>gsl\_CONFIG_CONTRACT\_EXPECTS\_ONLY</b>  
-Define this macro to disable all runtime checking and evaluation of postcondition contracts.
+Define this macro to permit runtime checking and evaluation for precondition contracts only.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_ENSURES\_ONLY</b>  
-Define this macro to disable all runtime checking and evaluation of precondition contracts.
+Define this macro to permit runtime checking and evaluation for postcondition contracts only.
 
 
 The following macros control the handling of runtime contract violations:
