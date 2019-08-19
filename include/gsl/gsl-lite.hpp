@@ -32,7 +32,7 @@
 #include <vector>
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  34
+#define  gsl_lite_MINOR  35
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
@@ -42,6 +42,16 @@
 #ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+#endif
+
+#if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.35.0; replace with gsl_CONFIG_CONTRACT_LEVEL_ON and gsl_CONFIG_CONTRACT_EXPECTS_ONLY.")
+# define gsl_CONFIG_CONTRACT_LEVEL_ON
+# define gsl_CONFIG_CONTRACT_EXPECTS_ONLY
+#elif defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.35.0; replace with gsl_CONFIG_CONTRACT_LEVEL_ON and gsl_CONFIG_CONTRACT_ENSURES_ONLY.")
+# define gsl_CONFIG_CONTRACT_LEVEL_ON
+# define gsl_CONFIG_CONTRACT_ENSURES_ONLY
 #endif
 
 // M-GSL compatibility:
@@ -115,15 +125,21 @@
 #endif
 
 #if    defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x33
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x00
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x01
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x10
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x00
 #else
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#endif
+
+#if    defined( gsl_CONFIG_CONTRACT_EXPECTS_ONLY )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  ( gsl_CONFIG_CONTRACT_LEVEL_MASK_0 & 0x0F )
+#elif  defined( gsl_CONFIG_CONTRACT_ENSURES_ONLY )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  ( gsl_CONFIG_CONTRACT_LEVEL_MASK_0 & 0xF0 )
+#else
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  gsl_CONFIG_CONTRACT_LEVEL_MASK_0
 #endif
 
 #if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined ( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
@@ -734,8 +750,12 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 // GSL.assert: assertions
 //
 
-#define gsl_ELIDE_CONTRACT_EXPECTS  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
-#define gsl_ELIDE_CONTRACT_ENSURES  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
+#define gsl_ELIDE_CONTRACT_EXPECTS        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
+#define gsl_ELIDE_CONTRACT_ENSURES        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
+#define gsl_ASSUME_CONTRACT_EXPECTS       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x04 ) )
+#define gsl_ASSUME_CONTRACT_ENSURES       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x40 ) )
+#define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
+#define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
 
 #if gsl_ELIDE_CONTRACT_EXPECTS
 # define Expects( x )  /* Expects elided */
@@ -753,6 +773,16 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # define gsl_EXPECTS_UNUSED_PARAM( x )  x
 #endif
 
+#if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
+# define ExpectsAudit( x )  /* ExpectsAudit elided */
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
+#else
+# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x) )
+#endif
+
 #if gsl_ELIDE_CONTRACT_ENSURES
 # define Ensures( x )  /* Ensures elided */
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
@@ -761,6 +791,16 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # define Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
 #else
 # define Ensures( x )  ::gsl::fail_fast_assert( (x) )
+#endif
+
+#if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
+# define EnsuresAudit( x )  /* EnsuresAudit elided */
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
+#else
+# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
 #define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )

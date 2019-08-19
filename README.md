@@ -298,28 +298,47 @@ Provide experimental types `final_action_return` and `final_action_error` and co
 
 ### Contract violation response macros
 
-*gsl-lite* provides contract violation response control as suggested in proposal [N4415](http://wg21.link/n4415).
+*gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
 
+There are four macros for expressing pre- and postconditions:
+
+- `Expects` for simple preconditions
+- `Ensures` for simple postconditions
+- `ExpectsAudit` for preconditions that are expensive or include potentially opaque function calls
+- `EnsuresAudit` for postconditions that are expensive or include potentially opaque function calls
+
+
+The contract checking level can be controlled by defining one of the following macros:
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_AUDIT</b>  
+Define this macro to have all contracts checked at runtime.
+ 
 \-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ON</b>  
-Define this macro to include both `Expects` and `Ensures` in the code. This is the default case.
+Define this macro to have contracts expressed with `Expects` and `Ensures` checked at runtime, and contracts expressed with `ExpectsAudit` and `EnsuresAudit` not checked and not evaluated at runtime. This is the default case.
  
 \-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_OFF</b>  
-Define this macro to exclude both `Expects` and `Ensures` from the code.
+Define this macro to disable all runtime checking and evaluation of contracts.
 
-\-D<b>gsl\_CONFIG_CONTRACT\_LEVEL\_EXPECTS\_ONLY</b>  
-Define this macro to include `Expects` in the code and exclude `Ensures` from the code.
 
-\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ENSURES\_ONLY</b>  
-Define this macro to exclude `Expects` from the code and include `Ensures` in the code.
+It is possible to selectively disable either pre- or postcondition checking with the following macros:
+
+\-D<b>gsl\_CONFIG_CONTRACT\_EXPECTS\_ONLY</b>  
+Define this macro to disable all runtime checking and evaluation of postcondition contracts.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_ENSURES\_ONLY</b>  
+Define this macro to disable all runtime checking and evaluation of precondition contracts.
+
+
+The following macros control the handling of runtime contract violations:
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
-Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and `narrow`. This is the default case.
+Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `ExpectsAudit`, `Ensures`, `EnsuresAudit`, and `narrow`. This is the default case.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and throw a std::exception-derived exception `narrowing_error` on discarding  information in `narrow`.
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `ExpectsAudit`, `Ensures`, `EnsuresAudit`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `narrow`.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
-Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects` and `Ensures`, and call `std::terminate()` on discarding  information in `narrow`. The user is expected to supply a definition matching the following signature:
+Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `ExpectsAudit`, `Ensures`, and `EnsuresAudit`, and call `std::terminate()` on discarding information in `narrow`. The user is expected to supply a definition matching the following signature:
 
 ```Cpp
 namespace gsl {
@@ -415,6 +434,8 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
+ExpectsAudit()              | -       | -       | &#10003;| Audit-level precondition assertion |
+EnsuresAudit()              | -       | -       | &#10003;| Audit-level postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 index                       | &#10003;| &#10003;| &#10003;| type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
 byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
