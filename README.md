@@ -506,6 +506,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
+0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
+&nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_EXPECTS_ONLY`/`gsl_CONFIG_CONTRACT_ENSURES_ONLY` |
 0.31.0  |   5   | span( std::nullptr_t, index_type ) |
 &nbsp;  |&nbsp; | span( pointer, index_type ) is used |
 0.31.0  |   5   | span( U *, index_type size ) |
@@ -524,8 +526,8 @@ Version | Level | Feature / Notes |
 &nbsp;  |&nbsp; | Use span::size_bytes() |
 0.17.0  |   2   | member span::as_bytes(), span::as_writeable_bytes() |
 &nbsp;  |&nbsp; | &mdash; |
-0.7.0   |   1   | gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR |
-&nbsp;  |&nbsp; | Use gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR,<br>or consider span(with_container, cont). |
+0.7.0   |   -   | `gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR` |
+&nbsp;  |&nbsp; | Use `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR`,<br>or consider span(with_container, cont). |
 
 
 Reported to work with
