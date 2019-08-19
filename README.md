@@ -316,8 +316,44 @@ Define this macro to have all contracts checked at runtime.
 \-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ON</b>  
 Define this macro to have contracts expressed with `Expects` and `Ensures` checked at runtime, and contracts expressed with `ExpectsAudit` and `EnsuresAudit` not checked and not evaluated at runtime. This is the default case.
  
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ASSUME</b>  
+Define this macro to let the compiler assume that contracts expressed with `Expects` and `Ensures` always hold true (which may incur evaluation at runtime), and to have contracts expressed with `ExpectsAudit` and `EnsuresAudit` not checked and not evaluated at runtime.
+ 
 \-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_OFF</b>  
 Define this macro to disable all runtime checking and evaluation of contracts.
+
+
+Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When <b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ASSUME</b> is defined, the compiler is instructed that the
+condition expressed by regular contracts can be assumed to hold true. This is meant to be an aid for the optimizer; runtime evaluation of the condition is not desired. However, because the GSL implements contract checks
+with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers will
+generate the runtime function call.
+
+Therefore, `Expects` and `Ensures` should be used only for conditions that can be proven side-effect-free by the compiler, and `ExpectsAudit` and `EnsuresAudit` for everything else. In practice, this implies that
+`Expects` and `Ensures` should only be used for simple comparisons of scalar values and for comparisons of class objects with trivially inlineable comparison operators.
+
+
+Example:
+
+```Cpp
+template <typename It> // assuming random-access iterators
+auto median( It first, It last )
+{
+        // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
+        // compiler will inline the comparison operator and understand that the comparison is free
+        // of side-effects, and hence generate no code in gsl_CONFIG_CONTRACT_LEVEL_ASSUME mode.
+    Expects( first != last );
+
+        // Verifying that a range of elements is sorted may be an expensive operation, and we
+        // cannot trust the compiler to understand that it is free of side-effects, so we use an
+        // audit-level contract check.
+    ExpectsAudit( std::is_sorted( first, last ) );
+
+    auto count = last - first;
+    return count % 2 != 0
+        ? first[count / 2]
+        : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
+}
+```
 
 
 It is possible to selectively disable either pre- or postcondition checking with the following macros:

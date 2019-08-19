@@ -128,6 +128,8 @@
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x33
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x44
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x00
 #else
@@ -750,6 +752,22 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 // GSL.assert: assertions
 //
 
+#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+# define  gsl_ASSUME( x )  /* there is no assume intrinsic in CUDA device code */
+#elif gsl_COMPILER_MSVC_VERSION
+# define  gsl_ASSUME( x )  __assume( x )
+#elif gsl_COMPILER_GNUC_VERSION
+#  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
+#elif defined(__has_builtin)
+# if __has_builtin(__builtin_assume)
+#  define gsl_ASSUME( x )  __builtin_assume( x )
+# elif __has_builtin(__builtin_unreachable)
+#  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
+# endif
+#else
+#  define gsl_ASSUME( x )  /* unknown compiler; cannot rely on assume intrinsic */
+#endif
+
 #define gsl_ELIDE_CONTRACT_EXPECTS        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
 #define gsl_ELIDE_CONTRACT_ENSURES        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
 #define gsl_ASSUME_CONTRACT_EXPECTS       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x04 ) )
@@ -764,13 +782,17 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS
-# define Expects( x )  gsl_ELIDE_CONTRACT( x )
+# if gsl_ASSUME_CONTRACT_EXPECTS
+#  define Expects( x )  gsl_ASSUME( x )
+# else
+#  define Expects( x )  gsl_ELIDE_CONTRACT( x )
+# endif
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+# define  Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define Expects( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
+# define  Expects( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
 #else
-# define Expects( x )  ::gsl::fail_fast_assert( (x) )
+# define  Expects( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
@@ -784,13 +806,17 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
-# define Ensures( x )  gsl_ELIDE_CONTRACT( x )
+# if gsl_ASSUME_CONTRACT_EXPECTS
+#  define Ensures( x )  gsl_ASSUME( x )
+# else
+#  define Ensures( x )  gsl_ELIDE_CONTRACT( x )
+# endif
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+# define  Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
+# define  Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
 #else
-# define Ensures( x )  ::gsl::fail_fast_assert( (x) )
+# define  Ensures( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
