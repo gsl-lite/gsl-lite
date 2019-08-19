@@ -757,8 +757,14 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
 #define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
 
+#if gsl_HAVE( TYPE_TRAITS )
+# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
+#else
+# define gsl_ELIDE_CONTRACT( x )
+#endif
+
 #if gsl_ELIDE_CONTRACT_EXPECTS
-# define Expects( x )  /* Expects elided */
+# define Expects( x )  gsl_ELIDE_CONTRACT( x )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
@@ -767,14 +773,8 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # define Expects( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
-#if gsl_ELIDE_CONTRACT_EXPECTS
-# define gsl_EXPECTS_UNUSED_PARAM( x )  /* Make param unnamed if Expects elided */
-#else
-# define gsl_EXPECTS_UNUSED_PARAM( x )  x
-#endif
-
 #if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
-# define ExpectsAudit( x )  /* ExpectsAudit elided */
+# define ExpectsAudit( x )  gsl_ELIDE_CONTRACT( x )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
@@ -784,7 +784,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
-# define Ensures( x )  /* Ensures elided */
+# define Ensures( x )  gsl_ELIDE_CONTRACT( x )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
@@ -794,7 +794,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
-# define EnsuresAudit( x )  /* EnsuresAudit elided */
+# define EnsuresAudit( x )  gsl_ELIDE_CONTRACT( x )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 # define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
@@ -1631,7 +1631,7 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
 #if gsl_HAVE( NULLPTR )
-    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type gsl_EXPECTS_UNUSED_PARAM( size_in ) )
+    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
         : first_( nullptr )
         , last_ ( nullptr )
     {
