@@ -32,7 +32,7 @@
 #include <vector>
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  34
+#define  gsl_lite_MINOR  35
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
@@ -42,6 +42,16 @@
 #ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+#endif
+
+#if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.35.0; replace with gsl_CONFIG_CONTRACT_LEVEL_ON and gsl_CONFIG_CONTRACT_EXPECTS_ONLY.")
+# define gsl_CONFIG_CONTRACT_LEVEL_ON
+# define gsl_CONFIG_CONTRACT_EXPECTS_ONLY
+#elif defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.35.0; replace with gsl_CONFIG_CONTRACT_LEVEL_ON and gsl_CONFIG_CONTRACT_ENSURES_ONLY.")
+# define gsl_CONFIG_CONTRACT_LEVEL_ON
+# define gsl_CONFIG_CONTRACT_ENSURES_ONLY
 #endif
 
 // M-GSL compatibility:
@@ -115,15 +125,23 @@
 #endif
 
 #if    defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x33
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x44
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x00
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x01
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x10
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x00
 #else
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  0x11
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#endif
+
+#if    defined( gsl_CONFIG_CONTRACT_EXPECTS_ONLY )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  ( gsl_CONFIG_CONTRACT_LEVEL_MASK_0 & 0x0F )
+#elif  defined( gsl_CONFIG_CONTRACT_ENSURES_ONLY )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  ( gsl_CONFIG_CONTRACT_LEVEL_MASK_0 & 0xF0 )
+#else
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  gsl_CONFIG_CONTRACT_LEVEL_MASK_0
 #endif
 
 #if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined ( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
@@ -734,33 +752,81 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 // GSL.assert: assertions
 //
 
-#define gsl_ELIDE_CONTRACT_EXPECTS  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
-#define gsl_ELIDE_CONTRACT_ENSURES  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
-
-#if gsl_ELIDE_CONTRACT_EXPECTS
-# define Expects( x )  /* Expects elided */
-#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define Expects( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
+#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+# define  gsl_ASSUME( x )  /* there is no assume intrinsic in CUDA device code */
+#elif gsl_COMPILER_MSVC_VERSION
+# define  gsl_ASSUME( x )  __assume( x )
+#elif gsl_COMPILER_GNUC_VERSION
+#  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
+#elif defined(__has_builtin)
+# if __has_builtin(__builtin_assume)
+#  define gsl_ASSUME( x )  __builtin_assume( x )
+# elif __has_builtin(__builtin_unreachable)
+#  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
+# endif
 #else
-# define Expects( x )  ::gsl::fail_fast_assert( (x) )
+#  define gsl_ASSUME( x )  /* unknown compiler; cannot rely on assume intrinsic */
+#endif
+
+#define gsl_ELIDE_CONTRACT_EXPECTS        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
+#define gsl_ELIDE_CONTRACT_ENSURES        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
+#define gsl_ASSUME_CONTRACT_EXPECTS       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x04 ) )
+#define gsl_ASSUME_CONTRACT_ENSURES       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x40 ) )
+#define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
+#define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
+
+#if gsl_HAVE( TYPE_TRAITS )
+# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
+#else
+# define gsl_ELIDE_CONTRACT( x )
 #endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS
-# define gsl_EXPECTS_UNUSED_PARAM( x )  /* Make param unnamed if Expects elided */
+# if gsl_ASSUME_CONTRACT_EXPECTS
+#  define Expects( x )  gsl_ASSUME( x )
+# else
+#  define Expects( x )  gsl_ELIDE_CONTRACT( x )
+# endif
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+# define  Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define  Expects( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
 #else
-# define gsl_EXPECTS_UNUSED_PARAM( x )  x
+# define  Expects( x )  ::gsl::fail_fast_assert( (x) )
+#endif
+
+#if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
+# define ExpectsAudit( x )  gsl_ELIDE_CONTRACT( x )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
+#else
+# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
-# define Ensures( x )  /* Ensures elided */
+# if gsl_ASSUME_CONTRACT_EXPECTS
+#  define Ensures( x )  gsl_ASSUME( x )
+# else
+#  define Ensures( x )  gsl_ELIDE_CONTRACT( x )
+# endif
 #elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+# define  Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
 #elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
+# define  Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
 #else
-# define Ensures( x )  ::gsl::fail_fast_assert( (x) )
+# define  Ensures( x )  ::gsl::fail_fast_assert( (x) )
+#endif
+
+#if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
+# define EnsuresAudit( x )  gsl_ELIDE_CONTRACT( x )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
+#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
+#else
+# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x) )
 #endif
 
 #define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
@@ -1591,7 +1657,7 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
 #if gsl_HAVE( NULLPTR )
-    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type gsl_EXPECTS_UNUSED_PARAM( size_in ) )
+    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
         : first_( nullptr )
         , last_ ( nullptr )
     {
