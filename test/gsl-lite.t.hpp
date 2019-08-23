@@ -39,13 +39,9 @@
 # pragma GCC   diagnostic ignored "-Wunused-function"
 #endif
 
-#include "lest_cpp03.hpp"
-
-#define CASE( name ) lest_CASE( specification(), name )
-
-extern lest::tests & specification();
-
 namespace lest {
+
+// These functions cannot be found via ADL, so we have to define them before including lest.
 
 #if gsl_HAVE( ARRAY )
 template< typename T, std::size_t N >
@@ -74,6 +70,12 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 #endif // gsl_HAVE( WCHAR )
 
 } // namespace lest
+
+#include "lest_cpp03.hpp"
+
+#define CASE( name ) lest_CASE( specification(), name )
+
+extern lest::tests & specification();
 
 namespace gsl {
 
