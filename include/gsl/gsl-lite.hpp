@@ -124,10 +124,12 @@
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0
 #endif
 
-#if    defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#if 2 <= defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT ) + defined( gsl_CONFIG_CONTRACT_LEVEL_ON ) + defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) + defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+# error only one of gsl_CONFIG_CONTRACT_LEVEL_AUDIT, gsl_CONFIG_CONTRACT_LEVEL_ON, gsl_CONFIG_CONTRACT_LEVEL_ASSUME, and gsl_CONFIG_CONTRACT_LEVEL_OFF may be defined.
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x33
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME )
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x44
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
@@ -144,8 +146,8 @@
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK  gsl_CONFIG_CONTRACT_LEVEL_MASK_0
 #endif
 
-#if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined ( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
+#if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 # define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
 # define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
@@ -158,6 +160,13 @@
 #else
 # define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
 # define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
+#endif
+
+#if defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) && ( defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER ) )
+// `gsl_CONFIG_CONTRACT_LEVEL_ASSUME` should not be combined with any of the violation
+// response macros. Contract violations are undefined behavior in ASSUME mode, and
+// code which expects a particular violation response will not work as expected.
+# error cannot define gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, or gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER if gsl_CONFIG_CONTRACT_LEVEL_ASSUME is defined.
 #endif
 
 // C++ language version detection (C++20 is speculative):
