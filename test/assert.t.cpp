@@ -23,17 +23,17 @@ bool expects( bool x ) { Expects( x ); return x; }
 bool ensures( bool x ) { Ensures( x ); return x; }
 bool expectsAudit( bool x ) { ExpectsAudit( x ); return x; } 
 bool ensuresAudit( bool x ) { EnsuresAudit( x ); return x; }
-    
+
 }
 
 CASE( "Expects(): Allows a true expression" )
 {
-    EXPECT( expects( true  ) );
+    EXPECT_NO_THROW( expects( true  ) );
 }
 
 CASE( "Ensures(): Allows a true expression" )
 {
-    EXPECT( ensures( true  ) );
+    EXPECT_NO_THROW( ensures( true  ) );
 }
 
 CASE( "Expects(): Terminates on a false expression" )
@@ -48,22 +48,30 @@ CASE( "Ensures(): Terminates on a false expression" )
 
 CASE( "ExpectsAudit(): Allows a true expression" )
 {
-    EXPECT( expectsAudit( true  ) );
+    EXPECT_NO_THROW( expectsAudit( true  ) );
 }
 
 CASE( "EnsuresAudit(): Allows a true expression" )
 {
-    EXPECT( ensuresAudit( true  ) );
+    EXPECT_NO_THROW( ensuresAudit( true  ) );
 }
 
-CASE( "ExpectsAudit(): Terminates on a false expression" )
+CASE( "ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
 {
+#if defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
     EXPECT_THROWS( expectsAudit( false ) );
+#else
+    EXPECT_NO_THROW( expectsAudit( false ) );
+#endif
 }
 
-CASE( "EnsuresAudit(): Terminates on a false expression" )
+CASE( "EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
 {
+#if defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
     EXPECT_THROWS( ensuresAudit( false ) );
+#else
+    EXPECT_NO_THROW( ensuresAudit( false ) );
+#endif
 }
 
 // end of file
