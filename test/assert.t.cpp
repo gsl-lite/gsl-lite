@@ -21,6 +21,8 @@ namespace {
 
 bool expects( bool x ) { Expects( x ); return x; } 
 bool ensures( bool x ) { Ensures( x ); return x; }
+bool expectsAudit( bool x ) { ExpectsAudit( x ); return x; } 
+bool ensuresAudit( bool x ) { EnsuresAudit( x ); return x; }
     
 }
 
@@ -42,6 +44,26 @@ CASE( "Expects(): Terminates on a false expression" )
 CASE( "Ensures(): Terminates on a false expression" )
 {
     EXPECT_THROWS( ensures( false ) );
+}
+
+CASE( "ExpectsAudit(): Allows a true expression" )
+{
+    EXPECT( expectsAudit( true  ) );
+}
+
+CASE( "EnsuresAudit(): Allows a true expression" )
+{
+    EXPECT( ensuresAudit( true  ) );
+}
+
+CASE( "ExpectsAudit(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( expectsAudit( false ) );
+}
+
+CASE( "EnsuresAudit(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( ensuresAudit( false ) );
 }
 
 // end of file
