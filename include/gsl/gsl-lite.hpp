@@ -806,7 +806,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
-# if gsl_ASSUME_CONTRACT_EXPECTS
+# if gsl_ASSUME_CONTRACT_ENSURES
 #  define Ensures( x )  gsl_ASSUME( x )
 # else
 #  define Ensures( x )  gsl_ELIDE_CONTRACT( x )
