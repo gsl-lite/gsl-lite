@@ -60,13 +60,20 @@ inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
 #endif
 
 #if gsl_HAVE( WCHAR )
+// We do this with a loop and explicit casts to avoid warnings about implicit narrowing casts (which we don't care about because we don't have to handle non-ASCII strings in the tests).
+inline std::string narrowString( std::wstring const & str )
+{
+    std::string result(str.size(), '\0');
+    for (std::size_t i = 0, n = str.size(); i != n; ++i)
+    {
+        result[i] = static_cast<char>(str[i]);
+    }
+    return result;
+}
+
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 {
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
-    return os << std::string( text.begin(), text.end() );
-#else
-    std::copy( text.begin(), text.end(), std::ostream_iterator<char>(os) ); return os;
-#endif
+    return os << narrowString( text );
 }
 #endif // gsl_HAVE( WCHAR )
 
