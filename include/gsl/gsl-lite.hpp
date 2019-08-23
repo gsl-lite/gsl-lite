@@ -752,8 +752,14 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 // GSL.assert: assertions
 //
 
+#if gsl_HAVE( TYPE_TRAITS )
+# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
+#else
+# define gsl_ELIDE_CONTRACT( x )
+#endif
+
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define  gsl_ASSUME( x )  /* there is no assume intrinsic in CUDA device code */
+# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT( x ) /* there is no assume intrinsic in CUDA device code */
 #elif gsl_COMPILER_MSVC_VERSION
 # define  gsl_ASSUME( x )  __assume( x )
 #elif gsl_COMPILER_GNUC_VERSION
@@ -765,7 +771,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
 # endif
 #else
-#  define gsl_ASSUME( x )  /* unknown compiler; cannot rely on assume intrinsic */
+# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT( x ) /* unknown compiler; cannot rely on assume intrinsic */
 #endif
 
 #define gsl_ELIDE_CONTRACT_EXPECTS        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
@@ -774,12 +780,6 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #define gsl_ASSUME_CONTRACT_ENSURES       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x40 ) )
 #define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
 #define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
-
-#if gsl_HAVE( TYPE_TRAITS )
-# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
-#else
-# define gsl_ELIDE_CONTRACT( x )
-#endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS
 # if gsl_ASSUME_CONTRACT_EXPECTS
