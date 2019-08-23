@@ -765,9 +765,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #elif gsl_COMPILER_GNUC_VERSION
 #  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
 #elif defined(__has_builtin)
-# if __has_builtin(__builtin_assume)
-#  define gsl_ASSUME( x )  __builtin_assume( x )
-# elif __has_builtin(__builtin_unreachable)
+# if __has_builtin(__builtin_unreachable)
 #  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
 # endif
 #else

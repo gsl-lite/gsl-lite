@@ -17,6 +17,8 @@
 
 #include "gsl-lite.t.hpp"
 
+#include <vector>
+
 namespace {
 
 bool expects( bool x ) { Expects( x ); return x; } 
@@ -72,6 +74,13 @@ CASE( "EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
 #else
     EXPECT_NO_THROW( ensuresAudit( false ) );
 #endif
+}
+
+int testAssume( int i, std::vector<int> const& v )
+{
+    // This should compile without warnings.
+    gsl_ASSUME( i >= 0 && static_cast<std::size_t>(i) < v.size() );
+    return v.at( i );
 }
 
 // end of file
