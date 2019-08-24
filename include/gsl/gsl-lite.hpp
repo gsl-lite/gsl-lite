@@ -25,7 +25,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <ostream>
+#include <iosfwd>
 #include <stdexcept>
 #include <string>
 #include <utility>
