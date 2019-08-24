@@ -847,7 +847,7 @@ struct fail_fast : public std::logic_error
 
 # if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
-gsl_api inline void fail_fast_assert( bool cond, char const * const message )
+gsl_api gsl_constexpr inline void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
@@ -858,7 +858,7 @@ gsl_api inline void fail_fast_assert( bool cond, char const * const message )
 // Should be defined by user
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
 
-gsl_api inline void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
+gsl_api gsl_constexpr inline void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
         fail_fast_assert_handler( expression, message, file, line );
@@ -866,7 +866,7 @@ gsl_api inline void fail_fast_assert( bool cond, char const * const expression, 
 
 # else
 
-gsl_api inline void fail_fast_assert( bool cond ) gsl_noexcept
+gsl_api gsl_constexpr inline void fail_fast_assert( bool cond ) gsl_noexcept
 {
 #ifdef __CUDA_ARCH__
     assert(cond);
