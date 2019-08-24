@@ -124,10 +124,12 @@
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0
 #endif
 
-#if    defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#if 2 <= defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT ) + defined( gsl_CONFIG_CONTRACT_LEVEL_ON ) + defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) + defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+# error only one of gsl_CONFIG_CONTRACT_LEVEL_AUDIT, gsl_CONFIG_CONTRACT_LEVEL_ON, gsl_CONFIG_CONTRACT_LEVEL_ASSUME, and gsl_CONFIG_CONTRACT_LEVEL_OFF may be defined.
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x33
+#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
+# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME )
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x44
 #elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
@@ -144,8 +146,8 @@
 # define        gsl_CONFIG_CONTRACT_LEVEL_MASK  gsl_CONFIG_CONTRACT_LEVEL_MASK_0
 #endif
 
-#if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined ( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
+#if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 # define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
 # define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
@@ -158,6 +160,13 @@
 #else
 # define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
 # define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
+#endif
+
+#if defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) && ( defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER ) )
+// `gsl_CONFIG_CONTRACT_LEVEL_ASSUME` should not be combined with any of the violation
+// response macros. Contract violations are undefined behavior in ASSUME mode, and
+// code which expects a particular violation response will not work as expected.
+# error cannot define gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, or gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER if gsl_CONFIG_CONTRACT_LEVEL_ASSUME is defined.
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -752,20 +761,24 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 // GSL.assert: assertions
 //
 
+#if gsl_HAVE( TYPE_TRAITS )
+# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
+#else
+# define gsl_ELIDE_CONTRACT( x )
+#endif
+
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define  gsl_ASSUME( x )  /* there is no assume intrinsic in CUDA device code */
+# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT( x ) /* there is no assume intrinsic in CUDA device code */
 #elif gsl_COMPILER_MSVC_VERSION
 # define  gsl_ASSUME( x )  __assume( x )
 #elif gsl_COMPILER_GNUC_VERSION
 #  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
 #elif defined(__has_builtin)
-# if __has_builtin(__builtin_assume)
-#  define gsl_ASSUME( x )  __builtin_assume( x )
-# elif __has_builtin(__builtin_unreachable)
+# if __has_builtin(__builtin_unreachable)
 #  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
 # endif
 #else
-#  define gsl_ASSUME( x )  /* unknown compiler; cannot rely on assume intrinsic */
+# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT( x ) /* unknown compiler; cannot rely on assume intrinsic */
 #endif
 
 #define gsl_ELIDE_CONTRACT_EXPECTS        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
@@ -774,12 +787,6 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #define gsl_ASSUME_CONTRACT_ENSURES       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x40 ) )
 #define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
 #define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
-
-#if gsl_HAVE( TYPE_TRAITS )
-# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
-#else
-# define gsl_ELIDE_CONTRACT( x )
-#endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS
 # if gsl_ASSUME_CONTRACT_EXPECTS
@@ -806,7 +813,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
-# if gsl_ASSUME_CONTRACT_EXPECTS
+# if gsl_ASSUME_CONTRACT_ENSURES
 #  define Ensures( x )  gsl_ASSUME( x )
 # else
 #  define Ensures( x )  gsl_ELIDE_CONTRACT( x )

@@ -128,10 +128,22 @@ CASE( "gsl-lite configuration" "[.gsl-configuration]" )
 //    gsl_ABSENT(  gsl_api );
 //#endif
 
+#ifdef gsl_CONFIG_CONTRACT_LEVEL_AUDIT
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_AUDIT );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_AUDIT );
+#endif
+
 #ifdef gsl_CONFIG_CONTRACT_LEVEL_ON
     gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_ON );
 #else
     gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_ON );
+#endif
+
+#ifdef gsl_CONFIG_CONTRACT_LEVEL_ASSUME
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_ASSUME );
+#else
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_ASSUME );
 #endif
 
 #ifdef gsl_CONFIG_CONTRACT_LEVEL_OFF
@@ -140,16 +152,16 @@ CASE( "gsl-lite configuration" "[.gsl-configuration]" )
     gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_OFF );
 #endif
 
-#ifdef gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY
-    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY );
+#ifdef gsl_CONFIG_CONTRACT_EXPECTS_ONLY
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_EXPECTS_ONLY );
 #else
-    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY );
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_EXPECTS_ONLY );
 #endif
 
-#ifdef gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY
-    gsl_PRESENT( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY );
+#ifdef gsl_CONFIG_CONTRACT_ENSURES_ONLY
+    gsl_PRESENT( gsl_CONFIG_CONTRACT_ENSURES_ONLY );
 #else
-    gsl_ABSENT(  gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY );
+    gsl_ABSENT(  gsl_CONFIG_CONTRACT_ENSURES_ONLY );
 #endif
 
 #ifdef gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
