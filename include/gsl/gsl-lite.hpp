@@ -1317,11 +1317,11 @@ public:
 #undef gsl_not_null_explicit
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api                ~not_null() = default;
-    gsl_api gsl_constexpr   not_null( not_null &&      other ) = default;
-    gsl_api gsl_constexpr   not_null( not_null const & other ) = default;
-    gsl_api                 not_null & operator=( not_null &&      other ) = default;
-    gsl_api                 not_null & operator=( not_null const & other ) = default;
+                           ~not_null() = default;
+            gsl_constexpr   not_null( not_null &&      other ) = default;
+            gsl_constexpr   not_null( not_null const & other ) = default;
+                            not_null & operator=( not_null &&      other ) = default;
+                            not_null & operator=( not_null const & other ) = default;
 #else
     gsl_api                ~not_null() {};
     gsl_api gsl_constexpr   not_null( not_null const & other ) : ptr_ ( other.ptr_  ) {}
@@ -1858,8 +1858,8 @@ public:
 #endif // deprecate shared_ptr, unique_ptr
 
 #if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
-    gsl_api gsl_constexpr span( span && ) gsl_noexcept = default;
-    gsl_api gsl_constexpr span( span const & ) = default;
+            gsl_constexpr span( span && ) gsl_noexcept = default;
+            gsl_constexpr span( span const & ) = default;
 #else
     gsl_api gsl_constexpr span( span const & other )
         : first_( other.begin() )
@@ -1874,8 +1874,8 @@ public:
 #endif
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
-    gsl_api gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
+            gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
+            gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
 #else
     gsl_api span & operator=( span other ) gsl_noexcept
     {
@@ -2387,7 +2387,7 @@ public:
     // construction:
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api gsl_constexpr basic_string_span() gsl_noexcept = default;
+            gsl_constexpr basic_string_span() gsl_noexcept = default;
 #else
     gsl_api gsl_constexpr basic_string_span() gsl_noexcept {}
 #endif
@@ -2490,13 +2490,13 @@ public:
 
 #if gsl_HAVE( IS_DEFAULT )
 # if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
-    gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
+            gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
 
-    gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
+            gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
 # else
-    gsl_api gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
+            gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
 
-    gsl_api gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
+            gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
 # endif
 #endif
 
@@ -2533,11 +2533,11 @@ public:
     // destruction, assignment:
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api ~basic_string_span() gsl_noexcept = default;
+            ~basic_string_span() gsl_noexcept = default;
 
-    gsl_api basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
+            basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
 
-    gsl_api basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
+            basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
 #endif
 
     // sub span:
@@ -3020,10 +3020,10 @@ public:
     }
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other ) = default;
-    gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span &&      other ) = default;
-    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other ) = default;
-    gsl_api gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other ) = default;
+            gsl_constexpr basic_zstring_span( basic_zstring_span const & other ) = default;
+            gsl_constexpr basic_zstring_span( basic_zstring_span &&      other ) = default;
+            gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other ) = default;
+            gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other ) = default;
 #else
     gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
     gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other ) { span_ = other.span_; return *this; }
