@@ -39,6 +39,7 @@ endif()
 
 option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
 option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
+option( CMAKE_EXPORT_PACKAGE_REGISTRY "Export build directory to CMake user package registry" OFF )
 
 # If requested, build and perform tests, build examples:
 
