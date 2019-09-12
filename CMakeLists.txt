@@ -39,6 +39,7 @@ endif()
 
 option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
 option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
+option( CMAKE_EXPORT_PACKAGE_REGISTRY "Export build directory to CMake user package registry" OFF )
 
 # If requested, build and perform tests, build examples:
 
@@ -113,6 +114,18 @@ install(
     NAMESPACE    ${package_nspace}::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_folder}"
 )
+
+export(
+    EXPORT       ${package_target}
+    NAMESPACE    ${package_nspace}::
+    FILE         "${CMAKE_CURRENT_BINARY_DIR}/${package_name}-targets.cmake"
+)
+
+if(CMAKE_EXPORT_PACKAGE_REGISTRY)
+    export(
+        PACKAGE  ${package_name}
+    )
+endif()
 
 install(
     FILES       "${CMAKE_CURRENT_BINARY_DIR}/${package_config}"
