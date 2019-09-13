@@ -39,17 +39,9 @@
 # pragma GCC   diagnostic ignored "-Wunused-function"
 #endif
 
-#include "lest_cpp03.hpp"
-
-#define CASE( name ) lest_CASE( specification(), name )
-
-extern lest::tests & specification();
-
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
-namespace std {
-#else
 namespace lest {
-#endif
+
+// These functions cannot be found via ADL, so we have to define them before including lest.
 
 #if gsl_HAVE( ARRAY )
 template< typename T, std::size_t N >
@@ -60,27 +52,36 @@ inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
 #endif
 
 #if gsl_HAVE( WCHAR )
+// We do this with a loop and explicit casts to avoid warnings about implicit narrowing casts (which we don't care about because we don't have to handle non-ASCII strings in the tests).
+inline std::string narrowString( std::wstring const & str )
+{
+    std::string result(str.size(), '\0');
+    for (std::size_t i = 0, n = str.size(); i != n; ++i)
+    {
+        result[i] = static_cast<char>(str[i]);
+    }
+    return result;
+}
+
 inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 {
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
-    return os << std::string( text.begin(), text.end() );
-#else
-    std::copy( text.begin(), text.end(), std::ostream_iterator<char>(os) ); return os;
-#endif
+    return os << narrowString( text );
 }
 #endif // gsl_HAVE( WCHAR )
 
-#if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 60, 70 )
-} // namespace std
-#else
 } // namespace lest
-#endif
+
+#include "lest_cpp03.hpp"
+
+#define CASE( name ) lest_CASE( specification(), name )
+
+extern lest::tests & specification();
 
 namespace gsl {
 
 inline const void * nullptr_void() { return gsl_nullptr; }
 
-// use oparator<< instead of to_string() overload;
+// use operator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
 
 inline std::ostream & operator<<( std::ostream & os, byte b )

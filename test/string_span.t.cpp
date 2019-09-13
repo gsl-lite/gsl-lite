@@ -35,7 +35,7 @@ inline std::vector<T> vector_iota( int n )
 
   for ( int i = 0; i < n; ++i )
     result.push_back( static_cast<T>( i ) );
-    
+
   return result;
 }
 
@@ -1096,6 +1096,126 @@ CASE( "string_span: Allows to view the elements as read-only bytes" )
     EXPECT( b[4] == to_byte( hello[4] ) );
 }
 
+//------------------------------------------------------------------------
+// zstring_span
+
+CASE( "zstring_span: Allows to construct a zstring_span from a zero-terminated empty string (via span)" )
+{
+    char zero[] = "";
+
+    zstring_span zsv( make_span( zero, 1 ) );
+
+    EXPECT_NOT( zsv.empty() );
+    EXPECT(     zsv.ensure_z().size() == 0u );
+    EXPECT(     zsv.as_string_span().size() == 0u );
+    EXPECT(     std::string( zsv.as_string_span().data() ) == "" );
+}
+
+CASE( "zstring_span: Allows to construct a zstring_span from a zero-terminated non-empty string (via span)" )
+{
+    char hello[] = "hello, world";
+    const index_type len = std::string(hello).length();
+
+    zstring_span zsv( make_span( hello, len + 1 ) );
+
+    EXPECT_NOT( zsv.empty() );
+    EXPECT(     zsv.ensure_z().size() == len );
+    EXPECT(     zsv.as_string_span().size() == len );
+    EXPECT(     std::string( zsv.as_string_span().data() ) == hello );
+}
+
+CASE( "zstring_span: Terminates construction of a zstring_span from a non-zero-terminated string (via span)" )
+{
+    struct F
+    {
+        static void blow()
+        {
+            char hello[] = "hello, worldxxx";
+            const index_type len = std::string(hello).length();
+
+            zstring_span zsv( make_span( hello, len ) );
+        }
+    };
+
+    EXPECT_THROWS( F::blow() );
+}
+
+#if gsl_HAVE( WCHAR )
+
+CASE( "zstring_span: Allows to construct a wzstring_span from a zero-terminated empty string (via span)" )
+{
+    wchar_t zero[] = L"";
+
+    wzstring_span wzsv( make_span( zero, 1 ) );
+
+    EXPECT_NOT( wzsv.empty() );
+    EXPECT(     wzsv.ensure_z().size() == 0u );
+    EXPECT(     wzsv.as_string_span().size() == 0u );
+    EXPECT(     std::wstring( wzsv.as_string_span().data() ) == L"" );
+}
+
+CASE( "zstring_span: Allows to construct a wzstring_span from a zero-terminated non-empty string (via span)" )
+{
+    wchar_t hello[] = L"hello, world";
+    const index_type len = std::wstring(hello).length();
+
+    wzstring_span wzsv( make_span( hello, len + 1 ) );
+
+    EXPECT_NOT( wzsv.empty() );
+    EXPECT(     wzsv.ensure_z().size() == len );
+    EXPECT(     wzsv.as_string_span().size() == len );
+//  EXPECT(     std::wstring( wzsv.as_string_span().data() ) == hello );
+}
+
+CASE( "zstring_span: Terminates construction of a wzstring_span from a non-zero-terminated string (via span)" )
+{
+    struct F
+    {
+        static void blow()
+        {
+            wchar_t hello[] = L"hello, worldxxx";
+            const index_type len = std::wstring(hello).length();
+
+            wzstring_span wzsv( make_span( hello, len ) );
+        }
+    };
+
+    EXPECT_THROWS( F::blow() );
+}
+
+#endif // gsl_HAVE( WCHAR )
+
+CASE( "zstring_span: Allows to use a zstring_span with a legacy API via member assume_z()" )
+{
+    char hello[] = "hello, world";
+    const std::string::size_type len = std::string(hello).length();
+
+    zstring_span zsv( make_span( hello, len + 1 ) );
+    czstring     czs( zsv.assume_z() );
+
+    EXPECT( strlen( czs ) == len );
+    EXPECT( *(czs + len ) == '\0');
+}
+
+#if gsl_HAVE( WCHAR )
+
+CASE( "zstring_span: Allows to use a wzstring_span with a legacy API via member assume_z()" )
+{
+    wchar_t hello[] = L"hello, world";
+    const index_type len = std::wstring(hello).length();
+
+    wzstring_span wzsv( make_span( hello, len + 1 ) );
+    cwzstring     cwzs( wzsv.assume_z() );
+
+    EXPECT( wcslen( cwzs ) == len );
+    EXPECT( *(cwzs + len ) == '\0');
+}
+
+#endif // gsl_HAVE( WCHAR )
+
+//------------------------------------------------------------------------
+// global functions:
+
 CASE( "to_string(): Allows to explicitly convert from string_span to std::string" )
 {
     char s[] = "hello";
@@ -1329,6 +1449,5 @@ CASE( "string_span: wstring_span and cwstring_span not available (wchar_t not av
     EXPECT( true );
 }
 #endif // gsl_HAVE( WCHAR )
-
 
 // end of file

@@ -274,7 +274,7 @@ Functions (methods) are decorated with `gsl_api`. At default `gsl_api` is define
 ### Standard selection macro
 
 \-D<b>gsl\_CPLUSPLUS</b>=199711L  
-Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cpluplus` macro correctly.
+Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
 
 ### Feature selection macros
 
@@ -287,8 +287,8 @@ Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to incl
 \-D<b>gsl\_FEATURE\_BYTE\_SPAN\_TO\_STD</b>=99  
 Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. Default is 99 for inclusion with any standard.
 
-\-D<b>gsl\_FEATURE\_IMPLICIT\_MACRO</b>=1  
-Define this macro to 0 to omit the `implicit` macro. Default is 1.
+\-D<b>gsl\_FEATURE\_IMPLICIT\_MACRO</b>=0  
+Define this macro to 1 to provide the `implicit` macro. Default is 0.
 
 \-D<b>gsl\_FEATURE\_OWNER\_MACRO</b>=1  
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. Default is 1.
@@ -298,25 +298,91 @@ Provide experimental types `final_action_return` and `final_action_error` and co
 
 ### Contract violation response macros
 
-*gsl-lite* provides contract violation response control as suggested in proposal [N4415](http://wg21.link/n4415).
+*gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
 
+There are four macros for expressing pre- and postconditions:
+
+- `Expects` for simple preconditions
+- `Ensures` for simple postconditions
+- `ExpectsAudit` for preconditions that are expensive or include potentially opaque function calls
+- `EnsuresAudit` for postconditions that are expensive or include potentially opaque function calls
+
+
+The contract checking level can be controlled by defining one of the following macros:
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_AUDIT</b>  
+Define this macro to have all contracts checked at runtime.
+ 
 \-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ON</b>  
-Define this macro to include both `Expects` and `Ensures` in the code. This is the default case.
+Define this macro to have contracts expressed with `Expects` and `Ensures` checked at runtime, and contracts expressed with `ExpectsAudit` and `EnsuresAudit` not checked and not evaluated at runtime. This is the default case.
+ 
+\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ASSUME</b>  
+Define this macro to let the compiler assume that contracts expressed with `Expects` and `Ensures` always hold true (which may incur evaluation at runtime), and to have contracts expressed with `ExpectsAudit` and `EnsuresAudit` not checked and not evaluated at runtime.
  
 \-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_OFF</b>  
-Define this macro to exclude both `Expects` and `Ensures` from the code.
+Define this macro to disable all runtime checking and evaluation of contracts.
 
-\-D<b>gsl\_CONFIG_CONTRACT\_LEVEL\_EXPECTS\_ONLY</b>  
-Define this macro to include `Expects` in the code and exclude `Ensures` from the code.
 
-\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ENSURES\_ONLY</b>  
-Define this macro to exclude `Expects` from the code and include `Ensures` in the code.
+Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When <b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ASSUME</b> is defined, the compiler is instructed that the
+condition expressed by regular contracts can be assumed to hold true. This is meant to be an aid for the optimizer; runtime evaluation of the condition is not desired. However, because the GSL implements contract checks
+with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers will
+generate the runtime function call.
+
+Therefore, `Expects` and `Ensures` should be used only for conditions that can be proven side-effect-free by the compiler, and `ExpectsAudit` and `EnsuresAudit` for everything else. In practice, this implies that
+`Expects` and `Ensures` should only be used for simple comparisons of scalar values and for comparisons of class objects with trivially inlineable comparison operators.
+
+
+Example:
+
+```Cpp
+template <typename It> // assuming random-access iterators
+auto median( It first, It last )
+{
+        // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
+        // compiler will inline the comparison operator and understand that the comparison is free
+        // of side-effects, and hence generate no code in gsl_CONFIG_CONTRACT_LEVEL_ASSUME mode.
+    Expects( first != last );
+
+        // Verifying that a range of elements is sorted may be an expensive operation, and we
+        // cannot trust the compiler to understand that it is free of side-effects, so we use an
+        // audit-level contract check.
+    ExpectsAudit( std::is_sorted( first, last ) );
+
+    auto count = last - first;
+    return count % 2 != 0
+        ? first[count / 2]
+        : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
+}
+```
+
+
+It is possible to enable only precondition or only postcondition checking with one of the following macros:
+
+\-D<b>gsl\_CONFIG_CONTRACT\_EXPECTS\_ONLY</b>  
+Define this macro to permit runtime checking and evaluation for precondition contracts only.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_ENSURES\_ONLY</b>  
+Define this macro to permit runtime checking and evaluation for postcondition contracts only.
+
+
+The following macros control the handling of runtime contract violations:
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
-Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and `narrow`. This is the default case.
+Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `ExpectsAudit`, `Ensures`, `EnsuresAudit`, and `narrow`. This is the default case.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `Ensures` and throw a std::exception-derived exception `narrowing_error` on discarding  information in `narrow`.
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `ExpectsAudit`, `Ensures`, `EnsuresAudit`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `narrow`.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
+Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `ExpectsAudit`, `Ensures`, and `EnsuresAudit`, and call `std::terminate()` on discarding information in `narrow`. The user is expected to supply a definition matching the following signature:
+
+```Cpp
+namespace gsl {
+	gsl_api gsl_constexpr14 void fail_fast_assert_handler(
+		char const * const expression, char const * const message,
+		char const * const file, int line );
+}
+```
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
 Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects` and `Ensures`, and call `std::terminate()` on discarding  information in `narrow`. The user is expected to supply a definition matching the following signature:
@@ -403,6 +469,10 @@ string_span                 | &#10003;| &#10003;| &#10003;| basic_string_span&lt
 wstring_span                | -       | &#10003;| &#10003;| basic_string_span&lt;wchar_t > |
 cstring_span                | &#10003;| &#10003;| &#10003;| basic_string_span&lt;const char> |
 cwstring_span               | -       | &#10003;| &#10003;| basic_string_span&lt;const wchar_t > |
+zstring_span                | -       | &#10003;| &#10003;| basic_zstring_span&lt;char> |
+wzstring_span               | -       | &#10003;| &#10003;| basic_zstring_span&lt;wchar_t > |
+czstring_span               | -       | &#10003;| &#10003;| basic_zstring_span&lt;const char> |
+cwzstring_span              | -       | &#10003;| &#10003;| basic_zstring_span&lt;const wchar_t > |
 ensure_z()                  | -       | &#10003;| &#10003;| Create a cstring_span or cwstring_span |
 to_string()                 | -       | &#10003;| &#10003;| Convert a string_span to std::string or std::wstring |
 **2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
@@ -411,6 +481,8 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
+ExpectsAudit()              | -       | -       | &#10003;| Audit-level precondition assertion |
+EnsuresAudit()              | -       | -       | &#10003;| Audit-level postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 index                       | &#10003;| &#10003;| &#10003;| type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
 byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
@@ -426,7 +498,8 @@ on_error()                  | -       | -       | >=C++11 | Make a final_action_
 on_error()                  | -       | -       | < C++11 | Make a final_action_error, [experimental](#feature-selection-macros) |
 narrow_cast<>               | &#10003;| &#10003;| &#10003;| Searchable narrowing casts of values |
 narrow()                    | &#10003;| &#10003;| &#10003;| Checked version of narrow_cast() |
-implicit                    | &#10003;| -       | &#10003;| Symmetric with explicit |
+[[implicit]]                | &#10003;| -       | C++??   | Symmetric with explicit |
+implicit                    | -       | -       | &#10003;| Macro, see [Feature selection macros](#feature-selection-macros) |
 move_owner                  | ?       | -       | -       | ... |
 **5. Algorithms**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 copy()                      | &nbsp;  | &nbsp;  | &nbsp;  | Copy from source span to destination span |
@@ -444,6 +517,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
+0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
+&nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_EXPECTS_ONLY`/`gsl_CONFIG_CONTRACT_ENSURES_ONLY` |
 0.31.0  |   5   | span( std::nullptr_t, index_type ) |
 &nbsp;  |&nbsp; | span( pointer, index_type ) is used |
 0.31.0  |   5   | span( U *, index_type size ) |
@@ -462,8 +537,8 @@ Version | Level | Feature / Notes |
 &nbsp;  |&nbsp; | Use span::size_bytes() |
 0.17.0  |   2   | member span::as_bytes(), span::as_writeable_bytes() |
 &nbsp;  |&nbsp; | &mdash; |
-0.7.0   |   1   | gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR |
-&nbsp;  |&nbsp; | Use gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR,<br>or consider span(with_container, cont). |
+0.7.0   |   -   | `gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR` |
+&nbsp;  |&nbsp; | Use `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR`,<br>or consider span(with_container, cont). |
 
 
 Reported to work with
@@ -669,6 +744,7 @@ span<>: Allows to construct from a C-array
 span<>: Allows to construct from a const C-array
 span<>: Allows to construct from a C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows to construct from a const C-array with size via decay to pointer (potentially dangerous)
+span<>: Allows to construct from a std::initializer_list<> (C++11)
 span<>: Allows to construct from a std::array<> (C++11)
 span<>: Allows to construct from a std::array<> with const data (C++11) [deprecated-5]
 span<>: Allows to construct from a container (std::vector<>)
@@ -735,6 +811,7 @@ make_span(): Allows to build from a non-null pointer and a size
 make_span(): Allows to build from a non-null const pointer and a size
 make_span(): Allows to build from a C-array
 make_span(): Allows to build from a const C-array
+make_span(): Allows building from a std::initializer_list<> (C++11)
 make_span(): Allows to build from a std::array<> (C++11)
 make_span(): Allows to build from a const std::array<> (C++11)
 make_span(): Allows to build from a container (std::vector<>)
@@ -830,6 +907,14 @@ string_span: Allows to obtain the number of elements via size()
 string_span: Allows to obtain the number of bytes via length_bytes()
 string_span: Allows to obtain the number of bytes via size_bytes()
 string_span: Allows to view the elements as read-only bytes
+zstring_span: Allows to construct a zstring_span from a zero-terminated empty string (via span)
+zstring_span: Allows to construct a zstring_span from a zero-terminated non-empty string (via span)
+zstring_span: Terminates construction of a zstring_span from a non-zero-terminated string (via span)
+zstring_span: Allows to construct a wzstring_span from a zero-terminated empty string (via span)
+zstring_span: Allows to construct a wzstring_span from a zero-terminated non-empty string (via span)
+zstring_span: Terminates construction of a wzstring_span from a non-zero-terminated string (via span)
+zstring_span: Allows to use a zstring_span with a legacy API via member assume_z()
+zstring_span: Allows to use a wzstring_span with a legacy API via member assume_z()
 to_string(): Allows to explicitly convert from string_span to std::string
 to_string(): Allows to explicitly convert from cstring_span to std::string
 to_string(): Allows to explicitly convert from wstring_span to std::wstring
