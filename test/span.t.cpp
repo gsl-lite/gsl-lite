@@ -344,6 +344,19 @@ CASE( "span<>: Allows to construct from a const C-array with size via decay to p
 #endif
 }
 
+CASE( "span<>: Allows to construct from a std::initializer_list<> (C++11)" )
+{
+#if gsl_CPP11_OR_GREATER
+    auto il = { 1, 2, 3, 4, 5, };
+
+    span<int const> v( il );
+
+    EXPECT( std::equal( v.begin(), v.end(), il.begin() ) );
+#else
+    EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
+#endif
+}
+
 CASE( "span<>: Allows to construct from a std::array<> (C++11)" )
 {
 # if gsl_HAVE( ARRAY )
@@ -1381,6 +1394,19 @@ CASE( "make_span(): Allows to build from a const C-array" )
     span<const int> v = make_span( arr );
 
     EXPECT( std::equal( v.begin(), v.end(), arr ) );
+}
+
+CASE( "make_span(): Allows building from a std::initializer_list<> (C++11)" )
+{
+#if gsl_CPP11_OR_GREATER
+    auto il = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    span<int const> v = make_span( il );
+
+    EXPECT( std::equal( v.begin(), v.end(), il.begin() ) );
+#else
+    EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
+#endif
 }
 
 CASE( "make_span(): Allows to build from a std::array<> (C++11)" )

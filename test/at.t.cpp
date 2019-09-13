@@ -72,36 +72,56 @@ CASE( "at(): Terminates access to non-existing gsl::span elements" )
 
 CASE( "at(): Allows to access existing C-array elements" )
 {
-    size_t a[] = { 1, 2, 3, 4 };
+    size_t       a[] = { 1, 2, 3, 4 };
+    size_t const b[] = { 1, 2, 3, 4 };
 
     for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) ==  i + 1 );
+        EXPECT( at(b, i) ==  i + 1 );
     }
 }
 
 CASE( "at(): Allows to access existing std::array elements (C++11)" )
 {
 #if gsl_HAVE( ARRAY )
-    std::array<size_t, 4> a = {{ 1, 2, 3, 4 }};
+    std::array<size_t, 4>       a = {{ 1, 2, 3, 4 }};
+    std::array<size_t, 4> const b = {{ 1, 2, 3, 4 }};
+    std::array<size_t const, 4> c = {{ 1, 2, 3, 4 }};
 
     for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) == i + 1 );
+        EXPECT( at(b, i) == i + 1 );
+        EXPECT( at(c, i) == i + 1 );
     }
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
 #endif
 }
 
+namespace {
+
+std::vector<size_t> make_vector( size_t N )
+{
+    std::vector<size_t> v;
+    for ( size_t i = 0; i < N; ++i )
+    {
+        v.push_back( i + 1 );
+    }
+    return v;
+}
+}
+
 CASE( "at(): Allows to access existing std::vector elements" )
 {
-    std::vector<size_t> a; // = { 1, 2, 3, 4 };
+    std::vector<size_t>       a = make_vector( 4 );  // = { 1, 2, 3, 4 };
+    std::vector<size_t> const b = make_vector( 4 );  // = { 1, 2, 3, 4 };
 
     for ( size_t i = 0; i < 4; ++i )
     {
-        a.push_back( i + 1 );
         EXPECT( at(a, i) == i + 1 );
+        EXPECT( at(b, i) == i + 1 );
     }
 }
 
@@ -110,11 +130,13 @@ CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 // Note: GCC 4.6.3 has std::initializer_list but selects at(Cont & cont,...) overload.
 
 #if gsl_HAVE( INITIALIZER_LIST ) && ( !gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_GNUC_VERSION >= 473 )
-    std::initializer_list<size_t> a = { 1, 2, 3, 4 };
+    std::initializer_list<size_t>       a = { 1, 2, 3, 4 };
+    std::initializer_list<size_t> const b = { 1, 2, 3, 4 };
 
     for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) == i + 1 );
+        EXPECT( at(b, i) == i + 1 );
     }
 #else
     EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
@@ -123,12 +145,17 @@ CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 
 CASE( "at(): Allows to access gsl::span elements" )
 {
-    size_t arr[] = { 1, 2, 3, 4 };
-    span<size_t> a( arr );
+    size_t        arr[] = { 1, 2, 3, 4 };
+    size_t const carr[] = { 1, 2, 3, 4 };
+    span<size_t>        a( arr );
+    span<size_t> const  b( arr );
+    span<size_t  const> c( carr );
 
     for ( size_t i = 0; i < 4; ++i )
     {
         EXPECT( at(a, i) == i + 1 );
+        EXPECT( at(b, i) == i + 1 );
+        EXPECT( at(c, i) == i + 1 );
     }
 }
 

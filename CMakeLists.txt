@@ -13,7 +13,7 @@ cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project(
     gsl_lite
-    VERSION 0.34.0
+    VERSION 0.35.0
 #   DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
 #   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
     LANGUAGES CXX )
@@ -39,6 +39,7 @@ endif()
 
 option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
 option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
+option( CMAKE_EXPORT_PACKAGE_REGISTRY "Export build directory to CMake user package registry" OFF )
 
 # If requested, build and perform tests, build examples:
 
@@ -95,10 +96,9 @@ configure_package_config_file(
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_folder}"
 )
 
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}"
-    VERSION       ${package_version}
-    COMPATIBILITY SameMajorVersion
+configure_file(
+   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${package_config_version}.in"
+   "${CMAKE_CURRENT_BINARY_DIR}/${package_config_version}" @ONLY
 )
 
 # Installation:
@@ -114,6 +114,18 @@ install(
     NAMESPACE    ${package_nspace}::
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${package_folder}"
 )
+
+export(
+    EXPORT       ${package_target}
+    NAMESPACE    ${package_nspace}::
+    FILE         "${CMAKE_CURRENT_BINARY_DIR}/${package_name}-targets.cmake"
+)
+
+if(CMAKE_EXPORT_PACKAGE_REGISTRY)
+    export(
+        PACKAGE  ${package_name}
+    )
+endif()
 
 install(
     FILES       "${CMAKE_CURRENT_BINARY_DIR}/${package_config}"
