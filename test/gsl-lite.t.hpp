@@ -39,6 +39,9 @@
 # pragma GCC   diagnostic ignored "-Wunused-function"
 #endif
 
+// GSL-Lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>
+#include <ostream>
+
 namespace lest {
 
 // These functions cannot be found via ADL, so we have to define them before including lest.
