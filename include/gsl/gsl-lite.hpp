@@ -315,7 +315,7 @@
 
 // Presence of C++14 language features:
 
-#define gsl_HAVE_CONSTEXPR_14           gsl_CPP14_000
+#define gsl_HAVE_CONSTEXPR_14           ( gsl_CPP14_000 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 600 ) )
 #define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
 
 // Presence of C++17 language features:
