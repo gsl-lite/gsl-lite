@@ -378,7 +378,7 @@ Define this macro to call a user-defined handler function `gsl::fail_fast_assert
 
 ```Cpp
 namespace gsl {
-	gsl_api gsl_constexpr14 void fail_fast_assert_handler(
+	gsl_api void fail_fast_assert_handler(
 		char const * const expression, char const * const message,
 		char const * const file, int line );
 }
