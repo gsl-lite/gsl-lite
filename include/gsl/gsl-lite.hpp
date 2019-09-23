@@ -1293,7 +1293,38 @@ class not_null
     typedef T get_result_t;
 #endif
 
+#if gsl_CPP11_OR_GREATER
+    template<class U, class E = void>
+    struct element_type_helper
+    {
+        // For types without a member element_type (this will handle raw pointers)
+        typedef typename std::remove_reference<decltype(*std::declval<U>())>::type type;
+    };
+
+    template<class U>
+    struct element_type_helper<U, std17::void_t<typename U::element_type>>
+    {
+        // For types with a member element_type
+        typedef typename U::element_type type;
+    };
+#else
+    // Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
+    template<class U, class E = void>
+    struct element_type_helper
+    {
+        typedef typename U::element_type type;
+    };
+
+    template<class U>
+    struct element_type_helper<U*>
+    {
+        typedef U type;
+    };
+#endif
+
 public:
+    typedef typename element_type_helper<T>::type element_type;
+
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
@@ -1351,9 +1382,7 @@ public:
     gsl_api gsl_constexpr operator get_result_t  () const { return get(); }
     gsl_api gsl_constexpr get_result_t operator->() const { return get(); }
 
-#if gsl_HAVE( DECLTYPE_AUTO )
-    gsl_api gsl_constexpr decltype(auto) operator*() const { return *get(); }
-#endif
+    gsl_api gsl_constexpr element_type& operator*() const { return *get(); }
 
 gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
