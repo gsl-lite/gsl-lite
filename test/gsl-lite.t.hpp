@@ -102,6 +102,9 @@ inline void suppress_warning_unused_template_ensure_sentinel()
     (void) gsl::ensure_z( "zero-terminated" );
 }
 
+// GSL-Lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>
+#include <ostream>
+
 #endif // GSL_TEST_GSL_LITE_HPP_INCLUDED
 
 // end of file
