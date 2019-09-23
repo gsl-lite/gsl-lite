@@ -563,8 +563,11 @@ template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
 #if gsl_CPP11_120
 
-template< class...>
-using void_t = void;
+template< class... Ts >
+struct make_void { typedef void type; };
+
+template< class... Ts >
+using void_t = typename make_void< Ts... >::type;
 
 #endif
 
