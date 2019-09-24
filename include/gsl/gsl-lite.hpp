@@ -25,7 +25,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
-#include <iosfwd>
+#include <ios>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -318,7 +318,7 @@
 
 // Presence of C++14 language features:
 
-#define gsl_HAVE_CONSTEXPR_14           gsl_CPP14_000
+#define gsl_HAVE_CONSTEXPR_14           ( gsl_CPP14_000 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 600 ) )
 #define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
 #define gsl_HAVE_DEPRECATED             gsl_CPP14_140
 
@@ -875,7 +875,7 @@ gsl_api gsl_noreturn inline void fail_fast_throw( char const * const message )
 
 } // namespace detail
 
-gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr inline
+gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
@@ -887,7 +887,7 @@ void fail_fast_assert( bool cond, char const * const message )
 // Should be defined by user
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
 
-gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr inline
+gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
@@ -905,7 +905,7 @@ gsl_api gsl_noreturn inline void fail_fast() gsl_noexcept
 
 } // namespace detail
 
-gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr inline
+gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond ) gsl_noexcept
 {
 #ifdef __CUDA_ARCH__

@@ -21,6 +21,13 @@ addons:
 matrix:
   include:
     - os: linux
+      env: COMPILER=g++-4.7
+      compiler: gcc
+      addons: &gcc4_7
+        apt:
+          packages: ["g++-4.7", "python3-pip", "lcov"]
+          sources: *apt_sources
+    - os: linux
       env: COMPILER=g++-4.8
       compiler: gcc
       addons: &gcc4_8
