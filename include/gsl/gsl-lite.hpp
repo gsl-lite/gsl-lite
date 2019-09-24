@@ -162,11 +162,11 @@
 # define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) && ( defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER ) )
+#if ( defined( gsl_CONFIG_CONTRACT_LEVEL_OFF ) || defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) ) && ( defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER ) )
 // `gsl_CONFIG_CONTRACT_LEVEL_ASSUME` should not be combined with any of the violation
 // response macros. Contract violations are undefined behavior in ASSUME mode, and
 // code which expects a particular violation response will not work as expected.
-# error cannot define gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, or gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER if gsl_CONFIG_CONTRACT_LEVEL_ASSUME is defined.
+# error cannot define gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, or gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER if gsl_CONFIG_CONTRACT_LEVEL_OFF or gsl_CONFIG_CONTRACT_LEVEL_ASSUME is defined.
 #endif
 
 // C++ language version detection (C++20 is speculative):
