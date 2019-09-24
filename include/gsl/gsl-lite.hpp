@@ -308,6 +308,7 @@
 #define gsl_HAVE_IS_DEFAULT             gsl_CPP11_140
 #define gsl_HAVE_IS_DELETE              gsl_CPP11_140
 #define gsl_HAVE_NOEXCEPT               gsl_CPP11_140
+#define gsl_HAVE_NORETURN               gsl_CPP11_140
 
 #if gsl_CPP11_OR_GREATER
 // see above
@@ -317,12 +318,14 @@
 
 #define gsl_HAVE_CONSTEXPR_14           gsl_CPP14_000
 #define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
+#define gsl_HAVE_DEPRECATED             gsl_CPP14_140
 
 // Presence of C++17 language features:
 // MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
 
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
 #define gsl_HAVE_DEDUCTION_GUIDES      (gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 999 ) )
+#define gsl_HAVE_NODISCARD              gsl_CPP17_000
 
 // Presence of C++ library features:
 
@@ -406,6 +409,24 @@
 # define gsl_nullptr  nullptr
 #else
 # define gsl_nullptr  NULL
+#endif
+
+#if gsl_HAVE( NODISCARD )
+# define gsl_nodiscard [[nodiscard]]
+#else
+# define gsl_nodiscard
+#endif
+
+#if gsl_HAVE( NORETURN )
+# define gsl_noreturn [[noreturn]]
+#else
+# define gsl_noreturn
+#endif
+
+#if gsl_HAVE( DEPRECATED )
+# define gsl_deprecated(because) [[deprecated( because )]]
+#else
+# define gsl_deprecated(because)
 #endif
 
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
