@@ -28,7 +28,10 @@ bool ensuresAudit( bool x ) { EnsuresAudit( x ); return x; }
 
 struct ConvertibleToBool
 {
-    explicit operator bool(void) const noexcept { return true; }
+#if gsl_CPP11_OR_GREATER
+    explicit
+#endif
+    operator bool(void) const gsl_noexcept { return true; }
 };
 
 
@@ -86,12 +89,12 @@ int testAssume( int i, std::vector<int> const& v )
 {
     // This should compile without warnings.
     gsl_ASSUME( i >= 0 && static_cast<std::size_t>(i) < v.size() );
-    return v.at( i );
+    return v.at( std::size_t(i) );
 }
 
 void testConvertibleToBool()
 {
-    Expects( ConvertibleToBool{ } );
+    Expects( ConvertibleToBool() );
 }
 
 // end of file
