@@ -811,28 +811,32 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
 #define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
 
+#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#  define  gsl_CONTRACT_CHECK_( x )  assert( x )
+#else
+# if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str " at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+# elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
+# else
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast() )
+# endif
+#endif
+
 #if gsl_ELIDE_CONTRACT_EXPECTS
 # if gsl_ASSUME_CONTRACT_EXPECTS
 #  define Expects( x )  gsl_ASSUME( x )
 # else
 #  define Expects( x )  gsl_ELIDE_CONTRACT( x )
 # endif
-#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define  Expects( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define  Expects( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
 #else
-# define  Expects( x )  ::gsl::fail_fast_assert( (x) )
+# define  Expects( x )  gsl_CONTRACT_CHECK_( "Precondition failure", x )
 #endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
 # define ExpectsAudit( x )  gsl_ELIDE_CONTRACT( x )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Precondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Precondition failure", __FILE__, __LINE__ )
 #else
-# define ExpectsAudit( x )  ::gsl::fail_fast_assert( (x) )
+# define ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "Precondition failure (audit)", x )
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
@@ -841,22 +845,14 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # else
 #  define Ensures( x )  gsl_ELIDE_CONTRACT( x )
 # endif
-#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define  Ensures( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define  Ensures( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
 #else
-# define  Ensures( x )  ::gsl::fail_fast_assert( (x) )
+# define  Ensures( x )  gsl_CONTRACT_CHECK_( "Postcondition failure", x )
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
 # define EnsuresAudit( x )  gsl_ELIDE_CONTRACT( x )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), "GSL: Postcondition failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) )
-#elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x), #x, "GSL: Postcondition failure", __FILE__, __LINE__ )
 #else
-# define EnsuresAudit( x )  ::gsl::fail_fast_assert( (x) )
+# define EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
 #endif
 
 #define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
@@ -870,7 +866,17 @@ struct fail_fast : public std::logic_error
 
 # if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
 
-gsl_api gsl_constexpr inline void fail_fast_assert( bool cond, char const * const message )
+namespace detail {
+
+gsl_api gsl_noreturn inline void fail_fast_throw( char const * const message )
+{
+    throw fail_fast( message );
+}
+
+} // namespace detail
+
+gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr inline
+void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
@@ -881,7 +887,8 @@ gsl_api gsl_constexpr inline void fail_fast_assert( bool cond, char const * cons
 // Should be defined by user
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
 
-gsl_api gsl_constexpr inline void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
+gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr inline
+void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
         fail_fast_assert_handler( expression, message, file, line );
@@ -889,7 +896,17 @@ gsl_api gsl_constexpr inline void fail_fast_assert( bool cond, char const * cons
 
 # else
 
-gsl_api gsl_constexpr inline void fail_fast_assert( bool cond ) gsl_noexcept
+namespace detail {
+
+gsl_api gsl_noreturn inline void fail_fast() gsl_noexcept
+{
+    std::terminate();
+}
+
+} // namespace detail
+
+gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr inline
+void fail_fast_assert( bool cond ) gsl_noexcept
 {
 #ifdef __CUDA_ARCH__
     assert(cond);

@@ -26,6 +26,12 @@ bool ensures( bool x ) { Ensures( x ); return x; }
 bool expectsAudit( bool x ) { ExpectsAudit( x ); return x; } 
 bool ensuresAudit( bool x ) { EnsuresAudit( x ); return x; }
 
+struct ConvertibleToBool
+{
+    explicit operator bool(void) const noexcept { return true; }
+};
+
+
 }
 
 CASE( "Expects(): Allows a true expression" )
@@ -81,6 +87,11 @@ int testAssume( int i, std::vector<int> const& v )
     // This should compile without warnings.
     gsl_ASSUME( i >= 0 && static_cast<std::size_t>(i) < v.size() );
     return v.at( i );
+}
+
+void testConvertibleToBool()
+{
+    Expects( ConvertibleToBool{ } );
 }
 
 // end of file
