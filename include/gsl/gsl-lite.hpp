@@ -1738,15 +1738,7 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
     template< class U >
-    gsl_api gsl_constexpr14 span( U * & data_in, index_type size_in )
-        : first_( data_in )
-        , last_ ( data_in + size_in )
-    {
-        Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
-    }
-
-    template< class U >
-    gsl_api gsl_constexpr14 span( U * const & data_in, index_type size_in )
+    gsl_api gsl_constexpr14 span( U * data_in, index_type size_in )
         : first_( data_in )
         , last_ ( data_in + size_in )
     {
