@@ -1698,7 +1698,6 @@ public:
         : first_( gsl_nullptr )
         , last_ ( gsl_nullptr )
     {
-        Expects( size() == 0 );
     }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
