@@ -207,11 +207,13 @@
 // MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
 
 #if defined(_MSC_VER ) && !defined(__clang__)
-# define gsl_COMPILER_MSVC_VER      (_MSC_VER )
-# define gsl_COMPILER_MSVC_VERSION  (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
+# define gsl_COMPILER_MSVC_VER           (_MSC_VER )
+# define gsl_COMPILER_MSVC_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
+# define gsl_COMPILER_MSVC_VERSION_FULL  (_MSC_VER - 100 * ( 5 + (_MSC_VER < 1900 ) ) )
 #else
-# define gsl_COMPILER_MSVC_VER      0
-# define gsl_COMPILER_MSVC_VERSION  0
+# define gsl_COMPILER_MSVC_VER           0
+# define gsl_COMPILER_MSVC_VERSION       0
+# define gsl_COMPILER_MSVC_VERSION_FULL  0
 #endif
 
 #define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
@@ -324,7 +326,7 @@
 // MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
 
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
-#define gsl_HAVE_DEDUCTION_GUIDES      (gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 999 ) )
+#define gsl_HAVE_DEDUCTION_GUIDES      (gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
 #define gsl_HAVE_NODISCARD              gsl_CPP17_000
 
 // Presence of C++ library features:
