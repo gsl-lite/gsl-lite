@@ -215,6 +215,16 @@ CASE( "not_null<>: Allows dereferencing" )
     EXPECT( *p == i );
 }
 
+#if gsl_HAVE( SHARED_PTR )
+CASE( "not_null<>: Allows dereferencing (shared_ptr)" )
+{
+    std::shared_ptr< int > pi = std::make_shared< int >(12);
+    not_null< std::shared_ptr< int > > p( pi );
+
+    EXPECT( *p == *pi );
+}
+#endif
+
 namespace {
 
 // provide not_null pointers to compare:
@@ -338,6 +348,104 @@ CASE( "not_null<>: Allows to compare greater than or equal to a raw pointer of t
     EXPECT(   _.p1() >= _.pv1 );
     EXPECT( ( _.p1() >= _.pv2 ) == ( _.pv1 >= _.pv2 ) );
     EXPECT( ( _.p2() >= _.pv1 ) == ( _.pv2 >= _.pv1 ) );
+}
+
+// user-defined types to check element_type deduction
+
+template<class T>
+struct NormalPtr
+{
+    typedef T element_type;
+    T* ptr;
+    T& operator*() { return *ptr; }
+    NormalPtr(T* ptr) : ptr(ptr) {}
+};
+
+template<class T>
+struct ETLessNormalPtr
+{
+    // no element_type typedef
+    T* ptr;
+    T& operator*() { return *ptr; }
+    ETLessNormalPtr(T* ptr) : ptr(ptr) {}
+};
+
+template<class T>
+struct WeirdPtr // element_type and *p's type differ
+{
+    typedef T element_type;
+    T* ptr;
+    double operator*() { return *ptr; }
+    WeirdPtr(T* ptr) : ptr(ptr) {}
+};
+
+template<class T>
+struct ETLessWeirdPtr // // element_type and type T differ
+{
+    // no element_type typedef
+    T* ptr;
+    double operator*() { return *ptr; }
+    ETLessWeirdPtr(T* ptr) : ptr(ptr) {}
+}; 
+
+#if gsl_HAVE( TYPE_TRAITS )
+using std::is_same;
+#else
+template<class T, class U>
+struct is_same { enum { value = false }; };
+ 
+template<class T>
+struct is_same<T, T> { enum { value = true }; };
+#endif
+
+CASE( "not_null<>: Able to deduce element_type of raw pointers" )
+{
+    EXPECT(( is_same< gsl::not_null< int* >::element_type, int >::value ));
+    EXPECT(( is_same< gsl::not_null< const int* >::element_type, const int >::value ));
+}
+
+CASE( "not_null<>: Able to deduce element_type of unique_ptr" )
+{
+#if gsl_HAVE( UNIQUE_PTR )
+    EXPECT(( is_same< gsl::not_null< std::unique_ptr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl::not_null< std::unique_ptr< const int > >::element_type, const int >::value ));
+#endif
+}
+
+CASE( "not_null<>: Able to deduce element_type of shared_ptr" )
+{
+#if gsl_HAVE( SHARED_PTR )
+    EXPECT(( is_same< gsl::not_null< std::shared_ptr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl::not_null< std::shared_ptr< const int > >::element_type, const int >::value ));
+#endif
+}
+
+CASE( "not_null<>: Able to deduce element_type of normal user-defined smart pointers" )
+{
+    EXPECT(( is_same< gsl::not_null< NormalPtr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl::not_null< NormalPtr< const int > >::element_type, const int >::value ));
+}
+
+CASE( "not_null<>: Able to correctly deduce element_type of user-defined smart pointers even if typedef and result of dereferencing differs" )
+{
+    EXPECT(( is_same< gsl::not_null< WeirdPtr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl::not_null< WeirdPtr< const int > >::element_type, const int >::value ));
+}
+
+CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef" )
+{
+#if gsl_CPP11_OR_GREATER
+    EXPECT(( is_same< gsl::not_null< ETLessNormalPtr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl::not_null< ETLessNormalPtr< const int > >::element_type, const int >::value ));
+#endif
+}
+
+CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef, and element_type differs from T" )
+{
+#if gsl_CPP11_OR_GREATER
+    EXPECT(( is_same< gsl::not_null< ETLessWeirdPtr< int > >::element_type, double >::value ));
+    EXPECT(( is_same< gsl::not_null< ETLessWeirdPtr< const int > >::element_type, double >::value ));
+#endif
 }
 
 // end of file

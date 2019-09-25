@@ -563,8 +563,11 @@ template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
 #if gsl_CPP11_120
 
-template< class...>
-using void_t = void;
+template< class... Ts >
+struct make_void { typedef void type; };
+
+template< class... Ts >
+using void_t = typename make_void< Ts... >::type;
 
 #endif
 
@@ -1278,6 +1281,41 @@ gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 //
 // not_null<> - Wrap any indirection and enforce non-null.
 //
+
+namespace detail
+{
+    // helper class to figure out the pointed-to type of a pointer
+#if gsl_CPP11_OR_GREATER
+    template<class T, class E = void>
+    struct element_type_helper
+    {
+        // For types without a member element_type (this will handle raw pointers)
+        typedef typename std::remove_reference<decltype(*std::declval<T>())>::type type;
+    };
+
+    template<class T>
+    struct element_type_helper<T, std17::void_t<typename T::element_type>>
+    {
+        // For types with a member element_type
+        typedef typename T::element_type type;
+    };
+#else
+    // Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
+    template<class T, class E = void>
+    struct element_type_helper
+    {
+        typedef typename T::element_type type;
+    };
+
+    template<class T>
+    struct element_type_helper<T*>
+    {
+        typedef T type;
+    };
+#endif
+
+}
+
 template< class T >
 class not_null
 {
@@ -1294,6 +1332,8 @@ class not_null
 #endif
 
 public:
+    typedef typename detail::element_type_helper<T>::type element_type;
+
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
@@ -1351,9 +1391,7 @@ public:
     gsl_api gsl_constexpr operator get_result_t  () const { return get(); }
     gsl_api gsl_constexpr get_result_t operator->() const { return get(); }
 
-#if gsl_HAVE( DECLTYPE_AUTO )
-    gsl_api gsl_constexpr decltype(auto) operator*() const { return *get(); }
-#endif
+    gsl_api gsl_constexpr element_type& operator*() const { return *get(); }
 
 gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
