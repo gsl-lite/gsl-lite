@@ -348,6 +348,7 @@
 #define gsl_HAVE_INTEGRAL_CONSTANT      gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_REMOVE_CONST           gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_REMOVE_REFERENCE       gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_REMOVE_CVREF           gsl_CPP20_OR_GREATER
 
 #define gsl_HAVE_TR1_ADD_CONST          gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_TR1_INTEGRAL_CONSTANT  gsl_HAVE_TR1_TYPE_TRAITS
@@ -636,6 +637,22 @@ inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E 
 #endif // span_HAVE( DATA )
 
 } // namespace std17
+
+// C++20 emulation:
+
+namespace std20 {
+
+#if gsl_HAVE( REMOVE_CVREF )
+
+using std::remove_cvref;
+
+#else
+
+template< class T > struct remove_cvref { typedef typename std11::remove_cv< typename std11::remove_reference< T >::type >::type type; };
+
+#endif // gsl_HAVE( REMOVE_CVREF )
+
+} // namespace std20
 
 namespace detail {
 
