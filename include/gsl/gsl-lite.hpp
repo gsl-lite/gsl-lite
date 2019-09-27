@@ -533,6 +533,25 @@ struct remove_cv
 
 #endif // gsl_HAVE( REMOVE_CONST )
 
+#if gsl_HAVE( REMOVE_REFERENCE )
+
+using std::remove_reference;
+
+#elif gsl_HAVE( TR1_REMOVE_REFERENCE )
+
+using std::tr1::remove_reference;
+
+#else
+
+template< class T > struct remove_reference { typedef T type; };
+template< class T > struct remove_reference<T&> { typedef T type; };
+# if gsl_HAVE( RVALUE_REFERENCE )
+template< class T > struct remove_reference<T&&> { typedef T type; };
+# endif
+
+#endif // gsl_HAVE( REMOVE_REFERENCE )
+
+
 #if gsl_HAVE( INTEGRAL_CONSTANT )
 
 using std::integral_constant;
