@@ -1353,15 +1353,6 @@ namespace detail
         typedef T type;
     };
 #endif
-
-    template<class T>
-    struct is_not_null : public std11::false_type {};
-
-    template<class T>
-    struct is_not_null< not_null< T > > : public std11::true_type {};
-
-    template<class T>
-    struct is_not_null_cvref : public is_not_null< typename std20::remove_cvref< T >::type > {};
 }
 
 template< class T >
@@ -1392,13 +1383,7 @@ public:
     template< class U >
     gsl_api gsl_constexpr14 gsl_not_null_explicit
 #if gsl_HAVE( RVALUE_REFERENCE )
-    not_null( U && u
-        gsl_REQUIRES_A((
-            // without constraining it, U&& would be too greedy,
-            // see https://mpark.github.io/programming/2014/06/07/beware-of-perfect-forwarding-constructors/
-            // alternative would be to have a "copy, then move" constructor
-            !detail::is_not_null_cvref<U>::value
-        ))
+    not_null( U u
 #if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 )
         gsl_REQUIRES_A((
             // in clang 3.x, is_constructible with T=unique_ptr<X>, U=not_null<T> tries to call copy constructor of unique_ptr, triggering an error
@@ -1407,7 +1392,7 @@ public:
         ))
 #endif
     )
-    : ptr_( std::forward<U>( u ) )
+    : ptr_( std::move( u ) )
 #else
     not_null( U const & u )
     : ptr_( u )
@@ -1436,53 +1421,32 @@ public:
     // converting copy constructors and assignment from not_null<U>:
     // without type_traits, we can't distinguish is_convertible and is_constructible, so all converting constructors are explicit
 
-#if gsl_HAVE( TYPE_TRAITS )
-    template< class U >
-    gsl_api gsl_constexpr not_null( not_null<U> const & other gsl_REQUIRES_A((std::is_convertible<U, T>::value)) )
-    : ptr_( other.checked_ptr_ref() )
-    {}
-#endif
-
-    template< class U >
-    gsl_api gsl_constexpr explicit not_null( not_null<U> const & other
-#if gsl_HAVE( TYPE_TRAITS )
-        gsl_REQUIRES_A((std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value))
-#endif
-    )
-    : ptr_( other.checked_ptr_ref() )
-    {}
-
-    template< class U >
-    gsl_api gsl_constexpr14 not_null<T>& operator=( not_null<U> const & other)
-    {
-        ptr_ = other.checked_ptr_ref();
-        return *this;
-    }
-    
-    // converting move constructors and assignment from not_null<U>:
-    // without type_traits, we can't distinguish is_convertible and is_constructible, so all converting constructors are explicit
-    
 #if gsl_HAVE( RVALUE_REFERENCE )
 # if gsl_HAVE( TYPE_TRAITS )
     template< class U >
-    gsl_api gsl_constexpr not_null( not_null<U> && other gsl_REQUIRES_A((std::is_convertible<U, T>::value)) )
+    gsl_api gsl_constexpr not_null( not_null<U> other gsl_REQUIRES_A((std::is_convertible<U, T>::value)) )
     : ptr_( other.checked_ptr_move() )
     {}
 # endif
 
     template< class U >
-    gsl_api gsl_constexpr14 explicit not_null( not_null<U> && other
+    gsl_api gsl_constexpr explicit not_null( not_null<U> other
 # if gsl_HAVE( TYPE_TRAITS )
         gsl_REQUIRES_A((std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value))
 # endif
     )
     : ptr_( other.checked_ptr_move() )
     {}
+#else // a.k.a. #if ! gsl_HAVE( RVALUE_REFERENCE )
+    template< class U >
+    gsl_api gsl_constexpr explicit not_null( const not_null<U>& other )
+    : ptr_( other.checked_ptr_ref() )
+    {}
     
     template< class U >
-    gsl_api gsl_constexpr14 not_null<T>& operator=( not_null<U> && other)
+    gsl_api gsl_constexpr14 not_null<T>& operator=( const not_null<U>& other)
     {
-        ptr_ = other.checked_ptr_move();
+        ptr_ = other.checked_ptr_ref();
         return *this;
     }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
