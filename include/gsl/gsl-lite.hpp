@@ -1398,12 +1398,15 @@ public:
             // see https://mpark.github.io/programming/2014/06/07/beware-of-perfect-forwarding-constructors/
             // alternative would be to have a "copy, then move" constructor
             !detail::is_not_null_cvref<U>::value
-# if ! gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 400)
+        ))
+#if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 )
+        gsl_REQUIRES_A((
             // in clang 3.x, is_constructible with T=unique_ptr<X>, U=not_null<T> tries to call copy constructor of unique_ptr, triggering an error
             // it's okay to skip this check, because misuse will still trigger an error, but a less readable one
-            && std::is_constructible<T, U>::value
-# endif
-    )))
+            std::is_constructible<T, U>::value
+        ))
+#endif
+    )
     : ptr_( std::forward<U>( u ) )
 #else
     not_null( U const & u )
