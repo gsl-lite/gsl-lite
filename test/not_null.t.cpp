@@ -472,17 +472,17 @@ CASE( "not_null<>: Allows assignment to a const pointer from a not_null related 
     EXPECT( &*q == raw );
 }
 
-#if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF ) // This does not work when get_result_t is simply T, see issue #185
 CASE( "not_null<>: Allows indirect member access (unique_ptr)" )
 {
+#if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF ) // This does not work when get_result_t is simply T, see issue #185
     using namespace nonlocal;
     S s = { 'a', 7 };
     not_null< unique_ptr< S > > p( make_unique< S >(s) );
 
     EXPECT( p->c == 'a' );
     EXPECT( p->i ==  7  );
-}
 #endif
+}
 
 CASE( "not_null<>: Allows dereferencing (unique_ptr)" )
 {
