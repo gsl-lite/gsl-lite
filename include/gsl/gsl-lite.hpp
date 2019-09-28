@@ -1414,8 +1414,8 @@ public:
     gsl_api gsl_constexpr   not_null( not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 # if gsl_HAVE( RVALUE_REFERENCE )
-    gsl_api gsl_constexpr   not_null( not_null && other ) : ptr_( std::move( other.get() ) ) {}
-    gsl_api                 not_null & operator=( not_null && other ) { ptr_ = std::move( other.get() ); return *this; }
+    gsl_api gsl_constexpr   not_null( not_null && other ) : ptr_( other.checked_ptr_move() ) {}
+    gsl_api                 not_null & operator=( not_null && other ) { ptr_ = other.checked_ptr_move(); return *this; }
 # endif
 #endif
 
