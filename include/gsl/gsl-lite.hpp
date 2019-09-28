@@ -1360,9 +1360,6 @@ gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 // not_null<> - Wrap any indirection and enforce non-null.
 //
 
-template< class T >
-class not_null;
-
 namespace detail
 {
     // helper class to figure out the pointed-to type of a pointer
@@ -1411,6 +1408,7 @@ class not_null
     typedef T get_result_t;
 #endif
 
+    // need to access not_null<U>'s checked_ptr()
     template< class U >
     friend class not_null;
 
@@ -1455,8 +1453,8 @@ public:
     gsl_api gsl_constexpr   not_null( not_null const & other ) : ptr_ ( other.ptr_  ) {}
     gsl_api                 not_null & operator=( not_null const & other ) { ptr_ = other.ptr_; return *this; }
 # if gsl_HAVE( RVALUE_REFERENCE )
-    gsl_api gsl_constexpr   not_null( not_null && other ) : ptr_( other.checked_ptr_move() ) {}
-    gsl_api                 not_null & operator=( not_null && other ) { ptr_ = other.checked_ptr_move(); return *this; }
+    gsl_api gsl_constexpr   not_null( not_null && other ) : ptr_( std::move(other.checked_ptr()) ) {}
+    gsl_api                 not_null & operator=( not_null && other ) { ptr_ = std::move(other.checked_ptr()); return *this; }
 # endif
 #endif
 
@@ -1469,7 +1467,7 @@ public:
         gsl_REQUIRES_A((std::is_convertible<U, T>::value))
     >
     gsl_api gsl_constexpr not_null( not_null<U> other )
-    : ptr_( other.checked_ptr_move() )
+    : ptr_( std::move(other.checked_ptr()) )
     {}
 # endif
 
@@ -1479,37 +1477,37 @@ public:
 # endif
     >
     gsl_api gsl_constexpr explicit not_null( not_null<U> other )
-    : ptr_( other.checked_ptr_move() )
+    : ptr_( std::move(other.checked_ptr()) )
     {}
 #else // a.k.a. #if ! gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_api gsl_constexpr explicit not_null( const not_null<U>& other )
-    : ptr_( other.checked_ptr_ref() )
+    : ptr_( other.checked_ptr() )
     {}
     
     template< class U >
     gsl_api gsl_constexpr14 not_null<T>& operator=( const not_null<U>& other)
     {
-        ptr_ = other.checked_ptr_ref();
+        ptr_ = other.checked_ptr();
         return *this;
     }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
     gsl_api gsl_constexpr14 get_result_t get() const
     {
-        return checked_ptr_ref();
+        return checked_ptr();
     }
 
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-    gsl_api gsl_constexpr   operator T const &     () const & { return checked_ptr_ref(); }
-    gsl_api gsl_constexpr14 operator T &&          () &&      { return checked_ptr_move(); }
+    gsl_api gsl_constexpr   operator T const &     () const & { return checked_ptr(); }
+    gsl_api gsl_constexpr14 operator T &&          () &&      { return std::move(checked_ptr()); }
 
 #else
-    gsl_api gsl_constexpr   operator get_result_t  () const   { return checked_ptr_ref(); }
+    gsl_api gsl_constexpr   operator get_result_t  () const   { return checked_ptr(); }
 #endif
 
-    gsl_api gsl_constexpr   get_result_t operator->() const   { return checked_ptr_ref(); }
-    gsl_api gsl_constexpr   element_type& operator*() const   { return *checked_ptr_ref(); }
+    gsl_api gsl_constexpr   get_result_t operator->() const   { return get(); }
+    gsl_api gsl_constexpr   element_type& operator*() const   { return *checked_ptr(); }
 
 gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
@@ -1536,22 +1534,18 @@ gsl_is_delete_access:
 
 private:
     T ptr_;
-    
-    // checked_ptr_ref and checked_ptr_move could be overloads based on the rvaluedness of *this, but GCC 4.7.3 doesn't support that
-    
-    gsl_api gsl_constexpr14 T const & checked_ptr_ref() const
+        
+    gsl_api gsl_constexpr14 T const & checked_ptr() const
     {
         Ensures( ptr_ != gsl_nullptr );
         return ptr_;
     }
 
-#if gsl_HAVE( RVALUE_REFERENCE )
-    gsl_api gsl_constexpr14 T && checked_ptr_move()
+    gsl_api gsl_constexpr14 T & checked_ptr()
     {
         Ensures( ptr_ != gsl_nullptr );
-        return std::move(ptr_);
+        return ptr_;
     }
-#endif
 };
 
 // not_null with implicit constructor, allowing copy-initialization:
