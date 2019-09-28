@@ -1458,18 +1458,9 @@ public:
 # endif
 #endif
 
-    // converting copy constructors and assignment from not_null<U>:
-    // without type_traits, we can't distinguish is_convertible and is_constructible, so all converting constructors are explicit in that case
-
 #if gsl_HAVE( RVALUE_REFERENCE )
-# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
-    template< class U
-        gsl_REQUIRES_A((std::is_convertible<U, T>::value))
-    >
-    gsl_api gsl_constexpr not_null( not_null<U> other )
-    : ptr_( std::move(other.checked_ptr()) )
-    {}
-# endif
+    // explicit converting constructor
+    // if type_traits is not available, then we can't distinguish is_convertible and is_constructible, so we use this unconditionally
 
     template< class U
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
@@ -1479,6 +1470,24 @@ public:
     gsl_api gsl_constexpr explicit not_null( not_null<U> other )
     : ptr_( std::move(other.checked_ptr()) )
     {}
+
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
+    // implicit converting constructor if type_traits is available
+    template< class U
+        gsl_REQUIRES_A((std::is_convertible<U, T>::value))
+    >
+    gsl_api gsl_constexpr not_null( not_null<U> other )
+    : ptr_( std::move(other.checked_ptr()) )
+    {}
+# else
+    // there's no implicit converting constructor, so we need to define the assignment operator manually
+    template< class U >
+    gsl_api gsl_constexpr14 not_null<T>& operator=( not_null<U> other)
+    {
+        ptr_ = std::move(other.checked_ptr());
+        return *this;
+    }
+# endif
 #else // a.k.a. #if ! gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_api gsl_constexpr explicit not_null( const not_null<U>& other )
