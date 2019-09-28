@@ -304,6 +304,7 @@
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_120
 #define gsl_HAVE_EXPLICIT               gsl_CPP11_120
 #define gsl_HAVE_INITIALIZER_LIST       gsl_CPP11_120
+#define gsl_HAVE_VARIADIC_TEMPLATE      gsl_CPP11_120
 
 #define gsl_HAVE_CONSTEXPR_11           gsl_CPP11_140
 #define gsl_HAVE_IS_DEFAULT             gsl_CPP11_140
@@ -580,11 +581,12 @@ typedef integral_constant< bool, false > false_type;
 
 namespace std14 {
 
-#if gsl_HAVE( MAKE_UNIQUE )
+#if gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( MAKE_UNIQUE )
 
 using std::make_unique;
 
-#elif gsl_HAVE( UNIQUE_PTR )
+# elif gsl_HAVE( VARIADIC_TEMPLATE )
 
 template<typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args)
@@ -592,7 +594,28 @@ std::unique_ptr<T> make_unique(Args&&... args)
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-#endif // gsl_HAVE( MAKE_UNIQUE )
+# else
+
+template<typename T>
+std::unique_ptr<T> make_unique()
+{
+    return std::unique_ptr<T>(new T());
+}
+
+template<typename T, typename Arg>
+std::unique_ptr<T> make_unique(Arg&& arg)
+{
+    return std::unique_ptr<T>(new T(std::forward<Arg>(arg)));
+}
+
+template<typename T, typename Arg1, typename Arg2>
+std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2)
+{
+    return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2)));
+}
+
+# endif // gsl_HAVE( MAKE_UNIQUE ), gsl_HAVE( VARIADIC_TEMPLATE )
+#endif // gsl_HAVE( UNIQUE_PTR )
 
 } // namespace std14
 
