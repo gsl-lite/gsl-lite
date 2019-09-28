@@ -240,7 +240,7 @@
     typename std::enable_if<VA, R>::type
 
 #define gsl_REQUIRES_A(VA) \
-    , typename std::enable_if<VA, void*>::type = nullptr
+    , typename std::enable_if<VA, int>::type = 0
 
 // Compiler non-strict aliasing:
 
@@ -1398,19 +1398,19 @@ public:
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
-    template< class U >
-    gsl_api gsl_constexpr14 gsl_not_null_explicit
-#if gsl_HAVE( RVALUE_REFERENCE )
-    not_null( U u
-#if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! defined( __apple_build_version__ )
+    template< class U
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! defined( __apple_build_version__ )
         gsl_REQUIRES_A((
             // in clang 3.x, is_constructible with T=unique_ptr<X>, U=not_null<T> tries to call copy constructor of unique_ptr, triggering an error
             // it's okay to skip this check, because misuse will still trigger an error, but a less readable one
             // apple clang's __clang_major__ etc. are different from regular clang, so it's best to simply not poke the beast, and skip is_constructible entirely
             std::is_constructible<T, U>::value
         ))
-#endif
-    )
+#endif    
+    >
+    gsl_api gsl_constexpr14 gsl_not_null_explicit
+#if gsl_HAVE( RVALUE_REFERENCE )
+    not_null( U u )
     : ptr_( std::move( u ) )
 #else
     not_null( U const & u )
@@ -1438,22 +1438,24 @@ public:
 #endif
 
     // converting copy constructors and assignment from not_null<U>:
-    // without type_traits, we can't distinguish is_convertible and is_constructible, so all converting constructors are explicit
+    // without type_traits, we can't distinguish is_convertible and is_constructible, so all converting constructors are explicit in that case
 
 #if gsl_HAVE( RVALUE_REFERENCE )
-# if gsl_HAVE( TYPE_TRAITS )
-    template< class U >
-    gsl_api gsl_constexpr not_null( not_null<U> other gsl_REQUIRES_A((std::is_convertible<U, T>::value)) )
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
+    template< class U
+        gsl_REQUIRES_A((std::is_convertible<U, T>::value))
+    >
+    gsl_api gsl_constexpr not_null( not_null<U> other )
     : ptr_( other.checked_ptr_move() )
     {}
 # endif
 
-    template< class U >
-    gsl_api gsl_constexpr explicit not_null( not_null<U> other
-# if gsl_HAVE( TYPE_TRAITS )
+    template< class U
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
         gsl_REQUIRES_A((std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value))
 # endif
-    )
+    >
+    gsl_api gsl_constexpr explicit not_null( not_null<U> other )
     : ptr_( other.checked_ptr_move() )
     {}
 #else // a.k.a. #if ! gsl_HAVE( RVALUE_REFERENCE )
