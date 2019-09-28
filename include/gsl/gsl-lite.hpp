@@ -1384,10 +1384,11 @@ public:
     gsl_api gsl_constexpr14 gsl_not_null_explicit
 #if gsl_HAVE( RVALUE_REFERENCE )
     not_null( U u
-#if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 )
+#if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! defined( __apple_build_version__ )
         gsl_REQUIRES_A((
             // in clang 3.x, is_constructible with T=unique_ptr<X>, U=not_null<T> tries to call copy constructor of unique_ptr, triggering an error
             // it's okay to skip this check, because misuse will still trigger an error, but a less readable one
+            // apple clang's __clang_major__ etc. are different from regular clang, so it's best to simply not poke the beast, and skip is_constructible entirely
             std::is_constructible<T, U>::value
         ))
 #endif
