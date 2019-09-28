@@ -179,7 +179,7 @@ CASE( "not_null<>: Allows assignment from a not_null related pointer type (raw p
 {
     MyDerived derived;
     not_null< MyDerived* > p( &derived );
-    not_null< MyBase* > q(p);
+    not_null< MyBase*    > q( p );
 
     q = p;
 
@@ -189,8 +189,8 @@ CASE( "not_null<>: Allows assignment from a not_null related pointer type (raw p
 CASE( "not_null<>: Allows assignment to a const pointer from a not_null related pointer type (raw pointer)" )
 {
     MyDerived derived;
-    not_null< MyDerived* > p( &derived );
-    not_null< const MyBase* > q(p);
+    not_null< MyDerived*    > p( &derived );
+    not_null< const MyBase* > q( p );
 
     q = p;
 
@@ -283,7 +283,11 @@ CASE( "not_null<>: Allows to construct from a not_null related pointer type (sha
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
+#if gsl_CPP11_OR_GREATER
     not_null< shared_ptr< MyBase > > q = p;
+#else
+    not_null< shared_ptr< MyBase > > q(p); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( q == p );
 }
@@ -293,7 +297,11 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
+#if gsl_CPP11_OR_GREATER
     not_null< shared_ptr< const MyBase > > q = p;
+#else
+    not_null< shared_ptr< const MyBase > > q(p); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( q == p );
 }
@@ -302,7 +310,7 @@ CASE( "not_null<>: Allows assignment from a not_null related pointer type (share
 {
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
-    not_null< shared_ptr< MyBase >    > q = p;
+    not_null< shared_ptr< MyBase >    > q( p );
 
     q = p;
 
@@ -313,7 +321,7 @@ CASE( "not_null<>: Allows assignment to a const pointer from a not_null related 
 {
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived    > > p( pderived );
-    not_null< shared_ptr< const MyBase > > q = p;
+    not_null< shared_ptr< const MyBase > > q( p );
 
     q = p;
 
@@ -414,7 +422,11 @@ CASE( "not_null<>: Allows to construct from a not_null related pointer type (uni
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
+#if gsl_CPP11_OR_GREATER
     not_null< unique_ptr< MyBase > > q = std::move(p);
+#else
+    not_null< unique_ptr< MyBase > > q(std::move(p)); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( &*q == raw );
 }
@@ -425,7 +437,11 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
+#if gsl_CPP11_OR_GREATER
     not_null< unique_ptr< const MyBase > > q = std::move(p);
+#else
+    not_null< unique_ptr< const MyBase > > q(std::move(p)); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( &*q == raw );
 }
@@ -521,7 +537,11 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a not_null
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
+#if gsl_CPP11_OR_GREATER
     not_null< shared_ptr< int > > q = std::move(p);
+#else
+    not_null< shared_ptr< int > > q(std::move(p)); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( &*q == raw );
 }
@@ -532,7 +552,11 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a no
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
+#if gsl_CPP11_OR_GREATER
     not_null< shared_ptr< const int > > q = std::move(p);
+#else
+    not_null< shared_ptr< const int > > q(std::move(p)); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( &*q == raw );
 }
@@ -543,7 +567,11 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related 
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
+#if gsl_CPP11_OR_GREATER
     not_null< shared_ptr< MyBase > > q = std::move(p);
+#else
+    not_null< shared_ptr< MyBase > > q(std::move(p)); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( &*q == raw );
 }
@@ -554,7 +582,11 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a re
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
+#if gsl_CPP11_OR_GREATER
     not_null< shared_ptr< const MyBase > > q = std::move(p);
+#else
+    not_null< shared_ptr< const MyBase > > q(std::move(p)); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 
     EXPECT( &*q == raw );
 }
