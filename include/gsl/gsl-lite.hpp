@@ -576,6 +576,26 @@ typedef integral_constant< bool, false > false_type;
 
 } // namespace std11
 
+// C++14 emulation:
+
+namespace std14 {
+
+#if gsl_HAVE( MAKE_UNIQUE )
+
+using std::make_unique;
+
+#elif gsl_HAVE( UNIQUE_PTR )
+
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+#endif // gsl_HAVE( MAKE_UNIQUE )
+
+} // namespace std14
+
 // C++17 emulation:
 
 namespace std17 {
@@ -769,9 +789,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
   using std::unique_ptr;
   using std::shared_ptr;
   using std::make_shared;
-# if gsl_HAVE( MAKE_UNIQUE )
-  using std::make_unique;
-# endif
+  using std14::make_unique;
 #endif
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )

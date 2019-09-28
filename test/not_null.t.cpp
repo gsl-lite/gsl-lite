@@ -20,24 +20,6 @@
 
 using namespace gsl;
 
-#if gsl_HAVE( SHARED_PTR )
-using std::shared_ptr;
-using std::make_shared;
-#endif
-
-#if gsl_HAVE( UNIQUE_PTR )
-using std::unique_ptr;
-# if gsl_HAVE( MAKE_UNIQUE )
-using std::make_unique;
-# else
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-# endif
-#endif
-
 namespace {
 
 struct MyBase {};
