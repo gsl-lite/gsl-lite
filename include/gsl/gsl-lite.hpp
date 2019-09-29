@@ -594,26 +594,6 @@ std::unique_ptr<T> make_unique(Args&&... args)
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
-# else
-
-template<typename T>
-std::unique_ptr<T> make_unique()
-{
-    return std::unique_ptr<T>(new T());
-}
-
-template<typename T, typename Arg>
-std::unique_ptr<T> make_unique(Arg&& arg)
-{
-    return std::unique_ptr<T>(new T(std::forward<Arg>(arg)));
-}
-
-template<typename T, typename Arg1, typename Arg2>
-std::unique_ptr<T> make_unique(Arg1&& arg1, Arg2&& arg2)
-{
-    return std::unique_ptr<T>(new T(std::forward<Arg1>(arg1), std::forward<Arg2>(arg2)));
-}
-
 # endif // gsl_HAVE( MAKE_UNIQUE ), gsl_HAVE( VARIADIC_TEMPLATE )
 #endif // gsl_HAVE( UNIQUE_PTR )
 
@@ -812,7 +792,9 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
   using std::unique_ptr;
   using std::shared_ptr;
   using std::make_shared;
+# if gsl_HAVE( MAKE_UNIQUE ) || gsl_HAVE( VARIADIC_TEMPLATE )
   using std14::make_unique;
+# endif
 #endif
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )

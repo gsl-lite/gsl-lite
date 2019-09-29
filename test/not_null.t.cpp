@@ -350,6 +350,20 @@ CASE( "not_null<>: Allows dereferencing (shared_ptr)" )
 
 #if gsl_HAVE( UNIQUE_PTR )
 
+# if ! gsl_HAVE( MAKE_UNIQUE ) && ! gsl_HAVE( VARIADIC_TEMPLATE )
+template<typename T>
+unique_ptr<T> make_unique()
+{
+    return unique_ptr<T>(new T());
+}
+
+template<typename T, typename Arg>
+unique_ptr<T> make_unique(Arg&& arg)
+{
+    return unique_ptr<T>(new T(std::forward<Arg>(arg)));
+}
+# endif
+
 CASE( "not_null<>: Terminates construction from a null pointer value (unique_ptr)" )
 {
     struct F { static void blow() { unique_ptr< int > z = gsl_nullptr; not_null< unique_ptr< int > > p(std::move(z)); } };
