@@ -648,6 +648,10 @@ Expects(): Allows a true expression
 Ensures(): Allows a true expression
 Expects(): Terminates on a false expression
 Ensures(): Terminates on a false expression
+ExpectsAudit(): Allows a true expression
+EnsuresAudit(): Allows a true expression
+ExpectsAudit(): Terminates on a false expression in AUDIT mode
+EnsuresAudit(): Terminates on a false expression in AUDIT mode
 at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements (C++11)
 at(): Terminates access to non-existing std::vector elements
@@ -680,19 +684,61 @@ not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATI
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
-not_null<>: Terminates construction from a null pointer value
-not_null<>: Terminates construction from related pointer types for null pointer value
-not_null<>: Terminates assignment from a null pointer value
-not_null<>: Terminates assignment from related pointer types for null pointer value
-not_null<>: Allows to construct from a non-null underlying pointer
-not_null<>: Allows to construct from a non-null user-defined ref-counted type
-not_null<>: Allows to construct from a non-null related pointer
-not_null<>: Allows to construct from a not_null related pointer type
-not_null<>: Allows assignment from a not_null related pointer type
+not_null<>: Terminates construction from a null pointer value (raw pointer)
+not_null<>: Terminates construction from related pointer types for null pointer value (raw pointer)
+not_null<>: Terminates assignment from a null pointer value (raw pointer)
+not_null<>: Terminates assignment from related pointer types for null pointer value (raw pointer)
+not_null<>: Allows to construct from a non-null underlying pointer (raw pointer)
+not_null<>: Allows to construct a const pointer from a non-null underlying pointer (raw pointer)
+not_null<>: Allows to construct from a non-null related pointer (raw pointer)
+not_null<>: Allows to construct a const pointer from a non-null related pointer (raw pointer)
+not_null<>: Allows to construct from a not_null related pointer type (raw pointer)
+not_null<>: Allows to construct a const pointer from a not_null related pointer type (raw pointer)
+not_null<>: Allows assignment from a not_null related pointer type (raw pointer)
+not_null<>: Allows assignment to a const pointer from a not_null related pointer type (raw pointer)
+not_null<>: Allows indirect member access (raw pointer)
+not_null<>: Allows dereferencing (raw pointer)
+not_null<>: Terminates construction from a null pointer value (shared_ptr)
+not_null<>: Terminates construction from related pointer types for null pointer value (shared_ptr)
+not_null<>: Terminates assignment from a null pointer value (shared_ptr)
+not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)
+not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)
+not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)
+not_null<>: Allows to construct from a non-null related pointer (shared_ptr)
+not_null<>: Allows to construct a const pointer from a non-null related pointer (shared_ptr)
+not_null<>: Allows to construct from a not_null related pointer type (shared_ptr)
+not_null<>: Allows to construct a const pointer from a not_null related pointer type (shared_ptr)
+not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)
+not_null<>: Allows assignment to a const pointer from a not_null related pointer type (shared_ptr)
+not_null<>: Allows indirect member access (shared_ptr)
+not_null<>: Allows dereferencing (shared_ptr)
+not_null<>: Terminates construction from a null pointer value (unique_ptr)
+not_null<>: Terminates construction from related pointer types for null pointer value (unique_ptr)
+not_null<>: Terminates assignment from a null pointer value (unique_ptr)
+not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)
+not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)
+not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)
+not_null<>: Allows to construct from a non-null related pointer (unique_ptr)
+not_null<>: Allows to construct a const pointer from a non-null related pointer (unique_ptr)
+not_null<>: Allows to construct from a not_null related pointer type (unique_ptr)
+not_null<>: Allows to construct a const pointer from a not_null related pointer type (unique_ptr)
+not_null<>: Allows assignment from a not_null related pointer type (unique_ptr)
+not_null<>: Allows assignment to a const pointer from a not_null related pointer type (unique_ptr)
+not_null<>: Allows indirect member access (unique_ptr)
+not_null<>: Allows dereferencing (unique_ptr)
+not_null<>: Allows to construct a not_null<shared_ptr<T>> from a non-null unique_ptr<T>
+not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a non-null unique_ptr<T>
+not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related non-null unique_ptr<U>
+not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a related non-null unique_ptr<U>
+not_null<>: Allows to construct a not_null<shared_ptr<T>> from a not_null<unique_ptr<T>>
+not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a not_null<unique_ptr<T>>
+not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related not_null<unique_ptr<U>>
+not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a related not_null<unique_ptr<U>>
+not_null<>: Allows assignment to a not_null<shared_ptr<T>> from a related not_null<unique_ptr<U>>
+not_null<>: Allows assignment to a not_null<shared_ptr<const T>> from a related not_null<unique_ptr<U>>
 not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
-not_null<>: Allows indirect member access
-not_null<>: Allows dereferencing
+not_null<>: Allows to construct from a non-null user-defined ref-counted type
 not_null<>: Allows to compare equal to another not_null of the same type
 not_null<>: Allows to compare unequal to another not_null of the same type
 not_null<>: Allows to compare less than another not_null of the same type
@@ -705,6 +751,13 @@ not_null<>: Allows to compare less than a raw pointer of the same type
 not_null<>: Allows to compare less than or equal to a raw pointer of the same type
 not_null<>: Allows to compare greater than a raw pointer of the same type
 not_null<>: Allows to compare greater than or equal to a raw pointer of the same type
+not_null<>: Able to deduce element_type of raw pointers
+not_null<>: Able to deduce element_type of unique_ptr
+not_null<>: Able to deduce element_type of shared_ptr
+not_null<>: Able to deduce element_type of normal user-defined smart pointers
+not_null<>: Able to correctly deduce element_type of user-defined smart pointers even if typedef and result of dereferencing differs
+not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef
+not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef, and element_type differs from T
 owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
