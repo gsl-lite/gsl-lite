@@ -1610,6 +1610,9 @@ template< class U >
 not_null( not_null<U> ) -> not_null<U>;
 #endif
 
+#if gsl_HAVE( NULLPTR )
+void make_not_null( std::nullptr_t ) = delete;
+#endif // gsl_HAVE( NULLPTR )
 #if gsl_HAVE( RVALUE_REFERENCE )
 template< class U >
 not_null<U> make_not_null( U u )
