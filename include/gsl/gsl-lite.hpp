@@ -1532,13 +1532,19 @@ public:
     gsl_api gsl_constexpr14 operator T() const & { return checked_ptr(); }
     gsl_api gsl_constexpr14 operator T() &&      { return std::move(checked_ptr()); }
 
+    gsl_api gsl_constexpr14 T const & operator->() const & { return checked_ptr(); }
+    gsl_api gsl_constexpr14 T &&      operator->() &&      { return std::move(checked_ptr()); }
+
+    gsl_api gsl_constexpr14 element_type &  operator*() const & { return *checked_ptr(); }
+    gsl_api gsl_constexpr14 element_type && operator*() &&      { return *std::move(checked_ptr()); }
 
 #else
     gsl_api gsl_constexpr   operator get_result_t  () const   { return checked_ptr(); }
-#endif
 
-    gsl_api gsl_constexpr   get_result_t operator->() const   { return get(); }
-    gsl_api gsl_constexpr   element_type& operator*() const   { return *checked_ptr(); }
+    gsl_api gsl_constexpr   get_result_t operator->() const   { return checked_ptr(); }
+
+    gsl_api gsl_constexpr   element_type & operator*() const  { return *checked_ptr(); }
+#endif
 
 gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
