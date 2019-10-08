@@ -896,7 +896,7 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
 # else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_assert() )
 # endif
 #endif
 
@@ -975,7 +975,7 @@ void fail_fast_assert( bool cond, char const * const expression, char const * co
 
 namespace detail {
 
-gsl_api gsl_noreturn inline void fail_fast() gsl_noexcept
+gsl_api gsl_noreturn inline void fail_fast_assert() gsl_noexcept
 {
     std::terminate();
 }
