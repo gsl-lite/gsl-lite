@@ -692,6 +692,8 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (raw pointer)
 not_null<>: Terminates assignment from related pointer types for null pointer value (raw pointer)
 not_null<>: Allows to construct from a non-null underlying pointer (raw pointer)
+not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with make_not_null()
+not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (raw pointer)
 not_null<>: Allows to construct from a non-null related pointer (raw pointer)
 not_null<>: Allows to construct a const pointer from a non-null related pointer (raw pointer)
@@ -706,6 +708,8 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (shared_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)
+not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()
+not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)
 not_null<>: Allows to construct from a non-null related pointer (shared_ptr)
 not_null<>: Allows to construct a const pointer from a non-null related pointer (shared_ptr)
@@ -720,6 +724,9 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (unique_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)
+not_null<>: Allows to move from a not-null pointer (unique_ptr)
+not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()
+not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)
 not_null<>: Allows to construct from a non-null related pointer (unique_ptr)
 not_null<>: Allows to construct a const pointer from a non-null related pointer (unique_ptr)
