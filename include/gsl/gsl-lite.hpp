@@ -314,6 +314,8 @@
 #define gsl_HAVE_NOEXCEPT               gsl_CPP11_140
 #define gsl_HAVE_NORETURN               gsl_CPP11_140
 
+#define gsl_HAVE_EXPRESSION_SFINAE      gsl_CPP11_140
+
 #if gsl_CPP11_OR_GREATER
 // see above
 #endif
@@ -435,6 +437,14 @@
 #endif
 
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
+
+// Expression SFINAE
+
+#if gsl_HAVE( EXPRESSION_SFINAE )
+# define gsl_DECLTYPE_(T, EXPR) decltype(EXPR)
+#else
+# define gsl_DECLTYPE_(T, EXPR) T
+#endif // gsl_HAVE( EXPRESSION_SFINAE )
 
 // Other features:
 
@@ -1624,37 +1634,115 @@ not_null<T> operator+( std::ptrdiff_t, not_null<T> const & ) gsl_is_delete;
 // not_null comparisons
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator==( not_null<T> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+operator==( not_null<T> const & l, not_null<U> const & r )
 {
-    return  l.get() == r.get();
+    return l.operator->() == r.operator->();
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+operator==( not_null<T> const & l, U const & r )
+{
+    return l.operator->() == r;
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+operator==( T const & l, not_null<U> const & r )
+{
+    return l == r.operator->();
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator< ( not_null<T> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+operator<( not_null<T> const & l, not_null<U> const & r )
 {
-    return l.get() < r.get();
+    return l.operator->() < r.operator->();
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+operator<( not_null<T> const & l, U const & r )
+{
+    return l.operator->() < r;
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+operator<( T const & l, not_null<U> const & r )
+{
+    return l < r.operator->();
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator!=( not_null<T> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+operator!=( not_null<T> const & l, not_null<U> const & r )
+{
+    return !( l == r );
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+operator!=( not_null<T> const & l, U const & r )
+{
+    return !( l == r );
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+operator!=( T const & l, not_null<U> const & r )
 {
     return !( l == r );
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator<=( not_null<T> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+operator<=( not_null<T> const & l, not_null<U> const & r )
+{
+    return !( r < l );
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+operator<=( not_null<T> const & l, U const & r )
+{
+    return !( r < l );
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+operator<=( T const & l, not_null<U> const & r )
 {
     return !( r < l );
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator> ( not_null<T> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+operator>( not_null<T> const & l, not_null<U> const & r )
 {
-    return ( r < l );
+    return r < l;
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+operator>( not_null<T> const & l, U const & r )
+{
+    return r < l;
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+operator>( T const & l, not_null<U> const & r )
+{
+    return r < l;
 }
 
 template< class T, class U >
-gsl_api inline gsl_constexpr bool operator>=( not_null<T> const & l, not_null<U> const & r )
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+operator>=( not_null<T> const & l, not_null<U> const & r )
+{
+    return !( l < r );
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+operator>=( not_null<T> const & l, U const & r )
+{
+    return !( l < r );
+}
+template< class T, class U >
+gsl_api inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+operator>=( T const & l, not_null<U> const & r )
 {
     return !( l < r );
 }

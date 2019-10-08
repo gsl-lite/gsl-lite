@@ -119,7 +119,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
 
     not_null< int* > p( &i );
 
-    EXPECT( p.get() == &i );
+    EXPECT( p == &i );
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (raw pointer)" )
@@ -128,7 +128,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
 
     not_null< const int* > p( &i );
 
-    EXPECT( p.get() == &i );
+    EXPECT( p == &i );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
@@ -136,7 +136,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer (raw poin
     MyDerived derived;
     not_null< MyBase* > p( &derived );
 
-    EXPECT( p.get() == &derived );
+    EXPECT( p == &derived );
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null related pointer (raw pointer)" )
@@ -144,7 +144,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null related p
     MyDerived derived;
     not_null< const MyBase* > p( &derived );
 
-    EXPECT( p.get() == &derived );
+    EXPECT( p == &derived );
 }
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type (raw pointer)" )
@@ -251,7 +251,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
-    EXPECT( p.get() == pi );
+    EXPECT( p == pi );
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)" )
@@ -259,7 +259,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< const int > > p( pi );
 
-    EXPECT( p.get() == pi );
+    EXPECT( p == pi );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -267,7 +267,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_p
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyBase > > p( pderived );
 
-    EXPECT( p.get() == pderived );
+    EXPECT( p == pderived );
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null related pointer (shared_ptr)" )
@@ -275,7 +275,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null related p
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< const MyBase > > p( pderived );
 
-    EXPECT( p.get() == pderived );
+    EXPECT( p == pderived );
 }
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type (shared_ptr)" )
@@ -658,7 +658,7 @@ CASE( "not_null<>: Allows to construct from a non-null user-defined ref-counted 
 
     not_null<   int*>  p( rp );
 
-    EXPECT( p.get() == &i );
+    EXPECT( p == &i );
 }
 
 namespace {
