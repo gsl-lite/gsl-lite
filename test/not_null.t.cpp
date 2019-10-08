@@ -122,6 +122,17 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
     EXPECT( p == &i );
 }
 
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with deduction guide" )
+{
+#if gsl_HAVE( DEDUCTION_GUIDES )
+    int i = 12;
+
+    not_null p( &i );
+
+    EXPECT( p == &i );
+#endif
+}
+
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (raw pointer)" )
 {
     int i = 12;
@@ -252,6 +263,17 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     not_null< shared_ptr< int > > p( pi );
 
     EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with deduction guide" )
+{
+#if gsl_HAVE( DEDUCTION_GUIDES )
+    shared_ptr< int > pi = make_shared< int >(12);
+
+    not_null p( pi );
+
+    EXPECT( p == pi );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)" )
@@ -401,6 +423,18 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with deduction guide" )
+{
+#if gsl_HAVE( DEDUCTION_GUIDES )
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null p( std::move(pi) );
+
+    EXPECT( &*p == raw );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)" )

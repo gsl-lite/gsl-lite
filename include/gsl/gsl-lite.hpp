@@ -334,7 +334,7 @@
 // MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
 
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
-#define gsl_HAVE_DEDUCTION_GUIDES      (gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
+#define gsl_HAVE_DEDUCTION_GUIDES       ( gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
 #define gsl_HAVE_NODISCARD              gsl_CPP17_000
 
 // Presence of C++ library features:
@@ -1603,6 +1603,13 @@ private:
         return ptr_;
     }
 };
+#if gsl_HAVE( DEDUCTION_GUIDES )
+template< class U >
+not_null( U ) -> not_null<U>;
+template< class U >
+not_null( not_null<U> ) -> not_null<U>;
+#endif
+
 
 // not_null with implicit constructor, allowing copy-initialization:
 
