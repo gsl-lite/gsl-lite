@@ -443,6 +443,20 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     EXPECT( &*p == raw );
 }
 
+CASE( "not_null<>: Allows to move from a not-null pointer (unique_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
+    pi = std::move(p); // ...and back again.
+
+    EXPECT_THROWS( *p );
+    EXPECT( pi.get() == raw );
+#endif
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()" )
 {
     unique_ptr< int > pi = make_unique< int >(12);
