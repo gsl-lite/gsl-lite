@@ -386,7 +386,7 @@ namespace gsl {
 
 ### Microsoft GSL compatibility macros
 
-\-D<b>GSL_UNENFORCED_ON_CONTRACT_VIOLATION</b>  
+\-D<b>GSL\_UNENFORCED\_ON\_CONTRACT\_VIOLATION</b>  
 Equivalent to -Dgsl_CONFIG_CONTRACT_LEVEL_OFF.
 
 \-D<b>GSL\_THROW\_ON\_CONTRACT\_VIOLATION</b>  
@@ -406,7 +406,7 @@ Define this macro to the type to use for indices in `span` and `basic_string_spa
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_EXPLICIT\_CTOR</b>=0  
 Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl lite*-specific `not_null`-derived class `not_null_ic`.
 
-\-D<b>gsl\_CONFIG\_NOT\_NULL\_GET_BY\_CONST\_REF</b>=0  
+\-D<b>gsl\_CONFIG\_NOT\_NULL\_GET\_BY\_CONST\_REF</b>=0  
 Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T` in pre-C++11 mode. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`. This macro has no effect if rvalue references are available.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_TRANSPARENT\_GET</b>=0  
