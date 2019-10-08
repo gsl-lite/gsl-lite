@@ -1528,8 +1528,8 @@ public:
     {
         return checked_ptr();
     }
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
 
-#if gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_api gsl_constexpr   operator T const &     () const & { return checked_ptr(); }
     gsl_api gsl_constexpr14 operator T &&          () &&      { return std::move(checked_ptr()); }
 
