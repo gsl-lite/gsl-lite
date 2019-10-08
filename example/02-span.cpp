@@ -2,6 +2,8 @@
 
 #include "gsl/gsl-lite.hpp"
 #include <iostream>
+#include <array>
+#include <vector>
 
 using namespace gsl;
 
