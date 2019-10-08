@@ -25,7 +25,7 @@ set( package_nspace  "gsl" )
 set( package_name    "${unit_name}-lite" )
 set( package_version "${${PROJECT_NAME}_VERSION}" )
 
-message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '${package_version}'")
+message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '${package_version}'" )
 
 # Toplevel or subproject:
 
@@ -37,9 +37,11 @@ endif()
 
 # If toplevel project, enable building and performing of tests, disable building of examples:
 
-option( GSL_LITE_OPT_BUILD_TESTS    "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
-option( GSL_LITE_OPT_BUILD_EXAMPLES "Build gsl-lite examples" OFF )
-option( CMAKE_EXPORT_PACKAGE_REGISTRY "Export build directory to CMake user package registry" OFF )
+option( GSL_LITE_OPT_BUILD_TESTS             "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
+option( GSL_LITE_OPT_BUILD_EXAMPLES          "Build gsl-lite examples" OFF )
+option( CMAKE_EXPORT_PACKAGE_REGISTRY        "Export build directory to CMake user package registry" OFF )
+option( GSL_LITE_OPT_INSTALL_COMPAT_HEADER   "Install MS-GSL compatibility header <gsl/gsl>" OFF )
+option( GSL_LITE_OPT_INSTALL_LEGACY_HEADERS  "Install legacy headers <gsl.h>, <gsl.hpp>, <gsl/gsl-lite.h>" OFF )
 
 # If requested, build and perform tests, build examples:
 
@@ -134,8 +136,25 @@ install(
 )
 
 install(
-    DIRECTORY   "include/"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    FILES       "include/gsl/gsl-lite.hpp"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/gsl/"
 )
+if(GSL_LITE_OPT_INSTALL_COMPAT_HEADER)
+    install(
+        FILES       "include/gsl/gsl"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/gsl/"
+    )
+endif()
+if(GSL_LITE_OPT_INSTALL_LEGACY_HEADERS)
+    install(
+        FILES       "include/gsl/gsl-lite.h"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/gsl/"
+    )
+    install(
+        FILES       "include/gsl.h"
+                    "include/gsl.hpp"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/"
+    )
+endif()
 
 # end of file
