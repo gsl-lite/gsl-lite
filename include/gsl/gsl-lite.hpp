@@ -1610,6 +1610,30 @@ template< class U >
 not_null( not_null<U> ) -> not_null<U>;
 #endif
 
+#if gsl_HAVE( RVALUE_REFERENCE )
+template< class U >
+not_null<U> make_not_null( U u )
+{
+    return not_null<U>( std::move( u ) );
+}
+template< class U >
+not_null<U> make_not_null( not_null<U> u )
+{
+    return std::move( u );
+}
+#else
+template< class U >
+not_null<U> make_not_null( U const & u )
+{
+    return not_null<U>( u );
+}
+template< class U >
+not_null<U> make_not_null( not_null<U> const & u )
+{
+    return u;
+}
+#endif // gsl_HAVE( RVALUE_REFERENCE )
+
 
 // not_null with implicit constructor, allowing copy-initialization:
 

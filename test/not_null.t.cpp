@@ -122,6 +122,15 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
     EXPECT( p == &i );
 }
 
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with make_not_null()" )
+{
+    int i = 12;
+
+    not_null< int* > p = make_not_null( &i );
+
+    EXPECT( p == &i );
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with deduction guide" )
 {
 #if gsl_HAVE( DEDUCTION_GUIDES )
@@ -261,6 +270,15 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
 {
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
+
+    EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+
+    not_null< shared_ptr< int > > p = make_not_null( pi );
 
     EXPECT( p == pi );
 }
@@ -421,6 +439,16 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     unique_ptr< int > pi = make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
+
+    EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null< unique_ptr< int > > p = make_not_null( std::move(pi) );
 
     EXPECT( &*p == raw );
 }
