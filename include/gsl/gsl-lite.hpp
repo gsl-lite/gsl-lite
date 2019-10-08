@@ -112,6 +112,10 @@
 # define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0
 #endif
 
+#ifndef  gsl_CONFIG_NOT_NULL_TRANSPARENT_GET
+# define gsl_CONFIG_NOT_NULL_TRANSPARENT_GET  0
+#endif
+
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
 #endif
@@ -1534,11 +1538,14 @@ public:
     }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
-    gsl_api gsl_constexpr14 get_result_t get() const
-    {
-        return checked_ptr();
-    }
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+# if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    gsl_api gsl_constexpr14 element_type &  get() const &  { return checked_ptr().get(); }
+    gsl_api gsl_constexpr14 element_type && get() &&       { return std::move(checked_ptr()).get(); }
+# else
+    gsl_api gsl_constexpr14 get_result_t get() const { return checked_ptr(); }
+# endif
+
     gsl_api gsl_constexpr14 operator T() const & { return checked_ptr(); }
     gsl_api gsl_constexpr14 operator T() &&      { return std::move(checked_ptr()); }
 
@@ -1549,6 +1556,8 @@ public:
     gsl_api gsl_constexpr14 element_type && operator*() &&      { return *std::move(checked_ptr()); }
 
 #else
+    gsl_api gsl_constexpr14 get_result_t get() const { return checked_ptr(); }
+
     gsl_api gsl_constexpr   operator get_result_t  () const   { return checked_ptr(); }
 
     gsl_api gsl_constexpr   get_result_t operator->() const   { return checked_ptr(); }
@@ -1752,7 +1761,8 @@ operator>=( T const & l, not_null<U> const & r )
 template< class CharType, class Traits, class T >
 gsl_api std::basic_ostream< CharType, Traits > & operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
 {
-    return os << p.get();
+    T const & pp = p;
+    return os << pp;
 }
 
 

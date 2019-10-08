@@ -636,9 +636,9 @@ CASE( "not_null<>: Allows assignment from a non-null bare recast pointer" )
     MyDerived derived;
     not_null< MyDerived* > p( &derived );
 
-    not_null< Unrelated* > t( reinterpret_cast< Unrelated* >( p.get() ) );
+    not_null< Unrelated* > t( reinterpret_cast< Unrelated* >( &*p ) );
 
-    EXPECT( p.get() == reinterpret_cast< MyDerived* >( t.get() ) );
+    EXPECT( &*p == reinterpret_cast< MyDerived* >( &*t ) );
 }
 
 CASE( "not_null<>: Allows implicit conversion to underlying type" )

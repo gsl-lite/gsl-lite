@@ -407,7 +407,10 @@ Define this macro to the type to use for indices in `span` and `basic_string_spa
 Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl lite*-specific `not_null`-derived class `not_null_ic`.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_GET_BY\_CONST\_REF</b>=0  
-Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`. 
+Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T` in pre-C++11 mode. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`. This macro has no effect if rvalue references are available.
+
+\-D<b>gsl\_CONFIG\_NOT\_NULL\_TRANSPARENT\_GET</b>=0  
+Define this macro to 1 to have `not_null<>::get()` behave transparently, i.e. return the result of the underlying smart pointer's `get()` member function. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. Default is 0.
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
