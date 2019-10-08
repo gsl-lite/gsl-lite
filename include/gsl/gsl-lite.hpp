@@ -315,7 +315,7 @@
 #define gsl_HAVE_IS_DEFAULT             gsl_CPP11_140
 #define gsl_HAVE_IS_DELETE              gsl_CPP11_140
 #define gsl_HAVE_NOEXCEPT               gsl_CPP11_140
-#define gsl_HAVE_NORETURN               gsl_CPP11_140
+#define gsl_HAVE_NORETURN               ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 ) )
 
 #define gsl_HAVE_EXPRESSION_SFINAE      gsl_CPP11_140
 
