@@ -18,16 +18,17 @@
 #ifndef GSL_GSL_LITE_HPP_INCLUDED
 #define GSL_GSL_LITE_HPP_INCLUDED
 
-#include <algorithm>
-#include <exception>
-#include <iterator>
+#include <algorithm> // for swap() [pre-C++11], equal(), lexicographical_compare()
+#include <exception> // for exception, terminate(), uncaught_exceptions()
+#include <iterator>  // for data(), size(), reverse_iterator<>, iterator_traits<>
 #include <limits>
-#include <memory>
-#include <ios>
-#include <stdexcept>
+#include <memory>    // for addressof(), unique_ptr<>, shared_ptr<>
+#include <iosfwd>    // for basic_ostream<>
+#include <ios>       // for ios_base, streamsize
+#include <stdexcept> // for logic_error
 #include <string>
-#include <utility>
-#include <vector>
+#include <utility>   // for move(), forward<>(), swap()
+#include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 
 #define  gsl_lite_MAJOR  0
 #define  gsl_lite_MINOR  35
@@ -473,14 +474,21 @@
 # include <array>
 #endif
 
+#if !gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || !gsl_HAVE( AUTO )
+# include <vector>
+#endif
+
 #if gsl_HAVE( INITIALIZER_LIST )
 # include <initializer_list>
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# include <type_traits>
+# include <type_traits>     // for enable_if<>,
+                            // add_const<>, add_pointer<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
+                            // is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
+                            // integral_constant<>, declval()
 #elif gsl_HAVE( TR1_TYPE_TRAITS )
-# include <tr1/type_traits>
+# include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
 #if gsl_HAVE( SIZED_TYPES )
