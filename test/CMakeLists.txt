@@ -72,6 +72,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
 
     set( OPTIONS
         -O2
+        -Werror
         -Wall
         -Wno-missing-braces
         -Wconversion

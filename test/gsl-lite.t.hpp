@@ -35,11 +35,15 @@
 // Compiler warning suppression for usage of lest:
 
 #ifdef __clang__
+# pragma clang diagnostic ignored "-Wunknown-pragmas" // don't warn if any of the following warnings are introduced later than the current compiler version
+# pragma clang diagnostic ignored "-Wunknown-warning-option" // see above, but for newer compilers
 # pragma clang diagnostic ignored "-Wstring-conversion"
 # pragma clang diagnostic ignored "-Wunused-parameter"
 # pragma clang diagnostic ignored "-Wunused-template"
 # pragma clang diagnostic ignored "-Wunused-function"
 # pragma clang diagnostic ignored "-Wunused-member-function"
+# pragma clang diagnostic warning "-Wunknown-warning-option" // we want to see warnings about unknown warning options
+# pragma clang diagnostic warning "-Wunknown-pragmas" // we want to see warnings about unknown pragmas
 #elif defined __GNUC__
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"

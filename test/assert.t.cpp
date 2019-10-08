@@ -89,7 +89,7 @@ int testAssume( int i, std::vector<int> const& v )
 {
     // This should compile without warnings.
     gsl_ASSUME( i >= 0 && static_cast<std::size_t>(i) < v.size() );
-    return v.at( std::size_t(i) );
+    return v.at( static_cast<std::size_t>(i) );
 }
 
 void testConvertibleToBool()
