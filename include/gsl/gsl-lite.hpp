@@ -1529,9 +1529,9 @@ public:
         return checked_ptr();
     }
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    gsl_api gsl_constexpr14 operator T() const & { return checked_ptr(); }
+    gsl_api gsl_constexpr14 operator T() &&      { return std::move(checked_ptr()); }
 
-    gsl_api gsl_constexpr   operator T const &     () const & { return checked_ptr(); }
-    gsl_api gsl_constexpr14 operator T &&          () &&      { return std::move(checked_ptr()); }
 
 #else
     gsl_api gsl_constexpr   operator get_result_t  () const   { return checked_ptr(); }
