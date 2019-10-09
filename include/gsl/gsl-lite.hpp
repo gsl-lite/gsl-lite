@@ -1801,8 +1801,7 @@ operator>=( T const & l, not_null<U> const & r )
 template< class CharType, class Traits, class T >
 gsl_api std::basic_ostream< CharType, Traits > & operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
 {
-    T const & pp = p;
-    return os << pp;
+    return os << p.operator->();
 }
 
 
