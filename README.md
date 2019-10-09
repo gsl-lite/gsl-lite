@@ -308,28 +308,55 @@ There are four macros for expressing pre- and postconditions:
 - `gsl_EnsuresAudit()` for postconditions that are expensive or include potentially opaque function calls
 
 
-The contract checking level can be controlled by defining one of the following macros:
+The following macros control whether contracts are checked at runtime:
 
-\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_AUDIT</b>  
+\-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_AUDIT</b>  
 Define this macro to have all contracts checked at runtime.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_ON</b>  
+Define this macro to have contracts expressed with `Expects()` and `Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. This is the default case.
  
-\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ON</b>  
-Define this macro to have contracts expressed with `Expects` and `Ensures` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. This is the default case.
- 
-\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ASSUME</b>  
-Define this macro to let the compiler assume that contracts expressed with `Expects` and `Ensures` always hold true (which may incur evaluation at runtime), and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime.
- 
-\-D<b>gsl\_CONFIG\_CONTRACT\_LEVEL\_OFF</b>  
-Define this macro to disable all runtime checking and evaluation of contracts.
+\-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_OFF</b>  
+Define this macro to disable all runtime checking of contracts.
 
 
-Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When <b>gsl\_CONFIG\_CONTRACT\_LEVEL\_ASSUME</b> is defined, the compiler is instructed that the
+The following macros can be used to selectively disable checking for a particular kind of contract:
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_EXPECTS\_OFF</b>  
+Define this macro to disable runtime checking of precondition contracts expressed with `Expects()` and `gsl_ExpectsAudit()`.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_ENSURES\_OFF</b>  
+Define this macro to disable runtime checking of precondition contracts expressed with `Ensures()` and `gsl_EnsuresAudit()`.
+
+
+The following macros control the handling of runtime contract violations:
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
+Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, `gsl_EnsuresAudit`, and `narrow`. This is the default case.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, `gsl_EnsuresAudit`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `narrow`.
+
+\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
+Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, and `gsl_EnsuresAudit`, and call `std::terminate()` on discarding information in `narrow`. The user is expected to supply a definition matching the following signature:
+
+
+The following macros control what happens with contract checks not enforced at runtime:
+
+\-D<b>gsl\_CONFIG\_UNENFORCED\_CONTRACTS\_ASSUME</b>  
+Define this macro to let the compiler assume that contracts expressed with `Expects` and `Ensures` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
+ 
+\-D<b>gsl\_CONFIG\_UNENFORCED\_CONTRACTS\_ELIDE</b>  
+Define this macro to disable all runtime checking and evaluation of contracts. This is the default case.
+
+
+Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When <b>gsl\_CONFIG\_UNENFORCED\_CONTRACTS\_ASSUME</b> is defined, the compiler is instructed that the
 condition expressed by regular contracts can be assumed to hold true. This is meant to be an aid for the optimizer; runtime evaluation of the condition is not desired. However, because the GSL implements contract checks
 with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers will
 generate the runtime function call.
 
 Therefore, `Expects` and `Ensures` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit` and `gsl_EnsuresAudit` for everything else. In practice, this implies that
-`Expects` and `Ensures` should only be used for simple comparisons of scalar values and for comparisons of class objects with trivially inlineable comparison operators.
+`Expects` and `Ensures` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
 
 
 Example:
@@ -340,7 +367,7 @@ auto median( It first, It last )
 {
         // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
         // compiler will inline the comparison operator and understand that the comparison is free
-        // of side-effects, and hence generate no code in gsl_CONFIG_CONTRACT_LEVEL_ASSUME mode.
+        // of side-effects, and hence generate no code in gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME mode.
     Expects( first != last );
 
         // Verifying that a range of elements is sorted may be an expensive operation, and we
@@ -356,25 +383,7 @@ auto median( It first, It last )
 ```
 
 
-It is possible to enable only precondition or only postcondition checking with one of the following macros:
-
-\-D<b>gsl\_CONFIG_CONTRACT\_EXPECTS\_ONLY</b>  
-Define this macro to permit runtime checking and evaluation for precondition contracts only.
-
-\-D<b>gsl\_CONFIG\_CONTRACT\_ENSURES\_ONLY</b>  
-Define this macro to permit runtime checking and evaluation for postcondition contracts only.
-
-
-The following macros control the handling of runtime contract violations:
-
-\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
-Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, `gsl_EnsuresAudit`, and `narrow`. This is the default case.
-
-\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, `gsl_EnsuresAudit`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `narrow`.
-
-\-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
-Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, and `gsl_EnsuresAudit`, and call `std::terminate()` on discarding information in `narrow`. The user is expected to supply a definition matching the following signature:
+If <b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b> is defined, the user must provide a definition of the following function:
 
 ```Cpp
 namespace gsl {
@@ -387,7 +396,7 @@ namespace gsl {
 ### Microsoft GSL compatibility macros
 
 \-D<b>GSL\_UNENFORCED\_ON\_CONTRACT\_VIOLATION</b>  
-Equivalent to -Dgsl_CONFIG_CONTRACT_LEVEL_OFF.
+Equivalent to -Dgsl\_CONFIG\_CONTRACT\_CHECKING\_OFF.
 
 \-D<b>GSL\_THROW\_ON\_CONTRACT\_VIOLATION</b>  
 Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS.
@@ -473,8 +482,8 @@ at()                        | -       | -       | < C++11 | static arrays, std::
 **3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 Expects()                   | &#10003;| &#10003;| &#10003;| Precondition assertion |
 Ensures()                   | &#10003;| &#10003;| &#10003;| Postcondition assertion |
-gsl_ExpectsAudit()              | -       | -       | &#10003;| Audit-level precondition assertion |
-gsl_EnsuresAudit()              | -       | -       | &#10003;| Audit-level postcondition assertion |
+gsl_ExpectsAudit()          | -       | -       | &#10003;| Audit-level precondition assertion |
+gsl_EnsuresAudit()          | -       | -       | &#10003;| Audit-level postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;  | &nbsp; |
 index                       | &#10003;| &#10003;| &#10003;| type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
 byte                        | -       | &#10003;| &#10003;| byte type, see also proposal [p0298](http://wg21.link/p0298) |
@@ -509,8 +518,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
-0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
-&nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_EXPECTS_ONLY`/`gsl_CONFIG_CONTRACT_ENSURES_ONLY` |
+0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
+&nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
 0.31.0  |   5   | span( std::nullptr_t, index_type ) |
 &nbsp;  |&nbsp; | span( pointer, index_type ) is used |
 0.31.0  |   5   | span( U *, index_type size ) |

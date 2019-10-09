@@ -34,7 +34,7 @@ set( SOURCES
 
 # Configure gsl-lite for testing:
 
-set( GSL_CONFIG -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Dgsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+set( GSL_CONFIG -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT )
 
 # Preset available C++ language compiler flags:
 

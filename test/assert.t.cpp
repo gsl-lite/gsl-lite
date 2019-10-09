@@ -69,7 +69,7 @@ CASE( "gsl_EnsuresAudit(): Allows a true expression" )
 
 CASE( "gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
 {
-#if defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
     EXPECT_THROWS( expectsAudit( false ) );
 #else
     EXPECT_NO_THROW( expectsAudit( false ) );
@@ -78,7 +78,7 @@ CASE( "gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
 
 CASE( "gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
 {
-#if defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
     EXPECT_THROWS( ensuresAudit( false ) );
 #else
     EXPECT_NO_THROW( ensuresAudit( false ) );
