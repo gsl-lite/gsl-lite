@@ -917,9 +917,9 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
-# define ExpectsAudit( x )  gsl_ELIDE_CONTRACT( x )
+# define gsl_ExpectsAudit( x )  gsl_ELIDE_CONTRACT( x )
 #else
-# define ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "Precondition failure (audit)", x )
+# define gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "Precondition failure (audit)", x )
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES
@@ -933,9 +933,9 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
-# define EnsuresAudit( x )  gsl_ELIDE_CONTRACT( x )
+# define gsl_EnsuresAudit( x )  gsl_ELIDE_CONTRACT( x )
 #else
-# define EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
+# define gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
 #endif
 
 #define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
