@@ -422,21 +422,21 @@
 #endif
 
 #if gsl_HAVE( NODISCARD )
-# define gsl_nodiscard [[nodiscard]]
+# define gsl_NODISCARD [[nodiscard]]
 #else
-# define gsl_nodiscard
+# define gsl_NODISCARD
 #endif
 
 #if gsl_HAVE( NORETURN )
-# define gsl_noreturn [[noreturn]]
+# define gsl_NORETURN [[noreturn]]
 #else
-# define gsl_noreturn
+# define gsl_NORETURN
 #endif
 
 #if gsl_HAVE( DEPRECATED )
-# define gsl_deprecated(because) [[deprecated( because )]]
+# define gsl_DEPRECATED(because) [[deprecated( because )]]
 #else
-# define gsl_deprecated(because)
+# define gsl_DEPRECATED(because)
 #endif
 
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
@@ -951,14 +951,14 @@ struct fail_fast : public std::logic_error
 
 namespace detail {
 
-gsl_api gsl_noreturn inline void fail_fast_throw( char const * const message )
+gsl_api gsl_NORETURN inline void fail_fast_throw( char const * const message )
 {
     throw fail_fast( message );
 }
 
 } // namespace detail
 
-gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
+gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
@@ -970,7 +970,7 @@ void fail_fast_assert( bool cond, char const * const message )
 // Should be defined by user
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
 
-gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
+gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
@@ -981,14 +981,14 @@ void fail_fast_assert( bool cond, char const * const expression, char const * co
 
 namespace detail {
 
-gsl_api gsl_noreturn inline void fail_fast_assert() gsl_noexcept
+gsl_api gsl_NORETURN inline void fail_fast_assert() gsl_noexcept
 {
     std::terminate();
 }
 
 } // namespace detail
 
-gsl_deprecated("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
+gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond ) gsl_noexcept
 {
 #ifdef __CUDA_ARCH__
