@@ -382,7 +382,7 @@
 # define gsl_is_delete_access private
 #endif
 
-#if !gsl_HAVE( NOEXCEPT ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+#if !gsl_HAVE( NOEXCEPT )
 # define gsl_noexcept /*noexcept*/
 #else
 # define gsl_noexcept noexcept
@@ -2081,7 +2081,7 @@ public:
     template< class Container
         gsl_REQUIRES_T(( detail::is_compatible_container< Container, element_type >::value ))
     >
-    gsl_api gsl_constexpr span( Container & cont )
+    gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
         , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
@@ -2092,7 +2092,7 @@ public:
             && detail::is_compatible_container< Container, element_type >::value
         ))
     >
-    gsl_api gsl_constexpr span( Container const & cont )
+    gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
         , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
@@ -2116,13 +2116,13 @@ public:
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
     template< class Container >
-    gsl_api gsl_constexpr span( with_container_t, Container & cont )
+    gsl_api gsl_constexpr span( with_container_t, Container & cont ) gsl_noexcept
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
     template< class Container >
-    gsl_api gsl_constexpr span( with_container_t, Container const & cont )
+    gsl_api gsl_constexpr span( with_container_t, Container const & cont ) gsl_noexcept
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
@@ -2204,25 +2204,25 @@ public:
 
     // 26.7.3.3 Subviews [span.sub]
 
-    gsl_api gsl_constexpr14 span first( index_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span first( index_type count ) const
     {
         Expects( 0 <= count && count <= this->size() );
         return span( this->data(), count );
     }
 
-    gsl_api gsl_constexpr14 span last( index_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span last( index_type count ) const
     {
         Expects( 0 <= count && count <= this->size() );
         return span( this->data() + this->size() - count, count );
     }
 
-    gsl_api gsl_constexpr14 span subspan( index_type offset ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( index_type offset ) const
     {
         Expects( 0 <= offset && offset <= this->size() );
         return span( this->data() + offset, this->size() - offset );
     }
 
-    gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const
     {
         Expects(
             0 <= offset && offset <= this->size() &&
@@ -2364,7 +2364,7 @@ public:
 #endif
 
     template< class U >
-    gsl_api span< U > as_span() const gsl_noexcept
+    gsl_api span< U > as_span() const
     {
         Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
         return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) ); // NOLINT
