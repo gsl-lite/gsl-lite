@@ -491,10 +491,6 @@
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
-#if gsl_HAVE( SIZED_TYPES )
-# include <cstdint>
-#endif
-
 // MSVC warning suppression macros:
 
 #if gsl_COMPILER_MSVC_VERSION >= 140
