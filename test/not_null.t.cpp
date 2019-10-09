@@ -119,7 +119,27 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
 
     not_null< int* > p( &i );
 
-    EXPECT( p.get() == &i );
+    EXPECT( p == &i );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with make_not_null()" )
+{
+    int i = 12;
+
+    not_null< int* > p = make_not_null( &i );
+
+    EXPECT( p == &i );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with deduction guide" )
+{
+#if gsl_HAVE( DEDUCTION_GUIDES )
+    int i = 12;
+
+    not_null p( &i );
+
+    EXPECT( p == &i );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (raw pointer)" )
@@ -128,7 +148,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
 
     not_null< const int* > p( &i );
 
-    EXPECT( p.get() == &i );
+    EXPECT( p == &i );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
@@ -136,7 +156,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer (raw poin
     MyDerived derived;
     not_null< MyBase* > p( &derived );
 
-    EXPECT( p.get() == &derived );
+    EXPECT( p == &derived );
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null related pointer (raw pointer)" )
@@ -144,7 +164,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null related p
     MyDerived derived;
     not_null< const MyBase* > p( &derived );
 
-    EXPECT( p.get() == &derived );
+    EXPECT( p == &derived );
 }
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type (raw pointer)" )
@@ -251,7 +271,27 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
-    EXPECT( p.get() == pi );
+    EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+
+    not_null< shared_ptr< int > > p = make_not_null( pi );
+
+    EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with deduction guide" )
+{
+#if gsl_HAVE( DEDUCTION_GUIDES )
+    shared_ptr< int > pi = make_shared< int >(12);
+
+    not_null p( pi );
+
+    EXPECT( p == pi );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)" )
@@ -259,7 +299,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< const int > > p( pi );
 
-    EXPECT( p.get() == pi );
+    EXPECT( p == pi );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -267,7 +307,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_p
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyBase > > p( pderived );
 
-    EXPECT( p.get() == pderived );
+    EXPECT( p == pderived );
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null related pointer (shared_ptr)" )
@@ -275,7 +315,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null related p
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< const MyBase > > p( pderived );
 
-    EXPECT( p.get() == pderived );
+    EXPECT( p == pderived );
 }
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type (shared_ptr)" )
@@ -401,6 +441,42 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows to move from a not-null pointer (unique_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
+    pi = std::move(p); // ...and back again.
+
+    EXPECT_THROWS( *p );
+    EXPECT( pi.get() == raw );
+#endif
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null< unique_ptr< int > > p = make_not_null( std::move(pi) );
+
+    EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with deduction guide" )
+{
+#if gsl_HAVE( DEDUCTION_GUIDES )
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null p( std::move(pi) );
+
+    EXPECT( &*p == raw );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)" )
@@ -636,9 +712,9 @@ CASE( "not_null<>: Allows assignment from a non-null bare recast pointer" )
     MyDerived derived;
     not_null< MyDerived* > p( &derived );
 
-    not_null< Unrelated* > t( reinterpret_cast< Unrelated* >( p.get() ) );
+    not_null< Unrelated* > t( reinterpret_cast< Unrelated* >( &*p ) );
 
-    EXPECT( p.get() == reinterpret_cast< MyDerived* >( t.get() ) );
+    EXPECT( &*p == reinterpret_cast< MyDerived* >( &*t ) );
 }
 
 CASE( "not_null<>: Allows implicit conversion to underlying type" )
@@ -658,7 +734,7 @@ CASE( "not_null<>: Allows to construct from a non-null user-defined ref-counted 
 
     not_null<   int*>  p( rp );
 
-    EXPECT( p.get() == &i );
+    EXPECT( p == &i );
 }
 
 namespace {
