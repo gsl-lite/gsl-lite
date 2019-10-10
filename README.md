@@ -548,12 +548,12 @@ The table below mentions the compiler versions *gsl-lite* is reported to work wi
 
 OS           | Compiler   | Where  | Versions |
 ------------:|:-----------|-------:|----------|
-**GNU/Linux**| Clang/LLVM | Travis | 3.4, 3.4, 3.6, 3.7, 3.8, 3.9, 4.0, 5.0 |
-&nbsp;       | GCC        | Travis | 5.4.1, 6.3.0, 7.2.0 |
-**OS X**     | ?          | &nbsp; | ? |
+**GNU/Linux**| Clang/LLVM | Travis | 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 5.0, 6.0 |
+&nbsp;       | GCC        | Travis | 4.7, 4.8, 4.9, 5, 6, 7, 8 |
+**OS X**     | AppleClang | &nbsp; | Xcode 7.3, 8, 9 |
 **Windows**  | Clang/LLVM | &nbsp; | ? |
-&nbsp;       | GCC        | Local  |4.8.4, 4.9.2, 5.2.0, 7.2.0 |
-&nbsp;       | Visual C++<br>(Visual Studio)| Local<br>Local<br>AppVeyor | 6 (6) via header [gsl-lite-vc6.hpp](include/gsl/gsl-lite-vc6.hpp) (not up to date)<br>8 (2005),<br> 10 (2010), 11 (2012), 12 (2013), 14 (2015), 15 (2017) |
+&nbsp;       | GCC        | Local  | 4.8.4, 4.9.2, 5.2.0, 7.2.0 |
+&nbsp;       | Visual C++<br>(Visual Studio)| Local<br>Local<br>AppVeyor | 6 (6) via header [gsl-lite-vc6.hpp](include/gsl/gsl-lite-vc6.hpp) (not up to date)<br>8 (2005),<br> 10 (2010), 11 (2012), 12 (2013), 14 (2015), 15 (2017), 16 (2019) |
 **DOSBox**   | DJGPP      | Local  | DJGPP for GCC 7.2.0 |
 **FreeDOS**  | DJGPP      | Local  | DJGPP for GCC 7.2.0 |
 
