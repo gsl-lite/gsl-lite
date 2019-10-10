@@ -122,6 +122,17 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
     EXPECT( p == &i );
 }
 
+CASE( "not_null<>: Returns underlying pointer with get() (raw pointer)" )
+{
+#if !gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    int i = 12;
+    not_null< int* > p( &i );
+
+    int* pg = p.get();
+    EXPECT( pg == &i );
+#endif
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with make_not_null()" )
 {
     int i = 12;
@@ -272,6 +283,34 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     not_null< shared_ptr< int > > p( pi );
 
     EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Returns underlying pointer with get() (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+    not_null< shared_ptr< int > > p( pi );
+
+#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    int* pg = p.get();
+    EXPECT( pg == pi.get() );
+#else
+    shared_ptr< int > const & pg = p.get();
+    EXPECT( pg == pi );
+#endif
+}
+
+CASE( "not_null<>: Allows to move from a not_null pointer (shared_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    shared_ptr< int > pi = make_shared< int >(12);
+    int* raw(pi.get());
+
+    not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
+    pi = std::move(p); // ...and back again.
+
+    EXPECT_THROWS( *p );
+    EXPECT( pi.get() == raw );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()" )
@@ -443,7 +482,25 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     EXPECT( &*p == raw );
 }
 
-CASE( "not_null<>: Allows to move from a not-null pointer (unique_ptr)" )
+CASE( "not_null<>: Returns underlying pointer with get() (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+    not_null< unique_ptr< int > > p( std::move(pi) );
+
+#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    int* pg = p.get();
+    EXPECT( pg == raw );
+#elif gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    int* pg = p.get().get();
+    EXPECT( pg == raw );
+#else
+    (void) pi;
+    (void) p;
+#endif
+}
+
+CASE( "not_null<>: Allows to move from a not_null pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     unique_ptr< int > pi = make_unique< int >(12);

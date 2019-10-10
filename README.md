@@ -406,11 +406,11 @@ Define this macro to the type to use for indices in `span` and `basic_string_spa
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_EXPLICIT\_CTOR</b>=0  
 Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl lite*-specific `not_null`-derived class `not_null_ic`.
 
-\-D<b>gsl\_CONFIG\_NOT\_NULL\_GET\_BY\_CONST\_REF</b>=0  
-Define this macro to 1 to have `not_null<>::get()` and relatives return by `T const &` instead of `T` in pre-C++11 mode. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`. This macro has no effect if rvalue references are available.
-
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_TRANSPARENT\_GET</b>=0  
 Define this macro to 1 to have `not_null<>::get()` behave transparently, i.e. return the result of the underlying smart pointer's `get()` member function. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. Default is 0.
+
+\-D<b>gsl\_CONFIG\_NOT\_NULL\_GET\_BY\_CONST\_REF</b>=0  
+Define this macro to 1 to have the non-transparent version of `not_null<>::get()` and the pre-C++11 version of `not_null<>`'s conversion operator to the underlying pointer return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`.
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
@@ -692,6 +692,7 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (raw pointer)
 not_null<>: Terminates assignment from related pointer types for null pointer value (raw pointer)
 not_null<>: Allows to construct from a non-null underlying pointer (raw pointer)
+not_null<>: Returns underlying pointer with get() (raw pointer)
 not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with make_not_null()
 not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (raw pointer)
@@ -708,6 +709,8 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (shared_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)
+not_null<>: Returns underlying pointer with get() (shared_ptr)
+not_null<>: Allows to move from a not_null pointer (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)
@@ -724,7 +727,8 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (unique_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)
-not_null<>: Allows to move from a not-null pointer (unique_ptr)
+not_null<>: Returns underlying pointer with get() (unique_ptr)
+not_null<>: Allows to move from a not_null pointer (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)
