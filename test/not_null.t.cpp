@@ -495,6 +495,7 @@ CASE( "not_null<>: Returns underlying pointer with get() (unique_ptr)" )
     int* pg = p.get().get();
     EXPECT( pg == raw );
 #else
+    (void) raw;
     (void) pi;
     (void) p;
 #endif
