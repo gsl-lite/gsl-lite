@@ -1398,38 +1398,39 @@ gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 // not_null<> - Wrap any indirection and enforce non-null.
 //
 
-namespace detail
-{
-    // helper class to figure out the pointed-to type of a pointer
+namespace detail {
+
+// helper class to figure out the pointed-to type of a pointer
 #if gsl_CPP11_OR_GREATER
-    template<class T, class E = void>
-    struct element_type_helper
-    {
-        // For types without a member element_type (this will handle raw pointers)
-        typedef typename std::remove_reference<decltype(*std::declval<T>())>::type type;
-    };
+template< class T, class E = void >
+struct element_type_helper
+{
+    // For types without a member element_type (this will handle raw pointers)
+    typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
+};
 
-    template<class T>
-    struct element_type_helper<T, std17::void_t<typename T::element_type>>
-    {
-        // For types with a member element_type
-        typedef typename T::element_type type;
-    };
+template< class T >
+struct element_type_helper< T, std17::void_t< typename T::element_type > >
+{
+    // For types with a member element_type
+    typedef typename T::element_type type;
+};
 #else
-    // Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
-    template<class T, class E = void>
-    struct element_type_helper
-    {
-        typedef typename T::element_type type;
-    };
+// Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
+template< class T, class E = void >
+struct element_type_helper
+{
+    typedef typename T::element_type type;
+};
 
-    template<class T>
-    struct element_type_helper<T*>
-    {
-        typedef T type;
-    };
+template< class T >
+struct element_type_helper< T* >
+{
+    typedef T type;
+};
 #endif
-}
+
+} // namespace detail
 
 template< class T >
 class not_null
@@ -1502,7 +1503,7 @@ public:
 
     template< class U
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
-        gsl_REQUIRES_A((std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value))
+        gsl_REQUIRES_A(( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ))
 # endif
     >
     gsl_api gsl_constexpr explicit not_null( not_null<U> other )
@@ -1512,7 +1513,7 @@ public:
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
     // implicit converting constructor if type_traits is available
     template< class U
-        gsl_REQUIRES_A((std::is_convertible<U, T>::value))
+        gsl_REQUIRES_A(( std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr not_null( not_null<U> other )
     : ptr_( std::move(other.checked_ptr()) )
