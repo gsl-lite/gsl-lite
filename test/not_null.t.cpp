@@ -618,11 +618,13 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
 
 CASE( "not_null<>: Converts to underlying pointer (unique_ptr)" )
 {
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     unique_ptr< int > pi = make_unique< int >();
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     take_unique_by_val<int>( std::move(p) );
     //take_unique_by_ref<int>( p ); // We sacrifice the ability to convert to `unique_ptr<> const &`, cf. comment regarding conversion operators in gsl-lite.hpp.
+#endif
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_ptr)" )
@@ -675,11 +677,13 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
 
 CASE( "not_null<>: Converts to a related pointer (unique_ptr)" )
 {
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
     take_unique_by_val<MyBase>( std::move(p) );
     //take_unique_by_ref<MyBase>( p ); // We sacrifice the ability to convert to `unique_ptr<> const &`, cf. comment regarding conversion operators in gsl-lite.hpp.
+#endif
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (unique_ptr)" )
