@@ -39,6 +39,7 @@ template< class T >
 void take_raw( T* )
 {
 }
+#if gsl_HAVE( UNIQUE_PTR )
 template< class T >
 void take_unique_by_val( std::unique_ptr<T> )
 {
@@ -47,6 +48,8 @@ template< class T >
 void take_unique_by_ref( std::unique_ptr<T> const & )
 {
 }
+#endif
+#if gsl_HAVE( SHARED_PTR )
 template< class T >
 void take_shared_by_val( std::shared_ptr<T> )
 {
@@ -55,9 +58,9 @@ template< class T >
 void take_shared_by_ref( std::shared_ptr<T> const & )
 {
 }
+#endif
 
-
-}
+} // anonymous namespace
 
 namespace nonlocal
 {
