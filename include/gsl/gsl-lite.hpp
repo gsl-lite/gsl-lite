@@ -1434,9 +1434,9 @@ struct element_type_helper< T* >
 #endif
 
 template< class T >
-struct is_not_null_oracle : std::false_type { };
+struct is_not_null_oracle : std11::false_type { };
 template< class T >
-struct is_not_null_oracle< not_null<T> > : std::true_type { };
+struct is_not_null_oracle< not_null<T> > : std11::true_type { };
 
 } // namespace detail
 
