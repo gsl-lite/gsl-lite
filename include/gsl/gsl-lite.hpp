@@ -1604,7 +1604,7 @@ public:
 # endif
 #else // a.k.a. #if ! gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
-    gsl_api gsl_constexpr14 explicit operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
+    gsl_api gsl_constexpr14 operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 #undef gsl_not_null_LVALUE_REF
 #undef gsl_not_null_CONVERSION_REF
