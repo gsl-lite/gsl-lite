@@ -1573,30 +1573,36 @@ public:
     // This implies we cannot convert to const refs of move-only types; but that scenario should be rare.
 
 #if gsl_HAVE( RVALUE_REFERENCE )
+# if gsl_HAVE( EXPLICIT )
     // explicit conversion operator
     // if type_traits is not available, then we can't distinguish is_convertible and is_constructible, so we use this unconditionally
 
     template< class U
-# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
+#  if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
         gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
-# endif
+#  endif
     >
     gsl_api gsl_constexpr14 explicit operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
-# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+#  if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
     >
     gsl_api gsl_constexpr14 explicit operator U() && { return std::move(checked_ptr()); }
+#  endif
 # endif
 
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
     // implicit conversion operator if type_traits is available
     template< class U
+#  if gsl_HAVE( EXPLICIT )
         gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
+#  else
+        gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !gsl::detail::is_not_null_oracle<U>::value ))
+#  endif
     >
     gsl_api gsl_constexpr14 operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
 # endif
-# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER ) // implies EXPLICIT for supported compilers
     template< class U
         gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
     >
