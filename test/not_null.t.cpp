@@ -192,7 +192,7 @@ CASE( "not_null<>: Converts to underlying pointer (raw pointer)" )
     int i = 12;
     not_null< int* > p( &i );
 
-    take_raw<int>(p);
+    take_raw<int>( p );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
@@ -244,7 +244,7 @@ CASE( "not_null<>: Converts to a related pointer (raw pointer)" )
     MyDerived derived;
     not_null< MyDerived* > p( &derived );
 
-    take_raw<MyBase>(p);
+    take_raw<MyBase>( p );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (raw pointer)" )
@@ -387,8 +387,8 @@ CASE( "not_null<>: Converts to underlying pointer (shared_ptr)" )
     shared_ptr< int > pi = make_shared< int >();
     not_null< shared_ptr< int > > p( pi );
 
-    take_shared_by_val<int>(p);
-    take_shared_by_ref<int>(p);
+    take_shared_by_val<int>( p );
+    take_shared_by_ref<int>( p );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -440,8 +440,8 @@ CASE( "not_null<>: Converts to a related pointer (shared_ptr)" )
     shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
-    take_shared_by_val<MyBase>(p);
-    take_shared_by_ref<MyBase>(p);
+    take_shared_by_val<MyBase>( p );
+    take_shared_by_ref<MyBase>( p );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)" )
