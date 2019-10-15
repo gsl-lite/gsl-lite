@@ -410,7 +410,7 @@ Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. 
 Define this macro to 1 to have `not_null<>::get()` behave transparently, i.e. return the result of the underlying smart pointer's `get()` member function. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. Default is 0.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_GET\_BY\_CONST\_REF</b>=0  
-Define this macro to 1 to have the non-transparent version of `not_null<>::get()` and the pre-C++11 version of `not_null<>`'s conversion operator to the underlying pointer return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. Default is 0 for `T`.
+Define this macro to 1 to have the non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if <b>gsl\_CONFIG\_NOT\_NULL\_TRANSPARENT\_GET</b>=1. Default is 0 for `T`.
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.

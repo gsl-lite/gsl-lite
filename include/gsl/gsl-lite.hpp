@@ -95,6 +95,10 @@
 
 // Configuration: Other
 
+#if defined( gsl_CONFIG_NOT_NULL_TRANSPARENT_GET ) && gsl_CONFIG_NOT_NULL_TRANSPARENT_GET && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
+# error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_NOT_NULL_TRANSPARENT_GET=1
+#endif
+
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
 # define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 #endif
@@ -1581,24 +1585,18 @@ public:
     //     std::shared_ptr<U> vs = sp; // no extra copy
     //     std::unique_ptr<U> vu = std::move( p );
 
-#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-# define gsl_not_null_LVALUE_REF &
-# define gsl_not_null_CONVERSION_REF
-#else
-# define gsl_not_null_LVALUE_REF
-# if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-#  define gsl_not_null_CONVERSION_REF const &
-# else
-#  define gsl_not_null_CONVERSION_REF
-# endif
-#endif
 #if gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+#  define gsl_not_null_LVALUE_REF &
+# else
+#  define gsl_not_null_LVALUE_REF
+# endif
     // explicit conversion operator
 
     template< class U
         gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
     >
-    gsl_api gsl_constexpr14 explicit operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
+    gsl_api gsl_constexpr14 explicit operator U() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
@@ -1610,19 +1608,18 @@ public:
     template< class U
         gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
     >
-    gsl_api gsl_constexpr14 operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
+    gsl_api gsl_constexpr14 operator U() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
     >
     gsl_api gsl_constexpr14 operator U() && { return std::move(checked_ptr()); }
 # endif
+# undef gsl_not_null_LVALUE_REF
 #else // a.k.a. #if !( gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
     template< class U >
-    gsl_api gsl_constexpr14 operator U gsl_not_null_CONVERSION_REF() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
+    gsl_api gsl_constexpr14 operator U() const { return checked_ptr(); }
 #endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
-#undef gsl_not_null_LVALUE_REF
-#undef gsl_not_null_CONVERSION_REF
 
     gsl_api gsl_constexpr   T const &     operator->() const   { return checked_ptr(); }
 
