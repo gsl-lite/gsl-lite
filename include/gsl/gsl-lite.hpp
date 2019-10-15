@@ -1443,29 +1443,6 @@ struct is_not_null_oracle< not_null<T> > : std11::true_type { };
 template< class T >
 class not_null
 {
-#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# define gsl_not_null_explicit   explicit
-#else
-# define gsl_not_null_explicit /*explicit*/
-#endif
-#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-# define gsl_not_null_LVALUE_REF &
-# define gsl_not_null_CONVERSION_REF
-#else
-# define gsl_not_null_LVALUE_REF
-# if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-#  define gsl_not_null_CONVERSION_REF const &
-# else
-#  define gsl_not_null_CONVERSION_REF
-# endif
-#endif
-
-#if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-    typedef T const & get_result_t;
-#else
-    typedef T get_result_t;
-#endif
-
     // need to access not_null<U>'s checked_ptr()
     template< class U >
     friend class not_null;
@@ -1477,6 +1454,11 @@ public:
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
+#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+# define gsl_not_null_explicit   explicit
+#else
+# define gsl_not_null_explicit /*explicit*/
+#endif
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! defined( __apple_build_version__ )
         gsl_REQUIRES_A((
@@ -1563,18 +1545,55 @@ public:
 #if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
     gsl_api gsl_constexpr14 element_type* get() const { return checked_ptr().get(); }
 #else
-    gsl_api gsl_constexpr14 get_result_t  get() const { return checked_ptr(); }
+# if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    gsl_api gsl_constexpr14 T const & get() const { return checked_ptr(); }
+# else
+    gsl_api gsl_constexpr14 T         get() const { return checked_ptr(); }
+# endif
 #endif
 
-    // Ideally, we would convert to either `T const &` or `T &&` so we would permit a move but still avoid potentially unnecessary copies.
-    // Unfortunately, that would render code like `std::unique_ptr<T> p = not_null<std::unique_ptr<T>>(...);` ambiguous.
-    // We choose to always convert to `T` instead if function ref qualifiers are available, expecting that the cost of the copy will usually be
-    // alleviated by move semantics.
-    // This implies we cannot convert to const refs of move-only types; but that scenario should be rare.
+    // We want an implicit conversion operator that can be used to convert from both lvalues (by
+    // const reference or by copy) and rvalues (by move). So it seems like we could define
+    //
+    //     template< class U, gsl_REQUIRE_A( ... ) >
+    //     operator U const &() const & { return checked_ptr(); }
+    //     template< class U, gsl_REQUIRE_A( ... ) >
+    //     operator U&&() && { return std::move( checked_ptr() ); }
+    //
+    // However, having two conversion operators with different return types renders the assignment
+    // operator of the result type ambiguous:
+    //
+    //     not_null<std::unique_ptr<T>> p( ... );
+    //     std::unique_ptr<U> q;
+    //     q = std::move( p ); // ambiguous
+    //
+    // To avoid this ambiguity, we have both overloads of the conversion operator return `U`
+    // rather than `U const &` or `U &&`. This implies that converting an lvalue always induces
+    // a copy, which can cause unnecessary copies or even fail to compile in some situations:
+    //
+    //     not_null<std::shared_ptr<T>> sp( ... );
+    //     std::shared_ptr<U> const & rs = sp; // unnecessary copy
+    //     std::unique_ptr<U> const & ru = p; // error: cannot copy `unique_ptr<T>`
+    //
+    // However, these situations are rather unusual, and the following, more frequent situations
+    // remain unimpaired:
+    //
+    //     std::shared_ptr<U> vs = sp; // no extra copy
+    //     std::unique_ptr<U> vu = std::move( p );
 
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+# define gsl_not_null_LVALUE_REF &
+# define gsl_not_null_CONVERSION_REF
+#else
+# define gsl_not_null_LVALUE_REF
+# if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+#  define gsl_not_null_CONVERSION_REF const &
+# else
+#  define gsl_not_null_CONVERSION_REF
+# endif
+#endif
 #if gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
     // explicit conversion operator
-    // if type_traits is not available, then we can't distinguish is_convertible and is_constructible, so we use this unconditionally
 
     template< class U
         gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
@@ -1587,7 +1606,7 @@ public:
     gsl_api gsl_constexpr14 explicit operator U() && { return std::move(checked_ptr()); }
 # endif
 
-    // implicit conversion operator if type_traits is available
+    // implicit conversion operator
     template< class U
         gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
     >
