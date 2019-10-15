@@ -326,7 +326,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     EXPECT( p == pi );
 }
 
-CASE( "not_null<>: Returns underlying pointer with get() (shared_ptr)" )
+CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)" )
 {
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
@@ -340,7 +340,7 @@ CASE( "not_null<>: Returns underlying pointer with get() (shared_ptr)" )
 #endif
 }
 
-CASE( "not_null<>: Allows to move from a not_null pointer (shared_ptr)" )
+CASE( "not_null<>: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     shared_ptr< int > pi = make_shared< int >(12);
@@ -541,7 +541,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     EXPECT( &*p == raw );
 }
 
-CASE( "not_null<>: Returns underlying pointer with get() (unique_ptr)" )
+CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)" )
 {
 #if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET ) || gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     unique_ptr< int > pi = make_unique< int >(12);
@@ -558,7 +558,7 @@ CASE( "not_null<>: Returns underlying pointer with get() (unique_ptr)" )
 #endif
 }
 
-CASE( "not_null<>: Allows to move from a not_null pointer (unique_ptr)" )
+CASE( "not_null<>: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     unique_ptr< int > pi = make_unique< int >(12);

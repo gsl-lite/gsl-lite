@@ -711,8 +711,8 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (shared_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)
-not_null<>: Returns underlying pointer with get() (shared_ptr)
-not_null<>: Allows to move from a not_null pointer (shared_ptr)
+not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)
+not_null<>: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with deduction guide
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)
@@ -731,8 +731,8 @@ not_null<>: Terminates construction from related pointer types for null pointer 
 not_null<>: Terminates assignment from a null pointer value (unique_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)
-not_null<>: Returns underlying pointer with get() (unique_ptr)
-not_null<>: Allows to move from a not_null pointer (unique_ptr)
+not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)
+not_null<>: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)
 not_null<>: Allows to move to a related pointer from a not_null pointer (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with deduction guide
