@@ -43,14 +43,22 @@
 # pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
 #endif
 
+#if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ON.")
+# define gsl_CONFIG_CONTRACT_CHECKING_ON
+#endif
+#if defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_OFF.")
+# define gsl_CONFIG_CONTRACT_CHECKING_OFF
+#endif
 #if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.35.0; replace with gsl_CONFIG_CONTRACT_LEVEL_ON and gsl_CONFIG_CONTRACT_EXPECTS_ONLY.")
-# define gsl_CONFIG_CONTRACT_LEVEL_ON
-# define gsl_CONFIG_CONTRACT_EXPECTS_ONLY
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF.")
+# define gsl_CONFIG_CONTRACT_CHECKING_ON
+# define gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF
 #elif defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.35.0; replace with gsl_CONFIG_CONTRACT_LEVEL_ON and gsl_CONFIG_CONTRACT_ENSURES_ONLY.")
-# define gsl_CONFIG_CONTRACT_LEVEL_ON
-# define gsl_CONFIG_CONTRACT_ENSURES_ONLY
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF.")
+# define gsl_CONFIG_CONTRACT_CHECKING_ON
+# define gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF
 #endif
 
 // M-GSL compatibility:
@@ -131,49 +139,14 @@
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0
 #endif
 
-#if 2 <= defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT ) + defined( gsl_CONFIG_CONTRACT_LEVEL_ON ) + defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) + defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
-# error only one of gsl_CONFIG_CONTRACT_LEVEL_AUDIT, gsl_CONFIG_CONTRACT_LEVEL_ON, gsl_CONFIG_CONTRACT_LEVEL_ASSUME, and gsl_CONFIG_CONTRACT_LEVEL_OFF may be defined.
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x33
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x44
-#elif  defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x00
-#else
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK_0  0x11
+#if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
+# error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined.
 #endif
-
-#if    defined( gsl_CONFIG_CONTRACT_EXPECTS_ONLY )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  ( gsl_CONFIG_CONTRACT_LEVEL_MASK_0 & 0x0F )
-#elif  defined( gsl_CONFIG_CONTRACT_ENSURES_ONLY )
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  ( gsl_CONFIG_CONTRACT_LEVEL_MASK_0 & 0xF0 )
-#else
-# define        gsl_CONFIG_CONTRACT_LEVEL_MASK  gsl_CONFIG_CONTRACT_LEVEL_MASK_0
-#endif
-
-#if 2 <= defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+#if 1 < defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 # error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 1
-# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
-# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
-# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
-# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 1
-#else
-# define        gsl_CONFIG_CONTRACT_VIOLATION_THROWS_V 0
-# define        gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER_V 0
 #endif
-
-#if ( defined( gsl_CONFIG_CONTRACT_LEVEL_OFF ) || defined( gsl_CONFIG_CONTRACT_LEVEL_ASSUME ) ) && ( defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER ) )
-// `gsl_CONFIG_CONTRACT_LEVEL_ASSUME` should not be combined with any of the violation
-// response macros. Contract violations are undefined behavior in ASSUME mode, and
-// code which expects a particular violation response will not work as expected.
-# error cannot define gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, or gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER if gsl_CONFIG_CONTRACT_LEVEL_OFF or gsl_CONFIG_CONTRACT_LEVEL_ASSUME is defined.
+#if 1 < defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
+# error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined.
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -413,7 +386,7 @@
 # define gsl_is_delete_access private
 #endif
 
-#if !gsl_HAVE( NOEXCEPT ) || gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#if !gsl_HAVE( NOEXCEPT )
 # define gsl_noexcept /*noexcept*/
 #else
 # define gsl_noexcept noexcept
@@ -868,13 +841,13 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 //
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_ELIDE_CONTRACT( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
+# define gsl_ELIDE_CONTRACT_( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
 #else
-# define gsl_ELIDE_CONTRACT( x )
+# define gsl_ELIDE_CONTRACT_( x )
 #endif
 
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT( x ) /* there is no assume intrinsic in CUDA device code */
+# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT_( x ) /* there is no assume intrinsic in CUDA device code */
 #elif gsl_COMPILER_MSVC_VERSION
 # define  gsl_ASSUME( x )  __assume( x )
 #elif gsl_COMPILER_GNUC_VERSION
@@ -884,58 +857,51 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
 # endif
 #else
-# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT( x ) /* unknown compiler; cannot rely on assume intrinsic */
+# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
 #endif
-
-#define gsl_ELIDE_CONTRACT_EXPECTS        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x01 ) )
-#define gsl_ELIDE_CONTRACT_ENSURES        ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x10 ) )
-#define gsl_ASSUME_CONTRACT_EXPECTS       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x04 ) )
-#define gsl_ASSUME_CONTRACT_ENSURES       ( 0 != ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x40 ) )
-#define gsl_ELIDE_CONTRACT_EXPECTS_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x02 ) )
-#define gsl_ELIDE_CONTRACT_ENSURES_AUDIT  ( 0 == ( gsl_CONFIG_CONTRACT_LEVEL_MASK & 0x20 ) )
 
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 #  define  gsl_CONTRACT_CHECK_( x )  assert( x )
 #else
-# if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+# if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str " at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
-# elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
-# else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_assert() )
+# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
 # endif
 #endif
 
-#if gsl_ELIDE_CONTRACT_EXPECTS
-# if gsl_ASSUME_CONTRACT_EXPECTS
-#  define Expects( x )  gsl_ASSUME( x )
-# else
-#  define Expects( x )  gsl_ELIDE_CONTRACT( x )
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
+# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+#  define Expects( x )           gsl_ASSUME( x )
+# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
+#  define Expects( x )           gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  Expects( x )  gsl_CONTRACT_CHECK_( "Precondition failure", x )
+# define  Expects( x )           gsl_CONTRACT_CHECK_( "Precondition failure", x )
 #endif
 
-#if gsl_ELIDE_CONTRACT_EXPECTS_AUDIT
-# define ExpectsAudit( x )  gsl_ELIDE_CONTRACT( x )
+#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
+# define  gsl_ExpectsAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
-# define ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "Precondition failure (audit)", x )
+# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "Precondition failure (audit)", x )
 #endif
 
-#if gsl_ELIDE_CONTRACT_ENSURES
-# if gsl_ASSUME_CONTRACT_ENSURES
-#  define Ensures( x )  gsl_ASSUME( x )
-# else
-#  define Ensures( x )  gsl_ELIDE_CONTRACT( x )
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
+# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+#  define Ensures( x )           gsl_ASSUME( x )
+# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
+#  define Ensures( x )           gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  Ensures( x )  gsl_CONTRACT_CHECK_( "Postcondition failure", x )
+# define  Ensures( x )           gsl_CONTRACT_CHECK_( "Postcondition failure", x )
 #endif
 
-#if gsl_ELIDE_CONTRACT_ENSURES_AUDIT
-# define EnsuresAudit( x )  gsl_ELIDE_CONTRACT( x )
+#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
+# define  gsl_EnsuresAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
-# define EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
+# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
 #endif
 
 #define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
@@ -943,52 +909,47 @@ typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 struct fail_fast : public std::logic_error
 {
-    gsl_api explicit fail_fast( char const * const message )
+    gsl_api explicit fail_fast( char const * message )
     : std::logic_error( message ) {}
 };
 
-# if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
-
 namespace detail {
 
-gsl_api gsl_NORETURN inline void fail_fast_throw( char const * const message )
+gsl_api gsl_NORETURN inline void fail_fast_throw( char const * message )
 {
     throw fail_fast( message );
 }
-
-} // namespace detail
-
-gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
-void fail_fast_assert( bool cond, char const * const message )
-{
-    if ( !cond )
-        throw fail_fast( message );
-}
-
-# elif gsl_CONFIG( CONTRACT_VIOLATION_CALLS_HANDLER_V )
-
-// Should be defined by user
-gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
-
-gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
-void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
-{
-    if ( !cond )
-        fail_fast_assert_handler( expression, message, file, line );
-}
-
-# else
-
-namespace detail {
-
-gsl_api gsl_NORETURN inline void fail_fast_assert() gsl_noexcept
+gsl_api gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept
 {
     std::terminate();
 }
 
 } // namespace detail
 
-gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract check macros instead") gsl_api gsl_constexpr14 inline
+// Should be defined by user
+gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
+
+#if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+
+gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_api gsl_constexpr14 inline
+void fail_fast_assert( bool cond, char const * const message )
+{
+    if ( !cond )
+        throw fail_fast( message );
+}
+
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+
+gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_api gsl_constexpr14 inline
+void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
+{
+    if ( !cond )
+        fail_fast_assert_handler( expression, message, file, line );
+}
+
+#else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
+
+gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond ) gsl_noexcept
 {
 #ifdef __CUDA_ARCH__
@@ -999,7 +960,8 @@ void fail_fast_assert( bool cond ) gsl_noexcept
 #endif // __CUDA_ARCH__
 }
 
-# endif
+#endif
+
 
 //
 // GSL.util: utilities
@@ -1325,7 +1287,7 @@ gsl_api inline T narrow( U u )
 
     if ( static_cast<U>( t ) != u )
     {
-#if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
         throw narrowing_error();
 #else
         std::terminate();
@@ -1344,7 +1306,7 @@ gsl_api inline T narrow( U u )
     if ( ( t < 0 ) != ( u < 0 ) )
 #endif
     {
-#if gsl_CONFIG( CONTRACT_VIOLATION_THROWS_V )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
         throw narrowing_error();
 #else
         std::terminate();
@@ -2172,7 +2134,7 @@ public:
     template< class Container
         gsl_REQUIRES_T(( detail::is_compatible_container< Container, element_type >::value ))
     >
-    gsl_api gsl_constexpr span( Container & cont )
+    gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
         , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
@@ -2183,7 +2145,7 @@ public:
             && detail::is_compatible_container< Container, element_type >::value
         ))
     >
-    gsl_api gsl_constexpr span( Container const & cont )
+    gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
         , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
@@ -2207,13 +2169,13 @@ public:
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
     template< class Container >
-    gsl_api gsl_constexpr span( with_container_t, Container & cont )
+    gsl_api gsl_constexpr span( with_container_t, Container & cont ) gsl_noexcept
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
 
     template< class Container >
-    gsl_api gsl_constexpr span( with_container_t, Container const & cont )
+    gsl_api gsl_constexpr span( with_container_t, Container const & cont ) gsl_noexcept
         : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
         , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
     {}
@@ -2295,25 +2257,25 @@ public:
 
     // 26.7.3.3 Subviews [span.sub]
 
-    gsl_api gsl_constexpr14 span first( index_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span first( index_type count ) const
     {
         Expects( 0 <= count && count <= this->size() );
         return span( this->data(), count );
     }
 
-    gsl_api gsl_constexpr14 span last( index_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span last( index_type count ) const
     {
         Expects( 0 <= count && count <= this->size() );
         return span( this->data() + this->size() - count, count );
     }
 
-    gsl_api gsl_constexpr14 span subspan( index_type offset ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( index_type offset ) const
     {
         Expects( 0 <= offset && offset <= this->size() );
         return span( this->data() + offset, this->size() - offset );
     }
 
-    gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const gsl_noexcept
+    gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const
     {
         Expects(
             0 <= offset && offset <= this->size() &&
@@ -2455,7 +2417,7 @@ public:
 #endif
 
     template< class U >
-    gsl_api span< U > as_span() const gsl_noexcept
+    gsl_api span< U > as_span() const
     {
         Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
         return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) ); // NOLINT

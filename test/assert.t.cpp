@@ -23,8 +23,8 @@ namespace {
 
 bool expects( bool x ) { Expects( x ); return x; } 
 bool ensures( bool x ) { Ensures( x ); return x; }
-bool expectsAudit( bool x ) { ExpectsAudit( x ); return x; } 
-bool ensuresAudit( bool x ) { EnsuresAudit( x ); return x; }
+bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; } 
+bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 
 struct ConvertibleToBool
 {
@@ -57,28 +57,28 @@ CASE( "Ensures(): Terminates on a false expression" )
     EXPECT_THROWS( ensures( false ) );
 }
 
-CASE( "ExpectsAudit(): Allows a true expression" )
+CASE( "gsl_ExpectsAudit(): Allows a true expression" )
 {
     EXPECT_NO_THROW( expectsAudit( true  ) );
 }
 
-CASE( "EnsuresAudit(): Allows a true expression" )
+CASE( "gsl_EnsuresAudit(): Allows a true expression" )
 {
     EXPECT_NO_THROW( ensuresAudit( true  ) );
 }
 
-CASE( "ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
+CASE( "gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
 {
-#if defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
     EXPECT_THROWS( expectsAudit( false ) );
 #else
     EXPECT_NO_THROW( expectsAudit( false ) );
 #endif
 }
 
-CASE( "EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
+CASE( "gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
 {
-#if defined( gsl_CONFIG_CONTRACT_LEVEL_AUDIT )
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
     EXPECT_THROWS( ensuresAudit( false ) );
 #else
     EXPECT_NO_THROW( ensuresAudit( false ) );
