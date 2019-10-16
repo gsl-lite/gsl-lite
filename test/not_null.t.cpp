@@ -35,7 +35,32 @@ struct RefCounted
     T * p_;
 };
 
+template< class T >
+void take_raw( T* )
+{
 }
+#if gsl_HAVE( UNIQUE_PTR )
+template< class T >
+void take_unique_by_val( std::unique_ptr<T> )
+{
+}
+template< class T >
+void take_unique_by_ref( std::unique_ptr<T> const & )
+{
+}
+#endif
+#if gsl_HAVE( SHARED_PTR )
+template< class T >
+void take_shared_by_val( std::shared_ptr<T> )
+{
+}
+template< class T >
+void take_shared_by_ref( std::shared_ptr<T> const & )
+{
+}
+#endif
+
+} // anonymous namespace
 
 namespace nonlocal
 {
@@ -122,6 +147,17 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
     EXPECT( p == &i );
 }
 
+CASE( "not_null<>: Returns underlying pointer with get() (raw pointer)" )
+{
+#if !gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    int i = 12;
+    not_null< int* > p( &i );
+
+    int* pg = p.get();
+    EXPECT( pg == &i );
+#endif
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with make_not_null()" )
 {
     int i = 12;
@@ -149,6 +185,14 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
     not_null< const int* > p( &i );
 
     EXPECT( p == &i );
+}
+
+CASE( "not_null<>: Converts to underlying pointer (raw pointer)" )
+{
+    int i = 12;
+    not_null< int* > p( &i );
+
+    take_raw<int>( p );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
@@ -193,6 +237,14 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
 #endif
 
     EXPECT( q == p );
+}
+
+CASE( "not_null<>: Converts to a related pointer (raw pointer)" )
+{
+    MyDerived derived;
+    not_null< MyDerived* > p( &derived );
+
+    take_raw<MyBase>( p );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (raw pointer)" )
@@ -274,6 +326,34 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     EXPECT( p == pi );
 }
 
+CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+    not_null< shared_ptr< int > > p( pi );
+
+#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    int* pg = p.get();
+    EXPECT( pg == pi.get() );
+#else
+    shared_ptr< int > const & pg = p.get();
+    EXPECT( pg == pi );
+#endif
+}
+
+CASE( "not_null<>: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    shared_ptr< int > pi = make_shared< int >(12);
+    int* raw(pi.get());
+
+    not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
+    pi = std::move(p); // ...and back again.
+
+    EXPECT_THROWS( *p );
+    EXPECT( pi.get() == raw );
+#endif
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()" )
 {
     shared_ptr< int > pi = make_shared< int >(12);
@@ -300,6 +380,15 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
     not_null< shared_ptr< const int > > p( pi );
 
     EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Converts to underlying pointer (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >();
+    not_null< shared_ptr< int > > p( pi );
+
+    take_shared_by_val<int>( p );
+    take_shared_by_ref<int>( p );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -344,6 +433,15 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
 #endif
 
     EXPECT( q == p );
+}
+
+CASE( "not_null<>: Converts to a related pointer (shared_ptr)" )
+{
+    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    not_null< shared_ptr< MyDerived > > p( pderived );
+
+    take_shared_by_val<MyBase>( p );
+    take_shared_by_ref<MyBase>( p );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)" )
@@ -443,7 +541,24 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     EXPECT( &*p == raw );
 }
 
-CASE( "not_null<>: Allows to move from a not-null pointer (unique_ptr)" )
+CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)" )
+{
+#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET ) || gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+    not_null< unique_ptr< int > > p( std::move(pi) );
+
+# if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    int* pg = p.get();
+    EXPECT( pg == raw );
+# else // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    int* pg = p.get().get();
+    EXPECT( pg == raw );
+# endif
+#endif
+}
+
+CASE( "not_null<>: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     unique_ptr< int > pi = make_unique< int >(12);
@@ -454,6 +569,19 @@ CASE( "not_null<>: Allows to move from a not-null pointer (unique_ptr)" )
 
     EXPECT_THROWS( *p );
     EXPECT( pi.get() == raw );
+#endif
+}
+
+CASE( "not_null<>: Allows to move to a related pointer from a not_null pointer (unique_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    MyDerived* raw(pderived.get());
+    not_null< unique_ptr< MyDerived > > p ( std::move(pderived) );
+    unique_ptr< MyBase > pbase = std::move(p);
+
+    EXPECT_THROWS( *p );
+    EXPECT( pbase.get() == raw );
 #endif
 }
 
@@ -486,6 +614,17 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
     not_null< unique_ptr< const int > > p( std::move(pi) );
 
     EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Converts to underlying pointer (unique_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    unique_ptr< int > pi = make_unique< int >();
+    not_null< unique_ptr< int > > p( std::move(pi) );
+
+    take_unique_by_val<int>( std::move(p) );
+    //take_unique_by_ref<int>( p ); // We sacrifice the ability to convert to `unique_ptr<> const &`, cf. comment regarding conversion operators in gsl-lite.hpp.
+#endif
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_ptr)" )
@@ -536,6 +675,17 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
     EXPECT( &*q == raw );
 }
 
+CASE( "not_null<>: Converts to a related pointer (unique_ptr)" )
+{
+#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
+
+    take_unique_by_val<MyBase>( std::move(p) );
+    //take_unique_by_ref<MyBase>( p ); // We sacrifice the ability to convert to `unique_ptr<> const &`, cf. comment regarding conversion operators in gsl-lite.hpp.
+#endif
+}
+
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (unique_ptr)" )
 {
     unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
@@ -562,14 +712,12 @@ CASE( "not_null<>: Allows assignment to a const pointer from a not_null related 
 
 CASE( "not_null<>: Allows indirect member access (unique_ptr)" )
 {
-#if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF ) // This does not work when get_result_t is simply T, see issue #185
     using namespace nonlocal;
     S s = { 'a', 7 };
     not_null< unique_ptr< S > > p( make_unique< S >(s) );
 
     EXPECT( p->c == 'a' );
     EXPECT( p->i ==  7  );
-#endif
 }
 
 CASE( "not_null<>: Allows dereferencing (unique_ptr)" )

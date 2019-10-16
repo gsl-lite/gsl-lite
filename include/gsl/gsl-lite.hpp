@@ -95,6 +95,10 @@
 
 // Configuration: Other
 
+#if defined( gsl_CONFIG_NOT_NULL_TRANSPARENT_GET ) && gsl_CONFIG_NOT_NULL_TRANSPARENT_GET && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
+# error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_NOT_NULL_TRANSPARENT_GET=1
+#endif
+
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
 # define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 #endif
@@ -1398,54 +1402,51 @@ gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 // not_null<> - Wrap any indirection and enforce non-null.
 //
 
-namespace detail
-{
-    // helper class to figure out the pointed-to type of a pointer
+template< class T >
+class not_null;
+
+namespace detail {
+
+// helper class to figure out the pointed-to type of a pointer
 #if gsl_CPP11_OR_GREATER
-    template<class T, class E = void>
-    struct element_type_helper
-    {
-        // For types without a member element_type (this will handle raw pointers)
-        typedef typename std::remove_reference<decltype(*std::declval<T>())>::type type;
-    };
+template< class T, class E = void >
+struct element_type_helper
+{
+    // For types without a member element_type (this will handle raw pointers)
+    typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
+};
 
-    template<class T>
-    struct element_type_helper<T, std17::void_t<typename T::element_type>>
-    {
-        // For types with a member element_type
-        typedef typename T::element_type type;
-    };
+template< class T >
+struct element_type_helper< T, std17::void_t< typename T::element_type > >
+{
+    // For types with a member element_type
+    typedef typename T::element_type type;
+};
 #else
-    // Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
-    template<class T, class E = void>
-    struct element_type_helper
-    {
-        typedef typename T::element_type type;
-    };
+// Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
+template< class T, class E = void >
+struct element_type_helper
+{
+    typedef typename T::element_type type;
+};
 
-    template<class T>
-    struct element_type_helper<T*>
-    {
-        typedef T type;
-    };
+template< class T >
+struct element_type_helper< T* >
+{
+    typedef T type;
+};
 #endif
-}
+
+template< class T >
+struct is_not_null_oracle : std11::false_type { };
+template< class T >
+struct is_not_null_oracle< not_null<T> > : std11::true_type { };
+
+} // namespace detail
 
 template< class T >
 class not_null
 {
-#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# define gsl_not_null_explicit   explicit
-#else
-# define gsl_not_null_explicit /*explicit*/
-#endif
-
-#if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-    typedef T const & get_result_t;
-#else
-    typedef T get_result_t;
-#endif
-
     // need to access not_null<U>'s checked_ptr()
     template< class U >
     friend class not_null;
@@ -1457,6 +1458,11 @@ public:
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
+#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+# define gsl_not_null_explicit   explicit
+#else
+# define gsl_not_null_explicit /*explicit*/
+#endif
     template< class U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! defined( __apple_build_version__ )
         gsl_REQUIRES_A((
@@ -1502,7 +1508,7 @@ public:
 
     template< class U
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
-        gsl_REQUIRES_A((std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value))
+        gsl_REQUIRES_A(( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ))
 # endif
     >
     gsl_api gsl_constexpr explicit not_null( not_null<U> other )
@@ -1512,7 +1518,7 @@ public:
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
     // implicit converting constructor if type_traits is available
     template< class U
-        gsl_REQUIRES_A((std::is_convertible<U, T>::value))
+        gsl_REQUIRES_A(( std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr not_null( not_null<U> other )
     : ptr_( std::move(other.checked_ptr()) )
@@ -1540,32 +1546,84 @@ public:
     }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
-#if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-# if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
-    gsl_api gsl_constexpr14 element_type &  get() const &  { return checked_ptr().get(); }
-    gsl_api gsl_constexpr14 element_type && get() &&       { return std::move(checked_ptr()).get(); }
+#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+    gsl_api gsl_constexpr14 element_type* get() const { return checked_ptr().get(); }
+#else
+# if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    gsl_api gsl_constexpr14 T const & get() const { return checked_ptr(); }
 # else
-    gsl_api gsl_constexpr14 get_result_t get() const { return checked_ptr(); }
+    gsl_api gsl_constexpr14 T         get() const { return checked_ptr(); }
+# endif
+#endif
+
+    // We want an implicit conversion operator that can be used to convert from both lvalues (by
+    // const reference or by copy) and rvalues (by move). So it seems like we could define
+    //
+    //     template< class U, gsl_REQUIRE_A( ... ) >
+    //     operator U const &() const & { return checked_ptr(); }
+    //     template< class U, gsl_REQUIRE_A( ... ) >
+    //     operator U&&() && { return std::move( checked_ptr() ); }
+    //
+    // However, having two conversion operators with different return types renders the assignment
+    // operator of the result type ambiguous:
+    //
+    //     not_null<std::unique_ptr<T>> p( ... );
+    //     std::unique_ptr<U> q;
+    //     q = std::move( p ); // ambiguous
+    //
+    // To avoid this ambiguity, we have both overloads of the conversion operator return `U`
+    // rather than `U const &` or `U &&`. This implies that converting an lvalue always induces
+    // a copy, which can cause unnecessary copies or even fail to compile in some situations:
+    //
+    //     not_null<std::shared_ptr<T>> sp( ... );
+    //     std::shared_ptr<U> const & rs = sp; // unnecessary copy
+    //     std::unique_ptr<U> const & ru = p; // error: cannot copy `unique_ptr<T>`
+    //
+    // However, these situations are rather unusual, and the following, more frequent situations
+    // remain unimpaired:
+    //
+    //     std::shared_ptr<U> vs = sp; // no extra copy
+    //     std::unique_ptr<U> vu = std::move( p );
+
+#if gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+#  define gsl_not_null_LVALUE_REF &
+# else
+#  define gsl_not_null_LVALUE_REF
+# endif
+    // explicit conversion operator
+
+    template< class U
+        gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
+    >
+    gsl_api gsl_constexpr14 explicit operator U() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    template< class U
+        gsl_REQUIRES_A(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
+    >
+    gsl_api gsl_constexpr14 explicit operator U() && { return std::move(checked_ptr()); }
 # endif
 
-    gsl_api gsl_constexpr14 operator T() const & { return checked_ptr(); }
-    gsl_api gsl_constexpr14 operator T() &&      { return std::move(checked_ptr()); }
+    // implicit conversion operator
+    template< class U
+        gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
+    >
+    gsl_api gsl_constexpr14 operator U() const gsl_not_null_LVALUE_REF { return checked_ptr(); }
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    template< class U
+        gsl_REQUIRES_A(( std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value ))
+    >
+    gsl_api gsl_constexpr14 operator U() && { return std::move(checked_ptr()); }
+# endif
+# undef gsl_not_null_LVALUE_REF
+#else // a.k.a. #if !( gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
+    template< class U >
+    gsl_api gsl_constexpr14 operator U() const { return checked_ptr(); }
+#endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
-    gsl_api gsl_constexpr14 T const & operator->() const & { return checked_ptr(); }
-    gsl_api gsl_constexpr14 T &&      operator->() &&      { return std::move(checked_ptr()); }
-
-    gsl_api gsl_constexpr14 element_type &  operator*() const & { return *checked_ptr(); }
-    gsl_api gsl_constexpr14 element_type && operator*() &&      { return *std::move(checked_ptr()); }
-
-#else
-    gsl_api gsl_constexpr14 get_result_t get() const { return checked_ptr(); }
-
-    gsl_api gsl_constexpr   operator get_result_t  () const   { return checked_ptr(); }
-
-    gsl_api gsl_constexpr   get_result_t operator->() const   { return checked_ptr(); }
+    gsl_api gsl_constexpr   T const &     operator->() const   { return checked_ptr(); }
 
     gsl_api gsl_constexpr   element_type & operator*() const  { return *checked_ptr(); }
-#endif
 
 gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
