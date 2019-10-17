@@ -318,6 +318,18 @@ CASE( "not_null<>: Terminates assignment from related pointer types for null poi
     EXPECT_THROWS( p = not_null< shared_ptr< MyDerived > >( z ) );
 }
 
+CASE( "not_null<>: Terminates propagation of a moved-from value (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+    not_null< shared_ptr< int > > p( std::move( pi ) );
+    not_null< shared_ptr< int > > q( std::move( p ) );
+
+    EXPECT_THROWS( not_null< shared_ptr< int > >{ p } );
+    EXPECT_THROWS( not_null< shared_ptr< int > >{ std::move( p ) } );
+    EXPECT_THROWS( q = p );
+    EXPECT_THROWS( q = std::move( p ) );
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)" )
 {
     shared_ptr< int > pi = make_shared< int >(12);
@@ -530,6 +542,16 @@ CASE( "not_null<>: Terminates assignment from related pointer types for null poi
     not_null< unique_ptr< MyBase > > p( make_unique< MyDerived >() );
 
     EXPECT_THROWS( p = not_null< unique_ptr< MyDerived > >( std::move(z) ) );
+}
+
+CASE( "not_null<>: Terminates propagation of a moved-from value (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    not_null< unique_ptr< int > > p( std::move( pi ) );
+    not_null< unique_ptr< int > > q( std::move( p ) );
+
+    EXPECT_THROWS( not_null< unique_ptr< int > >{ std::move( p ) } );
+    EXPECT_THROWS( q = std::move( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)" )

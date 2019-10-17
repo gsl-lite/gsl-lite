@@ -372,7 +372,7 @@
 # define gsl_is_delete_access private
 #endif
 
-#if !gsl_HAVE( NOEXCEPT )
+#if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
 # define gsl_noexcept /*noexcept*/
 #else
 # define gsl_noexcept noexcept
