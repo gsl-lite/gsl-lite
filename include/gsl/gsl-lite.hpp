@@ -436,9 +436,14 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-# define gsl_REQUIRES_A_(VA) , typename std::enable_if< ( VA ), int >::type = 0
+# if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+// VS 2013 and earlier seem to have trouble with SFINAE for default non-type arguments
+#  define gsl_REQUIRES_A_(VA) gsl_REQUIRES_T_(VA)
+# else
+#  define gsl_REQUIRES_A_(VA) , typename std::enable_if< ( VA ), int >::type = 0
+# endif
 #else
-# define gsl_REQUIRES_A_(VA)
+# define  gsl_REQUIRES_A_(VA)
 #endif
 
 
@@ -1508,7 +1513,7 @@ public:
 # if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
     // implicit converting constructor if type_traits is available
     template< class U
-        , typename std::enable_if< std::is_convertible<U, T>::value, int >::type = 0
+        gsl_REQUIRES_A_(( std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : ptr_( std::move( other.ptr_ ) )
@@ -2184,7 +2189,7 @@ public:
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container
-        , typename std::enable_if< detail::is_compatible_container< Container, element_type >::value, int >::type = 0
+        gsl_REQUIRES_A_(( detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
@@ -2192,10 +2197,10 @@ public:
     {}
 
     template< class Container
-        , typename std::enable_if<
+        gsl_REQUIRES_A_((
             std::is_const< element_type >::value
             && detail::is_compatible_container< Container, element_type >::value
-        , int >::type = 0
+        ))
     >
     gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
@@ -2840,12 +2845,12 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template< class Container
-        , typename std::enable_if<
+        gsl_REQUIRES_A_((
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
-        , int >::type = 0
+        ))
     >
     gsl_api gsl_constexpr basic_string_span( Container & cont )
     : span_( ( cont ) )
@@ -2854,12 +2859,12 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template< class Container
-        , typename std::enable_if<
+        gsl_REQUIRES_A_((
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
-        , int >::type = 0
+        ))
     >
     gsl_api gsl_constexpr basic_string_span( Container const & cont )
     : span_( ( cont ) )
@@ -2915,7 +2920,7 @@ public:
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
     template< class U
-        , typename std::enable_if< std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value, int >::type = 0
+        gsl_REQUIRES_A_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
@@ -3098,7 +3103,7 @@ gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
-    , typename std::enable_if< !detail::is_basic_string_span<U>::value, int >::type = 0
+    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3109,7 +3114,7 @@ gsl_api inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T
 }
 
 template< class T, class U
-    , typename std::enable_if< !detail::is_basic_string_span<U>::value, int >::type = 0
+    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3173,7 +3178,7 @@ gsl_api inline gsl_constexpr14 bool operator>=( basic_string_span<T> const & l, 
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
-    , typename std::enable_if< !detail::is_basic_string_span<U>::value, int >::type = 0
+    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator!=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3181,7 +3186,7 @@ gsl_api inline gsl_constexpr14 bool operator!=( U const & l, basic_string_span<T
 }
 
 template< class T, class U
-    , typename std::enable_if< !detail::is_basic_string_span<U>::value, int >::type = 0
+    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator<=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3189,7 +3194,7 @@ gsl_api inline gsl_constexpr14 bool operator<=( U const & l, basic_string_span<T
 }
 
 template< class T, class U
-    , typename std::enable_if< !detail::is_basic_string_span<U>::value, int >::type = 0
+    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator>( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3197,7 +3202,7 @@ gsl_api inline gsl_constexpr14 bool operator>( U const & l, basic_string_span<T>
 }
 
 template< class T, class U
-    , typename std::enable_if< !detail::is_basic_string_span<U>::value, int >::type = 0
+    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_api inline gsl_constexpr14 bool operator>=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
