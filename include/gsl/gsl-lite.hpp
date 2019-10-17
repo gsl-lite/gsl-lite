@@ -415,7 +415,7 @@
 //     For functions, prefer return-type SFINAE if possible.
 //     If return-type SFINAE is not applicable, use `gsl_REQUIRES_A_()` or `typename std::enable_if< VA, int >::type = 0` in the function template argument list.
 //
-//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, int >::type` in class template argument lists.
+//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, gsl::detail::enabler >::type` in class template argument lists.
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
@@ -424,19 +424,19 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< VA, int >::type
+# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), gsl::detail::enabler >::type
 #else
 # define gsl_REQUIRES_T_(VA)
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_R_(R, VA) typename std::enable_if< VA, R >::type
+# define gsl_REQUIRES_R_(R, VA) typename std::enable_if< ( VA ), R >::type
 #else
 # define gsl_REQUIRES_R_(R, VA) R
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-# define gsl_REQUIRES_A_(VA) , typename std::enable_if< VA, int >::type = 0
+# define gsl_REQUIRES_A_(VA) , typename std::enable_if< ( VA ), int >::type = 0
 #else
 # define gsl_REQUIRES_A_(VA)
 #endif
@@ -798,7 +798,7 @@ template<
             && ! is_std_array< C >::value
             && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >::value)
         //  &&   has_size_and_data< C >::value
-        >::type
+        , enabler>::type
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
@@ -2840,12 +2840,12 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template< class Container
-        , typename = typename std::enable_if<
+        , typename std::enable_if<
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
-        >::type
+        , int >::type = 0
     >
     gsl_api gsl_constexpr basic_string_span( Container & cont )
     : span_( ( cont ) )
@@ -2854,12 +2854,12 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template< class Container
-        , typename = typename std::enable_if<
+        , typename std::enable_if<
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
-        >::type
+        , int >::type = 0
     >
     gsl_api gsl_constexpr basic_string_span( Container const & cont )
     : span_( ( cont ) )
