@@ -792,13 +792,13 @@ struct is_compatible_container : std17::bool_constant
 
 template<
     class C, class E
-        , typename std::enable_if<
+        , typename = typename std::enable_if<
             ! is_span< C >::value
             && ! is_array< C >::value
             && ! is_std_array< C >::value
             && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >::value)
         //  &&   has_size_and_data< C >::value
-        >
+        >::type
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
@@ -2293,7 +2293,7 @@ public:
 #endif
 
     template< class U
-        , typename std::enable_if< std::is_convertible<U(*)[], element_type(*)[]>::value, int >::type = 0
+        gsl_REQUIRES_A_(( std::is_convertible<U(*)[], element_type(*)[]>::value ))
     >
     gsl_api gsl_constexpr span( span<U> const & other )
         : first_( other.begin() )
