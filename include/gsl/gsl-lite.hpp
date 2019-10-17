@@ -1543,7 +1543,11 @@ public:
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
 #if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
-    gsl_api gsl_constexpr14 element_type* get() const { return checked_ptr().get(); }
+    gsl_api gsl_constexpr14 element_type* get() const
+    {
+        Expects( ptr_ != gsl_nullptr );
+        return ptr_.get();
+    }
 #else
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_api gsl_constexpr14 T const & get() const
