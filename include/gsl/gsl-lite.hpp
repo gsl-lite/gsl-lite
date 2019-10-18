@@ -1520,11 +1520,10 @@ public:
 
 #if gsl_HAVE( RVALUE_REFERENCE )
     template< class U
-# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! defined( __apple_build_version__ ) // TODO: make the Apple Clang check more precise
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
         gsl_REQUIRES_A_((
             // in clang 3.x, is_constructible with T=unique_ptr<X>, U=not_null<T> tries to call copy constructor of unique_ptr, triggering an error
-            // it's okay to skip this check, because misuse will still trigger an error, but a less readable one
-            // apple clang's __clang_major__ etc. are different from regular clang, so it's best to simply not poke the beast, and skip is_constructible entirely
+            // note that Apple Clang's __clang_major__ etc. are different from regular Clang
             std::is_constructible<T, U>::value
         ))
 # endif
