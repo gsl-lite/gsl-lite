@@ -625,10 +625,10 @@ using std::make_unique;
 
 # elif gsl_HAVE( VARIADIC_TEMPLATE )
 
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args&&... args)
+template< class T, class... Args >
+std::unique_ptr<T> make_unique( Args &&... args )
 {
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+    return std::unique_ptr<T>( new T( std::forward<Args>( args )... ) );
 }
 
 # endif // gsl_HAVE( MAKE_UNIQUE ), gsl_HAVE( VARIADIC_TEMPLATE )
@@ -1431,7 +1431,7 @@ struct not_null_data< T, false >
 {
     T ptr_;
 
-    gsl_constexpr14 not_null_data( T&& _ptr ) gsl_noexcept
+    gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
     : ptr_( std::move( _ptr ) )
     {
     }
@@ -1629,7 +1629,7 @@ public:
     //     template< class U >
     //     operator U const &() const & { ... }
     //     template< class U >
-    //     operator U&&() && { ... }
+    //     operator U &&() && { ... }
     //
     // However, having two conversion operators with different return types renders the assignment
     // operator of the result type ambiguous:
