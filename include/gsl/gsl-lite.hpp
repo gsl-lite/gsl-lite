@@ -273,10 +273,10 @@
 #define gsl_HAVE_EXPLICIT               gsl_CPP11_120
 #define gsl_HAVE_INITIALIZER_LIST       gsl_CPP11_120
 #define gsl_HAVE_VARIADIC_TEMPLATE      gsl_CPP11_120
+#define gsl_HAVE_IS_DELETE              gsl_CPP11_120
 
 #define gsl_HAVE_CONSTEXPR_11           gsl_CPP11_140
 #define gsl_HAVE_IS_DEFAULT             gsl_CPP11_140
-#define gsl_HAVE_IS_DELETE              gsl_CPP11_140
 #define gsl_HAVE_NOEXCEPT               gsl_CPP11_140
 #define gsl_HAVE_NORETURN               ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 ) )
 
