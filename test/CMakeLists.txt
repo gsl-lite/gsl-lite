@@ -32,10 +32,25 @@ set( SOURCES
     util.t.cpp
 )
 
+set( ALTERNATE_CONFIG_SOURCES
+    gsl-lite.t.cpp
+    # TODO: add more
+)
 # Configure gsl-lite for testing:
 
-set( GSL_CONFIG -Dgsl_TESTING_ -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT )
-
+set( GSL_CONFIG
+    -Dgsl_TESTING_
+    -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS
+    -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT
+)
+set( GSL_ALTERNATE_CONFIG
+    -Dgsl_TESTING_
+    -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS
+    -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT
+    -Dgsl_CONFIG_TRANSPARENT_NOT_NULL=1
+    -Dgsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0
+    -Dgsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1
+)
 # Preset available C++ language compiler flags:
 
 set( HAS_STD_FLAGS  FALSE )
@@ -54,7 +69,7 @@ if( MSVC )
     set( HAS_STD_FLAGS TRUE )
 
     set( OPTIONS     -W3 -EHsc )
-    set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS ${GSL_CONFIG} )
+    set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
 
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.00 )
         set( HAS_CPP14_FLAG TRUE )
@@ -81,7 +96,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
         -fno-elide-constructors
         -fstrict-aliasing -Wstrict-aliasing=2
     )
-    set( DEFINITIONS ${GSL_CONFIG} )
+    set( DEFINITIONS "" )
 
     # GNU: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
@@ -147,13 +162,13 @@ endfunction()
 
 # Make target, compile for given standard if specified:
 
-function( make_target target std )
+function( make_target target std sources extra_definitions )
     message( STATUS "Make target: '${std}'" )
 
-    add_executable            ( ${target} ${SOURCES}  )
+    add_executable            ( ${target} ${sources}  )
     target_link_libraries     ( ${target} PRIVATE ${PACKAGE} )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
-    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
+    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${extra_definitions} )
 
     if( std )
         if( MSVC )
@@ -172,30 +187,38 @@ endfunction()
 # Add generic executable, unless -std flags can be specified:
 
 if( NOT HAS_STD_FLAGS )
-    make_target( ${PROGRAM}.t "" )
+    make_target( ${PROGRAM}.t        "" "${SOURCES}" "${GSL_CONFIG}" )
+    make_target( ${PROGRAM}-altcfg.t "" "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
 else()
     # unconditionally add C++98 variant as MSVC has no option for it:
     if( HAS_CPP98_FLAG )
-        make_target( ${PROGRAM}-cpp98.t 98 )
+        make_target( ${PROGRAM}-cpp98.t        98 "${SOURCES}" "${GSL_CONFIG}" )
+        make_target( ${PROGRAM}-altcfg-cpp98.t 98 "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
     else()
-        make_target( ${PROGRAM}-cpp98.t "" )
+        make_target( ${PROGRAM}-cpp98.t        "" "${SOURCES}" "${GSL_CONFIG}" )
+        make_target( ${PROGRAM}-altcfg-cpp98.t "" "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
     endif()
 
     if( HAS_CPP11_FLAG )
-        make_target( ${PROGRAM}-cpp11.t 11 )
+        make_target( ${PROGRAM}-cpp11.t        11 "${SOURCES}" "${GSL_CONFIG}" )
+        make_target( ${PROGRAM}-altcfg-cpp11.t 11 "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
     endif()
 
     if( HAS_CPP14_FLAG )
-        make_target( ${PROGRAM}-cpp14.t 14 )
-    endif()
+        make_target( ${PROGRAM}-cpp14.t        14 "${SOURCES}" "${GSL_CONFIG}" )
+        make_target( ${PROGRAM}-altcfg-cpp14.t 14 "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
+endif()
 
     if( HAS_CPP17_FLAG )
-        make_target( ${PROGRAM}-cpp17.t 17 )
+        make_target( ${PROGRAM}-cpp17.t        17 "${SOURCES}" "${GSL_CONFIG}" )
         enable_msvs_guideline_checker( ${PROGRAM}-cpp17.t )
+        make_target( ${PROGRAM}-altcfg-cpp17.t        17 "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
+        enable_msvs_guideline_checker( ${PROGRAM}-altcfg-cpp17.t )
     endif()
 
     if( HAS_CPPLATEST_FLAG )
-        make_target( ${PROGRAM}-cpplatest.t latest )
+        make_target( ${PROGRAM}-cpplatest.t        latest "${SOURCES}" "${GSL_CONFIG}" )
+        make_target( ${PROGRAM}-altcfg-cpplatest.t latest "${ALTERNATE_CONFIG_SOURCES}" "${GSL_ALTERNATE_CONFIG}" )
     endif()
 endif()
 
@@ -205,19 +228,24 @@ enable_testing()
 
 if( HAS_STD_FLAGS )
     # Unconditionally add C++98 variant for MSVC:
-    add_test(     NAME test-cpp98     COMMAND ${PROGRAM}-cpp98.t )
+    add_test(     NAME test-cpp98            COMMAND ${PROGRAM}-cpp98.t )
+    add_test(     NAME test-altcfg-cpp98     COMMAND ${PROGRAM}-altcfg-cpp98.t )
 
     if( HAS_CPP11_FLAG )
-        add_test( NAME test-cpp11     COMMAND ${PROGRAM}-cpp11.t )
+        add_test( NAME test-cpp11            COMMAND ${PROGRAM}-cpp11.t )
+        add_test( NAME test-altcfg-cpp11     COMMAND ${PROGRAM}-altcfg-cpp11.t )
     endif()
     if( HAS_CPP14_FLAG )
-        add_test( NAME test-cpp14     COMMAND ${PROGRAM}-cpp14.t )
+        add_test( NAME test-cpp14            COMMAND ${PROGRAM}-cpp14.t )
+        add_test( NAME test-altcfg-cpp14     COMMAND ${PROGRAM}-altcfg-cpp14.t )
     endif()
     if( HAS_CPP17_FLAG )
-        add_test( NAME test-cpp17     COMMAND ${PROGRAM}-cpp17.t )
+        add_test( NAME test-cpp17            COMMAND ${PROGRAM}-cpp17.t )
+        add_test( NAME test-altcfg-cpp17     COMMAND ${PROGRAM}-altcfg-cpp17.t )
     endif()
     if( HAS_CPPLATEST_FLAG )
-        add_test( NAME test-cpplatest COMMAND ${PROGRAM}-cpplatest.t )
+        add_test( NAME test-cpplatest        COMMAND ${PROGRAM}-cpplatest.t )
+        add_test( NAME test-altcfg-cpplatest COMMAND ${PROGRAM}-altcfg-cpplatest.t )
     endif()
 else()
     add_test(     NAME test           COMMAND ${PROGRAM}. --pass )
