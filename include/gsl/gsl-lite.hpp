@@ -103,8 +103,8 @@
 
 // Configuration: Other
 
-#if defined( gsl_CONFIG_NOT_NULL_TRANSPARENT_GET ) && gsl_CONFIG_NOT_NULL_TRANSPARENT_GET && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
-# error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_NOT_NULL_TRANSPARENT_GET=1
+#if defined( gsl_CONFIG_TRANSPARENT_NOT_NULL ) && gsl_CONFIG_TRANSPARENT_NOT_NULL && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
+# error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_TRANSPARENT_NOT_NULL=1
 #endif
 
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
@@ -123,8 +123,8 @@
 # define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0
 #endif
 
-#ifndef  gsl_CONFIG_NOT_NULL_TRANSPARENT_GET
-# define gsl_CONFIG_NOT_NULL_TRANSPARENT_GET  0
+#ifndef  gsl_CONFIG_TRANSPARENT_NOT_NULL
+# define gsl_CONFIG_TRANSPARENT_NOT_NULL  0
 #endif
 
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -481,10 +481,10 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# include <type_traits>     // for enable_if<>,
-                            // add_const<>, add_pointer<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
-                            // is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
-                            // integral_constant<>, declval()
+# include <type_traits> // for enable_if<>,
+                        // add_const<>, add_pointer<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
+                        // is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
+                        // integral_constant<>, declval()
 #elif gsl_HAVE( TR1_TYPE_TRAITS )
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
@@ -1604,7 +1604,7 @@ public:
     }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
-#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+#if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     gsl_api gsl_constexpr14 element_type* get() const
     {
         Expects( this->ptr_ != gsl_nullptr );
