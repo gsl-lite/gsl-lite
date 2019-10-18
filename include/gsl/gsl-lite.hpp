@@ -1447,6 +1447,11 @@ struct not_null_data< T, false >
         ptr_ = std::move( other.ptr_ );
         return *this;
     }
+
+        // VC++ 2013 doesn't automatically delete these, so we have to provide them
+    not_null_data( not_null_data const & other ) gsl_is_delete;
+    not_null_data & operator=( not_null_data const & other ) gsl_is_delete;
+    
 };
 #endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS )
 template< class T >
