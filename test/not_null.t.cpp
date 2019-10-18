@@ -159,7 +159,9 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# endif
 
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     static_assert(  std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
@@ -167,7 +169,9 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 # endif
 
     static_assert( !std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
     static_assert( !std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# endif
 
 # if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
