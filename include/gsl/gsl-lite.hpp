@@ -1556,7 +1556,10 @@ public:
     // if type_traits is not available, then we can't distinguish is_convertible and is_constructible, so we use this unconditionally
 
     template< class U
-        gsl_REQUIRES_A_(( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ))
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value, int >::type = 0
+#endif
     >
     gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
     : base( std::move( other.ptr_ ) )
@@ -1564,10 +1567,10 @@ public:
         Expects( this->ptr_ != gsl_nullptr );
     }
 
-# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( TYPE_TRAITS )
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     // implicit converting constructor if type_traits is available
     template< class U
-        gsl_REQUIRES_A_(( std::is_convertible<U, T>::value ))
+        , typename std::enable_if< std::is_convertible<U, T>::value, int >::type = 0
     >
     gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : base( std::move( other.ptr_ ) )
