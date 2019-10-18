@@ -159,6 +159,16 @@ matrix:
       compiler: clang
       env: COMPILER='clang++'
 
+    - os: osx
+      osx_image: xcode10.3
+      compiler: clang
+      env: COMPILER='clang++'
+
+    - os: osx
+      osx_image: xcode11.2
+      compiler: clang
+      env: COMPILER='clang++'
+
   allow_failures:
     - osx_image: xcode10
 
