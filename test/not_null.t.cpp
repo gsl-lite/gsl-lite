@@ -95,6 +95,80 @@ CASE( "not_null<>: Disallows construction from a unique pointer to underlying ty
 #endif
 }
 
+CASE( "not_null<>: Layout is compatible to underlying type" )
+{
+#if gsl_HAVE( TYPE_TRAITS )
+    static_assert( sizeof( not_null< int* > ) == sizeof( int* ), "static assertion failed" );
+    static_assert( sizeof( not_null< unique_ptr< int > > ) == sizeof( unique_ptr< int > ), "static assertion failed" );
+    static_assert( sizeof( not_null< shared_ptr< int > > ) == sizeof( shared_ptr< int > ), "static assertion failed" );
+#endif
+}
+
+CASE( "not_null<>: Convertibility is correctly reported by type traits" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR )
+    static_assert(  std::is_convertible< not_null< int* >, int* >::value, "static assertion failed" );
+    static_assert(  std::is_convertible< not_null< int* >, not_null< int* > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_convertible< int*, not_null< int* > >::value, "static assertion failed" );
+# endif
+
+    static_assert(  std::is_convertible< not_null< MyDerived* >, MyBase* >::value, "static assertion failed" );
+    static_assert(  std::is_convertible< not_null< MyDerived* >, not_null< MyBase* > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_convertible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+# endif
+
+    static_assert(  std::is_convertible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+    static_assert(  std::is_convertible< not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_convertible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+# endif
+
+    static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+#endif
+}
+
+CASE( "not_null<>: Copyability and assignability are correctly reported by type traits" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR )
+    static_assert(  std::is_copy_constructible< not_null< int* > >::value, "static assertion failed" );
+    static_assert(  std::is_copy_assignable<    not_null< int* > >::value, "static assertion failed" );
+
+    static_assert( !std::is_copy_constructible< not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+    static_assert( !std::is_copy_assignable<    not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+
+    static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+
+    static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+
+    static_assert(  std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+#endif
+}
+
 CASE( "not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
