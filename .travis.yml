@@ -169,8 +169,8 @@ matrix:
       compiler: clang
       env: COMPILER='clang++'
 
-  allow_failures:
-    - osx_image: xcode10
+#  allow_failures:
+#    - osx_image: xcode10
 
   fast_finish: true
 

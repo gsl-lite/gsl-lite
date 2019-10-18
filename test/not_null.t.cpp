@@ -143,13 +143,17 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     static_assert(  std::is_copy_assignable<    not_null< int* > >::value, "static assertion failed" );
 
     static_assert( !std::is_copy_constructible< not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
     static_assert( !std::is_copy_assignable<    not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+# endif
 
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
     static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+# endif
 
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
     static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
