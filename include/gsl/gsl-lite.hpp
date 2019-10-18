@@ -1458,12 +1458,13 @@ struct not_null_data< T, true >
     : ptr_( _ptr )
     {
     }
-    gsl_constexpr14 not_null_data( T&& _ptr ) gsl_noexcept
+
+#if gsl_HAVE( RVALUE_REFERENCE )
+    gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
     : ptr_( std::move( _ptr ) )
     {
     }
     
-#if gsl_HAVE( RVALUE_REFERENCE )
     gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
     : ptr_( std::move( other.ptr_ ) )
     {
@@ -1475,7 +1476,8 @@ struct not_null_data< T, true >
         ptr_ = std::move( other.ptr_ );
         return *this;
     }
-#endif
+#endif // gsl_HAVE( RVALUE_REFERENCE )
+
     gsl_constexpr14 not_null_data( not_null_data const & other )
     : ptr_( other.ptr_ )
     {
