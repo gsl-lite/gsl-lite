@@ -1491,21 +1491,30 @@ struct not_null_data< T, true >
     }
 };
 
+template< class T >
+struct is_copyable
+#if gsl_HAVE( TYPE_TRAITS )
+: std11::integral_constant< bool, std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value >
+#else
+: std11::true_type
+#endif
+{
+};
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+// Type traits are buggy in VC++ 2013, so we explicitly declare `unique_ptr<>` non-copyable.
+template< class T, class Deleter >
+struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
+{
+};
+#endif
+
 } // namespace detail
 
 template< class T >
 class not_null
-: private detail::not_null_data< T
-#if gsl_HAVE( TYPE_TRAITS )
-    , std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value
-#endif
->
+: private detail::not_null_data< T, detail::is_copyable< T >::value >
 {
-    typedef detail::not_null_data< T
-#if gsl_HAVE( TYPE_TRAITS )
-        , std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value
-#endif
-    > base;
+    typedef detail::not_null_data< T, detail::is_copyable< T >::value > base;
 
     // need to access `not_null<U>::ptr_`
     template< class U >
