@@ -147,8 +147,18 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     static_assert( !std::is_copy_assignable<    not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
 # endif
 
+    static_assert(  std::is_constructible< not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_assignable<    not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
+# endif
+
+    static_assert( !std::is_constructible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
-    static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+# endif
 
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
 # if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
