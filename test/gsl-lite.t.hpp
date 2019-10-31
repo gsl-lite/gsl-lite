@@ -11,6 +11,12 @@
 #ifndef GSL_TEST_GSL_LITE_HPP_INCLUDED
 #define GSL_TEST_GSL_LITE_HPP_INCLUDED
 
+// Compiler warning suppression for ancient versions of Visual Studio:
+
+#if defined( _MSC_VER ) && _MSC_VER < 1800
+# pragma warning( disable : 4345 ) // behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
+#endif
+
 // Select GSL Lite for VC6 if compiling with VC6:
 
 #if defined(_MSC_VER) && _MSC_VER < 1300

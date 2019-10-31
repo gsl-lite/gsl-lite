@@ -1736,6 +1736,26 @@ public:
         return *data_.ptr_;
     }
 
+#if gsl_HAVE( RVALUE_REFERENCE )
+	// Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
+	gsl_constexpr14 not_null( not_null && other ) gsl_noexcept
+	: data_( std::move( other.data_ ) )
+	{
+        Expects( data_.ptr_ != gsl_nullptr );
+	}
+	gsl_constexpr14 not_null & operator=( not_null && other ) gsl_noexcept
+	{
+        Expects( other.data_.ptr_ != gsl_nullptr );
+		data_ = std::move( other.data_ );
+		return *this;
+	}
+#endif // gsl_HAVE( RVALUE_REFERENCE )
+
+#if gsl_HAVE( IS_DEFAULT )
+    gsl_constexpr14 not_null( not_null const & other ) = default;
+    gsl_constexpr14 not_null & operator=( not_null const & other ) = default;
+#endif
+
 gsl_is_delete_access:
     // prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE( NULLPTR )

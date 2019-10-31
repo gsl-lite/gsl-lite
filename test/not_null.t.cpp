@@ -106,7 +106,7 @@ CASE( "not_null<>: Layout is compatible to underlying type" )
 
 CASE( "not_null<>: Convertibility is correctly reported by type traits" )
 {
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR )
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
     static_assert(  std::is_convertible< not_null< int* >, int* >::value, "static assertion failed" );
     static_assert(  std::is_convertible< not_null< int* >, not_null< int* > >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
@@ -425,8 +425,8 @@ CASE( "not_null<>: Terminates propagation of a moved-from value (shared_ptr)" )
     not_null< shared_ptr< int > > p( std::move( pi ) );
     not_null< shared_ptr< int > > q( std::move( p ) );
 
-    EXPECT_THROWS( not_null< shared_ptr< int > >{ p } );
-    EXPECT_THROWS( not_null< shared_ptr< int > >{ std::move( p ) } );
+    EXPECT_THROWS( not_null< shared_ptr< int > > v( p ) );
+    EXPECT_THROWS( not_null< shared_ptr< int > > v( std::move( p ) ) );
     EXPECT_THROWS( q = p );
     EXPECT_THROWS( q = std::move( p ) );
 }
@@ -651,7 +651,7 @@ CASE( "not_null<>: Terminates propagation of a moved-from value (unique_ptr)" )
     not_null< unique_ptr< int > > p( std::move( pi ) );
     not_null< unique_ptr< int > > q( std::move( p ) );
 
-    EXPECT_THROWS( not_null< unique_ptr< int > >{ std::move( p ) } );
+    EXPECT_THROWS( not_null< unique_ptr< int > >( std::move( p ) ) );
     EXPECT_THROWS( q = std::move( p ) );
 }
 
