@@ -95,6 +95,107 @@ CASE( "not_null<>: Disallows construction from a unique pointer to underlying ty
 #endif
 }
 
+CASE( "not_null<>: Layout is compatible to underlying type" )
+{
+#if gsl_HAVE( TYPE_TRAITS )
+    static_assert( sizeof( not_null< int* > ) == sizeof( int* ), "static assertion failed" );
+    static_assert( sizeof( not_null< unique_ptr< int > > ) == sizeof( unique_ptr< int > ), "static assertion failed" );
+    static_assert( sizeof( not_null< shared_ptr< int > > ) == sizeof( shared_ptr< int > ), "static assertion failed" );
+#endif
+}
+
+CASE( "not_null<>: Convertibility is correctly reported by type traits" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
+    static_assert(  std::is_convertible< not_null< int* >, int* >::value, "static assertion failed" );
+    static_assert(  std::is_convertible< not_null< int* >, not_null< int* > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_convertible< int*, not_null< int* > >::value, "static assertion failed" );
+# endif
+
+    static_assert(  std::is_convertible< not_null< MyDerived* >, MyBase* >::value, "static assertion failed" );
+    static_assert(  std::is_convertible< not_null< MyDerived* >, not_null< MyBase* > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_convertible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+# endif
+
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    static_assert(  std::is_convertible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+# endif
+
+    static_assert(  std::is_convertible< not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_convertible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+# endif
+
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+    static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+# endif
+#endif
+}
+
+CASE( "not_null<>: Copyability and assignability are correctly reported by type traits" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+    static_assert(  std::is_copy_constructible< not_null< int* > >::value, "static assertion failed" );
+    static_assert(  std::is_copy_assignable<    not_null< int* > >::value, "static assertion failed" );
+
+    static_assert( !std::is_copy_constructible< not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+    static_assert( !std::is_copy_assignable<    not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+# endif
+
+    static_assert(  std::is_constructible< not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_assignable<    not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
+# endif
+
+    static_assert( !std::is_constructible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+
+    static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+# endif
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+# endif
+
+    static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# endif
+
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    static_assert(  std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+# endif
+
+    static_assert( !std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+    static_assert( !std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+# endif
+
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+
+    static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+# endif
+
+    static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+}
+
 CASE( "not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
@@ -318,6 +419,18 @@ CASE( "not_null<>: Terminates assignment from related pointer types for null poi
     EXPECT_THROWS( p = not_null< shared_ptr< MyDerived > >( z ) );
 }
 
+CASE( "not_null<>: Terminates propagation of a moved-from value (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+    not_null< shared_ptr< int > > p( std::move( pi ) );
+    not_null< shared_ptr< int > > q( std::move( p ) );
+
+    EXPECT_THROWS( not_null< shared_ptr< int > > v( p ) );
+    EXPECT_THROWS( not_null< shared_ptr< int > > v( std::move( p ) ) );
+    EXPECT_THROWS( q = p );
+    EXPECT_THROWS( q = std::move( p ) );
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)" )
 {
     shared_ptr< int > pi = make_shared< int >(12);
@@ -530,6 +643,16 @@ CASE( "not_null<>: Terminates assignment from related pointer types for null poi
     not_null< unique_ptr< MyBase > > p( make_unique< MyDerived >() );
 
     EXPECT_THROWS( p = not_null< unique_ptr< MyDerived > >( std::move(z) ) );
+}
+
+CASE( "not_null<>: Terminates propagation of a moved-from value (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    not_null< unique_ptr< int > > p( std::move( pi ) );
+    not_null< unique_ptr< int > > q( std::move( p ) );
+
+    EXPECT_THROWS( not_null< unique_ptr< int > >( std::move( p ) ) );
+    EXPECT_THROWS( q = std::move( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)" )

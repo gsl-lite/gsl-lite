@@ -415,11 +415,11 @@ Define this macro to the type to use for indices in `span` and `basic_string_spa
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_EXPLICIT\_CTOR</b>=0  
 Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl lite*-specific `not_null`-derived class `not_null_ic`.
 
-\-D<b>gsl\_CONFIG\_NOT\_NULL\_TRANSPARENT\_GET</b>=0  
-Define this macro to 1 to have `not_null<>::get()` behave transparently, i.e. return the result of the underlying smart pointer's `get()` member function. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. Default is 0.
+\-D<b>gsl\_CONFIG\_TRANSPARENT\_NOT\_NULL</b>=0  
+Define this macro to 1 to have `not_null<>` support typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. Default is 0.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_GET\_BY\_CONST\_REF</b>=0  
-Define this macro to 1 to have the non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if <b>gsl\_CONFIG\_NOT\_NULL\_TRANSPARENT\_GET</b>=1. Default is 0 for `T`.
+Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if gsl\_CONFIG\_TRANSPARENT\_NOT\_NULL=1. Default is 0 for `T`.
 
 \-D<b>gsl\_CONFIG\_ALLOWS\_NONSTRICT\_SPAN\_COMPARISON</b>=1  
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. Default is 1.
@@ -695,6 +695,9 @@ byte: Provides hash support (C++11)
 not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
+not_null<>: Layout is compatible to underlying type
+not_null<>: Convertibility is correctly reported by type traits
+not_null<>: Copyability and assignability are correctly reported by type traits
 not_null<>: Disallows assignment from unrelated pointers (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Terminates construction from a null pointer value (raw pointer)
 not_null<>: Terminates construction from related pointer types for null pointer value (raw pointer)
@@ -719,6 +722,7 @@ not_null<>: Terminates construction from a null pointer value (shared_ptr)
 not_null<>: Terminates construction from related pointer types for null pointer value (shared_ptr)
 not_null<>: Terminates assignment from a null pointer value (shared_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)
+not_null<>: Terminates propagation of a moved-from value (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)
 not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)
 not_null<>: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)
@@ -739,6 +743,7 @@ not_null<>: Terminates construction from a null pointer value (unique_ptr)
 not_null<>: Terminates construction from related pointer types for null pointer value (unique_ptr)
 not_null<>: Terminates assignment from a null pointer value (unique_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)
+not_null<>: Terminates propagation of a moved-from value (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)
 not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)
 not_null<>: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)
