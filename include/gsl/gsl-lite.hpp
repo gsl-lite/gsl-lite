@@ -119,6 +119,14 @@
 # define gsl_CONFIG_SPAN_INDEX_TYPE  std::size_t
 #endif
 
+#ifndef  gsl_CONFIG_INDEX_TYPE
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  define gsl_CONFIG_INDEX_TYPE  std::ptrdiff_t
+# else
+#  define gsl_CONFIG_INDEX_TYPE  gsl_CONFIG_SPAN_INDEX_TYPE
+# endif
+#endif
+
 #ifndef  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
 # define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
 #endif
@@ -824,7 +832,7 @@ struct is_compatible_container : std::true_type{};
 //
 
 // index type for all container indexes/subscripts/sizes
-typedef gsl_CONFIG_SPAN_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
+typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 //
 // GSL.owner: ownership pointers
@@ -2148,7 +2156,7 @@ class span
     template< class U > friend class span;
 
 public:
-    typedef index index_type;
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;
 
     typedef T element_type;
     typedef typename std11::remove_cv< T >::type value_type;
