@@ -41,6 +41,9 @@
   </Type>
 
   <Type Name="gsl::not_null&lt;*&gt;">
-    <DisplayString>value = {*ptr_}</DisplayString>
+      <DisplayString>{data_.ptr_}</DisplayString>
+      <Expand>
+          <ExpandedItem>data_.ptr_</ExpandedItem>
+      </Expand>
   </Type>
 </AutoVisualizer>
