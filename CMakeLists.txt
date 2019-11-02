@@ -68,18 +68,51 @@ include( CMakePackageConfigHelpers )
 
 add_library(
     ${package_name} INTERFACE )
-
 add_library(
     ${package_nspace}::${package_name} ALIAS ${package_name} )
-
 target_include_directories(
     ${package_name}
     INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
-
 target_sources(
     ${package_name}
+    INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis>" )
+
+# Interface library for targets with versioned defaults:
+
+# "gsl-lite-v0" target for legacy defaults:
+add_library(
+    ${package_name}-v0 INTERFACE )
+add_library(
+    ${package_nspace}::${package_name}-v0 ALIAS ${package_name}-v0 )
+target_include_directories(
+    ${package_name}-v0
+    INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
+target_sources(
+    ${package_name}-v0
+    INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis>" )
+
+# "gsl-lite-v1" target for modern defaults:
+add_library(
+    ${package_name}-v1 INTERFACE )
+add_library(
+    ${package_nspace}::${package_name}-v1 ALIAS ${package_name}-v1 )
+target_include_directories(
+    ${package_name}-v1
+    INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
+target_compile_definitions(
+    ${package_name}-v1
+    INTERFACE
+        gsl_lite_DEFAULTS_VERSION=1)
+target_sources(
+    ${package_name}-v1
     INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/gsl-lite.natvis>" )
 
@@ -106,7 +139,7 @@ configure_file(
 # Installation:
 
 install(
-    TARGETS      ${package_name}
+    TARGETS      ${package_name} ${package_name}-v0 ${package_name}-v1
     EXPORT       ${package_target}
 #   INCLUDES DESTINATION "${...}"  # already set via target_include_directories()
 )

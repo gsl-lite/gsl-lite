@@ -38,6 +38,10 @@
 
 // gsl-lite backward compatibility:
 
+#if !defined( gsl_CONFIG_DEFAULTS_VERSION )
+# define gsl_CONFIG_DEFAULTS_VERSION gsl_lite_MAJOR
+#endif
+
 #ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
@@ -94,7 +98,7 @@
 #endif
 
 #ifndef  gsl_FEATURE_OWNER_MACRO
-# define gsl_FEATURE_OWNER_MACRO  1
+# define gsl_FEATURE_OWNER_MACRO  (gsl_CONFIG_DEFAULTS_VERSION == 0)
 #endif
 
 #ifndef  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
@@ -112,11 +116,11 @@
 #endif
 
 #ifndef  gsl_CONFIG_SPAN_INDEX_TYPE
-# define gsl_CONFIG_SPAN_INDEX_TYPE  size_t
+# define gsl_CONFIG_SPAN_INDEX_TYPE  std::size_t
 #endif
 
 #ifndef  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
-# define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  0
+# define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
 #endif
 
 #ifndef  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
@@ -124,7 +128,7 @@
 #endif
 
 #ifndef  gsl_CONFIG_TRANSPARENT_NOT_NULL
-# define gsl_CONFIG_TRANSPARENT_NOT_NULL  0
+# define gsl_CONFIG_TRANSPARENT_NOT_NULL  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
 #endif
 
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
@@ -132,7 +136,7 @@
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
-# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1
+# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR

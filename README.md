@@ -409,8 +409,11 @@ Equivalent to -Dgsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES.
 \-D<b>gsl\_CONFIG\_DEPRECATE\_TO\_LEVEL</b>=0  
 Define this to and including the level you want deprecation; see table [Deprecation](#deprecation) below. Default is 0 for no deprecation.
 
+\-D<b>gsl\_CONFIG\_INDEX\_TYPE</b>=size_t  
+Define this macro to the type to use for `gsl::index`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl-lite* is `size_t`.
+
 \-D<b>gsl\_CONFIG\_SPAN\_INDEX\_TYPE</b>=size_t  
-Define this macro to the type to use for indices in `span` and `basic_string_span`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl lite* is `size_t`.
+Define this macro to the type to use for indices in `span` and `basic_string_span`. Microsoft's GSL uses `std::ptrdiff_t`. Default for *gsl-lite* is `size_t`.
 
 \-D<b>gsl\_CONFIG\_NOT\_NULL\_EXPLICIT\_CTOR</b>=0  
 Define this macro to 1 to make `not_null`'s constructor explicit. Default is 0. Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl lite*-specific `not_null`-derived class `not_null_ic`.
