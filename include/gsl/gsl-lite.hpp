@@ -517,14 +517,15 @@
 #endif
 
 // Suppress the following MSVC GSL warnings:
+// - C26432: gsl::c.21 : if you define or delete any default operation in the type '...', define or delete them all
 // - C26410: gsl::r.32 : the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
 // - C26415: gsl::r.30 : smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
 // - C26418: gsl::r.36 : shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
-// - C26455: gsl::f.6  : default constructor may not throw. Declare it 'noexcept'
 // - C26472: gsl::t.1  : don't use a static_cast for arithmetic conversions;
 //                       use brace initialization, gsl::narrow_cast or gsl::narrow
 // - C26439: gsl::f.6  : special function 'function' can be declared 'noexcept'
 // - C26440: gsl::f.6  : function 'function' can be declared 'noexcept'
+// - C26455: gsl::f.6  : default constructor may not throw. Declare it 'noexcept'
 // - C26473: gsl::t.1  : don't cast between pointer types where the source type and the target type are the same
 // - C26481: gsl::b.1  : don't use pointer arithmetic. Use span instead
 // - C26482: gsl::b.2  : only index into arrays using constant expressions
@@ -532,7 +533,7 @@
 // - C26490: gsl::t.1  : don't use reinterpret_cast
 // - C26487: gsl::l.4  : don't return a pointer '(<some number>'s result)' that may be invalid
 
-gsl_DISABLE_MSVC_WARNINGS( 26410 26415 26418 26472 26439 26440 26473 26481 26482 26446 26490 26487 )
+gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473 26481 26482 26446 26490 26487 )
 
 namespace gsl {
 
@@ -2144,9 +2145,9 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-// Tag to select span constructor taking a container (prevent ms-gsl warning C26426):
+// Tag to select span constructor taking a container:
 
-struct with_container_t { gsl_constexpr with_container_t() gsl_noexcept {} };
+struct with_container_t { };
 const  gsl_constexpr   with_container_t with_container;
 
 #endif

@@ -61,12 +61,15 @@ if( MSVC )
 
     set( HAS_STD_FLAGS TRUE )
 
-    set( OPTIONS     -W3 -EHsc )
+    set( OPTIONS     -EHsc -WX )
     set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
 
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.00 )
+        set( OPTIONS    ${OPTIONS} -W4 )
         set( HAS_CPP14_FLAG TRUE )
         set( HAS_CPPLATEST_FLAG TRUE )
+    else()
+        set( OPTIONS    ${OPTIONS} -W3 )
     endif()
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.11 )
         set( HAS_CPP17_FLAG TRUE )
