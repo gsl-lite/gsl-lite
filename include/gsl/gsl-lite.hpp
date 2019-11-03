@@ -509,6 +509,7 @@
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
 # define gsl_RESTORE_MSVC_WARNINGS()             __pragma(warning(pop ))
 #else
+// TODO: define for Clang
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)
 # define gsl_DISABLE_MSVC_WARNINGS(codes)
@@ -516,19 +517,20 @@
 #endif
 
 // Suppress the following MSVC GSL warnings:
-// - C26410: gsl::r.32: the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
-// - C26415: gsl::r.30: smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
-// - C26418: gsl::r.36: shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
-// - C26472: gsl::t.1 : don't use a static_cast for arithmetic conversions;
-//                      use brace initialization, gsl::narrow_cast or gsl::narow
-// - C26439: gsl::f.6 : special function 'function' can be declared 'noexcept'
-// - C26440: gsl::f.6 : function 'function' can be declared 'noexcept'
-// - C26473: gsl::t.1 : don't cast between pointer types where the source type and the target type are the same
-// - C26481: gsl::b.1 : don't use pointer arithmetic. Use span instead
-// - C26482: gsl::b.2 : only index into arrays using constant expressions
-// - C26446: gdl::b.4 : prefer to use gsl::at() instead of unchecked subscript operator
-// - C26490: gsl::t.1 : don't use reinterpret_cast
-// - C26487: gsl::l.4 : don't return a pointer '(<some number>'s result)' that may be invalid
+// - C26410: gsl::r.32 : the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
+// - C26415: gsl::r.30 : smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
+// - C26418: gsl::r.36 : shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
+// - C26455: gsl::f.6  : default constructor may not throw. Declare it 'noexcept'
+// - C26472: gsl::t.1  : don't use a static_cast for arithmetic conversions;
+//                       use brace initialization, gsl::narrow_cast or gsl::narrow
+// - C26439: gsl::f.6  : special function 'function' can be declared 'noexcept'
+// - C26440: gsl::f.6  : function 'function' can be declared 'noexcept'
+// - C26473: gsl::t.1  : don't cast between pointer types where the source type and the target type are the same
+// - C26481: gsl::b.1  : don't use pointer arithmetic. Use span instead
+// - C26482: gsl::b.2  : only index into arrays using constant expressions
+// - C26446: gdl::b.4  : prefer to use gsl::at() instead of unchecked subscript operator
+// - C26490: gsl::t.1  : don't use reinterpret_cast
+// - C26487: gsl::l.4  : don't return a pointer '(<some number>'s result)' that may be invalid
 
 gsl_DISABLE_MSVC_WARNINGS( 26410 26415 26418 26472 26439 26440 26473 26481 26482 26446 26490 26487 )
 
@@ -1058,6 +1060,7 @@ public:
         other.invoke_ = false;
     }
 
+    gsl_SUPPRESS_MSGSL_WARNING(f.6)
     gsl_api virtual ~final_action() gsl_noexcept
     {
         if ( invoke_ )
@@ -1769,6 +1772,7 @@ public:
 #endif
 
 gsl_is_delete_access:
+    gsl_api not_null() gsl_is_delete;
     // prevent compilation when initialized with a nullptr or literal 0:
 #if gsl_HAVE( NULLPTR )
     gsl_api not_null(             std::nullptr_t ) gsl_is_delete;
@@ -2603,6 +2607,7 @@ span( Container const & ) -> span<const typename Container::value_type>;
 #if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr bool operator==( span<T> const & l, span<U> const & r )
 {
     return  l.size()  == r.size()
@@ -2610,6 +2615,7 @@ gsl_api inline gsl_constexpr bool operator==( span<T> const & l, span<U> const &
 }
 
 template< class T, class U >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
@@ -2618,6 +2624,7 @@ gsl_api inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const &
 #else
 
 template< class T >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr bool operator==( span<T> const & l, span<T> const & r )
 {
     return  l.size()  == r.size()
@@ -2625,6 +2632,7 @@ gsl_api inline gsl_constexpr bool operator==( span<T> const & l, span<T> const &
 }
 
 template< class T >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr bool operator< ( span<T> const & l, span<T> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
@@ -3178,6 +3186,7 @@ private:
 #if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
     const basic_string_span< typename std11::add_const<T>::type > r( u );
@@ -3187,6 +3196,7 @@ gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, 
 }
 
 template< class T, class U >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
     const basic_string_span< typename std11::add_const<T>::type > r( u );
@@ -3199,6 +3209,7 @@ gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U
 template< class T, class U
     gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
     const basic_string_span< typename std11::add_const<T>::type > l( u );
@@ -3210,6 +3221,7 @@ gsl_api inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T
 template< class T, class U
     gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
 >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr14 bool operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
     const basic_string_span< typename std11::add_const<T>::type > l( u );
@@ -3221,6 +3233,7 @@ gsl_api inline gsl_constexpr14 bool operator<( U const & u, basic_string_span<T>
 #else //gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return l.size() == r.size()
@@ -3228,6 +3241,7 @@ gsl_api inline gsl_constexpr14 bool operator==( basic_string_span<T> const & l, 
 }
 
 template< class T >
+gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_api inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
