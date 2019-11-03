@@ -2147,7 +2147,7 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 
 // Tag to select span constructor taking a container:
 
-struct with_container_t { };
+struct with_container_t { gsl_constexpr with_container_t() gsl_noexcept {} };
 const  gsl_constexpr   with_container_t with_container;
 
 #endif
