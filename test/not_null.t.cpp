@@ -135,8 +135,10 @@ CASE( "not_null<>: Convertibility is correctly reported by type traits" )
 # endif
 
     // `unique_ptr<T>` and `shared_ptr<T>` have explicit constructors for `T*` arguments; do not allow implicit conversion.
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
     static_assert( !std::is_convertible< int*, not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
     static_assert( !std::is_convertible< int*, not_null< std::shared_ptr< int > > >::value, "static assertion failed" );
+# endif
 
     // Do not permit implicit downcasts for move-only types, with or without conversion.
 # if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
