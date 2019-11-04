@@ -107,33 +107,44 @@ CASE( "not_null<>: Layout is compatible to underlying type" )
 CASE( "not_null<>: Convertibility is correctly reported by type traits" )
 {
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
+
+    // We should permit conversion to underlying type.
     static_assert(  std::is_convertible< not_null< int* >, int* >::value, "static assertion failed" );
     static_assert(  std::is_convertible< not_null< int* >, not_null< int* > >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
     static_assert( !std::is_convertible< int*, not_null< int* > >::value, "static assertion failed" );
 # endif
 
+    // We should permit conversion to underlying type with implicit upcasts.
     static_assert(  std::is_convertible< not_null< MyDerived* >, MyBase* >::value, "static assertion failed" );
     static_assert(  std::is_convertible< not_null< MyDerived* >, not_null< MyBase* > >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
     static_assert( !std::is_convertible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
 # endif
 
+    // We should permit conversion to underlying type with implicit upcasts for move-only types.
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     static_assert(  std::is_convertible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
     static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 # endif
 
+    // We should permit implicit upcasts for move-only types.
     static_assert(  std::is_convertible< not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
     static_assert( !std::is_convertible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 # endif
 
+    // `unique_ptr<T>` and `shared_ptr<T>` have explicit constructors for `T*` arguments; we shouldn't allow implicit conversion.
+    static_assert( !std::is_convertible< int*, not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< int*, not_null< std::shared_ptr< int > > >::value, "static assertion failed" );
+
+    // We shouldn't permit implicit downcasts for move-only types, with or without conversion.
 # if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
     static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
     static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 # endif
-#endif
+
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
 }
 
 CASE( "not_null<>: Copyability and assignability are correctly reported by type traits" )
@@ -146,6 +157,9 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 # if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
     static_assert( !std::is_copy_assignable<    not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
 # endif
+
+    static_assert( std::is_constructible< not_null< std::unique_ptr< int > >, int* >::value, "static assertion failed" );
+    static_assert( std::is_constructible< not_null< std::shared_ptr< int > >, int* >::value, "static assertion failed" );
 
     static_assert(  std::is_constructible< not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
@@ -439,6 +453,12 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     EXPECT( p == pi );
 }
 
+CASE( "not_null<>: Allows to construct from a non-null raw pointer with explicit conversion (shared_ptr)" )
+{
+    int* i = new int(12);
+    not_null< shared_ptr< int > > p( i );
+}
+
 CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)" )
 {
     shared_ptr< int > pi = make_shared< int >(12);
@@ -662,6 +682,12 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null raw pointer with explicit conversion (unique_ptr)" )
+{
+    int* i = new int(12);
+    not_null< unique_ptr< int > > p( i );
 }
 
 CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)" )

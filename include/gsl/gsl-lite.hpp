@@ -1543,37 +1543,60 @@ public:
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+# if gsl_HAVE( RVALUE_REFERENCE )
     template< class U
-# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
-        gsl_REQUIRES_A_((
-            // in clang 3.x, is_constructible with T=unique_ptr<X>, U=not_null<T> tries to call copy constructor of unique_ptr, triggering an error
-            // note that Apple Clang's __clang_major__ etc. are different from regular Clang
-            std::is_constructible<T, U>::value
-        ))
-# endif
+    // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of unique_ptr, triggering an error.
+    // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< std::is_constructible<T, U>::value, int >::type = 0
+#  endif
     >
-    gsl_api gsl_constexpr14
-# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-    explicit
-# endif
-    not_null( U u )
-    : data_( std::move( u ) )
+    gsl_api gsl_constexpr14 explicit not_null( U other )
+    : data_( T( std::move( other ) ) )
     {
         Expects( data_.ptr_ != gsl_nullptr );
     }
-#else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+# else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
-    gsl_api gsl_constexpr14
-# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-    explicit
-# endif
-    not_null( U const & u )
-    : data_( u )
+    gsl_api gsl_constexpr14 explicit not_null( U const& other )
+    : data_( T( other ) )
     {
         Expects( data_.ptr_ != gsl_nullptr );
     }
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+# endif // gsl_HAVE( RVALUE_REFERENCE )
+#else // a.k.a. !gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of unique_ptr, triggering an error.
+    // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
+# if gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value, int >::type = 0
+    >
+    gsl_api gsl_constexpr14 explicit not_null( U other )
+    : data_( T( std::move( other ) ) )
+    {
+        Expects( data_.ptr_ != gsl_nullptr );
+    }
+
+    template< class U
+        , typename std::enable_if< std::is_convertible<U, T>::value, int >::type = 0
+    >
+    gsl_api gsl_constexpr14 not_null( U other )
+    : data_( T( std::move( other ) ) )
+    {
+        Expects( data_.ptr_ != gsl_nullptr );
+    }
+# else // a.k.a. !( gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 ) )
+    template< class U >
+    gsl_api gsl_constexpr14 not_null( U const& other )
+    : data_( T( other ) )
+    {
+        Expects( data_.ptr_ != gsl_nullptr );
+    }
+# endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+#endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 
 #if gsl_HAVE( RVALUE_REFERENCE )
     // explicit converting constructor
