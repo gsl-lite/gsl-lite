@@ -1463,8 +1463,8 @@ struct not_null_data< T, false >
     }
 
 gsl_is_delete_access:
-	not_null_data( not_null_data const & other ) gsl_is_delete;
-	not_null_data & operator=( not_null_data const & other ) gsl_is_delete;
+    not_null_data( not_null_data const & other ) gsl_is_delete;
+    not_null_data & operator=( not_null_data const & other ) gsl_is_delete;
 };
 #endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS )
 template< class T >
@@ -1530,7 +1530,7 @@ template< class T >
 class not_null
 {
 private:
-	detail::not_null_data< T, detail::is_copyable< T >::value > data_;
+    detail::not_null_data< T, detail::is_copyable< T >::value > data_;
 
     // need to access `not_null<U>::data_`
     template< class U >
@@ -1560,7 +1560,7 @@ public:
     not_null( U u )
     : data_( std::move( u ) )
     {
-		Expects( data_.ptr_ != gsl_nullptr );
+        Expects( data_.ptr_ != gsl_nullptr );
     }
 #else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
@@ -1571,7 +1571,7 @@ public:
     not_null( U const & u )
     : data_( u )
     {
-		Expects( data_.ptr_ != gsl_nullptr );
+        Expects( data_.ptr_ != gsl_nullptr );
     }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
@@ -1588,7 +1588,7 @@ public:
     gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
     {
-		Expects( data_.ptr_ != gsl_nullptr );
+        Expects( data_.ptr_ != gsl_nullptr );
     }
 
 # if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
@@ -1599,7 +1599,7 @@ public:
     gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
     {
-		Expects( data_.ptr_ != gsl_nullptr );
+        Expects( data_.ptr_ != gsl_nullptr );
     }
 # else
     // there's no implicit converting constructor, so we need to define the assignment operator manually
@@ -1616,7 +1616,7 @@ public:
     gsl_api gsl_constexpr explicit not_null( not_null<U> const & other )
     : data_( T( other.data_.ptr_ ) )
     {
-		Expects( data_.ptr_ != gsl_nullptr );
+        Expects( data_.ptr_ != gsl_nullptr );
     }
     
     template< class U >
@@ -1753,18 +1753,18 @@ public:
     }
 
 #if gsl_HAVE( RVALUE_REFERENCE )
-	// Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
-	gsl_constexpr14 not_null( not_null && other ) gsl_noexcept
-	: data_( std::move( other.data_ ) )
-	{
+    // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
+    gsl_constexpr14 not_null( not_null && other ) gsl_noexcept
+    : data_( std::move( other.data_ ) )
+    {
         Expects( data_.ptr_ != gsl_nullptr );
-	}
-	gsl_constexpr14 not_null & operator=( not_null && other ) gsl_noexcept
-	{
+    }
+    gsl_constexpr14 not_null & operator=( not_null && other ) gsl_noexcept
+    {
         Expects( other.data_.ptr_ != gsl_nullptr );
-		data_ = std::move( other.data_ );
-		return *this;
-	}
+        data_ = std::move( other.data_ );
+        return *this;
+    }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
 #if gsl_HAVE( IS_DEFAULT )
