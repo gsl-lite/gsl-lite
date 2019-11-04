@@ -200,7 +200,7 @@ This setup brings in more than you need, but also makes it easy to update *gsl-l
 	```CMake
 	cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 	
-	find_package( gsl-lite "0.33" REQUIRED )
+	find_package( gsl-lite "0.35" REQUIRED )
 	
 	project( program-using-gsl-lite LANGUAGES CXX )
 	
@@ -226,7 +226,7 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.34.0@nonstd-lite/stable
+        gsl-lite/0.35.1@nonstd-lite/stable
 
 3. Run conan's install command:
 
