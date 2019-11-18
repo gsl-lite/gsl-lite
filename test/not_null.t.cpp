@@ -178,7 +178,7 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Permit construction and assignment from subclass pointer.
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
-# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037 )
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 # endif
 
