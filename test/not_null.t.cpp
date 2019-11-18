@@ -178,7 +178,7 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Permit construction and assignment from subclass pointer.
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
-# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037 )
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 # endif
 
@@ -279,7 +279,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
 
 CASE( "not_null<>: Returns underlying pointer with get() (raw pointer)" )
 {
-#if !gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+#if !gsl_CONFIG( TRANSPARENT_NOT_NULL )
     int i = 12;
     not_null< int* > p( &i );
 
@@ -479,7 +479,7 @@ CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (shared_
     shared_ptr< int > pi = make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
-#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+#if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     int* pg = p.get();
     EXPECT( pg == pi.get() );
 #else
@@ -707,12 +707,12 @@ CASE( "not_null<>: Allows to construct from a non-null raw pointer with explicit
 
 CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)" )
 {
-#if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET ) || gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+#if gsl_CONFIG( TRANSPARENT_NOT_NULL ) || gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     unique_ptr< int > pi = make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
-# if gsl_CONFIG( NOT_NULL_TRANSPARENT_GET )
+# if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     int* pg = p.get();
     EXPECT( pg == raw );
 # else // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
