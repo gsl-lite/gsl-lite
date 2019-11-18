@@ -13,7 +13,7 @@ cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project(
     gsl_lite
-    VERSION 0.35.1
+    VERSION 0.35.2
 #   DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
 #   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
     LANGUAGES CXX )
@@ -110,7 +110,7 @@ target_include_directories(
 target_compile_definitions(
     ${package_name}-v1
     INTERFACE
-        gsl_lite_DEFAULTS_VERSION=1)
+        gsl_CONFIG_DEFAULTS_VERSION=1)
 target_sources(
     ${package_name}-v1
     INTERFACE
