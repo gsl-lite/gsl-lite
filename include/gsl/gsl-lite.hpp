@@ -898,6 +898,12 @@ typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 # endif
 #endif
 
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+  using std17::data;
+  using std17::size;
+  using std20::ssize;
+#endif // gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
 //
 // GSL.assert: assertions
 //
