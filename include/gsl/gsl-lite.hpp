@@ -316,6 +316,11 @@
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
 #define gsl_HAVE_DEDUCTION_GUIDES       ( gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
 #define gsl_HAVE_NODISCARD              gsl_CPP17_000
+#define gsl_HAVE_CONSTEXPR_17           gsl_CPP17_OR_GREATER
+
+// Presence of C++20 language features:
+
+#define gsl_HAVE_CONSTEXPR_20           gsl_CPP20_OR_GREATER
 
 // Presence of C++ library features:
 
@@ -367,6 +372,18 @@
 # define gsl_constexpr14 constexpr
 #else
 # define gsl_constexpr14 /*constexpr*/
+#endif
+
+#if gsl_HAVE( CONSTEXPR_17 )
+# define gsl_constexpr17 constexpr
+#else
+# define gsl_constexpr17 /*constexpr*/
+#endif
+
+#if gsl_HAVE( CONSTEXPR_20 )
+# define gsl_constexpr20 constexpr
+#else
+# define gsl_constexpr20 /*constexpr*/
 #endif
 
 #if gsl_HAVE( EXPLICIT )
