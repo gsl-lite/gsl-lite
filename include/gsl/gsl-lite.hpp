@@ -197,6 +197,7 @@
 // MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
 // MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
 // MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
+// MSVC++ 14.2 _MSC_VER >= 1920 (Visual Studio 2019)
 
 #if defined(_MSC_VER ) && !defined(__clang__)
 # define gsl_COMPILER_MSVC_VER           (_MSC_VER )
@@ -500,7 +501,7 @@
 
 #if gsl_HAVE( TYPE_TRAITS )
 # include <type_traits> // for enable_if<>,
-                        // add_const<>, add_pointer<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
+                        // add_const<>, add_pointer<>, common_type<>, make_signed<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
                         // is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
                         // integral_constant<>, declval()
 #elif gsl_HAVE( TR1_TYPE_TRAITS )
@@ -2976,7 +2977,7 @@ public:
 
 #if gsl_HAVE( NULLPTR )
     gsl_api gsl_constexpr basic_string_span( std::nullptr_t ptr ) gsl_noexcept
-    : span_( ptr, index_type( 0 ) )
+    : span_( ptr, static_cast<index_type>( 0 ) )
     {}
 #endif
 
