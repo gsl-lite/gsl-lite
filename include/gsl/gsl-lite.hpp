@@ -325,6 +325,7 @@
 
 #define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_140_CPP0X_90
 #define gsl_HAVE_STD_DATA               gsl_CPP17_000
+#define gsl_HAVE_STD_SSIZE              ( gsl_COMPILER_GNUC_VERSION >= 1000 || gsl_COMPILER_CLANG_VERSION >= 900 )
 
 #define gsl_HAVE_SIZED_TYPES            gsl_CPP11_140
 
@@ -680,7 +681,7 @@ using std::size;
 #elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
 template< class T, size_t N >
-inline gsl_constexpr auto size( const T(&)[N] ) gsl_noexcept -> size_t
+inline gsl_constexpr auto size( T const(&)[N] ) gsl_noexcept -> size_t
 {
     return N;
 }
@@ -722,6 +723,28 @@ inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E 
 // C++20 emulation:
 
 namespace std20 {
+
+#if gsl_HAVE( STD_SSIZE )
+
+using std::ssize;
+
+#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
+template < class C >
+gsl_constexpr auto ssize( C const & c )
+    -> typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type
+{
+    using R = typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type;
+    return static_cast<R>( c.size() );
+}
+
+template <class T, std::ptrdiff_t N>
+gsl_constexpr auto ssize( T const(&)[N] ) noexcept -> std::ptrdiff_t
+{
+    return N;
+}
+
+#endif // gsl_HAVE( STD_SSIZE )
 
 #if gsl_HAVE( REMOVE_CVREF )
 
