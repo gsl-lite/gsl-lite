@@ -757,7 +757,7 @@ gsl_constexpr auto ssize( C const & c )
 }
 
 template <class T, std::size_t N>
-gsl_constexpr auto ssize( T const(&)[N] ) noexcept -> std::ptrdiff_t
+gsl_constexpr auto ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
 {
     return std::ptrdiff_t( N );
 }
