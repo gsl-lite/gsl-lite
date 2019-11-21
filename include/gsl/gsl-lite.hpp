@@ -756,10 +756,10 @@ gsl_constexpr auto ssize( C const & c )
     return static_cast<R>( c.size() );
 }
 
-template <class T, std::ptrdiff_t N>
+template <class T, std::size_t N>
 gsl_constexpr auto ssize( T const(&)[N] ) noexcept -> std::ptrdiff_t
 {
-    return N;
+    return std::ptrdiff_t( N );
 }
 
 #endif // gsl_HAVE( STD_SSIZE )
