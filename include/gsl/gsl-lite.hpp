@@ -32,7 +32,7 @@
 
 #define  gsl_lite_MAJOR  0
 #define  gsl_lite_MINOR  35
-#define  gsl_lite_PATCH  2
+#define  gsl_lite_PATCH  3
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -197,6 +197,7 @@
 // MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
 // MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
 // MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
+// MSVC++ 14.2 _MSC_VER >= 1920 (Visual Studio 2019)
 
 #if defined(_MSC_VER ) && !defined(__clang__)
 # define gsl_COMPILER_MSVC_VER           (_MSC_VER )
@@ -210,9 +211,14 @@
 
 #define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
-#if defined(__clang__)
+#if defined( __apple_build_version__ )
+# define gsl_COMPILER_APPLECLANG_VERSION gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
+# define gsl_COMPILER_CLANG_VERSION 0
+#elif defined( __clang__ )
+# define gsl_COMPILER_APPLECLANG_VERSION 0
 # define gsl_COMPILER_CLANG_VERSION gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
 #else
+# define gsl_COMPILER_APPLECLANG_VERSION 0
 # define gsl_COMPILER_CLANG_VERSION 0
 #endif
 
@@ -310,6 +316,11 @@
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
 #define gsl_HAVE_DEDUCTION_GUIDES       ( gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
 #define gsl_HAVE_NODISCARD              gsl_CPP17_000
+#define gsl_HAVE_CONSTEXPR_17           gsl_CPP17_OR_GREATER
+
+// Presence of C++20 language features:
+
+#define gsl_HAVE_CONSTEXPR_20           gsl_CPP20_OR_GREATER
 
 // Presence of C++ library features:
 
@@ -320,6 +331,7 @@
 
 #define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_140_CPP0X_90
 #define gsl_HAVE_STD_DATA               gsl_CPP17_000
+#define gsl_HAVE_STD_SSIZE              ( gsl_COMPILER_GNUC_VERSION >= 1000 || gsl_COMPILER_CLANG_VERSION >= 900 )
 
 #define gsl_HAVE_SIZED_TYPES            gsl_CPP11_140
 
@@ -360,6 +372,18 @@
 # define gsl_constexpr14 constexpr
 #else
 # define gsl_constexpr14 /*constexpr*/
+#endif
+
+#if gsl_HAVE( CONSTEXPR_17 )
+# define gsl_constexpr17 constexpr
+#else
+# define gsl_constexpr17 /*constexpr*/
+#endif
+
+#if gsl_HAVE( CONSTEXPR_20 )
+# define gsl_constexpr20 constexpr
+#else
+# define gsl_constexpr20 /*constexpr*/
 #endif
 
 #if gsl_HAVE( EXPLICIT )
@@ -494,7 +518,7 @@
 
 #if gsl_HAVE( TYPE_TRAITS )
 # include <type_traits> // for enable_if<>,
-                        // add_const<>, add_pointer<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
+                        // add_const<>, add_pointer<>, common_type<>, make_signed<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
                         // is_assignable<>, is_constructible<>, is_const<>, is_convertible<>, is_integral<>, is_pointer<>, is_signed<>,
                         // integral_constant<>, declval()
 #elif gsl_HAVE( TR1_TYPE_TRAITS )
@@ -675,7 +699,7 @@ using std::size;
 #elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
 template< class T, size_t N >
-inline gsl_constexpr auto size( const T(&)[N] ) gsl_noexcept -> size_t
+inline gsl_constexpr auto size( T const(&)[N] ) gsl_noexcept -> size_t
 {
     return N;
 }
@@ -717,6 +741,28 @@ inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E 
 // C++20 emulation:
 
 namespace std20 {
+
+#if gsl_HAVE( STD_SSIZE )
+
+using std::ssize;
+
+#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
+template < class C >
+gsl_constexpr auto ssize( C const & c )
+    -> typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type
+{
+    using R = typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type;
+    return static_cast<R>( c.size() );
+}
+
+template <class T, std::size_t N>
+gsl_constexpr auto ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
+{
+    return std::ptrdiff_t( N );
+}
+
+#endif // gsl_HAVE( STD_SSIZE )
 
 #if gsl_HAVE( REMOVE_CVREF )
 
@@ -1032,7 +1078,7 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
     return detail::to_uchar( *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90) ) );
 }
 
-#elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION
+#elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 
 extern "C" char * __cxa_get_globals();
 inline unsigned char uncaught_exceptions() gsl_noexcept
@@ -1548,7 +1594,7 @@ public:
     template< class U
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< std::is_constructible<T, U>::value, int >::type = 0
 #  endif
@@ -1570,7 +1616,7 @@ public:
 # if gsl_HAVE( RVALUE_REFERENCE )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value, int >::type = 0
@@ -1589,7 +1635,7 @@ public:
     {
         Expects( data_.ptr_ != gsl_nullptr );
     }
-#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 ) )
+#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
     gsl_api gsl_constexpr14 not_null( U other )
@@ -1597,7 +1643,7 @@ public:
     {
         Expects( data_.ptr_ != gsl_nullptr );
     }
-#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_api gsl_constexpr14 not_null( U const& other )
@@ -1611,7 +1657,7 @@ public:
 # if gsl_HAVE( RVALUE_REFERENCE )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value, int >::type = 0
@@ -1630,7 +1676,7 @@ public:
     {
         Expects( data_.ptr_ != gsl_nullptr );
     }
-#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 ) )
+#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
     gsl_api gsl_constexpr14 not_null( not_null<U> other )
@@ -1645,7 +1691,7 @@ public:
         data_.ptr_ = std::move( other.data_.ptr_ );
         return *this;
     }
-#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_api gsl_constexpr14 not_null( not_null<U> const& other )
@@ -2942,7 +2988,7 @@ public:
 
 #if gsl_HAVE( NULLPTR )
     gsl_api gsl_constexpr basic_string_span( std::nullptr_t ptr ) gsl_noexcept
-    : span_( ptr, index_type( 0 ) )
+    : span_( ptr, static_cast<index_type>( 0 ) )
     {}
 #endif
 

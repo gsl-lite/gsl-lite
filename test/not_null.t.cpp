@@ -135,13 +135,13 @@ CASE( "not_null<>: Convertibility is correctly reported by type traits" )
 # endif
 
     // `unique_ptr<T>` and `shared_ptr<T>` have explicit constructors for `T*` arguments; do not allow implicit conversion.
-# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     static_assert( !std::is_convertible< int*, not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
     static_assert( !std::is_convertible< int*, not_null< std::shared_ptr< int > > >::value, "static assertion failed" );
 # endif
 
     // Do not permit implicit downcasts for move-only types, with or without conversion.
-# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     static_assert( !std::is_convertible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
     static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 # endif
@@ -158,7 +158,7 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Do not permit copy construction and assignment for move-only types.
     static_assert( !std::is_copy_constructible< not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
-# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+# if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
     static_assert( !std::is_copy_assignable<    not_null< std::unique_ptr< int > > >::value, "static assertion failed" );
 # endif
 
@@ -178,13 +178,13 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Permit construction and assignment from subclass pointer.
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
-# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037 )
+# if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 # endif
 
     // Do not permit copy construction and assignment from move-only subclass pointer.
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
-# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+# if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
 # endif
 
@@ -194,7 +194,7 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Do not permit copy construction and assignment from move-only `not_null<>` with subclass pointer.
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
-# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+# if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
 # endif
 
@@ -206,12 +206,12 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Do not permit conversion with copy to move-only superclass pointer.
     static_assert( !std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
-# if !defined( __apple_build_version__ ) || __apple_build_version__ >= 9000037
+# if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
     static_assert( !std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
 # endif
 
     // Do not permit construction and assignment from superclass pointer.
-# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ( !defined( __apple_build_version__ ) || __apple_build_version__ >= 10010046 )
+# if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
 
