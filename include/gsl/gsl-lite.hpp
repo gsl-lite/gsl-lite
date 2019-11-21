@@ -256,6 +256,33 @@
 
 // Presence of language & library features:
 
+#if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500) || gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 360) || gsl_COMPILER_APPLECLANG_VERSION
+# ifdef __EXCEPTIONS
+#  define gsl_HAVE_EXCEPTIONS  1
+# else
+#  define gsl_HAVE_EXCEPTIONS  0
+# endif // __EXCEPTIONS
+#elif gsl_COMPILER_GNUC_VERSION >= 500 || gsl_COMPILER_CLANG_VERSION >= 500
+# ifdef __cpp_exceptions
+#  define gsl_HAVE_EXCEPTIONS  1
+# else
+#  define gsl_HAVE_EXCEPTIONS  0
+# endif // __cpp_exceptions
+#elif gsl_COMPILER_MSVC_VERSION
+# ifdef _CPPUNWIND
+#  define gsl_HAVE_EXCEPTIONS  1
+# else
+#  define gsl_HAVE_EXCEPTIONS  0
+# endif // _CPPUNWIND
+#else
+// For all other compilers, assume exceptions are always enabled.
+# define  gsl_HAVE_EXCEPTIONS  1
+#endif
+
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) && !gsl_HAVE( EXCEPTIONS )
+# error Cannot use gsl_CONFIG_CONTRACT_VIOLATION_THROWS if exceptions are disabled.
+#endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) && !gsl_HAVE( EXCEPTIONS )
+
 #ifdef _HAS_CPP0X
 # define gsl_HAS_CPP0X  _HAS_CPP0X
 #else
@@ -995,10 +1022,13 @@ struct fail_fast : public std::logic_error
 
 namespace detail {
 
+
+#if gsl_HAVE( EXCEPTIONS )
 gsl_api gsl_NORETURN inline void fail_fast_throw( char const * message )
 {
     throw fail_fast( message );
 }
+#endif // gsl_HAVE( EXCEPTIONS )
 gsl_api gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept
 {
     std::terminate();
@@ -1011,12 +1041,14 @@ gsl_api void fail_fast_assert_handler( char const * const expression, char const
 
 #if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 
+# if gsl_HAVE( EXCEPTIONS )
 gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
         throw fail_fast( message );
 }
+# endif // gsl_HAVE( EXCEPTIONS )
 
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 
