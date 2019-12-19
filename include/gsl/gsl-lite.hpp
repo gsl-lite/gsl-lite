@@ -256,7 +256,9 @@
 
 // Presence of language & library features:
 
-#if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500) || gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 360) || gsl_COMPILER_APPLECLANG_VERSION
+#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#  define gsl_HAVE_EXCEPTIONS  0
+#elif gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500) || gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 360) || gsl_COMPILER_APPLECLANG_VERSION
 # ifdef __EXCEPTIONS
 #  define gsl_HAVE_EXCEPTIONS  1
 # else
@@ -968,7 +970,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 #endif
 
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  define  gsl_CONTRACT_CHECK_( x )  assert( x )
+#  define  gsl_CONTRACT_CHECK_( str, x )  assert( x )
 #else
 # if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str " at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
