@@ -800,6 +800,30 @@ inline gsl_constexpr auto data( std::initializer_list<E> il ) gsl_noexcept -> E 
 
 namespace std20 {
 
+#if gsl_CPP11_100
+
+struct identity
+{
+    template < class T >
+    gsl_constexpr auto operator ()( T && arg ) const noexcept
+        -> decltype( std::forward<T>( arg ) )
+    {
+        return std::forward<T>( arg );
+    }
+};
+
+#endif // gsl_CPP11_100
+
+template< class T >
+struct type_identity
+{
+    using type = T;
+};
+#if gsl_HAVE( ALIAS_TEMPLATE )
+template< class T >
+using type_identity_t = typename type_identity<T>::type;
+#endif // gsl_HAVE( ALIAS_TEMPLATE )
+
 #if gsl_HAVE( STD_SSIZE )
 
 using std::ssize;
