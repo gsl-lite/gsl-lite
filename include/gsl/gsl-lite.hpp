@@ -704,6 +704,19 @@ std::unique_ptr<T> make_unique( Args &&... args )
 
 } // namespace std14
 
+namespace detail {
+
+#if gsl_HAVE( VARIADIC_TEMPLATE )
+
+template <bool V0, class T0, class... Ts> struct conjunction_ { using type = T0; };
+template <class T0, class T1, class... Ts> struct conjunction_<true, T0, T1, Ts...> : conjunction_<T1::value, T1, Ts...> { };
+template <bool V0, class T0, class... Ts> struct disjunction_ { using type = T0; };
+template <class T0, class T1, class... Ts> struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
+
+#endif
+
+} // namespace detail
+
 // C++17 emulation:
 
 namespace std17 {
@@ -712,13 +725,29 @@ template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
 #if gsl_CPP11_120
 
+template <class... Ts> struct conjunction;
+template <> struct conjunction<> : std11::true_type { };
+template <class T0, class... Ts> struct conjunction<T0, Ts...> : detail::conjunction_<T0::value, T0, Ts...>::type { };
+template <class... Ts> struct disjunction;
+template <> struct disjunction<> : std11::false_type { };
+template <class T0, class... Ts> struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
+template <class T> struct negation : std11::integral_constant<bool, !T::value> { };
+
+# if gsl_CPP14_OR_GREATER
+
+template <typename... Ts> constexpr bool conjunction_v = conjunction<Ts...>::value;
+template <typename... Ts> constexpr bool disjunction_v = disjunction<Ts...>::value;
+template <typename T> constexpr bool negation_v = negation<T>::value;
+
+# endif // gsl_CPP14_OR_GREATER
+
 template< class... Ts >
 struct make_void { typedef void type; };
 
 template< class... Ts >
 using void_t = typename make_void< Ts... >::type;
 
-#endif
+#endif // gsl_CPP11_120
 
 #if gsl_HAVE( STD_DATA )
 
