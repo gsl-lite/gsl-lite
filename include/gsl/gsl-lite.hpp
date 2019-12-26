@@ -32,7 +32,7 @@
 
 #define  gsl_lite_MAJOR  0
 #define  gsl_lite_MINOR  35
-#define  gsl_lite_PATCH  3
+#define  gsl_lite_PATCH  4
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -708,10 +708,10 @@ namespace detail {
 
 #if gsl_HAVE( VARIADIC_TEMPLATE )
 
-template <bool V0, class T0, class... Ts> struct conjunction_ { using type = T0; };
-template <class T0, class T1, class... Ts> struct conjunction_<true, T0, T1, Ts...> : conjunction_<T1::value, T1, Ts...> { };
-template <bool V0, class T0, class... Ts> struct disjunction_ { using type = T0; };
-template <class T0, class T1, class... Ts> struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
+template < bool V0, class T0, class... Ts > struct conjunction_ { using type = T0; };
+template < class T0, class T1, class... Ts > struct conjunction_<true, T0, T1, Ts...> : conjunction_<T1::value, T1, Ts...> { };
+template < bool V0, class T0, class... Ts > struct disjunction_ { using type = T0; };
+template < class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
 
 #endif
 
@@ -725,19 +725,19 @@ template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
 #if gsl_CPP11_120
 
-template <class... Ts> struct conjunction;
-template <> struct conjunction<> : std11::true_type { };
-template <class T0, class... Ts> struct conjunction<T0, Ts...> : detail::conjunction_<T0::value, T0, Ts...>::type { };
-template <class... Ts> struct disjunction;
-template <> struct disjunction<> : std11::false_type { };
-template <class T0, class... Ts> struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
-template <class T> struct negation : std11::integral_constant<bool, !T::value> { };
+template < class... Ts > struct conjunction;
+template < > struct conjunction< > : std11::true_type { };
+template < class T0, class... Ts > struct conjunction<T0, Ts...> : detail::conjunction_<T0::value, T0, Ts...>::type { };
+template < class... Ts > struct disjunction;
+template < > struct disjunction< > : std11::false_type { };
+template < class T0, class... Ts > struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
+template < class T > struct negation : std11::integral_constant<bool, !T::value> { };
 
 # if gsl_CPP14_OR_GREATER
 
-template <typename... Ts> constexpr bool conjunction_v = conjunction<Ts...>::value;
-template <typename... Ts> constexpr bool disjunction_v = disjunction<Ts...>::value;
-template <typename T> constexpr bool negation_v = negation<T>::value;
+template < class... Ts > constexpr bool conjunction_v = conjunction<Ts...>::value;
+template < class... Ts > constexpr bool disjunction_v = disjunction<Ts...>::value;
+template < class T > constexpr bool negation_v = negation<T>::value;
 
 # endif // gsl_CPP14_OR_GREATER
 
