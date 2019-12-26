@@ -929,7 +929,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
     gsl_REQUIRES_T_( std::is_pointer<T>::value )
   >
   using owner = T;
-#else
+#elif gsl_CONFIG_DEFAULTS_VERSION == 0
   // TODO vNext: remove
   template< class T > struct owner { typedef T type; };
 #endif
@@ -983,13 +983,14 @@ typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-#  define Expects( x )           gsl_ASSUME( x )
+#  define gsl_Expects( x )       gsl_ASSUME( x )
 # else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
-#  define Expects( x )           gsl_ELIDE_CONTRACT_( x )
+#  define gsl_Expects( x )       gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  Expects( x )           gsl_CONTRACT_CHECK_( "Precondition failure", x )
+# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "Precondition failure", x )
 #endif
+#define   Expects( x )           gsl_Expects( x )
 
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsAudit( x )  gsl_ELIDE_CONTRACT_( x )
@@ -999,13 +1000,14 @@ typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-#  define Ensures( x )           gsl_ASSUME( x )
+#  define gsl_Ensures( x )       gsl_ASSUME( x )
 # else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
-#  define Ensures( x )           gsl_ELIDE_CONTRACT_( x )
+#  define gsl_Ensures( x )       gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  Ensures( x )           gsl_CONTRACT_CHECK_( "Postcondition failure", x )
+# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "Postcondition failure", x )
 #endif
+#define   Ensures( x )           gsl_Ensures( x )
 
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresAudit( x )  gsl_ELIDE_CONTRACT_( x )
@@ -1058,7 +1060,7 @@ gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checki
 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
-        fail_fast_assert_handler( expression, message, file, line );
+        ::gsl::fail_fast_assert_handler( expression, message, file, line );
 }
 
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
@@ -1797,7 +1799,7 @@ public:
     // explicit conversion operator
 
     template< class U
-        , typename std::enable_if< std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value, int>::type = 0
+        , typename std::enable_if< std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
     gsl_api gsl_constexpr14 explicit
     operator U() const
@@ -1810,7 +1812,7 @@ public:
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
-        , typename std::enable_if< std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value, int>::type = 0
+        , typename std::enable_if< std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
     gsl_api gsl_constexpr14 explicit operator U() &&
     {
@@ -1821,7 +1823,7 @@ public:
 
     // implicit conversion operator
     template< class U
-        , typename std::enable_if< std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value, int>::type = 0
+        , typename std::enable_if< std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
     gsl_api gsl_constexpr14
     operator U() const
@@ -1834,7 +1836,7 @@ public:
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
-        , typename std::enable_if< std::is_convertible<T, U>::value && !gsl::detail::is_not_null_oracle<U>::value, int>::type = 0
+        , typename std::enable_if< std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
     gsl_api gsl_constexpr14 operator U() &&
     {
@@ -3716,6 +3718,109 @@ public:
 } // namespace std
 
 #endif
+
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+
+// gsl_lite namespace:
+
+// gsl-lite currently keeps all symbols in the namespace `gsl`. The `gsl_lite` namespace contains all the symbols in the
+// `gsl` namespace, plus some extensions that are not specified in the Core Guidelines.
+//
+// Going forward, we want to support coexistence of gsl-lite with M-GSL, so we want to encourage using the `gsl_lite`
+// namespace when consuming gsl-lite. Typical use in library code would be:
+//
+//     #include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
+//
+//     namespace foo {
+//     namespace gsl = ::gsl_lite; // convenience alias
+//     double mean(gsl::span<double const> elements) {
+//         gsl_Expects(!elements.empty()); // instead of Expects()
+//         ...
+//     }
+//     } // namespace foo
+//
+// In a future version, the new <gsl-lite/gsl-lite.hpp> header will only define the `gsl_lite` namespace and no
+// unprefixed `Expects()` and `Ensures()` macros to avoid collision with M-GSL. To ensure backwards compatibility, the
+// old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
+
+namespace gsl_lite
+{
+
+namespace std11 = ::gsl::std11;
+namespace std14 = ::gsl::std14;
+namespace std17 = ::gsl::std17;
+namespace std20 = ::gsl::std20;
+
+using namespace std11;
+using namespace std14;
+using namespace std17;
+using namespace std20;
+
+#if gsl_HAVE( SHARED_PTR )
+using std::unique_ptr;
+using std::shared_ptr;
+using std::make_shared;
+#endif
+
+using ::gsl::index;
+
+#if  gsl_HAVE( ALIAS_TEMPLATE )
+using ::gsl::owner;
+#endif
+
+using ::gsl::fail_fast;
+
+using ::gsl::finally;
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+using ::gsl::on_return;
+using ::gsl::on_error;
+#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+
+using ::gsl::narrow_cast;
+using ::gsl::narrowing_error;
+using ::gsl::narrow;
+
+using ::gsl::at;
+
+using ::gsl::not_null;
+using ::gsl::make_not_null;
+
+using ::gsl::byte;
+
+using ::gsl::with_container_t;
+using ::gsl::with_container;
+
+using ::gsl::span;
+using ::gsl::make_span;
+using ::gsl::byte_span;
+using ::gsl::size;
+using ::gsl::ssize;
+using ::gsl::copy;
+using ::gsl::as_bytes;
+using ::gsl::as_writeable_bytes;
+
+using ::gsl::basic_string_span;
+using ::gsl::string_span;
+using ::gsl::cstring_span;
+
+using ::gsl::basic_zstring_span;
+using ::gsl::zstring_span;
+using ::gsl::czstring_span;
+
+using ::gsl::zstring;
+using ::gsl::czstring;
+
+#if gsl_HAVE( WCHAR )
+using ::gsl::zwstring;
+using ::gsl::cwzstring;
+
+using ::gsl::wzstring_span;
+using ::gsl::cwzstring_span;
+#endif // gsl_HAVE( WCHAR )
+
+} // namespace gsl_lite
+
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 
 gsl_RESTORE_MSVC_WARNINGS()
 
