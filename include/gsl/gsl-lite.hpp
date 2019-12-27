@@ -3732,11 +3732,11 @@ public:
 //     #include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
 //
 //     namespace foo {
-//     namespace gsl = ::gsl_lite; // convenience alias
-//     double mean(gsl::span<double const> elements) {
-//         gsl_Expects(!elements.empty()); // instead of Expects()
-//         ...
-//     }
+//         namespace gsl = ::gsl_lite; // convenience alias
+//         double mean(gsl::span<double const> elements) {
+//             gsl_Expects(!elements.empty()); // instead of Expects()
+//             ...
+//         }
 //     } // namespace foo
 //
 // In a future version, the new <gsl-lite/gsl-lite.hpp> header will only define the `gsl_lite` namespace and no
