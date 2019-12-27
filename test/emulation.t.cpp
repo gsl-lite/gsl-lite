@@ -29,7 +29,7 @@ struct Incomplete;
 template <template <typename...> class TraitT, typename... Ts>
 struct Check
 {
-    constexpr operator bool(void) const noexcept
+    gsl_constexpr operator bool(void) const gsl_noexcept
     {
         static_assert(TraitT<Ts...>::value, "static assertion failed");
         return true;
