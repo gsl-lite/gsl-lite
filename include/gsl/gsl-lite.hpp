@@ -3741,8 +3741,8 @@ public:
 //     } // namespace foo
 //
 // In a future version, the new <gsl-lite/gsl-lite.hpp> header will only define the `gsl_lite` namespace and no
-// unprefixed `gsl_Expects()` and `gsl_Ensures()` macros to avoid collision with M-GSL. To ensure backwards compatibility, the
-// old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `gsl_Expects()` and `gsl_Ensures()` macros.
+// unprefixed `gsl_Expects()` and `gsl_Ensures()` macros to avoid collision with M-GSL. To ensure backward compatibility, the
+// old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
 
 namespace gsl_lite
 {
