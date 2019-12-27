@@ -817,7 +817,7 @@ struct identity
 template< class T >
 struct type_identity
 {
-    using type = T;
+    typedef T type;
 };
 #if gsl_HAVE( ALIAS_TEMPLATE )
 template< class T >
