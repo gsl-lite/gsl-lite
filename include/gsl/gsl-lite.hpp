@@ -121,6 +121,7 @@
 
 #ifndef  gsl_CONFIG_INDEX_TYPE
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
+// p0122r3 uses std::ptrdiff_t
 #  define gsl_CONFIG_INDEX_TYPE  std::ptrdiff_t
 # else
 #  define gsl_CONFIG_INDEX_TYPE  gsl_CONFIG_SPAN_INDEX_TYPE
@@ -909,8 +910,8 @@ struct is_compatible_container : std::true_type{};
 // GSL.util: utilities
 //
 
-// index type for all container indexes/subscripts/sizes
-typedef gsl_CONFIG_INDEX_TYPE index;   // p0122r3 uses std::ptrdiff_t
+// Integer type for indices (e.g. in a loop).
+typedef gsl_CONFIG_INDEX_TYPE index;
 
 //
 // GSL.owner: ownership pointers
@@ -3763,8 +3764,14 @@ using std::make_shared;
 #endif
 
 using ::gsl::index;
+
+// Integer type for dimensions.
 typedef gsl_CONFIG_INDEX_TYPE dim;
+
+// Integer type for array strides.
 typedef gsl_CONFIG_INDEX_TYPE stride;
+
+// Integer type for pointer, iterator, or index differences.
 typedef gsl_CONFIG_INDEX_TYPE diff;
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
