@@ -3803,8 +3803,6 @@ using ::gsl::with_container;
 using ::gsl::span;
 using ::gsl::make_span;
 using ::gsl::byte_span;
-using ::gsl::size;
-using ::gsl::ssize;
 using ::gsl::copy;
 using ::gsl::as_bytes;
 using ::gsl::as_writeable_bytes;
