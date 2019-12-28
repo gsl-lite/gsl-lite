@@ -462,10 +462,105 @@
 #endif
 
 #if gsl_HAVE( DEPRECATED )
-# define gsl_DEPRECATED(because) [[deprecated( because )]]
+# define gsl_DEPRECATED( because ) [[deprecated( because )]]
 #else
-# define gsl_DEPRECATED(because)
+# define gsl_DEPRECATED( because )
 #endif
+
+#if gsl_HAVE( TYPE_TRAITS )
+
+#define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                    \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    operator~( ENUM val ) gsl_noexcept                                \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return ENUM( ~U( val ) );                                     \
+    }                                                                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    operator|( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return ENUM( U( lhs ) | U( rhs ) );                           \
+    }                                                                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    operator&( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return ENUM( U( lhs ) & U( rhs ) );                           \
+    }                                                                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    operator^( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return ENUM( U( lhs ) ^ U( rhs ) );                           \
+    }                                                                 \
+    gsl_api inline gsl_constexpr14 ENUM &                             \
+    operator|=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
+    {                                                                 \
+        return lhs = lhs | rhs;                                       \
+    }                                                                 \
+    gsl_api inline gsl_constexpr14 ENUM &                             \
+    operator&=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
+    {                                                                 \
+        return lhs = lhs & rhs;                                       \
+    }                                                                 \
+    gsl_api inline gsl_constexpr14 ENUM &                             \
+    operator^=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
+    {                                                                 \
+        return lhs = lhs ^ rhs;                                       \
+    }
+
+#define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return U( lhs ) < U( rhs );                                   \
+    }                                                                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    operator>( ENUM lhs, ENUM rhs ) gsl_noexcept                    \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return U( lhs ) > U( rhs );                                   \
+    }                                                                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    operator<=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return U( lhs ) <= U( rhs );                                  \
+    }                                                                 \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    operator>=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
+    {                                                                 \
+        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        return U( lhs ) >= U( rhs );                                  \
+    }
+
+    //
+    // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
+    //ᅟ
+    //ᅟ    enum class Vegetables {
+    //ᅟ        tomato   = 0b001,
+    //ᅟ        onion    = 0b010,
+    //ᅟ        eggplant = 0b100
+    //ᅟ    };
+    //ᅟ    gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
+    //
+#define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
+
+    //
+    // Defines relational operators `<`, `>`, `<=`, `>=` for the given enum type.
+    //ᅟ
+    //ᅟ    enum class OperatorPrecedence {
+    //ᅟ        additive = 0,
+    //ᅟ        multiplicative = 1,
+    //ᅟ        power = 2
+    //ᅟ    };
+    //ᅟ    gsl_DEFINE_ENUM_RELATIONAL_OPERATORS(OperatorPrecedence)
+    //
+#define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
+
+#endif // gsl_HAVE( TYPE_TRAITS )
 
 #define gsl_DIMENSION_OF( a ) ( sizeof(a) / sizeof(0[a]) )
 
@@ -677,6 +772,20 @@ using std::tr1::false_type;
 template< class T, T v > struct integral_constant { enum { value = v }; };
 typedef integral_constant< bool, true  > true_type;
 typedef integral_constant< bool, false > false_type;
+
+#endif
+
+#if gsl_HAVE( TYPE_TRAITS )
+
+using std::underlying_type;
+
+#elif gsl_HAVE( TR1_TYPE_TRAITS )
+
+using std::tr1::underlying_type;
+
+#else
+
+// We could try to define `underlying_type<>` for pre-C++11 here, but let's not until someone actually needs it.
 
 #endif
 
@@ -2198,8 +2307,42 @@ gsl_api inline gsl_constexpr unsigned char to_uchar( int i ) gsl_noexcept
     return static_cast<unsigned char>( i );
 }
 
-#if ! gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
+{
+#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+    return b = gsl::to_byte( gsl::to_uchar( b ) << shift );
+#else
+    b.v = gsl::to_uchar( b.v << shift ); return b;
+#endif
+}
 
+template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+gsl_api inline gsl_constexpr byte operator<<( byte b, IntegerType shift ) gsl_noexcept
+{
+    return gsl::to_byte( gsl::to_uchar( b ) << shift );
+}
+
+template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
+{
+#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+    return b = gsl::to_byte( gsl::to_uchar( b ) >> shift );
+#else
+    b.v = gsl::to_uchar( b.v >> shift ); return b;
+#endif
+}
+
+template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+gsl_api inline gsl_constexpr byte operator>>( byte b, IntegerType shift ) gsl_noexcept
+{
+    return gsl::to_byte( gsl::to_uchar( b ) >> shift );
+}
+
+#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+gsl_DEFINE_ENUM_BITMASK_OPERATORS( byte )
+gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( byte )
+#else // a.k.a. !gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 gsl_api inline gsl_constexpr bool operator==( byte l, byte r ) gsl_noexcept
 {
     return l.v == r.v;
@@ -2229,86 +2372,42 @@ gsl_api inline gsl_constexpr bool operator>=( byte l, byte r ) gsl_noexcept
 {
     return !( l < r );
 }
-#endif
-
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
-gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
-{
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = to_byte( to_uchar( b ) << shift );
-#else
-    b.v = to_uchar( b.v << shift ); return b;
-#endif
-}
-
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
-gsl_api inline gsl_constexpr byte operator<<( byte b, IntegerType shift ) gsl_noexcept
-{
-    return to_byte( to_uchar( b ) << shift );
-}
-
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
-gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
-{
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = to_byte( to_uchar( b ) >> shift );
-#else
-    b.v = to_uchar( b.v >> shift ); return b;
-#endif
-}
-
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
-gsl_api inline gsl_constexpr byte operator>>( byte b, IntegerType shift ) gsl_noexcept
-{
-    return to_byte( to_uchar( b ) >> shift );
-}
 
 gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcept
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return l = to_byte( to_uchar( l ) | to_uchar( r ) );
-#else
-    l.v = to_uchar( l ) | to_uchar( r ); return l;
-#endif
+    l.v |= r.v; return l;
 }
 
 gsl_api inline gsl_constexpr byte operator|( byte l, byte r ) gsl_noexcept
 {
-    return to_byte( to_uchar( l ) | to_uchar( r ) );
+    return gsl::to_byte( l.v | r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcept
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return l = to_byte( to_uchar( l ) & to_uchar( r ) );
-#else
-    l.v = to_uchar( l ) & to_uchar( r ); return l;
-#endif
+    l.v &= r.v; return l;
 }
 
 gsl_api inline gsl_constexpr byte operator&( byte l, byte r ) gsl_noexcept
 {
-    return to_byte( to_uchar( l ) & to_uchar( r ) );
+    return gsl::to_byte( l.v & r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcept
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return l = to_byte( to_uchar( l ) ^ to_uchar (r ) );
-#else
-    l.v = to_uchar( l ) ^ to_uchar (r ); return l;
-#endif
+    l.v ^= r.v; return l;
 }
 
 gsl_api inline gsl_constexpr byte operator^( byte l, byte r ) gsl_noexcept
 {
-    return to_byte( to_uchar( l ) ^ to_uchar( r ) );
+    return gsl::to_byte( l.v ^ r.v );
 }
 
 gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 {
-    return to_byte( ~to_uchar( b ) );
+    return gsl::to_byte( ~b.v );
 }
+#endif // gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
