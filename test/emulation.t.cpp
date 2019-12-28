@@ -25,43 +25,33 @@ template <int> struct True : std::true_type { };
 template <int> struct False : std::false_type { };
 
 struct Incomplete;
-
-template <template <typename...> class TraitT, typename... Ts>
-struct Check
-{
-    gsl_constexpr operator bool(void) const gsl_noexcept
-    {
-        static_assert(TraitT<Ts...>::value, "static assertion failed");
-        return true;
-    }
-};
 #endif // gsl_HAVE( TYPE_TRAITS )
 
 
 CASE( "conjunction<> and disjunction<>: Short-circuiting is handled correctly" )
 {
 #if gsl_HAVE( TYPE_TRAITS )
-    static_assert(Check<std::is_base_of, True<0>, std17::disjunction<True<0>, Incomplete>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, False<0>, std17::conjunction<False<0>, Incomplete>>{ }, "static assertion failed");
+    static_assert(std::is_base_of<True<0>, std17::disjunction<True<0>, Incomplete>>::value, "static assertion failed");
+    static_assert(std::is_base_of<False<0>, std17::conjunction<False<0>, Incomplete>>::value, "static assertion failed");
 #endif // gsl_HAVE( TYPE_TRAITS )
 }
 
 CASE( "conjunction<> and disjunction<>: First suitable type is chosen as base" )
 {
 #if gsl_HAVE( TYPE_TRAITS )
-    static_assert(Check<std::is_base_of, std::false_type, std17::disjunction<>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<0>, std17::disjunction<True<0>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, False<0>, std17::disjunction<False<0>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<0>, std17::disjunction<True<0>, True<1>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<0>, std17::disjunction<True<0>, True<1>, True<2>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<1>, std17::disjunction<False<0>, True<1>, True<2>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, False<2>, std17::disjunction<False<0>, False<1>, False<2>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, std::true_type, std17::conjunction<>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<0>, std17::conjunction<True<0>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, False<0>, std17::conjunction<False<0>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<1>, std17::conjunction<True<0>, True<1>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, True<2>, std17::conjunction<True<0>, True<1>, True<2>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, False<1>, std17::conjunction<True<0>, False<1>, False<2>>>{ }, "static assertion failed");
-    static_assert(Check<std::is_base_of, False<0>, std17::conjunction<False<0>, False<1>, False<2>>>{ }, "static assertion failed");
+    static_assert(std::is_base_of<std::false_type, std17::disjunction<>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<0>, std17::disjunction<True<0>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<False<0>, std17::disjunction<False<0>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<0>, std17::disjunction<True<0>, True<1>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<0>, std17::disjunction<True<0>, True<1>, True<2>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<1>, std17::disjunction<False<0>, True<1>, True<2>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<False<2>, std17::disjunction<False<0>, False<1>, False<2>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<std::true_type, std17::conjunction<>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<0>, std17::conjunction<True<0>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<False<0>, std17::conjunction<False<0>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<1>, std17::conjunction<True<0>, True<1>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<True<2>, std17::conjunction<True<0>, True<1>, True<2>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<False<1>, std17::conjunction<True<0>, False<1>, False<2>>>::value, "static assertion failed");
+    static_assert(std::is_base_of<False<0>, std17::conjunction<False<0>, False<1>, False<2>>>::value, "static assertion failed");
 #endif // gsl_HAVE( TYPE_TRAITS )
 }
