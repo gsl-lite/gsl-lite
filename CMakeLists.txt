@@ -172,6 +172,10 @@ install(
     FILES       "include/gsl/gsl-lite.hpp"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/gsl/"
 )
+install(
+    FILES       "include/gsl-lite/gsl-lite.hpp"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/gsl-lite/"
+)
 if(GSL_LITE_OPT_INSTALL_COMPAT_HEADER)
     install(
         FILES       "include/gsl/gsl"
