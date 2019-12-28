@@ -226,7 +226,7 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.35.3@nonstd-lite/stable
+        gsl-lite/0.35.4@nonstd-lite/stable
 
 3. Run conan's install command:
 
@@ -695,6 +695,8 @@ byte: Allows shift-right assignment
 byte: Provides constexpr non-assignment operations (C++11)
 byte: Provides constexpr assignment operations (C++14)
 byte: Provides hash support (C++11)
+conjunction<> and disjunction<>: Short-circuiting is handled correctly
+conjunction<> and disjunction<>: First suitable type is chosen as base
 not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
