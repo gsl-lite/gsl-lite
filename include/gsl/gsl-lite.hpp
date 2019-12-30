@@ -3763,6 +3763,9 @@ using std::make_shared;
 #endif
 
 using ::gsl::index;
+typedef gsl_CONFIG_INDEX_TYPE dim;
+typedef gsl_CONFIG_INDEX_TYPE stride;
+typedef gsl_CONFIG_INDEX_TYPE diff;
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
 using ::gsl::owner;
