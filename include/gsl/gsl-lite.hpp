@@ -3730,7 +3730,7 @@ public:
 // Going forward, we want to support coexistence of gsl-lite with M-GSL, so we want to encourage using the `gsl_lite`
 // namespace when consuming gsl-lite. Typical use in library code would be:
 //
-//     #include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
+//     #include <gsl/gsl-lite.hpp>
 //
 //     namespace foo {
 //         namespace gsl = ::gsl_lite; // convenience alias
@@ -3740,9 +3740,9 @@ public:
 //         }
 //     } // namespace foo
 //
-// In a future version, the new <gsl-lite/gsl-lite.hpp> header will only define the `gsl_lite` namespace and no
+// In a future version, a potential new <gsl-lite/gsl-lite.hpp> header would only define the `gsl_lite` namespace and no
 // unprefixed `gsl_Expects()` and `gsl_Ensures()` macros to avoid collision with M-GSL. To ensure backward compatibility, the
-// old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
+// old header <gsl/gsl-lite.hpp> would keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
 
 namespace gsl_lite
 {
