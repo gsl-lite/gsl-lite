@@ -3452,7 +3452,7 @@ typedef char * zstring;
 typedef const char * czstring;
 
 #if gsl_HAVE( WCHAR )
-typedef wchar_t * zwstring;
+typedef wchar_t * wzstring;
 typedef const wchar_t * cwzstring;
 #endif
 
