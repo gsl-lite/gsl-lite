@@ -3814,7 +3814,7 @@ using ::gsl::zstring;
 using ::gsl::czstring;
 
 #if gsl_HAVE( WCHAR )
-using ::gsl::zwstring;
+using ::gsl::wzstring;
 using ::gsl::cwzstring;
 
 using ::gsl::wzstring_span;
