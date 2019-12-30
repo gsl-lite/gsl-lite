@@ -21,8 +21,8 @@
 
 namespace {
 
-bool expects( bool x ) { Expects( x ); return x; } 
-bool ensures( bool x ) { Ensures( x ); return x; }
+bool expects( bool x ) { gsl_Expects( x ); return x; } 
+bool ensures( bool x ) { gsl_Ensures( x ); return x; }
 bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; } 
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 
@@ -37,22 +37,22 @@ struct ConvertibleToBool
 
 }
 
-CASE( "Expects(): Allows a true expression" )
+CASE( "gsl_Expects(): Allows a true expression" )
 {
     EXPECT_NO_THROW( expects( true  ) );
 }
 
-CASE( "Ensures(): Allows a true expression" )
+CASE( "gsl_Ensures(): Allows a true expression" )
 {
     EXPECT_NO_THROW( ensures( true  ) );
 }
 
-CASE( "Expects(): Terminates on a false expression" )
+CASE( "gsl_Expects(): Terminates on a false expression" )
 {
     EXPECT_THROWS( expects( false ) );
 }
 
-CASE( "Ensures(): Terminates on a false expression" )
+CASE( "gsl_Ensures(): Terminates on a false expression" )
 {
     EXPECT_THROWS( ensures( false ) );
 }
@@ -101,8 +101,8 @@ int testAssume( int i, std::vector<int> const& v )
 
 void testConvertibleToBool()
 {
-    // `Expects()` should be compatible with explicit conversions to bool.
-    Expects( ConvertibleToBool() );
+    // `gsl_Expects()` should be compatible with explicit conversions to bool.
+    gsl_Expects( ConvertibleToBool() );
 }
 
 // end of file
