@@ -3734,7 +3734,7 @@ public:
 //     namespace foo {
 //         namespace gsl = ::gsl_lite; // convenience alias
 //         double mean(gsl::span<double const> elements) {
-//             gsl_Expects(!elements.empty()); // instead of gsl_Expects()
+//             gsl_Expects(!elements.empty()); // instead of Expects()
 //             ...
 //         }
 //     } // namespace foo
