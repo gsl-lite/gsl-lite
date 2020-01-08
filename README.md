@@ -302,10 +302,12 @@ Provide experimental types `final_action_return` and `final_action_error` and co
 
 There are four macros for expressing pre- and postconditions:
 
-- `Expects()` for simple preconditions
-- `Ensures()` for simple postconditions
+- `gsl_Expects()` for simple preconditions
+- `gsl_Ensures()` for simple postconditions
 - `gsl_ExpectsAudit()` for preconditions that are expensive or include potentially opaque function calls
 - `gsl_EnsuresAudit()` for postconditions that are expensive or include potentially opaque function calls
+
+The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
 
 The following macros control whether contracts are checked at runtime:
@@ -314,7 +316,7 @@ The following macros control whether contracts are checked at runtime:
 Define this macro to have all contracts checked at runtime.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_ON</b>  
-Define this macro to have contracts expressed with `Expects()` and `Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. This is the default case.
+Define this macro to have contracts expressed with `gsl_Expects()` and `gsl_Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. This is the default case.
  
 \-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_OFF</b>  
 Define this macro to disable all runtime checking of contracts.
@@ -323,28 +325,36 @@ Define this macro to disable all runtime checking of contracts.
 The following macros can be used to selectively disable checking for a particular kind of contract:
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_EXPECTS\_OFF</b>  
-Define this macro to disable runtime checking of precondition contracts expressed with `Expects()` and `gsl_ExpectsAudit()`.
+Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Expects()` and `gsl_ExpectsAudit()`.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_CHECKING\_ENSURES\_OFF</b>  
-Define this macro to disable runtime checking of precondition contracts expressed with `Ensures()` and `gsl_EnsuresAudit()`.
+Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
 
 
 The following macros control the handling of runtime contract violations:
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_TERMINATES</b>  
-Define this macro to call `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, `gsl_EnsuresAudit`, and `narrow`. This is the default case.
+Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, and `narrow`. This is the default case.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_THROWS</b>  
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, `gsl_EnsuresAudit`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `narrow`.
+Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `gsl::narrow<>()`.
 
 \-D<b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b>  
-Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `Expects`, `gsl_ExpectsAudit`, `Ensures`, and `gsl_EnsuresAudit`, and call `std::terminate()` on discarding information in `narrow`. The user is expected to supply a definition matching the following signature:
+Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and call `std::terminate()` on discarding information in `gsl::narrow<>()`. The user must provide a definition of the following function:
+
+```Cpp
+namespace gsl {
+	gsl_api void fail_fast_assert_handler(
+		char const * const expression, char const * const message,
+		char const * const file, int line );
+}
+```
 
 
 The following macros control what happens with contract checks not enforced at runtime:
 
 \-D<b>gsl\_CONFIG\_UNENFORCED\_CONTRACTS\_ASSUME</b>  
-Define this macro to let the compiler assume that contracts expressed with `Expects` and `Ensures` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
+Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()` and `gsl_Ensures()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
  
 \-D<b>gsl\_CONFIG\_UNENFORCED\_CONTRACTS\_ELIDE</b>  
 Define this macro to disable all runtime checking and evaluation of contracts. This is the default case.
@@ -355,8 +365,8 @@ condition expressed by regular contracts can be assumed to hold true. This is me
 with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers will
 generate the runtime function call.
 
-Therefore, `Expects` and `Ensures` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit` and `gsl_EnsuresAudit` for everything else. In practice, this implies that
-`Expects` and `Ensures` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
+Therefore, `gsl_Expects()` and `gsl_Ensures()` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` for everything else. In practice, this implies that
+`gsl_Expects()` and `gsl_Ensures()` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
 
 
 Example:
@@ -368,7 +378,7 @@ auto median( It first, It last )
         // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
         // compiler will inline the comparison operator and understand that the comparison is free
         // of side-effects, and hence generate no code in gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME mode.
-    Expects( first != last );
+    gsl_Expects( first != last );
 
         // Verifying that a range of elements is sorted may be an expensive operation, and we
         // cannot trust the compiler to understand that it is free of side-effects, so we use an
@@ -377,21 +387,11 @@ auto median( It first, It last )
 
     auto count = last - first;
     return count % 2 != 0
-        ? first[count / 2]
+        ? first[ count / 2 ]
         : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
 }
 ```
 
-
-If <b>gsl\_CONFIG\_CONTRACT\_VIOLATION\_CALLS\_HANDLER</b> is defined, the user must provide a definition of the following function:
-
-```Cpp
-namespace gsl {
-	gsl_api void fail_fast_assert_handler(
-		char const * const expression, char const * const message,
-		char const * const file, int line );
-}
-```
 
 ### Microsoft GSL compatibility macros
 
