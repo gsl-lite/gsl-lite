@@ -24,6 +24,7 @@ set( SOURCES
     assert.t.cpp
     at.t.cpp
     byte.t.cpp
+    emulation.t.cpp
     issue.t.cpp
     not_null.t.cpp
     owner.t.cpp
