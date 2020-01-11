@@ -2682,27 +2682,27 @@ public:
 
     gsl_api gsl_constexpr14 span first( index_type count ) const
     {
-        gsl_Expects( 0 <= count && count <= this->size() );
+        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
         return span( this->data(), count );
     }
 
     gsl_api gsl_constexpr14 span last( index_type count ) const
     {
-        gsl_Expects( 0 <= count && count <= this->size() );
+        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
         return span( this->data() + this->size() - count, count );
     }
 
     gsl_api gsl_constexpr14 span subspan( index_type offset ) const
     {
-        gsl_Expects( 0 <= offset && offset <= this->size() );
+        gsl_Expects( std::size_t( offset ) <= std::size_t( this->size() ) );
         return span( this->data() + offset, this->size() - offset );
     }
 
     gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const
     {
         gsl_Expects(
-            0 <= offset && offset <= this->size() &&
-            0 <= count  && count <= this->size() - offset );
+            std::size_t( offset ) <= std::size_t( this->size() ) &&
+            std::size_t( count ) <= std::size_t( this->size() - offset ) );
         return span( this->data() + offset, count );
     }
 
