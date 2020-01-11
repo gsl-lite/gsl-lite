@@ -576,7 +576,7 @@
 //     For functions, prefer return-type SFINAE if possible.
 //     If return-type SFINAE is not applicable, use `gsl_REQUIRES_A_()` or `typename std::enable_if< VA, int >::type = 0` in the function template argument list.
 //
-//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, gsl::detail::enabler >::type` in class template argument lists.
+//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, ::gsl::detail::enabler >::type` in class template argument lists.
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
@@ -585,7 +585,7 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), gsl::detail::enabler >::type
+# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
 #else
 # define gsl_REQUIRES_T_(VA)
 #endif
@@ -652,7 +652,7 @@
 
 // MSVC warning suppression macros:
 
-#if gsl_COMPILER_MSVC_VERSION >= 140
+#if gsl_COMPILER_MSVC_VERSION >= 140 && !defined(__NVCC__)
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
@@ -2314,32 +2314,32 @@ template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::va
 gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = gsl::to_byte( gsl::to_uchar( b ) << shift );
+    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 #else
-    b.v = gsl::to_uchar( b.v << shift ); return b;
+    b.v = ::gsl::to_uchar( b.v << shift ); return b;
 #endif
 }
 
 template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr byte operator<<( byte b, IntegerType shift ) gsl_noexcept
 {
-    return gsl::to_byte( gsl::to_uchar( b ) << shift );
+    return ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 }
 
 template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = gsl::to_byte( gsl::to_uchar( b ) >> shift );
+    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 #else
-    b.v = gsl::to_uchar( b.v >> shift ); return b;
+    b.v = ::gsl::to_uchar( b.v >> shift ); return b;
 #endif
 }
 
 template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr byte operator>>( byte b, IntegerType shift ) gsl_noexcept
 {
-    return gsl::to_byte( gsl::to_uchar( b ) >> shift );
+    return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 }
 
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -2383,7 +2383,7 @@ gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator|( byte l, byte r ) gsl_noexcept
 {
-    return gsl::to_byte( l.v | r.v );
+    return ::gsl::to_byte( l.v | r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcept
@@ -2393,7 +2393,7 @@ gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator&( byte l, byte r ) gsl_noexcept
 {
-    return gsl::to_byte( l.v & r.v );
+    return ::gsl::to_byte( l.v & r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcept
@@ -2403,12 +2403,12 @@ gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator^( byte l, byte r ) gsl_noexcept
 {
-    return gsl::to_byte( l.v ^ r.v );
+    return ::gsl::to_byte( l.v ^ r.v );
 }
 
 gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 {
-    return gsl::to_byte( ~b.v );
+    return ::gsl::to_byte( ~b.v );
 }
 #endif // gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 
@@ -3828,7 +3828,7 @@ public:
 
     gsl_api gsl_constexpr string_span_type ensure_z() const
     {
-        return gsl::ensure_z(span_.data(), span_.size());
+        return ::gsl::ensure_z(span_.data(), span_.size());
     }
 
     gsl_api gsl_constexpr czstring_type assume_z() const gsl_noexcept
@@ -3859,12 +3859,12 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 namespace std {
 
 template<>
-struct hash< gsl::byte >
+struct hash< ::gsl::byte >
 {
 public:
-    std::size_t operator()( gsl::byte v ) const gsl_noexcept
+    std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
     {
-        return gsl::to_integer<std::size_t>( v );
+        return ::gsl::to_integer<std::size_t>( v );
     }
 };
 
