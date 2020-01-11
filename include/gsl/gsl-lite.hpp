@@ -276,9 +276,7 @@
 
 // Presence of language & library features:
 
-#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  define gsl_HAVE_EXCEPTIONS  0
-#elif gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500) || gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 360) || gsl_COMPILER_APPLECLANG_VERSION
+#if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500) || gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 360) || gsl_COMPILER_APPLECLANG_VERSION
 # ifdef __EXCEPTIONS
 #  define gsl_HAVE_EXCEPTIONS  1
 # else
