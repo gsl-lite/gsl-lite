@@ -164,6 +164,10 @@ function( make_target target std sources defaults_version )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
 
+    if( NOT CMAKE_VERSION VERSION_LESS 3.16 ) # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
+        target_precompile_headers( ${target} PRIVATE gsl-lite.t.hpp )
+    endif()
+
     if( std )
         if( MSVC )
             target_compile_options( ${target} PRIVATE -std:c++${std} )
