@@ -32,7 +32,7 @@
 
 #define  gsl_lite_MAJOR  0
 #define  gsl_lite_MINOR  35
-#define  gsl_lite_PATCH  4
+#define  gsl_lite_PATCH  5
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -153,13 +153,13 @@
 #endif
 
 #if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
-# error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined.
+# error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined
 #endif
 #if 1 < defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined
 #endif
 #if 1 < defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
-# error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined.
+# error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -188,17 +188,36 @@
 
 // Compiler versions:
 //
-// MSVC++ 6.0  _MSC_VER == 1200 (Visual Studio 6.0)
-// MSVC++ 7.0  _MSC_VER == 1300 (Visual Studio .NET 2002)
-// MSVC++ 7.1  _MSC_VER == 1310 (Visual Studio .NET 2003)
-// MSVC++ 8.0  _MSC_VER == 1400 (Visual Studio 2005)
-// MSVC++ 9.0  _MSC_VER == 1500 (Visual Studio 2008)
-// MSVC++ 10.0 _MSC_VER == 1600 (Visual Studio 2010)
-// MSVC++ 11.0 _MSC_VER == 1700 (Visual Studio 2012)
-// MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
-// MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
-// MSVC++ 14.1 _MSC_VER >= 1910 (Visual Studio 2017)
-// MSVC++ 14.2 _MSC_VER >= 1920 (Visual Studio 2019)
+// MSVC++  6.0  _MSC_VER == 1200  gsl_COMPILER_MSVC_VERSION ==  60  (Visual Studio 6.0)
+// MSVC++  7.0  _MSC_VER == 1300  gsl_COMPILER_MSVC_VERSION ==  70  (Visual Studio .NET 2002)
+// MSVC++  7.1  _MSC_VER == 1310  gsl_COMPILER_MSVC_VERSION ==  71  (Visual Studio .NET 2003)
+// MSVC++  8.0  _MSC_VER == 1400  gsl_COMPILER_MSVC_VERSION ==  80  (Visual Studio 2005)
+// MSVC++  9.0  _MSC_VER == 1500  gsl_COMPILER_MSVC_VERSION ==  90  (Visual Studio 2008)
+// MSVC++ 10.0  _MSC_VER == 1600  gsl_COMPILER_MSVC_VERSION == 100  (Visual Studio 2010)
+// MSVC++ 11.0  _MSC_VER == 1700  gsl_COMPILER_MSVC_VERSION == 110  (Visual Studio 2012)
+// MSVC++ 12.0  _MSC_VER == 1800  gsl_COMPILER_MSVC_VERSION == 120  (Visual Studio 2013)
+// MSVC++ 14.0  _MSC_VER == 1900  gsl_COMPILER_MSVC_VERSION == 140  (Visual Studio 2015)
+// MSVC++ 14.1  _MSC_VER >= 1910  gsl_COMPILER_MSVC_VERSION == 141  (Visual Studio 2017)
+// MSVC++ 14.2  _MSC_VER >= 1920  gsl_COMPILER_MSVC_VERSION == 142  (Visual Studio 2019)
+//
+// AppleClang  7.0.0  __apple_build_version__ ==  7000172  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.0, 7.0.1)          (LLVM 3.7.0)
+// AppleClang  7.0.0  __apple_build_version__ ==  7000176  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.1)                 (LLVM 3.7.0)
+// AppleClang  7.0.2  __apple_build_version__ ==  7000181  gsl_COMPILER_APPLECLANG_VERSION ==  702  (Xcode 7.2, 7.2.1)          (LLVM 3.7.0)
+// AppleClang  7.3.0  __apple_build_version__ ==  7030029  gsl_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3)                 (LLVM 3.8.0)
+// AppleClang  7.3.0  __apple_build_version__ ==  7030031  gsl_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3.1)               (LLVM 3.8.0)
+// AppleClang  8.0.0  __apple_build_version__ ==  8000038  gsl_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.0)                 (LLVM 3.9.0)
+// AppleClang  8.0.0  __apple_build_version__ ==  8000042  gsl_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.1, 8.2, 8.2.1)     (LLVM 3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020038  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3)                 (LLVM 3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020041  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.1)               (LLVM 3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020042  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.2, 8.3.3)        (LLVM 3.9.0)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000037  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.0)                 (LLVM 4.0.0?)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000038  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.1)                 (LLVM 4.0.0?)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000039  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.2)                 (LLVM 4.0.0?)
+// AppleClang  9.1.0  __apple_build_version__ ==  9020039  gsl_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.3, 9.3.1)          (LLVM 5.0.2?)
+// AppleClang  9.1.0  __apple_build_version__ ==  9020039  gsl_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.4, 9.4.1)          (LLVM 5.0.2?)
+// AppleClang 10.0.0  __apple_build_version__ == 10001145  gsl_COMPILER_APPLECLANG_VERSION == 1000  (Xcode 10.0, 10.1)          (LLVM 6.0.1?)
+// AppleClang 10.0.1  __apple_build_version__ == 10010046  gsl_COMPILER_APPLECLANG_VERSION == 1001  (Xcode 10.2, 10.2.1, 10.3)  (LLVM 7.0.0?)
+// AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3)    (LLVM 8.0.0?)
 
 #if defined(_MSC_VER ) && !defined(__clang__)
 # define gsl_COMPILER_MSVC_VER           (_MSC_VER )
@@ -576,7 +595,7 @@
 //     For functions, prefer return-type SFINAE if possible.
 //     If return-type SFINAE is not applicable, use `gsl_REQUIRES_A_()` or `typename std::enable_if< VA, int >::type = 0` in the function template argument list.
 //
-//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, gsl::detail::enabler >::type` in class template argument lists.
+//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, ::gsl::detail::enabler >::type` in class template argument lists.
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
@@ -585,7 +604,7 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), gsl::detail::enabler >::type
+# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
 #else
 # define gsl_REQUIRES_T_(VA)
 #endif
@@ -652,7 +671,7 @@
 
 // MSVC warning suppression macros:
 
-#if gsl_COMPILER_MSVC_VERSION >= 140
+#if gsl_COMPILER_MSVC_VERSION >= 140 && !defined(__NVCC__)
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
@@ -915,8 +934,7 @@ namespace std20 {
 struct identity
 {
     template < class T >
-    gsl_constexpr auto operator ()( T && arg ) const gsl_noexcept
-        -> decltype( std::forward<T>( arg ) )
+    gsl_constexpr T && operator ()( T && arg ) const gsl_noexcept
     {
         return std::forward<T>( arg );
     }
@@ -1977,7 +1995,8 @@ public:
     template< class U
         , typename std::enable_if< std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
-    gsl_api gsl_constexpr14 explicit operator U() &&
+    gsl_api gsl_constexpr14 explicit
+    operator U() &&
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return U( std::move( data_.ptr_ ) );
@@ -2001,7 +2020,8 @@ public:
     template< class U
         , typename std::enable_if< std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
-    gsl_api gsl_constexpr14 operator U() &&
+    gsl_api gsl_constexpr14
+    operator U() &&
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return std::move( data_.ptr_ );
@@ -2314,32 +2334,32 @@ template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::va
 gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = gsl::to_byte( gsl::to_uchar( b ) << shift );
+    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 #else
-    b.v = gsl::to_uchar( b.v << shift ); return b;
+    b.v = ::gsl::to_uchar( b.v << shift ); return b;
 #endif
 }
 
 template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr byte operator<<( byte b, IntegerType shift ) gsl_noexcept
 {
-    return gsl::to_byte( gsl::to_uchar( b ) << shift );
+    return ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 }
 
 template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = gsl::to_byte( gsl::to_uchar( b ) >> shift );
+    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 #else
-    b.v = gsl::to_uchar( b.v >> shift ); return b;
+    b.v = ::gsl::to_uchar( b.v >> shift ); return b;
 #endif
 }
 
 template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr byte operator>>( byte b, IntegerType shift ) gsl_noexcept
 {
-    return gsl::to_byte( gsl::to_uchar( b ) >> shift );
+    return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 }
 
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -2383,7 +2403,7 @@ gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator|( byte l, byte r ) gsl_noexcept
 {
-    return gsl::to_byte( l.v | r.v );
+    return ::gsl::to_byte( l.v | r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcept
@@ -2393,7 +2413,7 @@ gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator&( byte l, byte r ) gsl_noexcept
 {
-    return gsl::to_byte( l.v & r.v );
+    return ::gsl::to_byte( l.v & r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcept
@@ -2403,12 +2423,12 @@ gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator^( byte l, byte r ) gsl_noexcept
 {
-    return gsl::to_byte( l.v ^ r.v );
+    return ::gsl::to_byte( l.v ^ r.v );
 }
 
 gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 {
-    return gsl::to_byte( ~b.v );
+    return ::gsl::to_byte( ~b.v );
 }
 #endif // gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 
@@ -2682,27 +2702,27 @@ public:
 
     gsl_api gsl_constexpr14 span first( index_type count ) const
     {
-        gsl_Expects( 0 <= count && count <= this->size() );
+        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
         return span( this->data(), count );
     }
 
     gsl_api gsl_constexpr14 span last( index_type count ) const
     {
-        gsl_Expects( 0 <= count && count <= this->size() );
+        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
         return span( this->data() + this->size() - count, count );
     }
 
     gsl_api gsl_constexpr14 span subspan( index_type offset ) const
     {
-        gsl_Expects( 0 <= offset && offset <= this->size() );
+        gsl_Expects( std::size_t( offset ) <= std::size_t( this->size() ) );
         return span( this->data() + offset, this->size() - offset );
     }
 
     gsl_api gsl_constexpr14 span subspan( index_type offset, index_type count ) const
     {
         gsl_Expects(
-            0 <= offset && offset <= this->size() &&
-            0 <= count  && count <= this->size() - offset );
+            std::size_t( offset ) <= std::size_t( this->size() ) &&
+            std::size_t( count ) <= std::size_t( this->size() - offset ) );
         return span( this->data() + offset, count );
     }
 
@@ -3828,7 +3848,7 @@ public:
 
     gsl_api gsl_constexpr string_span_type ensure_z() const
     {
-        return gsl::ensure_z(span_.data(), span_.size());
+        return ::gsl::ensure_z(span_.data(), span_.size());
     }
 
     gsl_api gsl_constexpr czstring_type assume_z() const gsl_noexcept
@@ -3859,12 +3879,12 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 namespace std {
 
 template<>
-struct hash< gsl::byte >
+struct hash< ::gsl::byte >
 {
 public:
-    std::size_t operator()( gsl::byte v ) const gsl_noexcept
+    std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
     {
-        return gsl::to_integer<std::size_t>( v );
+        return ::gsl::to_integer<std::size_t>( v );
     }
 };
 

@@ -226,7 +226,7 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.35.4@nonstd-lite/stable
+        gsl-lite/0.35.5@nonstd-lite/stable
 
 3. Run conan's install command:
 
