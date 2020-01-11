@@ -6,8 +6,6 @@
 // This code is licensed under the MIT License (MIT).
 //
 
-#pragma once
-
 #ifndef GSL_TEST_GSL_LITE_HPP_INCLUDED
 #define GSL_TEST_GSL_LITE_HPP_INCLUDED
 

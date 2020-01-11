@@ -5,9 +5,7 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-if( NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION )
-    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-endif()
+cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project( gsl-lite-test LANGUAGES CXX )
 
@@ -62,7 +60,7 @@ if( MSVC )
 
     set( HAS_STD_FLAGS TRUE )
 
-    set( OPTIONS     -EHsc -W3 -WX )
+    set( OPTIONS     /EHsc /W3 /WX )
     set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
 
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.00 )
@@ -80,7 +78,6 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     set( HAS_CPP98_FLAG TRUE )
 
     set( OPTIONS
-        -O2
         -Werror
         -Wall
         -Wno-missing-braces
@@ -148,9 +145,9 @@ endif()
 function( enable_msvs_guideline_checker target )
     if( MSVC )
         set_target_properties( ${target} PROPERTIES
-        VS_GLOBAL_EnableCppCoreCheck true
-        VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
-        VS_GLOBAL_RunCodeAnalysis true )
+            VS_GLOBAL_EnableCppCoreCheck true
+            VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
+            VS_GLOBAL_RunCodeAnalysis true )
     endif()
 endfunction()
 
