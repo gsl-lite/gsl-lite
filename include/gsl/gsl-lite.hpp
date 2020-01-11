@@ -153,13 +153,13 @@
 #endif
 
 #if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
-# error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined.
+# error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined
 #endif
 #if 1 < defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined.
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined
 #endif
 #if 1 < defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
-# error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined.
+# error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -934,8 +934,7 @@ namespace std20 {
 struct identity
 {
     template < class T >
-    gsl_constexpr auto operator ()( T && arg ) const gsl_noexcept
-        -> decltype( std::forward<T>( arg ) )
+    gsl_constexpr T && operator ()( T && arg ) const gsl_noexcept
     {
         return std::forward<T>( arg );
     }
@@ -1996,7 +1995,8 @@ public:
     template< class U
         , typename std::enable_if< std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
-    gsl_api gsl_constexpr14 explicit operator U() &&
+    gsl_api gsl_constexpr14 explicit
+    operator U() &&
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return U( std::move( data_.ptr_ ) );
@@ -2020,7 +2020,8 @@ public:
     template< class U
         , typename std::enable_if< std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
     >
-    gsl_api gsl_constexpr14 operator U() &&
+    gsl_api gsl_constexpr14
+    operator U() &&
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return std::move( data_.ptr_ );
