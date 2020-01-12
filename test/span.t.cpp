@@ -63,7 +63,7 @@ CASE( "span<>: Disallows construction from a std::array of incompatible type (C+
 CASE( "span<>: Terminates construction from a nullptr and a non-zero size (C++11)" )
 {
 #if gsl_HAVE( NULLPTR )
-    struct F { static void blow() { span<int> v( nullptr, 42 ); } };
+    struct F { static void blow() { span<int> v( nullptr, 42 ); (void) v.size(); } };
 
     EXPECT_THROWS( F::blow() );
 #else
@@ -73,14 +73,14 @@ CASE( "span<>: Terminates construction from a nullptr and a non-zero size (C++11
 
 CASE( "span<>: Terminates construction from two pointers in the wrong order" )
 {
-    struct F { static void blow() { int a[2]; span<int> v( &a[1], &a[0] ); } };
+    struct F { static void blow() { int a[2]; span<int> v( &a[1], &a[0] ); (void) v.size(); } };
 
     EXPECT_THROWS( F::blow() );
 }
 
 CASE( "span<>: Terminates construction from a null pointer and a non-zero size" )
 {
-    struct F { static void blow() { int * p = gsl_nullptr; span<int> v( p, 42 ); } };
+    struct F { static void blow() { int * p = gsl_nullptr; span<int> v( p, 42 ); (void) v.size(); } };
 
     EXPECT_THROWS( F::blow() );
 }
