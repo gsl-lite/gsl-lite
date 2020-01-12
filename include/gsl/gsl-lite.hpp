@@ -1579,12 +1579,12 @@ namespace detail {
 
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
-    gsl_constexpr bool is_negative( T value, std::true_type /*isSigned*/ ) noexcept
+    gsl_constexpr bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
     {
         return value < T();
     }
     template< class T >
-    gsl_constexpr std::false_type is_negative( T value, std::false_type /*isUnsigned*/ ) noexcept
+    gsl_constexpr std::false_type is_negative( T value, std::false_type /*isUnsigned*/ ) gsl_noexcept
     {
         return std::false_type();
     }
