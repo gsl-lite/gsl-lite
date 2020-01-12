@@ -1,7 +1,4 @@
 
-variables:
-  system.debug: True
-
 trigger:
 - master
 - mr/*
@@ -36,7 +33,7 @@ jobs:
       cxxCompilerVersions: [9]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS=-fsanitize=address;-fsanitize=undefined'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
 
     - os: Linux
       cxxCompiler: Clang
@@ -48,7 +45,7 @@ jobs:
       cxxCompilerVersions: [9]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS=-fsanitize=address;-fsanitize=undefined'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
 
     - os: Linux
       cxxCompiler: GCC

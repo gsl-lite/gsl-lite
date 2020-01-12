@@ -103,6 +103,8 @@ void testConvertibleToBool()
 {
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     gsl_Expects( ConvertibleToBool() );
+
+    if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }
 
 // end of file

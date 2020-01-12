@@ -162,7 +162,8 @@ function( make_test_target target std sources defaults_version )
     target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
 
-    if( NOT CMAKE_VERSION VERSION_LESS 3.16 ) # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
+    if( NOT CMAKE_VERSION VERSION_LESS 3.16 # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
+            AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) ) # and GCC on MacOS has trouble with addresses of some text segments in the PCH
         target_precompile_headers( ${target} PRIVATE gsl-lite.t.hpp )
     endif()
 
