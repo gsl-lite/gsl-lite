@@ -47,13 +47,13 @@ jobs:
     #  tag: 'sanitize'
     #  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
 
-    - os: Linux
-      cxxCompiler: GCC
-      cxxCompilerVersions: [9]
-      cudaCompiler: NVCC
-      cudaCompilerVersion: 10_2
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+    #- os: Linux
+    #  cxxCompiler: GCC
+    #  cxxCompilerVersions: [9]
+    #  cudaCompiler: NVCC
+    #  cudaCompilerVersion: 10_2
+    #  platforms: [x64]
+    #  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     #- os: Windows
     #  cxxCompiler: MSVC
@@ -64,6 +64,7 @@ jobs:
     - os: Windows
       cxxCompiler: Clang
       cxxCompilerVersions: [9]
+      cmakeBuildConfigurations: [Debug]
       cmakeGenerator: 'MSBuild' # TODO: maybe this helps?
       platforms: [x86, x64]
 
@@ -72,6 +73,7 @@ jobs:
       cxxCompilerVersions: [19_2]
       cudaCompiler: NVCC
       cudaCompilerVersion: 10_2
+      cudaPackages: [visual_studio_integration]
       cmakeGenerator: 'MSBuild' # TODO: maybe this helps?
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
