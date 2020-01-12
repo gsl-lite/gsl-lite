@@ -1157,16 +1157,14 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
 #endif
 
-#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  define  gsl_CONTRACT_CHECK_( str, x )  assert( x )
-#else
-# if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str " at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
-# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
-# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
+#elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#  define  gsl_CONTRACT_CHECK_( str, x )  assert( ( x ) && str )
+#elif   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str " at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+#else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
-# endif
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
