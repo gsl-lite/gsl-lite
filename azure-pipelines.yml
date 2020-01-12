@@ -64,6 +64,7 @@ jobs:
     - os: Windows
       cxxCompiler: Clang
       cxxCompilerVersions: [9]
+      cmakeGenerator: 'MSBuild' # TODO: maybe this helps?
       platforms: [x86, x64]
 
     - os: Windows
@@ -71,6 +72,7 @@ jobs:
       cxxCompilerVersions: [19_2]
       cudaCompiler: NVCC
       cudaCompilerVersion: 10_2
+      cmakeGenerator: 'MSBuild' # TODO: maybe this helps?
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
