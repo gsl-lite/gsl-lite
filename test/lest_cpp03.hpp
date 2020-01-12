@@ -1426,7 +1426,8 @@ inline text compiler()
 inline int version( std::ostream & os )
 {
     os << "lest version "  << lest_VERSION << "\n"
-       << "Compiled with " << compiler()   << " on " << __DATE__ << " at " << __TIME__ << ".\n"
+// Disabled because __DATE__ and __TIME__ are PCH-unfriendly
+//       << "Compiled with " << compiler()   << " on " << __DATE__ << " at " << __TIME__ << ".\n"
        << "For more information, see https://github.com/martinmoene/lest.\n";
     return 0;
 }
