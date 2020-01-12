@@ -17,6 +17,9 @@ message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")
 
 # Test sources:
 
+set( CUDA_SOURCES
+    cuda.t.cu
+)
 set( SOURCES
     ../gsl-lite.t.cpp
     ../assert.t.cpp
