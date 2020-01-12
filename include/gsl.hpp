@@ -17,8 +17,6 @@
 
 // mimic MS include hierarchy
 
-#pragma once
-
 #ifndef GSL_GSL_HPP_INCLUDED
 #define GSL_GSL_HPP_INCLUDED
 

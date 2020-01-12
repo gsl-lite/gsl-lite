@@ -140,10 +140,11 @@ else()
     message( STATUS "Matched: nothing")
 endif()
 
-# Enable MS C++ Core Guidelines checker if MSVC:
+# Enable MS C++ Core Guidelines checker if MSVC (but only when using MSBuild because Ninja cannot find the <CppCoreCheck/warnings.h> header):
 
 function( enable_msvs_guideline_checker target )
-    if( MSVC )
+    if( MSVC AND CMAKE_GENERATOR MATCHES "Visual Studio" )
+        target_compile_definitions( ${target} PRIVATE gsl_TESTING_CPPCORECHECK_ )
         set_target_properties( ${target} PROPERTIES
             VS_GLOBAL_EnableCppCoreCheck true
             VS_GLOBAL_CodeAnalysisRuleSet CppCoreCheckRules.ruleset
