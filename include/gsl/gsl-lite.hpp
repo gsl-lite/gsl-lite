@@ -1573,12 +1573,26 @@ struct narrowing_error : public std::exception {};
 
 #if gsl_HAVE( TYPE_TRAITS )
 
-namespace detail
-{
+namespace detail {
+
     template< class T, class U >
     struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value>
     {};
-}
+
+    // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
+    template< class T >
+    gsl_constexpr bool is_negative( T value, std::true_type /*isSigned*/ ) noexcept
+    {
+        return value < T();
+    }
+    template< class T >
+    gsl_constexpr std::false_type is_negative( T value, std::false_type /*isUnsigned*/ ) noexcept
+    {
+        return std::false_type();
+    }
+
+} // namespace detail
+
 #endif
 
 template< class T, class U >
@@ -1598,13 +1612,10 @@ inline T narrow( U u )
 #endif
     }
 
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+
 #if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_MSVC_VERSION
-    // Suppress MSVC level 4 warning C4127 (conditional expression is constant)
-    if ( 0, ! detail::is_same_signedness<T, U>::value && ( ( t < T() ) != ( u < U() ) ) )
-# else
-    if (    ! detail::is_same_signedness<T, U>::value && ( ( t < T() ) != ( u < U() ) ) )
-# endif
+    if ( ! detail::is_same_signedness<T, U>::value && detail::is_negative( t, std::is_signed<T>() ) != detail::is_negative( u, std::is_signed<U>() ) )
 #else
     // Don't assume T() works:
     if ( ( t < 0 ) != ( u < 0 ) )
