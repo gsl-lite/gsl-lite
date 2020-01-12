@@ -636,6 +636,15 @@
 
 // GSL API (e.g. for CUDA platform):
 
+// Guidelines for using `gsl_api`:
+//
+// NVCC imposes the restriction that a function annotated `__host__ __device__` cannot call host-only or device-only functions.
+// This makes `gsl_api` inappropriate for generic functions that call unknown code, e.g. the template constructors of `span<>`
+// or functions like `finally()` which accept an arbitrary  function object.
+// It is often preferable to annotate functions only with `gsl_constexpr` or `gsl_constexpr14`. The "extended constexpr" mode
+// of NVCC (currently an experimental feature) will implicitly consider constexpr functions `__host__ __device__` functions
+// but tolerates calls to host-only or device-only functions.
+
 #ifndef   gsl_api
 # ifdef   __CUDACC__
 #  define gsl_api __host__ __device__
@@ -2666,16 +2675,10 @@ public:
 #endif
 
 #if gsl_HAVE( IS_DEFAULT )
-    ~span() = default;
-#else
-    ~span() {}
-#endif
-
-#if gsl_HAVE( IS_DEFAULT )
             gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
             gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
 #else
-    span & operator=( span other ) gsl_noexcept
+    gsl_constexpr14 span & operator=( span other ) gsl_noexcept
     {
         other.swap( *this );
         return *this;
@@ -2798,27 +2801,27 @@ public:
 #endif
     }
 
-    gsl_constexpr reverse_iterator rbegin() const gsl_noexcept
+    gsl_constexpr17 reverse_iterator rbegin() const gsl_noexcept
     {
         return reverse_iterator( end() );
     }
 
-    gsl_constexpr reverse_iterator rend() const gsl_noexcept
+    gsl_constexpr17 reverse_iterator rend() const gsl_noexcept
     {
         return reverse_iterator( begin() );
     }
 
-    gsl_constexpr const_reverse_iterator crbegin() const gsl_noexcept
+    gsl_constexpr17 const_reverse_iterator crbegin() const gsl_noexcept
     {
         return const_reverse_iterator( cend() );
     }
 
-    gsl_constexpr const_reverse_iterator crend() const gsl_noexcept
+    gsl_constexpr17 const_reverse_iterator crend() const gsl_noexcept
     {
         return const_reverse_iterator( cbegin() );
     }
 
-    void swap( span & other ) gsl_noexcept
+    gsl_constexpr14 void swap( span & other ) gsl_noexcept
     {
         using std::swap;
         swap( first_, other.first_ );
@@ -2967,7 +2970,7 @@ gsl_api inline gsl_constexpr std::ptrdiff_t ssize( span<T> const & spn )
 namespace detail {
 
 template< class II, class N, class OI >
-gsl_api inline OI copy_n( II first, N count, OI result )
+gsl_api gsl_constexpr14 inline OI copy_n( II first, N count, OI result )
 {
     if ( count > 0 )
     {
@@ -2982,7 +2985,7 @@ gsl_api inline OI copy_n( II first, N count, OI result )
 }
 
 template< class T, class U >
-gsl_api inline void copy( span<T> src, span<U> dest )
+gsl_api gsl_constexpr14 inline void copy( span<T> src, span<U> dest )
 {
 #if gsl_CPP14_OR_GREATER // gsl_HAVE( TYPE_TRAITS ) (circumvent Travis clang 3.4)
     static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
@@ -3328,11 +3331,9 @@ public:
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
     {}
 
-    // destruction, assignment:
+    // assignment:
 
 #if gsl_HAVE( IS_DEFAULT )
-            ~basic_string_span() gsl_noexcept = default;
-
             basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
 
             basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
@@ -3402,44 +3403,44 @@ public:
         return span_.data();
     }
 
-    gsl_api iterator begin() const gsl_noexcept
+    gsl_api gsl_constexpr iterator begin() const gsl_noexcept
     {
         return span_.begin();
     }
 
-    gsl_api iterator end() const gsl_noexcept
+    gsl_api gsl_constexpr iterator end() const gsl_noexcept
     {
         return span_.end();
     }
 
-    reverse_iterator rbegin() const gsl_noexcept
+    gsl_constexpr17 reverse_iterator rbegin() const gsl_noexcept
     {
         return span_.rbegin();
     }
 
-    reverse_iterator rend() const gsl_noexcept
+    gsl_constexpr17 reverse_iterator rend() const gsl_noexcept
     {
         return span_.rend();
     }
 
     // const version not in p0123r2:
 
-    gsl_api const_iterator cbegin() const gsl_noexcept
+    gsl_api gsl_constexpr const_iterator cbegin() const gsl_noexcept
     {
         return span_.cbegin();
     }
 
-    gsl_api const_iterator cend() const gsl_noexcept
+    gsl_api gsl_constexpr const_iterator cend() const gsl_noexcept
     {
         return span_.cend();
     }
 
-    const_reverse_iterator crbegin() const gsl_noexcept
+    gsl_constexpr17 const_reverse_iterator crbegin() const gsl_noexcept
     {
         return span_.crbegin();
     }
 
-    const_reverse_iterator crend() const gsl_noexcept
+    gsl_constexpr17 const_reverse_iterator crend() const gsl_noexcept
     {
         return span_.crend();
     }
@@ -3879,7 +3880,7 @@ template<>
 struct hash< ::gsl::byte >
 {
 public:
-    std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
+    gsl_constexpr std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
     {
         return ::gsl::to_integer<std::size_t>( v );
     }
