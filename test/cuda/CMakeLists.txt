@@ -76,9 +76,11 @@ endif()
 
 list( TRANSFORM OPTIONS PREPEND -Xcompiler= )
 
-# Make target, compile for given standard if specified:
+# Add targets and configure unit tests via CTest:
 
-function( make_cuda_target target std sources )
+enable_testing()
+
+function( make_cuda_test_target target std sources )
     message( STATUS "Make target: '${std}'" )
 
     add_executable            ( ${target} ${sources} )
@@ -87,14 +89,14 @@ function( make_cuda_target target std sources )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
     target_compile_features   ( ${target} PRIVATE cxx_std_14 )
     set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD 14 )
+    if( CMAKE_VERSION VERSION_GREATER_EQUAL 3.16 )
+        target_precompile_headers( ${target} PRIVATE ../gsl-lite.t.hpp )
+    endif()
+
+    add_test( NAME ${target} COMMAND ${target} )
 
 endfunction()
 
-make_cuda_target( ${PROGRAM}-cuda.t "" "${SOURCES}" v1 )
-
-# Configure unit tests via CTest:
-
-enable_testing()
-add_test( NAME test-cuda COMMAND ${PROGRAM}-cuda.t )
+make_cuda_test_target( ${PROGRAM}-cuda.t "" "${SOURCES};${CUDA_SOURCES}" v1 )
 
 # end of file

@@ -39,11 +39,10 @@ option( GSL_LITE_OPT_INSTALL_LEGACY_HEADERS  "Install legacy headers <gsl.h>, <g
 # If requested, build and perform tests, build examples:
 
 if ( GSL_LITE_OPT_BUILD_TESTS )
-    enable_testing()
     add_subdirectory( test )
-    if ( GSL_LITE_OPT_BUILD_CUDA_TESTS )
-        add_subdirectory( test/cuda )
-    endif()
+endif()
+if ( GSL_LITE_OPT_BUILD_CUDA_TESTS )
+    add_subdirectory( test/cuda )
 endif()
 
 if ( GSL_LITE_OPT_BUILD_EXAMPLES )
