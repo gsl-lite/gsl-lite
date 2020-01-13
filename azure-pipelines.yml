@@ -60,6 +60,10 @@ jobs:
     #  cxxCompilerVersions: [19_1, 19_2]
     #  cmakeGenerator: 'MSBuild' # required for CppCoreCheck
     #  platforms: [x86, x64]
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [19_2]
+      platforms: [x64]
 
     - os: Windows
       cxxCompiler: Clang
