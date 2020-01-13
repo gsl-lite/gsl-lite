@@ -18,12 +18,11 @@ jobs:
 - template: azure-pipelines-job-cmake.yml@templates
   parameters:
     cache: False
-    debug: True
     #vcpkgRef: bc01338fe2d50f4a24b7f56b53bc385d8de8ccd9
     #vcpkgPackages: ['catch2'] # to make sure we actually use Vcpkg
     cmakeBuildConfigurations: [Debug, RelWithDebInfo]
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
-    cmakeTestArgs: '--exclude-regex "cuda"' # do not run CUDA tests
+    cmakeTestArgs: '--exclude-regex cuda' # do not run CUDA tests
 
     targets:
 
@@ -40,7 +39,7 @@ jobs:
     #  cmakeBuildConfigurations: [Debug]
     #  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
     #  cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
-    #  cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-cpp17|gsl-lite-altcfg-cpp17"'
+    #  cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
 
     #- os: Linux
     #  cxxCompiler: Clang
@@ -55,7 +54,7 @@ jobs:
       cmakeBuildConfigurations: [Debug]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-cpp17|gsl-lite-altcfg-cpp17"'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
 
     #- os: Linux
     #  cxxCompiler: GCC
@@ -74,7 +73,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [19_2]
       platforms: [x64]
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-cpp17|gsl-lite-altcfg-cpp17"'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
 
     - os: Windows
       cxxCompiler: Clang
