@@ -1,4 +1,7 @@
 
+variables:
+  system.debug: true
+
 trigger:
 - master
 - mr/*
@@ -20,6 +23,7 @@ jobs:
     cache: False
     #vcpkgRef: bc01338fe2d50f4a24b7f56b53bc385d8de8ccd9
     #vcpkgPackages: ['catch2'] # to make sure we actually use Vcpkg
+    cmakeBuildConfigurations: [Debug, RelWithDebInfo]
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
     cmakeTestArgs: '--exclude-regex "cuda"' # do not run CUDA tests
 
@@ -37,8 +41,8 @@ jobs:
     #  tag: 'sanitize'
     #  cmakeBuildConfigurations: [Debug]
     #  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
-    #  cmakeBuildArgs: '--target gsl-lite-cpplatest.t gsl-lite-altcfg-cpplatest.t'
-    #  cmakeTestArgs: '--tests-regex "gsl-lite-cpplatest\.t|gsl-lite-altcfg-cpplatest\.t"'
+    #  cmakeBuildArgs: '--target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
+    #  cmakeTestArgs: '--tests-regex "gsl-lite-cpp17\.t|gsl-lite-altcfg-cpp17\.t"'
 
     #- os: Linux
     #  cxxCompiler: Clang
@@ -52,8 +56,8 @@ jobs:
       tag: 'sanitize'
       cmakeBuildConfigurations: [Debug]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
-      cmakeBuildArgs: '--target gsl-lite-cpplatest.t gsl-lite-altcfg-cpplatest.t'
-      cmakeTestArgs: '--tests-regex "gsl-lite-cpplatest\.t|gsl-lite-altcfg-cpplatest\.t"'
+      cmakeBuildArgs: '--target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
+      cmakeTestArgs: '--tests-regex "gsl-lite-cpp17\.t|gsl-lite-altcfg-cpp17\.t"'
 
     #- os: Linux
     #  cxxCompiler: GCC
