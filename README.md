@@ -556,19 +556,19 @@ Version | Level | Feature / Notes |
 
 Reported to work with
 ---------------------
-The table below mentions the compiler versions *gsl-lite* is reported to work with.
+The table below mentions the compiler versions and platforms *gsl-lite* is reported to work with.
 
-Compiler             | OS              | Versions               | CI |
---------------------:|:----------------|-----------------------:|----|
-GCC                  | Linux           | 4.7 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 4.7 through 4.9, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 5 through 9 |
-GCC (MinGW)          | Windows         | 4.8.4 and newer        |    |
-GCC (DJGPP)          | DOSBox, FreeDOS | 7.2                    |    |
-GCC                  | MacOS           | 6 and newer            | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 6 through 9 |
-Clang                | Linux           | 3.5 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 3.5 through 3.9, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 4 through 9 |
-Clang                | Windows         | 9 and newer            | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 9 |
-MSVC (Visual Studio) | Windows         | 16 (VS 2010) and newer | [AppVeyor](https://ci.appveyor.com/project/martinmoene/gsl-lite) for VS 2010, 2012, 2013, and 2015, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 2017 and 2019 |
-AppleClang (Xcode)   | MacOS           | 7.3 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 7.3 and 8, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 8.1, 9, 9.1, 10, 10.0.1, and 11 |
-NVCC (CUDA Toolkit)  | Linux, Windows  | 10.2 and newer         | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 10.2 |
+Compiler             | OS              | Platforms | Versions               | CI |
+--------------------:|:----------------|-----------|-----------------------:|----|
+GCC                  | Linux           | x64       | 4.7 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 4.7 through 4.9, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 5 through 9 |
+GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer        |    |
+GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2                    |    |
+GCC                  | MacOS           | x64       | 6 and newer            | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 6 through 9 |
+Clang                | Linux           | x64       | 3.5 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 3.5 through 3.9, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 4 through 9 |
+Clang                | Windows         | x64       | 9 and newer            | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 9 |
+MSVC (Visual Studio) | Windows         | x86, x64  | 16 (VS 2010) and newer | [AppVeyor](https://ci.appveyor.com/project/martinmoene/gsl-lite) for VS 2010, 2012, 2013, and 2015, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 2017 and 2019 |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 7.3 and 8, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 8.1, 9, 9.1, 10, 10.0.1, and 11 |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer         | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 10.2 |
 
 
 Building the tests
@@ -647,9 +647,8 @@ Appendix
 --------
 
 **Contents**  
-- [A.1 Extract Boost smart pointers](#a1)
-- [A.2 Compile-time information](#a2)
-- [A.3 GSL Lite test specification](#a3)
+- [A.1 Compile-time information](#a2)
+- [A.2 GSL Lite test specification](#a3)
 
 <a id="a2"></a>
 ### A.2 Compile-time information

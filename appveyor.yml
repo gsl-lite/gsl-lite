@@ -3,8 +3,9 @@ version: "{branch} #{build}"
 shallow_clone: true
 
 image:
-    - Visual Studio 2019
-    - Visual Studio 2017
+    # VS 2017 and newer are tested with Azure Pipelines
+    #- Visual Studio 2019
+    #- Visual Studio 2017
     - Visual Studio 2015
 
 platform:
@@ -17,8 +18,8 @@ configuration:
 
 environment:
     matrix:
-        - generator: "Visual Studio 16 2019"
-        - generator: "Visual Studio 15 2017"
+        #- generator: "Visual Studio 16 2019"
+        #- generator: "Visual Studio 15 2017"
         - generator: "Visual Studio 14 2015"
         - generator: "Visual Studio 12 2013"
         - generator: "Visual Studio 11 2012"
@@ -26,31 +27,31 @@ environment:
 
 matrix:
     fast_finish: true
-    exclude:
-        - image:      Visual Studio 2015
-          generator: "Visual Studio 16 2019"
-        - image:      Visual Studio 2015
-          generator: "Visual Studio 15 2017"
-        - image:      Visual Studio 2017
-          generator: "Visual Studio 16 2019"
-        - image:      Visual Studio 2017
-          generator: "Visual Studio 14 2015"
-        - image:      Visual Studio 2017
-          generator: "Visual Studio 12 2013"
-        - image:      Visual Studio 2017
-          generator: "Visual Studio 11 2012"
-        - image:      Visual Studio 2017
-          generator: "Visual Studio 10 2010"
-        - image:      Visual Studio 2019
-          generator: "Visual Studio 15 2017"
-        - image:      Visual Studio 2019
-          generator: "Visual Studio 14 2015"
-        - image:      Visual Studio 2019
-          generator: "Visual Studio 12 2013"
-        - image:      Visual Studio 2019
-          generator: "Visual Studio 11 2012"
-        - image:      Visual Studio 2019
-          generator: "Visual Studio 10 2010"
+    #exclude:
+    #    - image:      Visual Studio 2015
+    #      generator: "Visual Studio 16 2019"
+    #    - image:      Visual Studio 2015
+    #      generator: "Visual Studio 15 2017"
+    #    - image:      Visual Studio 2017
+    #      generator: "Visual Studio 16 2019"
+    #    - image:      Visual Studio 2017
+    #      generator: "Visual Studio 14 2015"
+    #    - image:      Visual Studio 2017
+    #      generator: "Visual Studio 12 2013"
+    #    - image:      Visual Studio 2017
+    #      generator: "Visual Studio 11 2012"
+    #    - image:      Visual Studio 2017
+    #      generator: "Visual Studio 10 2010"
+    #    - image:      Visual Studio 2019
+    #      generator: "Visual Studio 15 2017"
+    #    - image:      Visual Studio 2019
+    #      generator: "Visual Studio 14 2015"
+    #    - image:      Visual Studio 2019
+    #      generator: "Visual Studio 12 2013"
+    #    - image:      Visual Studio 2019
+    #      generator: "Visual Studio 11 2012"
+    #    - image:      Visual Studio 2019
+    #      generator: "Visual Studio 10 2010"
 
 before_build:
     - mkdir build && cd build
