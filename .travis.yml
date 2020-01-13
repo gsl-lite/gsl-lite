@@ -116,15 +116,15 @@ matrix:
           packages: ["clang-3.9", "g++-7", "python3-pip", "lcov"]
           sources: *apt_sources
 
-    - os: linux
-      env: COMPILER=clang++-4.0
-      compiler: clang
-      addons: &clang4_0
-        apt:
-          packages: ["clang-4.0", "g++-7", "python3-pip", "lcov"]
-          sources: *apt_sources
-
-    # Clang 5 and newer are tested with Azure Pipelines
+    # Clang 4 and newer are tested with Azure Pipelines
+    #- os: linux
+    #  env: COMPILER=clang++-4.0
+    #  compiler: clang
+    #  addons: &clang4_0
+    #    apt:
+    #      packages: ["clang-4.0", "g++-7", "python3-pip", "lcov"]
+    #      sources: *apt_sources
+    #
     #- os: linux
     #  env: COMPILER=clang++-5.0
     #  compiler: clang
