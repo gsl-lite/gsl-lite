@@ -22,19 +22,12 @@ jobs:
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
     cmakeTestArgs: '--exclude-regex cuda' # do not run CUDA tests
 
-    postSetupSteps:
-      - pwsh: |
-          echo "(echoing) os: $env:CIMAKESHIFT_OS"
-
     targets:
 
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [5, 6, 7, 8, 9]
       platforms: [x64]
-      preBuildSteps:
-        - pwsh: |
-            echo "(echoing) config: $env:CIMAKESHIFT_CMAKE_BUILD_CONFIGURATION"
 
     - os: Linux
       cxxCompiler: GCC
