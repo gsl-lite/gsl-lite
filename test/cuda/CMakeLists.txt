@@ -61,7 +61,6 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
         -Wno-missing-braces
         -Wconversion
         -Wsign-conversion
-        -Wno-string-conversion
         -fno-elide-constructors
         -fstrict-aliasing -Wstrict-aliasing=2
     )
