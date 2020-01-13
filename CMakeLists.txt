@@ -13,7 +13,7 @@ cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project(
     gsl_lite
-    VERSION 0.35.5
+    VERSION 0.35.6
 #   DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
 #   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
     LANGUAGES CXX )
@@ -27,17 +27,10 @@ set( package_version "${${PROJECT_NAME}_VERSION}" )
 
 message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '${package_version}'" )
 
-# Toplevel or subproject:
+# Do not build tests or examples by default:
 
-if ( CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME )
-    set( gsl_IS_TOPLEVEL_PROJECT TRUE )
-else()
-    set( gsl_IS_TOPLEVEL_PROJECT FALSE )
-endif()
-
-# If toplevel project, enable building and performing of tests, disable building of examples:
-
-option( GSL_LITE_OPT_BUILD_TESTS             "Build and perform gsl-lite tests" ${gsl_IS_TOPLEVEL_PROJECT} )
+option( GSL_LITE_OPT_BUILD_TESTS             "Build and perform gsl-lite tests" OFF )
+option( GSL_LITE_OPT_BUILD_CUDA_TESTS        "Build and perform gsl-lite CUDA tests" OFF )
 option( GSL_LITE_OPT_BUILD_EXAMPLES          "Build gsl-lite examples" OFF )
 option( CMAKE_EXPORT_PACKAGE_REGISTRY        "Export build directory to CMake user package registry" OFF )
 option( GSL_LITE_OPT_INSTALL_COMPAT_HEADER   "Install MS-GSL compatibility header <gsl/gsl>" OFF )
@@ -49,9 +42,12 @@ if ( GSL_LITE_OPT_BUILD_TESTS )
     enable_testing()
     add_subdirectory( test )
 endif()
+if ( GSL_LITE_OPT_BUILD_CUDA_TESTS )
+    enable_testing()
+    add_subdirectory( test/cuda )
+endif()
 
 if ( GSL_LITE_OPT_BUILD_EXAMPLES )
-    enable_testing()
     add_subdirectory( example )
 endif()
 

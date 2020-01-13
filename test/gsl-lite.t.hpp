@@ -6,8 +6,6 @@
 // This code is licensed under the MIT License (MIT).
 //
 
-#pragma once
-
 #ifndef GSL_TEST_GSL_LITE_HPP_INCLUDED
 #define GSL_TEST_GSL_LITE_HPP_INCLUDED
 
@@ -27,15 +25,9 @@
 
 // Limit C++ Core Guidelines checking to GSL Lite:
 
-#if defined(_MSC_VER) && _MSC_VER >= 1910
-# if defined(__has_include)
-#  if __has_include(<CppCoreCheck/warnings.h>)
-#   include <CppCoreCheck/warnings.h>
-#   pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
-#  else
-#   pragma message( "Warning: <CppCoreCheck/warnings.h> not in include path; skipping" )
-#  endif
-# endif
+#ifdef gsl_TESTING_CPPCORECHECK_
+# include <CppCoreCheck/warnings.h>
+# pragma warning(disable: ALL_CPPCORECHECK_WARNINGS)
 #endif
 
 // Compiler warning suppression for usage of lest:

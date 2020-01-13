@@ -1,0 +1,90 @@
+
+trigger:
+- master
+- mr/*
+
+pr:
+- master
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: mbeutel/CImakeshift
+      endpoint: mbeutel
+      #ref: refs/tags/0.2
+
+jobs:
+- template: azure-pipelines-job-cmake.yml@templates
+  parameters:
+    cache: False
+    cmakeBuildConfigurations: [Debug]
+    cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
+    cmakeTestArgs: '--exclude-regex cuda' # do not run CUDA tests
+
+    targets:
+
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [19_2]
+      cudaCompiler: NVCC
+      cudaCompilerVersion: 10_2
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [16, 17, 18, 19, 19_1, 19_2]
+      cmakeGenerator: 'MSBuild' # required for CppCoreCheck
+      platforms: [x86, x64]
+
+    - os: Windows
+      cxxCompiler: Clang
+      cxxCompilerVersions: [9]
+      platforms: [x86, x64]
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [5, 6, 7, 8, 9]
+      platforms: [x64]
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [9]
+      platforms: [x64]
+      tag: 'sanitize'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
+
+    - os: Linux
+      cxxCompiler: Clang
+      cxxCompilerVersions: [4, 5, 6, 7, 8, 9]
+      platforms: [x64]
+
+    - os: Linux
+      cxxCompiler: Clang
+      cxxCompilerVersions: [9]
+      platforms: [x64]
+      tag: 'sanitize'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [9]
+      cudaCompiler: NVCC
+      cudaCompilerVersion: 10_2
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: MacOS
+      cxxCompiler: GCC
+      cxxCompilerVersions: [6, 7, 8, 9]
+      platforms: [x64]
+
+    - os: MacOS
+      cxxCompiler: AppleClang
+      cxxCompilerVersions: [8_1, 9, 9_1, 10, 10_0_1, 11]
+      platforms: [x64]
