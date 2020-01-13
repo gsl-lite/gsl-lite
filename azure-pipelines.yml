@@ -18,7 +18,7 @@ jobs:
 - template: azure-pipelines-job-cmake.yml@templates
   parameters:
     cache: False
-    cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    cmakeBuildConfigurations: [Debug]
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
     cmakeTestArgs: '--exclude-regex cuda' # do not run CUDA tests
 
@@ -41,7 +41,6 @@ jobs:
       cxxCompilerVersions: [9]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeBuildConfigurations: [Debug]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
@@ -56,7 +55,6 @@ jobs:
       cxxCompilerVersions: [9]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeBuildConfigurations: [Debug]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
@@ -78,7 +76,6 @@ jobs:
     - os: Windows
       cxxCompiler: Clang
       cxxCompilerVersions: [9]
-      cmakeBuildConfigurations: [Debug]
       platforms: [x86, x64]
 
     - os: Windows
