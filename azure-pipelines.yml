@@ -82,13 +82,13 @@ jobs:
       cmakeBuildConfigurations: [Debug]
       platforms: [x86, x64]
 
-    #- os: Windows
-    #  cxxCompiler: MSVC
-    #  cxxCompilerVersions: [19_2]
-    #  cudaCompiler: NVCC
-    #  cudaCompilerVersion: 10_2
-    #  platforms: [x64]
-    #  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [19_2]
+      cudaCompiler: NVCC
+      cudaCompilerVersion: 10_2
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     #- os: MacOS
     #  cxxCompiler: GCC
