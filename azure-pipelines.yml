@@ -73,7 +73,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [19_2]
       platforms: [x64]
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17`|gsl-lite-altcfg-cpp17'
 
     - os: Windows
       cxxCompiler: Clang
