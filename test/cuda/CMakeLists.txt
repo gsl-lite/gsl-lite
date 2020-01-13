@@ -42,7 +42,7 @@ set( GSL_CONFIG
     -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT
 )
 # Set NVCC-specific options:
-set( NVCC_OPTIONS --expt-relaxed-constexpr --Werror all-warnings )
+set( NVCC_OPTIONS --Werror all-warnings )
 
 # Determine compiler-specifics for MSVC, GNUC, Clang:
 

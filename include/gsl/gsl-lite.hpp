@@ -488,66 +488,66 @@
 #if gsl_HAVE( TYPE_TRAITS )
 
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                    \
-    gsl_NODISCARD inline gsl_constexpr ENUM                          \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
     operator~( ENUM val ) gsl_noexcept                                \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( ~U( val ) );                                     \
     }                                                                 \
-    gsl_NODISCARD inline gsl_constexpr ENUM                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
     operator|( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) | U( rhs ) );                           \
     }                                                                 \
-    gsl_NODISCARD inline gsl_constexpr ENUM                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
     operator&( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) & U( rhs ) );                           \
     }                                                                 \
-    gsl_NODISCARD inline gsl_constexpr ENUM                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
     operator^( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) ^ U( rhs ) );                           \
     }                                                                 \
-    inline gsl_constexpr14 ENUM &                                     \
+    gsl_api inline gsl_constexpr14 ENUM &                             \
     operator|=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
     {                                                                 \
         return lhs = lhs | rhs;                                       \
     }                                                                 \
-    inline gsl_constexpr14 ENUM &                                     \
+    gsl_api inline gsl_constexpr14 ENUM &                             \
     operator&=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
     {                                                                 \
         return lhs = lhs & rhs;                                       \
     }                                                                 \
-    inline gsl_constexpr14 ENUM &                                     \
+    gsl_api inline gsl_constexpr14 ENUM &                             \
     operator^=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
     {                                                                 \
         return lhs = lhs ^ rhs;                                       \
     }
 
 #define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                 \
-    gsl_NODISCARD inline gsl_constexpr bool                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
     operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) < U( rhs );                                   \
     }                                                                 \
-    gsl_NODISCARD inline gsl_constexpr bool                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
     operator>( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) > U( rhs );                                   \
     }                                                                 \
-    gsl_NODISCARD inline gsl_constexpr bool                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
     operator<=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) <= U( rhs );                                  \
     }                                                                 \
-    gsl_NODISCARD inline gsl_constexpr bool                           \
+    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
     operator>=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
@@ -893,7 +893,7 @@ using std::size;
 #elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
 template< class T, size_t N >
-inline gsl_constexpr auto size( T const(&)[N] ) gsl_noexcept -> size_t
+gsl_api inline gsl_constexpr auto size( T const(&)[N] ) gsl_noexcept -> size_t
 {
     return N;
 }
@@ -905,7 +905,7 @@ inline gsl_constexpr auto size( C const & cont ) -> decltype( cont.size() )
 }
 
 template< class T, size_t N >
-inline gsl_constexpr auto data( T(&arr)[N] ) gsl_noexcept -> T*
+gsl_api inline gsl_constexpr auto data( T(&arr)[N] ) gsl_noexcept -> T*
 {
     return &arr[0];
 }
@@ -1272,7 +1272,7 @@ void fail_fast_assert( bool cond ) gsl_noexcept
 
 namespace detail {
 
-inline unsigned char to_uchar( unsigned x ) gsl_noexcept
+gsl_api inline unsigned char to_uchar( unsigned x ) gsl_noexcept
 {
     return static_cast<unsigned char>( x );
 }
@@ -1633,7 +1633,7 @@ inline T narrow( U u )
 //
 
 template< class T, size_t N >
-inline gsl_constexpr14 T & at( T(&arr)[N], size_t pos )
+gsl_api inline gsl_constexpr14 T & at( T(&arr)[N], size_t pos )
 {
     gsl_Expects( pos < N );
     return arr[pos];
@@ -1664,7 +1664,7 @@ inline const gsl_constexpr14 T at( std::initializer_list<T> cont, size_t pos )
 #endif
 
 template< class T >
-inline gsl_constexpr T & at( span<T> s, size_t pos )
+gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 {
     return s.at( pos );
 }
@@ -2689,7 +2689,8 @@ public:
 #else
     gsl_constexpr14 span & operator=( span other ) gsl_noexcept
     {
-        other.swap( *this );
+        first_ = other.first_;
+        last_ = other.last_;
         return *this;
     }
 #endif
@@ -3210,7 +3211,10 @@ public:
     {}
 #endif
 
-    gsl_api gsl_constexpr basic_string_span( pointer ptr )
+#ifdef __CUDACC_RELAXED_CONSTEXPR__
+    gsl_api
+#endif // __CUDACC_RELAXED_CONSTEXPR__
+    gsl_constexpr basic_string_span( pointer ptr )
     : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
     {}
 
@@ -3230,12 +3234,12 @@ public:
 #if gsl_HAVE( ARRAY )
 
     template< std::size_t N >
-    gsl_api gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
+    gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
     : span_( remove_z( arr ) )
     {}
 
     template< std::size_t N >
-    gsl_api gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
+    gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
     : span_( remove_z( arr ) )
     {}
 
@@ -3302,13 +3306,13 @@ public:
 
 #if gsl_HAVE( IS_DEFAULT )
 # if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
-            gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
+    gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
 
-            gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
+    gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
 # else
-            gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
+    gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
 
-            gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
+    gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
 # endif
 #endif
 
@@ -3343,29 +3347,33 @@ public:
     // assignment:
 
 #if gsl_HAVE( IS_DEFAULT )
-            basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
+    gsl_constexpr14 basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
 
-            basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
+    gsl_constexpr14 basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
 #endif
 
     // sub span:
 
-    gsl_api gsl_constexpr basic_string_span first( index_type count ) const
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_constexpr14 basic_string_span first( index_type count ) const
     {
         return span_.first( count );
     }
 
-    gsl_api gsl_constexpr basic_string_span last( index_type count ) const
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_constexpr14 basic_string_span last( index_type count ) const
     {
         return span_.last( count );
     }
 
-    gsl_api gsl_constexpr basic_string_span subspan( index_type offset ) const
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_constexpr14 basic_string_span subspan( index_type offset ) const
     {
         return span_.subspan( offset );
     }
 
-    gsl_api gsl_constexpr basic_string_span subspan( index_type offset, index_type count ) const
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_constexpr14 basic_string_span subspan( index_type offset, index_type count ) const
     {
         return span_.subspan( offset, count );
     }
@@ -3796,16 +3804,16 @@ gsl_api inline span<T> ensure_z( T * const & sz, size_t max = (std::numeric_limi
 template< class T, size_t N >
 gsl_api inline span<T> ensure_z( T (&sz)[N] )
 {
-    return ensure_z( gsl_ADDRESSOF( sz[0] ), N );
+    return ::gsl::ensure_z( gsl_ADDRESSOF( sz[0] ), N );
 }
 
 # if gsl_HAVE( TYPE_TRAITS )
 
 template< class Container >
-gsl_api inline span< typename std::remove_pointer<typename Container::pointer>::type >
+inline span< typename std::remove_pointer<typename Container::pointer>::type >
 ensure_z( Container & cont )
 {
-    return ensure_z( cont.data(), cont.length() );
+    return ::gsl::ensure_z( cont.data(), cont.length() );
 }
 # endif
 
@@ -3853,7 +3861,8 @@ public:
         return string_span_type( span_.data(), span_.size() > 1 ? span_.size() - 1 : 0 );
     }
 
-    gsl_api gsl_constexpr string_span_type ensure_z() const
+    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+    gsl_constexpr string_span_type ensure_z() const
     {
         return ::gsl::ensure_z(span_.data(), span_.size());
     }
