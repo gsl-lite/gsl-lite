@@ -32,16 +32,16 @@ jobs:
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
-    # VS 2010, 2012, and 2013 are tested with AppVeyor
+    # VS 2010, 2012, 2013, and 2015 are tested with AppVeyor
     #- os: Windows
     #  cxxCompiler: MSVC
-    #  cxxCompilerVersions: [16, 17, 18]
+    #  cxxCompilerVersions: [16, 17, 18, 19]
     #  cmakeGenerator: 'MSBuild' # required for CppCoreCheck
     #  platforms: [x86, x64]
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [19, 19_1, 19_2]
+      cxxCompilerVersions: [19_1, 19_2]
       cmakeGenerator: 'MSBuild' # required for CppCoreCheck
       platforms: [x86, x64]
 
@@ -70,7 +70,7 @@ jobs:
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
 
-    # Clang 3.5, 3.6, 3.7, 3.8, 3.9, and 4 are tested with Travis
+    # Clang 3.5, 3.6, 3.7, 3.8, and 3.9 are tested with Travis
     #- os: Linux
     #  cxxCompiler: Clang
     #  cxxCompilerVersions: [4]
@@ -78,7 +78,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [5, 6, 7, 8, 9]
+      cxxCompilerVersions: [4, 5, 6, 7, 8, 9]
       platforms: [x64]
 
     - os: Linux
