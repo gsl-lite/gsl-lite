@@ -24,7 +24,7 @@ jobs:
 
     postSetupSteps:
       - pwsh: |
-          echo "(echoing) os: ${{ coalesce(target.os, parameters.os) }}"
+          echo "(echoing) os: $env:CIMAKESHIFT_OS"
 
     targets:
 
@@ -34,7 +34,7 @@ jobs:
       platforms: [x64]
       preBuildSteps:
         - pwsh: |
-            echo "(echoing) config: ${{ config }}"
+            echo "(echoing) config: $env:CIMAKESHIFT_CMAKE_BUILD_CONFIGURATION"
 
     - os: Linux
       cxxCompiler: GCC
