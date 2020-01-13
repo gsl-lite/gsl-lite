@@ -18,10 +18,10 @@ jobs:
 - template: azure-pipelines-job-cmake.yml@templates
   parameters:
     cache: False
-    vcpkgRef: bc01338fe2d50f4a24b7f56b53bc385d8de8ccd9
+    #vcpkgRef: bc01338fe2d50f4a24b7f56b53bc385d8de8ccd9
+    #vcpkgPackages: ['catch2'] # to make sure we actually use Vcpkg
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
     cmakeTestArgs: '--exclude-regex "cuda"' # do not run CUDA tests
-    vcpkgPackages: ['catch2'] # to make sure we actually use Vcpkg
 
     targets:
 
