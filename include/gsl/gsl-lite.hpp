@@ -3113,12 +3113,14 @@ make_span( with_container_t, Container const & cont ) gsl_noexcept
 
 #endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
+#if !gsl_DEPRECATE_TO_LEVEL( 4 )
 template< class Ptr >
-gsl_api inline span<typename Ptr::element_type>
+inline span<typename Ptr::element_type>
 make_span( Ptr & ptr )
 {
     return span<typename Ptr::element_type>( ptr );
 }
+#endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
 
 template< class Ptr >
 gsl_api inline span<typename Ptr::element_type>
