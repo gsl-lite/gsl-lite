@@ -29,6 +29,7 @@ __global__ void preconditionAssertionKernel( int i, int j )
 CASE( "CUDA: Precondition and postcondition assertions can be used in kernel code" )
 {
     preconditionAssertionKernel<<<1, 1>>>( 0, 1 );
+    // TODO: check for failure
 }
 
 
@@ -47,6 +48,7 @@ __global__ void spanKernel( gsl::span< int > span )
 CASE( "CUDA: span<> can be used in kernel code" )
 {
     spanKernel<<<1, 1>>>( gsl::span< int >( ) );
+    // TODO: check for failure
     // TODO: add more tests
 }
 
@@ -58,5 +60,7 @@ __global__ void notNullKernel( gsl::not_null< int* > ptr )
 
 CASE( "CUDA: not_null<> can be used in kernel code" )
 {
+    // TODO: run kernel
+    // TODO: check for failure
     // TODO: add more tests
 }

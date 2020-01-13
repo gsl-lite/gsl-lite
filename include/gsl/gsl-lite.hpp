@@ -2678,8 +2678,8 @@ public:
 #endif // deprecate shared_ptr, unique_ptr
 
 #if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
-            gsl_constexpr span( span && ) gsl_noexcept = default;
-            gsl_constexpr span( span const & ) = default;
+    gsl_constexpr span( span && ) gsl_noexcept = default;
+    gsl_constexpr span( span const & ) = default;
 #else
     gsl_api gsl_constexpr span( span const & other )
         : first_( other.begin() )
@@ -2688,8 +2688,8 @@ public:
 #endif
 
 #if gsl_HAVE( IS_DEFAULT )
-            gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
-            gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
+    gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
+    gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
 #else
     gsl_constexpr14 span & operator=( span other ) gsl_noexcept
     {
@@ -2837,9 +2837,8 @@ public:
 
     gsl_constexpr14 void swap( span & other ) gsl_noexcept
     {
-        using std::swap;
-        swap( first_, other.first_ );
-        swap( last_ , other.last_  );
+        std::swap( first_, other.first_ );
+        std::swap( last_ , other.last_  );
     }
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 3 )
@@ -3126,7 +3125,7 @@ template< class Ptr >
 gsl_api inline span<typename Ptr::element_type>
 make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
 {
-    return span<typename Ptr::element_type>( ptr, count);
+    return span<typename Ptr::element_type>( ptr, count );
 }
 
 #endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
@@ -3206,7 +3205,7 @@ public:
     // construction:
 
 #if gsl_HAVE( IS_DEFAULT )
-            gsl_constexpr basic_string_span() gsl_noexcept = default;
+    gsl_constexpr basic_string_span() gsl_noexcept = default;
 #else
     gsl_api gsl_constexpr basic_string_span() gsl_noexcept {}
 #endif
@@ -3848,10 +3847,10 @@ public:
     }
 
 #if gsl_HAVE( IS_DEFAULT )
-            gsl_constexpr basic_zstring_span( basic_zstring_span const & other ) = default;
-            gsl_constexpr basic_zstring_span( basic_zstring_span &&      other ) = default;
-            gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other ) = default;
-            gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other ) = default;
+    gsl_constexpr basic_zstring_span( basic_zstring_span const & other ) = default;
+    gsl_constexpr basic_zstring_span( basic_zstring_span &&      other ) = default;
+    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other ) = default;
+    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other ) = default;
 #else
     gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
     gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other ) { span_ = other.span_; return *this; }
@@ -3935,7 +3934,7 @@ public:
 //     } // namespace foo
 //
 // In a future version, the new <gsl-lite/gsl-lite.hpp> header will only define the `gsl_lite` namespace and no
-// unprefixed `gsl_Expects()` and `gsl_Ensures()` macros to avoid collision with M-GSL. To ensure backward compatibility, the
+// unprefixed `Expects()` and `Ensures()` macros to avoid collision with M-GSL. To ensure backward compatibility, the
 // old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
 
 namespace gsl_lite
