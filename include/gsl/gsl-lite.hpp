@@ -112,7 +112,11 @@
 #endif
 
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
-# define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  5
+# else
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
+# endif
 #endif
 
 #ifndef  gsl_CONFIG_SPAN_INDEX_TYPE
