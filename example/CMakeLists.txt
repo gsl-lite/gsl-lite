@@ -43,8 +43,6 @@ endfunction()
 
 # Targets:
 
-enable_testing()
-
 foreach( target ${BASENAMES} )
     make_target( ${target} )
 endforeach()
