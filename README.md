@@ -1,6 +1,15 @@
 # GSL Lite: Guidelines Support Library for C++98, C++11 up
 
-[![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite) [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite) [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/martinmoene/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion) [![Try it on wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/fKCm0ERwPgFTH72I) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
+[![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
+ [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+ [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite)
+ [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite)
+ [![Build Status](https://dev.azure.com/martinmoene/gsl-lite/_apis/build/status/martinmoene.gsl-lite?branchName=master)](https://dev.azure.com/martinmoene/gsl-lite/_build/latest?definitionId=1&branchName=master)
+ [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases)
+ [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp)
+ [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/martinmoene/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion)
+ [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/fKCm0ERwPgFTH72I)
+ [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
 
 
 GSL Lite is based on the [Microsoft Guidelines Support Library (GSL)](https://github.com/microsoft/gsl). 
@@ -547,18 +556,19 @@ Version | Level | Feature / Notes |
 
 Reported to work with
 ---------------------
-The table below mentions the compiler versions *gsl-lite* is reported to work with.
+The table below mentions the compiler versions and platforms *gsl-lite* is reported to work with.
 
-OS           | Compiler   | Where  | Versions |
-------------:|:-----------|-------:|----------|
-**GNU/Linux**| Clang/LLVM | Travis | 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 5.0, 6.0 |
-&nbsp;       | GCC        | Travis | 4.7, 4.8, 4.9, 5, 6, 7, 8 |
-**OS X**     | AppleClang | &nbsp; | Xcode 7.3, 8, 9 |
-**Windows**  | Clang/LLVM | &nbsp; | ? |
-&nbsp;       | GCC        | Local  | 4.8.4, 4.9.2, 5.2.0, 7.2.0 |
-&nbsp;       | Visual C++<br>(Visual Studio)| Local<br>Local<br>AppVeyor | 6 (6) via header [gsl-lite-vc6.hpp](include/gsl/gsl-lite-vc6.hpp) (not up to date)<br>8 (2005),<br> 10 (2010), 11 (2012), 12 (2013), 14 (2015), 15 (2017), 16 (2019) |
-**DOSBox**   | DJGPP      | Local  | DJGPP for GCC 7.2.0 |
-**FreeDOS**  | DJGPP      | Local  | DJGPP for GCC 7.2.0 |
+Compiler             | OS              | Platforms | Versions               | CI |
+--------------------:|:----------------|-----------|-----------------------:|----|
+GCC                  | Linux           | x64       | 4.7 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 4.7 through 4.9, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 5 through 9 |
+GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer        |    |
+GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2                    |    |
+GCC                  | MacOS           | x64       | 6 and newer            | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 6 through 9 |
+Clang                | Linux           | x64       | 3.5 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 3.5 through 3.9, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 4 through 9 |
+Clang                | Windows         | x64       | 9 and newer            | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 9 |
+MSVC (Visual Studio) | Windows         | x86, x64  | 16 (VS 2010) and newer | [AppVeyor](https://ci.appveyor.com/project/martinmoene/gsl-lite) for VS 2010, 2012, 2013, and 2015, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 2017 and 2019 |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer          | [Travis](https://travis-ci.org/martinmoene/gsl-lite/) for 7.3 and 8, [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 8.1, 9, 9.1, 10, 10.0.1, and 11 |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer         | [Azure Pipelines](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) for 10.2 |
 
 
 Building the tests
@@ -581,7 +591,7 @@ Here we use c:\gsl-lite\build-win-x86-vc10.
 
 2. Configure CMake to use the compiler of your choice (run `cmake --help` for a list).
 
-        cmake -G "Visual Studio 10 2010" ..
+        cmake -G "Visual Studio 10 2010" -DGSL_LITE_OPT_BUILD_TESTS=ON ..
 
 3. Build the test suite in the Debug configuration (alternatively use Release).    
 
@@ -637,18 +647,8 @@ Appendix
 --------
 
 **Contents**  
-- [A.1 Extract Boost smart pointers](#a1)
-- [A.2 Compile-time information](#a2)
-- [A.3 GSL Lite test specification](#a3)
-
-<a id="a1"></a>
-### A.1 Extract Boost smart pointers
-
-To obtain a subset of Boost only containing the smart pointers, use the [bcp command](http://www.boost.org/doc/libs/1_59_0/tools/bcp/doc/html/index.html) like:
-
-    C:\Libraries\boost\boost_1_51>bin\bcp scoped_ptr.hpp shared_ptr.hpp weak_ptr.hpp make_shared.hpp C:\Libraries\boost-shared_ptr
-
-The smart pointers of Boost 1.51 can be used with VC6.
+- [A.1 Compile-time information](#a2)
+- [A.2 GSL Lite test specification](#a3)
 
 <a id="a2"></a>
 ### A.2 Compile-time information

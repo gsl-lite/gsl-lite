@@ -14,9 +14,9 @@ addons:
       - llvm-toolchain-precise-3.7
       - llvm-toolchain-precise-3.8
       - llvm-toolchain-trusty-3.9
-      - llvm-toolchain-trusty-4.0
-      - llvm-toolchain-trusty-5.0
-      - llvm-toolchain-trusty-6.0
+      #- llvm-toolchain-trusty-4.0
+      #- llvm-toolchain-trusty-5.0
+      #- llvm-toolchain-trusty-6.0
 
 matrix:
   include:
@@ -51,29 +51,30 @@ matrix:
           packages: ["g++-5", "python3-pip", "lcov"]
           sources: *apt_sources
 
-    - os: linux
-      env: COMPILER=g++-6
-      compiler: gcc
-      addons: &gcc6
-        apt:
-          packages: ["g++-6", "python3-pip", "lcov"]
-          sources: *apt_sources
-
-    - os: linux
-      env: COMPILER=g++-7
-      compiler: gcc
-      addons: &gcc7
-        apt:
-          packages: ["g++-7", "python3-pip", "lcov"]
-          sources: *apt_sources
-
-    - os: linux
-      env: COMPILER=g++-8
-      compiler: gcc
-      addons: &gcc8
-        apt:
-          packages: ["g++-8", "python3-pip", "lcov"]
-          sources: *apt_sources
+    # GCC 6 and newer are tested with Azure Pipelines
+    #- os: linux
+    #  env: COMPILER=g++-6
+    #  compiler: gcc
+    #  addons: &gcc6
+    #    apt:
+    #      packages: ["g++-6", "python3-pip", "lcov"]
+    #      sources: *apt_sources
+    #
+    #- os: linux
+    #  env: COMPILER=g++-7
+    #  compiler: gcc
+    #  addons: &gcc7
+    #    apt:
+    #      packages: ["g++-7", "python3-pip", "lcov"]
+    #      sources: *apt_sources
+    #
+    #- os: linux
+    #  env: COMPILER=g++-8
+    #  compiler: gcc
+    #  addons: &gcc8
+    #    apt:
+    #      packages: ["g++-8", "python3-pip", "lcov"]
+    #      sources: *apt_sources
 
     - os: linux
       env: COMPILER=clang++-3.5
@@ -123,21 +124,22 @@ matrix:
           packages: ["clang-4.0", "g++-7", "python3-pip", "lcov"]
           sources: *apt_sources
 
-    - os: linux
-      env: COMPILER=clang++-5.0
-      compiler: clang
-      addons: &clang5_0
-        apt:
-          packages: ["clang-5.0", "g++-7", "python3-pip", "lcov"]
-          sources: *apt_sources
-
-    - os: linux
-      env: COMPILER=clang++-6.0
-      compiler: clang
-      addons: &clang6_0
-        apt:
-          packages: ["clang-6.0", "g++-7", "python3-pip", "lcov"]
-          sources: *apt_sources
+    # Clang 5 and newer are tested with Azure Pipelines
+    #- os: linux
+    #  env: COMPILER=clang++-5.0
+    #  compiler: clang
+    #  addons: &clang5_0
+    #    apt:
+    #      packages: ["clang-5.0", "g++-7", "python3-pip", "lcov"]
+    #      sources: *apt_sources
+    #
+    #- os: linux
+    #  env: COMPILER=clang++-6.0
+    #  compiler: clang
+    #  addons: &clang6_0
+    #    apt:
+    #      packages: ["clang-6.0", "g++-7", "python3-pip", "lcov"]
+    #      sources: *apt_sources
 
     - os: osx
       osx_image: xcode7.3
@@ -149,28 +151,26 @@ matrix:
       compiler: clang
       env: COMPILER='clang++'
 
-    - os: osx
-      osx_image: xcode9
-      compiler: clang
-      env: COMPILER='clang++'
-
-    - os: osx
-      osx_image: xcode10
-      compiler: clang
-      env: COMPILER='clang++'
-
-    - os: osx
-      osx_image: xcode10.3
-      compiler: clang
-      env: COMPILER='clang++'
-
-    - os: osx
-      osx_image: xcode11.2
-      compiler: clang
-      env: COMPILER='clang++'
-
-#  allow_failures:
-#    - osx_image: xcode10
+    # Xcode 8.1 and newer are tested with Azure Pipelines
+    #- os: osx
+    #  osx_image: xcode9
+    #  compiler: clang
+    #  env: COMPILER='clang++'
+    #
+    #- os: osx
+    #  osx_image: xcode10
+    #  compiler: clang
+    #  env: COMPILER='clang++'
+    #
+    #- os: osx
+    #  osx_image: xcode10.3
+    #  compiler: clang
+    #  env: COMPILER='clang++'
+    #
+    #- os: osx
+    #  osx_image: xcode11.2
+    #  compiler: clang
+    #  env: COMPILER='clang++'
 
   fast_finish: true
 
