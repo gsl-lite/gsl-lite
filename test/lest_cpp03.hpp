@@ -317,7 +317,7 @@ namespace lest
         { \
             lest::inform( lest_LOCATION, #expr ); \
         } \
-    } while ( lest::is_false() )
+    } while ( false )
 
 #define lest_EXPECT_NOT( expr ) \
     do { \
@@ -335,7 +335,7 @@ namespace lest
         { \
             lest::inform( lest_LOCATION, lest::not_expr( #expr ) ); \
         } \
-    } while ( lest::is_false() )
+    } while ( false )
 
 #define lest_EXPECT_NO_THROW( expr ) \
     do \
@@ -349,7 +349,7 @@ namespace lest
         catch (...) { lest::inform( lest_LOCATION, #expr ); } \
         if ( lest_env.pass() ) \
             lest::report( lest_env.os, lest::got_none( lest_LOCATION, #expr ), lest_env.context() ); \
-    } while ( lest::is_false() )
+    } while ( false )
 
 #define lest_EXPECT_THROWS( expr ) \
     do \
@@ -368,7 +368,7 @@ namespace lest
         } \
         throw lest::expected( lest_LOCATION, #expr ); \
     } \
-    while ( false/*lest::is_false()*/ )
+    while ( false )
 
 #define lest_EXPECT_THROWS_AS( expr, excpt ) \
     do \
@@ -388,7 +388,7 @@ namespace lest
         catch (...) {} \
         throw lest::expected( lest_LOCATION, #expr, lest::of_type( #excpt ) ); \
     } \
-    while ( false/*lest::is_false()*/ )
+    while ( false )
 
 #define lest_DECOMPOSE( expr ) ( lest::expression_decomposer() << expr )
 

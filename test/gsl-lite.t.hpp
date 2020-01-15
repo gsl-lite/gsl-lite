@@ -47,9 +47,13 @@
 # pragma GCC   diagnostic ignored "-Wunused-function"
 #elif defined( _MSC_VER )
 //# pragma warning( disable : 4702 ) // unreachable code
-# if !gsl_CPP17_OR_GREATER
+# if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
+#  pragma warning( disable : 4127 ) // conditional expression is constant
+#  pragma warning( disable : 4512 ) // assignment operator could not be generated 
+# endif // gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
+# if !__has_cpp_attribute(maybe_unused) || !gsl_CPP17_OR_GREATER
 #  pragma warning( disable : 4100 ) // unreferenced formal parameter
-# endif
+# endif // !__has_cpp_attribute(maybe_unused) || !gsl_CPP17_OR_GREATER
 #endif
 
 // GSL-Lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>
