@@ -11,6 +11,14 @@
 
 // Compiler warning suppression for ancient versions of Visual Studio:
 
+#if defined( _MSC_VER )
+# if _MSC_VER < 1900
+#  pragma warning( disable : 4127 ) // conditional expression is constant
+# endif
+# if _MSC_VER < 1800
+#  pragma warning( disable : 4345 ) // behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
+# endif
+#endif
 #if defined( _MSC_VER ) && _MSC_VER < 1800
 # pragma warning( disable : 4345 ) // behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
 #endif
@@ -48,7 +56,6 @@
 #elif defined( _MSC_VER )
 //# pragma warning( disable : 4702 ) // unreachable code
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
-#  pragma warning( disable : 4127 ) // conditional expression is constant
 #  pragma warning( disable : 4512 ) // assignment operator could not be generated 
 # endif // gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 142) || !gsl_CPP17_OR_GREATER
