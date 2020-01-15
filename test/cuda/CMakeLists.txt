@@ -49,7 +49,7 @@ set( NVCC_OPTIONS --Werror all-warnings )
 if( MSVC )
     message( STATUS "Matched: MSVC")
 
-    set( OPTIONS     /EHsc /W3 /WX )
+    set( OPTIONS     /EHsc /WX /W4 )
     set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )

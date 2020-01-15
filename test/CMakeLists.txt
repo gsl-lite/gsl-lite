@@ -60,7 +60,7 @@ if( MSVC )
 
     set( HAS_STD_FLAGS TRUE )
 
-    set( OPTIONS     /EHsc /W3 /WX )
+    set( OPTIONS     /EHsc /WX /W4 )
     set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
 
     if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.00 )

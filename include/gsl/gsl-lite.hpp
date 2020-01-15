@@ -479,6 +479,8 @@
 
 #if gsl_HAVE( NORETURN )
 # define gsl_NORETURN [[noreturn]]
+#elif defined(_MSC_VER)
+# define gsl_NORETURN __declspec(noreturn)
 #else
 # define gsl_NORETURN
 #endif
@@ -1581,6 +1583,7 @@ namespace detail {
     struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value>
     {};
 
+# if defined( __NVCC__ )
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
     gsl_constexpr bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
@@ -1588,10 +1591,21 @@ namespace detail {
         return value < T();
     }
     template< class T >
-    gsl_constexpr std::false_type is_negative( T value, std::false_type /*isUnsigned*/ ) gsl_noexcept
+    gsl_constexpr std::false_type is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
     {
         return std::false_type();
     }
+    template< class T, class U >
+    gsl_constexpr std::true_type have_same_sign( T t, U u, std::true_type /*isSameSignedness*/ ) gsl_noexcept
+    {
+        return std::true_type();
+    }
+    template< class T, class U >
+    gsl_constexpr bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
+    {
+        return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
+    }
+# endif // defined( __NVCC__ )
 
 } // namespace detail
 
@@ -1603,7 +1617,7 @@ gsl_api
 #endif // !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 inline T narrow( U u )
 {
-    T t = narrow_cast<T>( u );
+    T t = static_cast<T>( u );
 
     if ( static_cast<U>( t ) != u )
     {
@@ -1614,12 +1628,16 @@ inline T narrow( U u )
 #endif
     }
 
-    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-
 #if gsl_HAVE( TYPE_TRAITS )
-    if ( ! detail::is_same_signedness<T, U>::value && detail::is_negative( t, std::is_signed<T>() ) != detail::is_negative( u, std::is_signed<U>() ) )
+# if defined( __NVCC__ )
+    if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
+# else
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    if ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
+# endif
 #else
     // Don't assume T() works:
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( ( t < 0 ) != ( u < 0 ) )
 #endif
     {
@@ -1629,6 +1647,7 @@ inline T narrow( U u )
         std::terminate();
 #endif
     }
+
     return t;
 }
 
@@ -3782,7 +3801,6 @@ gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_li
     typedef T * pointer;
 
     gsl_SUPPRESS_MSVC_WARNING( 26429, "f.23: symbol 'cur' is never tested for nullness, it can be marked as not_null" )
-
     pointer cur = seq;
 
     while ( static_cast<SizeType>( cur - seq ) < max && *cur != Sentinel )
