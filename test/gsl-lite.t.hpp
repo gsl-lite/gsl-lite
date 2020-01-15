@@ -54,8 +54,8 @@
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"
 #elif defined( _MSC_VER )
-//# pragma warning( disable : 4702 ) // unreachable code
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
+#  pragma warning( disable : 4702 ) // unreachable code
 #  pragma warning( disable : 4512 ) // assignment operator could not be generated 
 # endif // gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 142) || !gsl_CPP17_OR_GREATER

@@ -127,7 +127,7 @@ CASE( "finally: Allows moving final_action to throw" "[.]")
         int & i_;
         void operator()(){ i_ += 1; }     
         action( int & i ) : i_( i ) {}
-        action( action && other ) : i_( other.i_) { throw std::runtime_error("action move-ctor"); }   
+        action( action && other ) : i_( other.i_) { throw std::runtime_error("action move-ctor"); }
     };
 
     int i = 0;
