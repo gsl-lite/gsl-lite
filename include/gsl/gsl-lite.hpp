@@ -479,6 +479,8 @@
 
 #if gsl_HAVE( NORETURN )
 # define gsl_NORETURN [[noreturn]]
+#elif defined(_MSC_VER)
+# define gsl_NORETURN __declspec(noreturn)
 #else
 # define gsl_NORETURN
 #endif
