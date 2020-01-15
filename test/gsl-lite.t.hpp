@@ -42,9 +42,14 @@
 # pragma clang diagnostic ignored "-Wunused-member-function"
 # pragma clang diagnostic warning "-Wunknown-warning-option" // we want to see warnings about unknown warning options
 # pragma clang diagnostic warning "-Wunknown-pragmas" // we want to see warnings about unknown pragmas
-#elif defined __GNUC__
+#elif defined( __GNUC__ )
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"
+#elif defined( _MSC_VER )
+//# pragma warning( disable : 4702 ) // unreachable code
+# if !gsl_CPP17_OR_GREATER
+#  pragma warning( disable : 4100 ) // unreferenced formal parameter
+# endif
 #endif
 
 // GSL-Lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>
@@ -56,7 +61,7 @@ namespace lest {
 
 #if gsl_HAVE( ARRAY )
 template< typename T, std::size_t N >
-inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & a )
+inline std::ostream & operator<<( std::ostream & os, std::array<T,N> const & )
 {
     return os << std::hex << "[std::array[" << N << "]";
 }

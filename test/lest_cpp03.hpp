@@ -88,22 +88,30 @@
 // Suppress shadow and unused-value warning for sections:
 
 #if defined (__clang__)
-# define lest_SUPPRESS_WSHADOW    _Pragma( "clang diagnostic push" ) \
-                                  _Pragma( "clang diagnostic ignored \"-Wshadow\"" )
-# define lest_SUPPRESS_WUNUSED    _Pragma( "clang diagnostic push" ) \
-                                  _Pragma( "clang diagnostic ignored \"-Wunused-value\"" )
-# define lest_RESTORE_WARNINGS    _Pragma( "clang diagnostic pop"  )
+# define lest_SUPPRESS_WSHADOW         _Pragma( "clang diagnostic push" ) \
+                                       _Pragma( "clang diagnostic ignored \"-Wshadow\"" )
+# define lest_SUPPRESS_WUNUSED         _Pragma( "clang diagnostic push" ) \
+                                       _Pragma( "clang diagnostic ignored \"-Wunused-value\"" )
+# define lest_SUPPRESS_WUNREACHABLE    _Pragma( "GCC diagnostic push" )
+# define lest_RESTORE_WARNINGS         _Pragma( "clang diagnostic pop"  )
 
 #elif defined (__GNUC__)
-# define lest_SUPPRESS_WSHADOW    _Pragma( "GCC diagnostic push" ) \
-                                  _Pragma( "GCC diagnostic ignored \"-Wshadow\"" )
-# define lest_SUPPRESS_WUNUSED    _Pragma( "GCC diagnostic push" ) \
-                                  _Pragma( "GCC diagnostic ignored \"-Wunused-value\"" )
-# define lest_RESTORE_WARNINGS    _Pragma( "GCC diagnostic pop"  )
+# define lest_SUPPRESS_WSHADOW         _Pragma( "GCC diagnostic push" ) \
+                                       _Pragma( "GCC diagnostic ignored \"-Wshadow\"" )
+# define lest_SUPPRESS_WUNUSED         _Pragma( "GCC diagnostic push" ) \
+                                       _Pragma( "GCC diagnostic ignored \"-Wunused-value\"" )
+# define lest_SUPPRESS_WUNREACHABLE    _Pragma( "GCC diagnostic push" )
+# define lest_RESTORE_WARNINGS         _Pragma( "GCC diagnostic pop"  )
+#elif defined( _MSC_VER)
+# define lest_SUPPRESS_WSHADOW         __pragma(warning(push))  __pragma(warning(disable: 4456))
+# define lest_SUPPRESS_WUNUSED         __pragma(warning(push))  __pragma(warning(disable: 4100))
+# define lest_SUPPRESS_WUNREACHABLE    __pragma(warning(push))  __pragma(warning(disable: 4702))
+# define lest_RESTORE_WARNINGS         __pragma(warning(pop ))
 #else
-# define lest_SUPPRESS_WSHADOW    /*empty*/
-# define lest_SUPPRESS_WUNUSED    /*empty*/
-# define lest_RESTORE_WARNINGS    /*empty*/
+# define lest_SUPPRESS_WSHADOW         /*empty*/
+# define lest_SUPPRESS_WUNUSED         /*empty*/
+# define lest_SUPPRESS_WUNREACHABLE    /*empty*/
+# define lest_RESTORE_WARNINGS         /*empty*/
 #endif
 
 // Stringify:
@@ -360,7 +368,7 @@ namespace lest
         } \
         throw lest::expected( lest_LOCATION, #expr ); \
     } \
-    while ( lest::is_false() )
+    while ( false/*lest::is_false()*/ )
 
 #define lest_EXPECT_THROWS_AS( expr, excpt ) \
     do \
@@ -380,7 +388,7 @@ namespace lest
         catch (...) {} \
         throw lest::expected( lest_LOCATION, #expr, lest::of_type( #excpt ) ); \
     } \
-    while ( lest::is_false() )
+    while ( false/*lest::is_false()*/ )
 
 #define lest_DECOMPOSE( expr ) ( lest::expression_decomposer() << expr )
 
