@@ -42,7 +42,7 @@ set( GSL_CONFIG
     -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT
 )
 # Set NVCC-specific options:
-set( NVCC_OPTIONS --Werror all-warnings )
+set( NVCC_OPTIONS --Werror all-warnings -G )
 
 # Determine compiler-specifics for MSVC, GNUC, Clang:
 
@@ -82,12 +82,12 @@ list( TRANSFORM OPTIONS PREPEND -Xcompiler= )
 
 enable_testing()
 
-function( make_cuda_test_target target std sources )
-    message( STATUS "Make target: '${std}'" )
+function( make_cuda_test_target target sources extraOptions )
+    message( STATUS "Make CUDA target: '${extraOptions}'" )
 
     add_executable            ( ${target} ${sources} )
     target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-v1 )
-    target_compile_options    ( ${target} PRIVATE ${NVCC_OPTIONS} ${OPTIONS} )
+    target_compile_options    ( ${target} PRIVATE ${NVCC_OPTIONS} ${OPTIONS} ${extraOptions} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
     target_compile_features   ( ${target} PRIVATE cxx_std_14 )
     set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD 14 )
@@ -99,6 +99,7 @@ function( make_cuda_test_target target std sources )
 
 endfunction()
 
-make_cuda_test_target( ${PROGRAM}-cuda.t "" "${SOURCES};${CUDA_SOURCES}" v1 )
+make_cuda_test_target( ${PROGRAM}-cuda.t "${SOURCES};${CUDA_SOURCES}" "" )
+make_cuda_test_target( ${PROGRAM}-cuda-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" )
 
 # end of file

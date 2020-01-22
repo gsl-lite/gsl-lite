@@ -154,7 +154,7 @@ endfunction()
 # Make target, compile for given standard if specified:
 
 function( make_test_target target std sources defaults_version )
-    message( STATUS "Make target: '${std}'" )
+    message( STATUS "Make target: '${std}-${defaults_version}'" )
 
     add_executable            ( ${target} ${sources}  )
     target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-${defaults_version} )
