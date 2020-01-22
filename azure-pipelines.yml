@@ -92,7 +92,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [9]
+      cxxCompilerVersions: [7]
       cudaCompiler: NVCC
       cudaCompilerVersion: 10_2
       platforms: [x64]
