@@ -1969,7 +1969,7 @@ public:
     //
     // Expects that the `not_null<>` instance is valid.
     template< class U = T >
-    gsl_constexpr14 gsl_DECLTYPE_( element_type*, std::declval<U const>().get() )#
+    gsl_constexpr14 gsl_DECLTYPE_( element_type*, std::declval<U const>().get() )
     get() const
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
