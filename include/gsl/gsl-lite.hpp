@@ -1970,7 +1970,7 @@ public:
     // Expects that the `not_null<>` instance is valid.
 # if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U = T >
-    gsl_constexpr14 gsl_DECLTYPE_( element_type *, std::declval<U const>().get() )
+    gsl_constexpr14 gsl_DECLTYPE_( element_type *, std::declval<U const&>().get() )
 #else
     gsl_constexpr14 element_type *
 # endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
