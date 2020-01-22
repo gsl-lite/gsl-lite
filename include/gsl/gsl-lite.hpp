@@ -1964,7 +1964,13 @@ public:
 # endif // gsl_HAVE( RVALUE_REFERENCE )
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_constexpr14 element_type* get() const
+    // Returns the result of calling `get()` on the underlying pointer.
+    // For `std::unique_ptr<>` and `std::shared_ptr<>`, `get()` returns the raw pointer captured by the smart pointer.
+    //
+    // Expects that the `not_null<>` instance is valid.
+    template< class U = T >
+    gsl_constexpr14 gsl_DECLTYPE_( element_type*, std::declval<U const>().get() )#
+    get() const
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return data_.ptr_.get();
