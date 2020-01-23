@@ -174,7 +174,9 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
 
     // Do not permit conversion to subclass pointer.
     static_assert( !std::is_constructible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+# if !( defined( __NVCC__ ) && gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 800, 900 ) ) // oddly specific bug workaround
     static_assert( !std::is_assignable<    MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+# endif
 
     // Permit construction and assignment from subclass pointer.
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
@@ -219,7 +221,7 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 # endif
 
-    // Do not conversion to subclass pointer.
+    // Do not permit conversion to subclass pointer.
     static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
     static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
