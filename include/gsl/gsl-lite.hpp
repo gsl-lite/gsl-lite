@@ -44,7 +44,7 @@
 
 #ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
-# pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+# pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
@@ -68,15 +68,15 @@
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
-# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
+# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
-# define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES  1
+# define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
-# define gsl_CONFIG_CONTRACT_LEVEL_OFF  1
+# define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 
 // Configuration: Features
@@ -153,7 +153,7 @@
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
-# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)
+# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
@@ -2480,7 +2480,7 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 // Tag to select span constructor taking a container:
 
 struct with_container_t { gsl_constexpr with_container_t() gsl_noexcept {} };
-const  gsl_constexpr   with_container_t with_container;
+const  gsl_constexpr   with_container_t with_container; // TODO: this can lead to ODR violations because the symbol will be defined in multiple translation units
 
 #endif
 
