@@ -92,7 +92,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [9]
+      cxxCompilerVersions: [7, 8]
       cudaCompiler: NVCC
       cudaCompilerVersion: 10_2
       platforms: [x64]
@@ -105,5 +105,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [8_1, 9, 9_1, 10, 10_0_1, 11]
+      cxxCompilerVersions: [9_1, 10, 10_0_1, 11]
       platforms: [x64]

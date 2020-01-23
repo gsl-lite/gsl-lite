@@ -151,12 +151,17 @@ matrix:
       compiler: clang
       env: COMPILER='clang++'
 
-    # Xcode 8.1 and newer are tested with Azure Pipelines
-    #- os: osx
-    #  osx_image: xcode9
-    #  compiler: clang
-    #  env: COMPILER='clang++'
-    #
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env: COMPILER='clang++'
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env: COMPILER='clang++'
+
+    # Xcode 9.4.1 and newer are tested with Azure Pipelines
     #- os: osx
     #  osx_image: xcode10
     #  compiler: clang

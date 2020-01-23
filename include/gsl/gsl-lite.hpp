@@ -1964,7 +1964,8 @@ public:
 # endif // gsl_HAVE( RVALUE_REFERENCE )
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_constexpr14 element_type* get() const
+    gsl_constexpr14 element_type *
+    get() const
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return data_.ptr_.get();
