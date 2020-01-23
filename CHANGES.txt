@@ -11,8 +11,8 @@ Additions:
 - Add support for user-defined contract violation handler `fail_fast_assert_handler()`
 - Add macros `gsl_NORETURN`, `gsl_NODISCARD`, `gsl_DEPRECATED()`, gsl_constexpr17`, `gsl_constexpr20`
 - Add C++11 polyfills in `gsl::std11`: `remove_reference<>`
-- Add C++17 polyfills in `gsl::std17`: `conjunction<>`, `disjunction<>`, `negation<>`, and `void_t`
-- Add C++20 polyfills in `gsl::std20`: `identity`, `type_identity<>`, `ssize()` and `remove_cvref<>` in `gsl::std20` (#144, #180)
+- Add C++17 polyfills in `gsl::std17`: `conjunction<>`, `disjunction<>`, `negation<>`, `void_t`
+- Add C++20 polyfills in `gsl::std20`: `identity`, `type_identity<>`, `ssize()` (#144, #180), `remove_cvref<>`
 - Add configuration macro `gsl_CONFIG_TRANSPARENT_NOT_NULL` (#185)
 - Add configuration macro `gsl_CONFIG_INDEX_TYPE` which controls the type of `gsl::index` independently of `gsl::span<>::index_type` (#169)
 - Add language feature macro `gsl_HAVE_EXCEPTIONS`

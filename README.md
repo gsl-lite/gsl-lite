@@ -12,7 +12,7 @@
  [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
 
 
-*gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) based on the [Microsoft GSL](https://github.com/microsoft/gsl).
+*gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) based on [Microsoft GSL](https://github.com/microsoft/gsl).
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -69,7 +69,7 @@ prompt>g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basi
 
 In a nutshell
 -------------
-**gsl-lite** is a single-file header-only implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on the [Microsoft GSL](https://github.com/microsoft/gsl) and adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20.
+**gsl-lite** is a single-file header-only implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl) and adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20.
 
 The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
 
@@ -267,13 +267,13 @@ This setup brings in more than you need, but also makes it easy to update *gsl-l
 Version semantics
 -----------------
 
-*gsl-lite* strives to follow [Semantic Versioning](https://semver.org/) guidelines. Although we are still in the "initial development" stage (version 0.*.*), we generally maintain
+*gsl-lite* strives to follow [Semantic Versioning](https://semver.org/) guidelines. Although we are still in the "initial development" stage (version 0\.*), we generally maintain
 [API](https://en.wikipedia.org/wiki/Application_programming_interface) and [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) compatibility and avoid breaking changes in minor and patch releases.
 
 Development of *gsl-lite* happens in the `master` branch. Versioning semantics apply only to tagged releases: there is no stability guarantee between individual commits in the `master` branch, i.e. anything
 added since the last tagged release may be renamed, removed, have the semantics changed, etc. without further notice.
 
-A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/martinmoene/gsl-lite/issues/156) while we're still in version 0.*.*).
+A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/martinmoene/gsl-lite/issues/156) while we're still in version 0.\*).
 Thus, once a change is released, it becomes part of the API.
 
 Some of the [configuration options](#configuration-options) affect the API and ABI of *gsl-lite*. Most configuration options exist because a change we wanted to make would have broken backward compatibility,
@@ -324,7 +324,7 @@ Our goal is to make *gsl-lite* suitable for use in libraries; we want to address
 - include the new header \<gsl-lite/gsl-lite.hpp\> rather than \<gsl/gsl-lite.hpp\>
 - refer to the new `namespace gsl_lite` instead of `namespace gsl` (or define a `namespace gsl = ::gsl_lite;` alias in your own namespace)
 - use the prefixed contract checking macros `gsl_Expects()`/`gsl_Ensures()` rather than the unprefixed `Expects()`/`Ensures()`  
-  (M-GSL prefixes its macros with uppercase `GSL_`; we traditionally consider lowercase `gsl_` the macro realm of *gsl-lite*)
+  (M-GSL prefixes its macros with uppercase `GSL_`; we traditionally consider lowercase `gsl_` the realm of *gsl-lite*)
 - avoid any changes to the configuration options
 
 
