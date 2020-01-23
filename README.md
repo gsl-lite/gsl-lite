@@ -12,7 +12,7 @@
  [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
 
 
-*gsl-lite* is based on the [Microsoft Guidelines Support Library (GSL)](https://github.com/microsoft/gsl). 
+*gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) based on the [Microsoft GSL](https://github.com/microsoft/gsl).
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -69,7 +69,7 @@ prompt>g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basi
 
 In a nutshell
 -------------
-**gsl-lite** is a single-file header-only variant of Microsoft's implementation of the [Guidelines Support Library (GSL)](https://github.com/Microsoft/GSL) adapted for C++98, C++03. It should also work when compiled as C++11, C++14, C++17, C++20.
+**gsl-lite** is a single-file header-only implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on the [Microsoft GSL](https://github.com/microsoft/gsl) and adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20.
 
 The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
 
@@ -93,9 +93,9 @@ Installation and use
 **Contents**  
 - [As copied header](#as-copied-header)
 - [As CMake package](#as-cmake-package)
+- [As Vcpkg package](#as-vcpkg-package)
 - [As Conan package](#as-conan-package)
 - [As Conda package](#as-conda-package)
-- [As Vcpkg package](#as-vcpkg-package)
 - [As external Git project](#as-external-git-project)
 
 ### As copied header
@@ -270,61 +270,63 @@ Version semantics
 *gsl-lite* strives to follow [Semantic Versioning](https://semver.org/) guidelines. Although we are still in the "initial development" stage (version 0.*.*), we generally maintain
 [API](https://en.wikipedia.org/wiki/Application_programming_interface) and [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) compatibility and avoid breaking changes in minor and patch releases.
 
-Development of *gsl-lite* happens in the `master` branch. Versioning semantics apply only to tagged releases: there is no stability guarantee in the `master` branch, i.e. anything added since the last tagged
-release may be renamed, removed, have the semantics changed, etc. without further notice.
+Development of *gsl-lite* happens in the `master` branch. Versioning semantics apply only to tagged releases: there is no stability guarantee between individual commits in the `master` branch, i.e. anything
+added since the last tagged release may be renamed, removed, have the semantics changed, etc. without further notice.
 
-A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with minor exceptions while we're still in version 0.*.*). Thus, once a change is released, it becomes
-part of the API.
+A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/martinmoene/gsl-lite/issues/156) while we're still in version 0.*.*).
+Thus, once a change is released, it becomes part of the API.
 
 Some of the [configuration options](#configuration-options) affect the API and ABI of *gsl-lite*. Most configuration options exist because a change we wanted to make would have broken backward compatibility,
-so many recent changes and improvements are currently opt-in. The current intent is to toggle the default values of these configuration options in the next major version release.
+so many recent changes and improvements are currently opt-in. The current plan is to toggle the default values of these configuration options for the next major version release.
 
-To simplify migration to the next major version, *gsl-lite* introduces the notion of *versioned defaults*. By setting the configuration option `gsl_CONFIG_DEFAULTS_VERSION=0` or `gsl_CONFIG_DEFAULTS_VERSION=1`,
+To simplify migration to the next major version, *gsl-lite* 0.36 introduces the notion of *versioned defaults*. By setting the configuration option `gsl_CONFIG_DEFAULTS_VERSION=0` or `gsl_CONFIG_DEFAULTS_VERSION=1`,
 a set of version-specific default options can be selected. Alternatively, when consuming *gsl-lite* [as a CMake package](#as-cmake-package), versioned defaults can be selected by linking to the target
 `gsl::gsl-lite-v0` or `gsl::gsl-lite-v1` rather than `gsl::gsl-lite`.
 
 The following table gives an overview of the configuration options affected by versioned defaults:
 
 
-Macro                                         | v0 default                                               | v1 default       | |
----------------------------------------------:|:---------------------------------------------------------|------------------|-|
-`gsl_FEATURE_OWNER_MACRO`                     | 1                                                        | 0                | an unprefixed macro `Owner()` may interfere with user code |
-`gsl_FEATURE_GSL_LITE_NAMESPACE`              | 0                                                        | 1                | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
-`gsl_CONFIG_DEPRECATE_TO_LEVEL`               | 0                                                        | 5                | |
-`gsl_CONFIG_INDEX_TYPE`                       | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t` | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
-`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`           | 0                                                        | 1                | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
-`gsl_CONFIG_TRANSPARENT_NOT_NULL`             | 0                                                        | 1                | enables conformant behavior for `not_null<>::get()` |
+Macro                                         | version-0 default                                        | version-1 default | |
+---------------------------------------------:|:---------------------------------------------------------|-------------------|-|
+`gsl_FEATURE_OWNER_MACRO`                     | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
+`gsl_FEATURE_GSL_LITE_NAMESPACE`              | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
+`gsl_CONFIG_DEPRECATE_TO_LEVEL`               | 0                                                        | 5                 | |
+`gsl_CONFIG_INDEX_TYPE`                       | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
+`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
+`gsl_CONFIG_TRANSPARENT_NOT_NULL`             | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
+
+Note that this table is not complete; version-1 default
 
 
 
 Using *gsl-lite* in libraries
 -----------------------------
 
-Many parts of *gsl-lite* are useful ingredients for defining library interfaces, e.g. spans, precondition checks, or `gsl::not_null<>` annotations. As such, we encourage using *gsl-lite* in your libraries.
-However, there are some considerations that you should be aware of when making your library depend on *gsl-lite*:
+Many features of *gsl-lite* are very useful for defining library interfaces, e.g. spans, precondition checks, or `gsl::not_null<>`. As such, we encourage using *gsl-lite* in your libraries.
+However, when using *gsl-lite* in your library, please mind the following considerations:
 
-1. *gsl-lite* is an implementation of the [Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl), which is not a library but a non-formal *specification*.
-   There are other libraries implementing the GSL, most notably the [Microsoft GSL](https://github.com/microsoft/GSL/) (herein referred to as "M-GSL"). Both libraries live in different headers and consist of
-   unrelated implementations. There is considerable API compatibility between M-GSL and *gsl-lite*, but because the GSL specification is rather loose and informal, and because both implementations take some
+-  *gsl-lite* is an implementation of the [Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl), which is not a library but a non-formal specification.
+   There are other libraries implementing the GSL, most notably the [Microsoft GSL](https://github.com/microsoft/GSL/) (herein often referred to as "M-GSL"). Both libraries live in different headers and consist
+   of unrelated implementations. There is considerable API compatibility between M-GSL and *gsl-lite*, but because the GSL specification is rather loose and informal, and because both implementations take some
    liberties at interpreting and extending the specification (cf. e.g. [#6](https://github.com/martinmoene/gsl-lite/issues/6), [#52](https://github.com/martinmoene/gsl-lite/issues/52),
    [#153](https://github.com/martinmoene/gsl-lite/issues/153)), some differences are unavoidable. Also, the ABIs of *gsl-lite* and M-GSL are generally incompatible.
 
-2. It is not clear whether the GSL specification envisions that multiple implementations of the specifications should coexist (cf. [CppCoreGuidelines/#1519](https://github.com/isocpp/CppCoreGuidelines/issues/1519)),
+-  It is not clear whether the GSL specification envisions that multiple implementations of the specification should coexist (cf. [CppCoreGuidelines/#1519](https://github.com/isocpp/CppCoreGuidelines/issues/1519)),
    but because all existing implementations currently live in the same `namespace gsl`, using more than one GSL implementation in the same target will usually fail with compile/link errors. This is clearly
    an impediment for using either in a library because the library would thereby force its consumers to pick the same GSL implementation.
 
-3. The API and ABI of *gsl-lite* can be altered by some of the [configuration options](#configuration-options). We consider the availability of configuration options a strength of *gsl-lite*, but the lack
+-  The API and ABI of *gsl-lite* can be altered by some of the [configuration options](#configuration-options). We consider the availability of these options a strength of *gsl-lite*, but the lack
    of an option-invariant API and ABI is another burden for libraries, which may or may not depend on a particular choice of configuration settings and implicitly force these upon their users.
 
-Our goal is to make *gsl-lite* suitable for use in libraries; we want to address all of these concerns in the next major version. But if you want to use *gsl-lite* in a library today, it is recommended that you
+Our goal is to make *gsl-lite* suitable for use in libraries; we want to address all of these concerns in the next major version. But if you want to use *gsl-lite* in a library today, we recommend to
 
 - use version-1 defaults (cf. [Version semantics](#version-semantics))
 - include the new header \<gsl-lite/gsl-lite.hpp\> rather than \<gsl/gsl-lite.hpp\>
-- refer to the dedicated `namespace gsl_lite` instead of the global `namespace gsl`
-- use the prefixed contract checking macros `gsl_Expects()`/`gsl_Ensures()` rather than the unprefixed `Expects()`/`Ensures()`
+- refer to the new `namespace gsl_lite` instead of `namespace gsl` (or define a `namespace gsl = ::gsl_lite;` alias in your own namespace)
+- use the prefixed contract checking macros `gsl_Expects()`/`gsl_Ensures()` rather than the unprefixed `Expects()`/`Ensures()`  
+  (M-GSL prefixes its macros with uppercase `GSL_`; we traditionally consider lowercase `gsl_` the macro realm of *gsl-lite*)
 - avoid any changes to the configuration options
 
-(Note that M-GSL prefixes its macros with uppercase `GSL_`; we consider lowercase `gsl_` the macro realm of *gsl-lite*.)
 
 Example:
 
@@ -337,9 +339,9 @@ target_link_libraries( FOO PUBLIC gsl::gsl-lite-v1 )
 ```
 
 ```c++
-// foo/include/foo/bar.hpp>
+// foo/include/foo/bar.hpp
 
-#include <gsl-lite/gsl-lite.hpp>
+#include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
 
 namespace foo {
 
@@ -372,7 +374,7 @@ Configuration options
 ### API macro
 
 #### `gsl_api`
-Functions in *gsl-lite* are decorated with `gsl_api` where appropriate. *At default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform.* Define this macro to specify your own function decoration. 
+Functions in *gsl-lite* are decorated with `gsl_api` where appropriate. **By default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform.** Define this macro to specify your own function decoration. 
 
 ### Standard selection macro
 
@@ -382,25 +384,25 @@ Define this macro to override the auto-detection of the supported C++ standard i
 ### Feature selection macros
 
 #### `gsl_FEATURE_WITH_CONTAINER_TO_STD=99`
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`. *Default is 99 for inclusion with any standard.*
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`. **Default is 99 for inclusion with any standard.**
 
 #### `gsl_FEATURE_MAKE_SPAN_TO_STD=99`
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` creator functions. *Default is 99 for inclusion with any standard.*
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` creator functions. **Default is 99 for inclusion with any standard.**
 
 #### `gsl_FEATURE_BYTE_SPAN_TO_STD=99`
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. *Default is 99 for inclusion with any standard.*
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions. **Default is 99 for inclusion with any standard.**
 
 #### `gsl_FEATURE_IMPLICIT_MACRO=0`
-Define this macro to 1 to provide the `implicit` macro. *Default is 0.*
+Define this macro to 1 to provide the `implicit` macro. **Default is 0.**
 
 #### `gsl_FEATURE_OWNER_MACRO=1`
-At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. *Default is 1.*
+At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. **Default is 1.**
 
 #### `gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=0`
-Provide experimental types `final_action_return` and `final_action_error` and convenience functions `on_return()` and `on_error()`. *Default is 0.*
+Provide experimental types `final_action_return` and `final_action_error` and convenience functions `on_return()` and `on_error()`. **Default is 0.**
 
 #### `gsl_FEATURE_GSL_LITE_NAMESPACE=0`
-Define this to additionally define a `namespace gsl_lite` with most of the *gsl-lite* API available, cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries). *Default is 0.*
+Define this to additionally define a `namespace gsl_lite` with most of the *gsl-lite* API available, cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries). **Default is 0.**
 
 
 ### Contract violation response macros
@@ -423,7 +425,7 @@ The following macros control whether contracts are checked at runtime:
 Define this macro to have all contracts checked at runtime.
 
 #### `gsl_CONFIG_CONTRACT_CHECKING_ON` (default)
-Define this macro to have contracts expressed with `gsl_Expects()` and `gsl_Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. *This is the default.*
+Define this macro to have contracts expressed with `gsl_Expects()` and `gsl_Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. **This is the default.**
  
 #### `gsl_CONFIG_CONTRACT_CHECKING_OFF`
 Define this macro to disable all runtime checking of contracts.
@@ -441,7 +443,7 @@ Define this macro to disable runtime checking of precondition contracts expresse
 The following macros control the handling of runtime contract violations:
 
 #### `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)
-Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, and `narrow`. *This is the default.*
+Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, and `narrow`. **This is the default.**
 
 #### `gsl_CONFIG_CONTRACT_VIOLATION_THROWS`
 Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `gsl::narrow<>()`.
@@ -461,7 +463,7 @@ namespace gsl {
 The following macros control what happens with contract checks not enforced at runtime:
  
 #### `gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)
-Define this macro to disable all runtime checking and evaluation of contracts. *This is the default.*
+Define this macro to disable all runtime checking and evaluation of contracts. **This is the default.**
 
 #### `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`
 Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()` and `gsl_Ensures()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
@@ -518,33 +520,33 @@ Equivalent to defining `gsl_CONFIG_CONTRACT_VIOLATION_THROWS`.
 ### Other configuration macros
 
 #### `gsl_CONFIG_DEPRECATE_TO_LEVEL=0`
-Define this to and including the level you want deprecation; see table [Deprecation](#deprecation) below. *Default is 0 for no deprecation.*
+Define this to and including the level you want deprecation; see table [Deprecation](#deprecation) below. **Default is 0 for no deprecation.**
 
 #### `gsl_CONFIG_SPAN_INDEX_TYPE=std::size_t`
-Define this macro to the type to use for indices in `span<>` and `basic_string_span<>`. Microsoft GSL uses `std::ptrdiff_t`. *Default for *gsl-lite* is `std::size_t`.*
+Define this macro to the type to use for indices in `span<>` and `basic_string_span<>`. Microsoft GSL uses `std::ptrdiff_t`. **Default for *gsl-lite* is `std::size_t`.**
 
 #### `gsl_CONFIG_INDEX_TYPE=gsl_CONFIG_SPAN_INDEX_TYPE`
-Define this macro to the type to use for `gsl::index`. Microsoft's GSL uses `std::ptrdiff_t`. *Default for *gsl-lite* is `std::size_t`.*
+Define this macro to the type to use for `gsl::index`. Microsoft's GSL uses `std::ptrdiff_t`. **Default for *gsl-lite* is `std::size_t`.**
 
 #### `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=0`
-Define this macro to 1 to make `not_null<>`'s constructor explicit. *Default is 0.* Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl-lite*-specific `not_null<>`-derived class `not_null_ic<>`.
+Define this macro to 1 to make `not_null<>`'s constructor explicit. **Default is 0.** Note that in Microsoft's GSL the constructor is explicit. For implicit construction you can also use the *gsl-lite*-specific `not_null<>`-derived class `not_null_ic<>`.
 
 #### `gsl_CONFIG_TRANSPARENT_NOT_NULL=0`
-Define this macro to 1 to have `not_null<>` support typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. *Default is 0.*
+Define this macro to 1 to have `not_null<>` support typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. **Default is 0.**
 
 #### `gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=0`
-Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. *Default is 0 for `T`.*
+Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. **Default is 0 for `T`.**
 
 #### `gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=1`
-Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. *Default is 1.*
+Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. **Default is 1.**
 
 #### `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=0`
-Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. *Default is 0.*
+Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. **Default is 0.**
 
 Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl::with_container, cont)`.
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
-Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. *Default is 0.*
+Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. **Default is 0.**
 
 
 
@@ -750,16 +752,16 @@ Appendix
 --------
 
 **Contents**  
-- [A.1 Compile-time information](#a2)
-- [A.2 *gsl-lite* test specification](#a3)
+- [A.1 Compile-time information](#a1)
+- [A.2 *gsl-lite* test specification](#a2)
 
-<a id="a2"></a>
-### A.2 Compile-time information
+<a id="a1"></a>
+### A.1 Compile-time information
 
 In the test runner , the version of *gsl-lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
 
-<a id="a3"></a>
-### A.3 *gsl-lite* test specification
+<a id="a2"></a>
+### A.2 *gsl-lite* test specification
 
 ```
 Expects(): Allows a true expression
