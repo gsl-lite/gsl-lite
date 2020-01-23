@@ -31,8 +31,8 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  35
-#define  gsl_lite_PATCH  6
+#define  gsl_lite_MINOR  36
+#define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
