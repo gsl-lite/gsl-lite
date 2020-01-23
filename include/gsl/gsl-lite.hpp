@@ -105,6 +105,10 @@
 # define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0
 #endif
 
+#ifndef  gsl_FEATURE_GSL_LITE_NAMESPACE
+# define gsl_FEATURE_GSL_LITE_NAMESPACE  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
+#endif
+
 // Configuration: Other
 
 #if defined( gsl_CONFIG_TRANSPARENT_NOT_NULL ) && gsl_CONFIG_TRANSPARENT_NOT_NULL && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
@@ -3932,7 +3936,7 @@ public:
 
 #endif
 
-#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#if gsl_FEATURE_GSL_LITE_NAMESPACE
 
 // gsl_lite namespace:
 
@@ -4040,7 +4044,7 @@ using ::gsl::cwzstring_span;
 
 } // namespace gsl_lite
 
-#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
+#endif // gsl_FEATURE_GSL_LITE_NAMESPACE
 
 gsl_RESTORE_MSVC_WARNINGS()
 
