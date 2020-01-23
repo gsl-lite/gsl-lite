@@ -3142,7 +3142,7 @@ make_span( Ptr & ptr )
 #endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
 
 template< class Ptr >
-gsl_api inline span<typename Ptr::element_type>
+inline span<typename Ptr::element_type>
 make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
 {
     return span<typename Ptr::element_type>( ptr, count );
