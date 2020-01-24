@@ -4,6 +4,8 @@ version 0.36.0 2020-01-23
 
 gsl-lite is now mostly maintained by @mbeutel (#175).
 
+The repository now moved to a dedicated GitHub organization: https://github.com/gsl-lite/gsl-lite
+
 Additions:
 - Describe versioning semantics in Readme
 - Add audit-level contract checks `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` (#172)

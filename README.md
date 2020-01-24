@@ -2,14 +2,14 @@
 
 [![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
- [![Build Status](https://travis-ci.org/martinmoene/gsl-lite.svg?branch=master)](https://travis-ci.org/martinmoene/gsl-lite)
- [![Build status](https://ci.appveyor.com/api/projects/status/1ha3wnxtam547m8p?svg=true)](https://ci.appveyor.com/project/martinmoene/gsl-lite)
- [![Build Status](https://dev.azure.com/martinmoene/gsl-lite/_apis/build/status/martinmoene.gsl-lite?branchName=master)](https://dev.azure.com/martinmoene/gsl-lite/_build/latest?definitionId=1&branchName=master)
- [![Version](https://badge.fury.io/gh/martinmoene%2Fgsl-lite.svg)](https://github.com/martinmoene/gsl-lite/releases)
- [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/gsl-lite/master/include/gsl/gsl-lite.hpp)
- [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/martinmoene/nonstd-lite/gsl-lite%3Anonstd-lite/_latestVersion)
+ [![Build Status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite)
+ [![Build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)
+ [![Build Status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master)
+ [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases)
+ [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)
+ [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/conan/conan-center/gsl-lite%3A_/_latestVersion)
  [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/fKCm0ERwPgFTH72I)
- [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/g/iEAxnY)
+ [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c)
 
 
 *gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) based on [Microsoft GSL](https://github.com/microsoft/gsl).
@@ -172,18 +172,18 @@ Now *gsl-lite* can be consumed [as a CMake package](#as-cmake-package).
 
 For the [conan package manager](https://www.conan.io/), follow these steps:
 
-1. Add *nonstd-lite* to the conan remotes:
+1. Add Conan Center to the conan remotes:
 
-        conan remote add nonstd-lite https://api.bintray.com/conan/martinmoene/nonstd-lite
+        conan remote add center https://api.bintray.com/conan/conan/conan-center
 
-2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
+2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file (TODO):
 
         [requires]
-        gsl-lite/0.36.0@nonstd-lite/stable
+        gsl-lite/0.36.0@center/stable
 
 3. Run conan's install command:
 
-        conan install
+        conan install gsl-lite
 
 ### As Conda package
 
@@ -218,7 +218,7 @@ project( use-gsl-lite LANGUAGES CXX )
 
 # Set default ExternalProject root directory and add gsl-lite:
 
-set( GSL_LITE_URL https://github.com/martinmoene/gsl-lite.git )
+set( GSL_LITE_URL https://github.com/gsl-lite/gsl-lite.git )
 
 include( ExternalProject )
 find_package( Git REQUIRED )
@@ -236,7 +236,7 @@ ExternalProject_Add(
     LOG_DOWNLOAD ON
    )
 
-# Provide #include access to gsl-lite as 'gsl/gsl' and as 'gsl/gsl-lite.hpp': 
+# Provide #include access to gsl-lite as <gsl/gsl-lite.hpp>: 
 
 ExternalProject_Get_Property( gsl-extern SOURCE_DIR )
 set( GSL_LITE_INCLUDE_DIR ${SOURCE_DIR}/include CACHE INTERNAL "Include folder for gsl-lite" )
@@ -258,7 +258,7 @@ project( program-using-gsl-lite LANGUAGES CXX )
 # Make program executable:
 
 add_executable( program main.cpp )
-target_link_libraries( program PRIVATE gsl )
+target_link_libraries( program PRIVATE gsl::gsl-lite )
 ```
 
 This setup brings in more than you need, but also makes it easy to update *gsl-lite* to the latest version.  See [example/cmake-extern](example/cmake-extern) for a complete example.
@@ -273,7 +273,7 @@ Version semantics
 Development of *gsl-lite* happens in the `master` branch. Versioning semantics apply only to tagged releases: there is no stability guarantee between individual commits in the `master` branch, i.e. anything
 added since the last tagged release may be renamed, removed, have the semantics changed, etc. without further notice.
 
-A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/martinmoene/gsl-lite/issues/156) while we're still in version 0.\*).
+A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/gsl-lite/gsl-lite/issues/156) while we're still in version 0.\*).
 Thus, once a change is released, it becomes part of the API.
 
 Some of the [configuration options](#configuration-options) affect the API and ABI of *gsl-lite*. Most configuration options exist because a change we wanted to make would have broken backward compatibility,
@@ -308,8 +308,8 @@ However, when using *gsl-lite* in your library, please mind the following consid
 -  *gsl-lite* is an implementation of the [Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl), which is not a library but a non-formal specification.
    There are other libraries implementing the GSL, most notably the [Microsoft GSL](https://github.com/microsoft/GSL/) (herein often referred to as "M-GSL"). Both libraries live in different headers and consist
    of unrelated implementations. There is considerable API compatibility between M-GSL and *gsl-lite*, but because the GSL specification is rather loose and informal, and because both implementations take some
-   liberties at interpreting and extending the specification (cf. e.g. [#6](https://github.com/martinmoene/gsl-lite/issues/6), [#52](https://github.com/martinmoene/gsl-lite/issues/52),
-   [#153](https://github.com/martinmoene/gsl-lite/issues/153)), some differences are unavoidable. Also, the ABIs of *gsl-lite* and M-GSL are generally incompatible.
+   liberties at interpreting and extending the specification (cf. e.g. [#6](https://github.com/gsl-lite/gsl-lite/issues/6), [#52](https://github.com/gsl-lite/gsl-lite/issues/52),
+   [#153](https://github.com/gsl-lite/gsl-lite/issues/153)), some differences are unavoidable. Also, the ABIs of *gsl-lite* and M-GSL are generally incompatible.
 
 -  It is not clear whether the GSL specification envisions that multiple implementations of the specification should coexist (cf. [CppCoreGuidelines/#1519](https://github.com/isocpp/CppCoreGuidelines/issues/1519)),
    but because all existing implementations currently live in the same `namespace gsl`, using more than one GSL implementation in the same target will usually fail with compile/link errors. This is clearly
@@ -665,15 +665,15 @@ The table below mentions the compiler versions and platforms *gsl-lite* is repor
 
 Compiler             | OS              | Platforms | Versions          | CI |
 --------------------:|:----------------|-----------|------------------:|----|
-GCC                  | Linux           | x64       | 4.7 and newer     | [4.7 through 4.9](https://travis-ci.org/martinmoene/gsl-lite/), [5 through 9](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
+GCC                  | Linux           | x64       | 4.7 and newer     | [4.7 through 4.9](https://travis-ci.com/gsl-lite/gsl-lite/), [5 through 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
-GCC                  | MacOS           | x64       | 6 and newer       | [6 through 9](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [3.5 through 3.9](https://travis-ci.org/martinmoene/gsl-lite/), [4 through 9](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
-Clang                | Windows         | x64       | 9 and newer       | [9](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
-MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015](https://ci.appveyor.com/project/martinmoene/gsl-lite), [2017, 2019](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
-AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9](https://travis-ci.org/martinmoene/gsl-lite/), [9.1, 10, 10.0.1, 11](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
-NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [10.2](https://dev.azure.com/martinmoene/gsl-lite/_build?definitionId=1) |
+GCC                  | MacOS           | x64       | 6 and newer       | [6 through 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [3.5 through 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4 through 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Windows         | x64       | 9 and newer       | [9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2017, 2019](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9](https://travis-ci.com/gsl-lite/gsl-lite/), [9.1, 10, 10.0.1, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [10.2](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 
 
 Building the tests
@@ -685,12 +685,12 @@ To build the tests:
 
 The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
  
-The following steps assume that the [*gsl-lite* source code](https://github.com/martinmoene/gsl-lite) has been cloned into a directory named `c:\gsl-lite`.
+The following steps assume that the [*gsl-lite* source code](https://github.com/gsl-lite/gsl-lite) has been cloned into a directory named `C:\gsl-lite`.
 
 1. Create a directory for the build outputs for a particular architecture.  
-Here we use c:\gsl-lite\build-win-x86-vc10.
+Here we use C:\\gsl-lite\\build-win-x86-vc10.
 
-        cd c:\gsl-lite
+        cd C:\gsl-lite
         md build-win-x86-vc10
         cd build-win-x86-vc10
 
