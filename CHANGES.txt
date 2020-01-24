@@ -1,7 +1,7 @@
 Changes in gsl-lite
 ===================
 
-version 0.36.0 2020-01-23
+version 0.36.0 2020-01-24
 
 The repository now moved to a dedicated GitHub organization: https://github.com/gsl-lite/gsl-lite
 
