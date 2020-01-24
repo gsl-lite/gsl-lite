@@ -286,7 +286,7 @@ a set of version-specific default options can be selected. Alternatively, when c
 The following table gives an overview of the configuration options affected by versioned defaults:
 
 
-Macro                                         | version-0 default                                        | version-1 default | |
+Macro                                         | v0 default                                               | v1 default        | |
 ---------------------------------------------:|:---------------------------------------------------------|-------------------|-|
 `gsl_FEATURE_OWNER_MACRO`                     | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
 `gsl_FEATURE_GSL_LITE_NAMESPACE`              | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
@@ -295,7 +295,7 @@ Macro                                         | version-0 default               
 `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
 `gsl_CONFIG_TRANSPARENT_NOT_NULL`             | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
 
-Note that this table is not complete; version-1 default
+Note that the v1 defaults are not stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
 
 
 
@@ -303,13 +303,13 @@ Using *gsl-lite* in libraries
 -----------------------------
 
 Many features of *gsl-lite* are very useful for defining library interfaces, e.g. spans, precondition checks, or `gsl::not_null<>`. As such, we encourage using *gsl-lite* in your libraries.
-However, when using *gsl-lite* in your library, please mind the following considerations:
+However, please mind the following considerations:
 
 -  *gsl-lite* is an implementation of the [Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl), which is not a library but a non-formal specification.
    There are other libraries implementing the GSL, most notably the [Microsoft GSL](https://github.com/microsoft/GSL/) (herein often referred to as "M-GSL"). Both libraries live in different headers and consist
-   of unrelated implementations. There is considerable API compatibility between M-GSL and *gsl-lite*, but because the GSL specification is rather loose and informal, and because both implementations take some
-   liberties at interpreting and extending the specification (cf. e.g. [#6](https://github.com/gsl-lite/gsl-lite/issues/6), [#52](https://github.com/gsl-lite/gsl-lite/issues/52),
-   [#153](https://github.com/gsl-lite/gsl-lite/issues/153)), some differences are unavoidable. Also, the ABIs of *gsl-lite* and M-GSL are generally incompatible.
+   of unrelated implementations. There is considerable API compatibility between M-GSL and *gsl-lite*, but some differences are inevitable because the GSL specification is rather loose and informal, and because
+   both implementations take some liberties at interpreting and extending the specification (cf. e.g. [#6](https://github.com/gsl-lite/gsl-lite/issues/6), [#52](https://github.com/gsl-lite/gsl-lite/issues/52),
+   [#153](https://github.com/gsl-lite/gsl-lite/issues/153)). Also, the ABIs of *gsl-lite* and M-GSL are generally incompatible.
 
 -  It is not clear whether the GSL specification envisions that multiple implementations of the specification should coexist (cf. [CppCoreGuidelines/#1519](https://github.com/isocpp/CppCoreGuidelines/issues/1519)),
    but because all existing implementations currently live in the same `namespace gsl`, using more than one GSL implementation in the same target will usually fail with compile/link errors. This is clearly
