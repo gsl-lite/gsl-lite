@@ -3235,8 +3235,8 @@ public:
 #endif
 
 #if gsl_HAVE( NULLPTR )
-    gsl_api gsl_constexpr basic_string_span( std::nullptr_t ptr ) gsl_noexcept
-    : span_( ptr, static_cast<index_type>( 0 ) )
+    gsl_api gsl_constexpr basic_string_span( std::nullptr_t ) gsl_noexcept
+    : span_( nullptr, static_cast<index_type>( 0 ) )
     {}
 #endif
 

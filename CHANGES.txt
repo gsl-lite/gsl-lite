@@ -1,10 +1,11 @@
-Changes for GSL Lite � Guidelines Support Library for C++98/03 and later
+Changes in gsl-lite
+===================
 
 version 0.36.0 2020-01-23
 
-gsl-lite is now mostly maintained by @mbeutel (#175).
-
 The repository now moved to a dedicated GitHub organization: https://github.com/gsl-lite/gsl-lite
+
+gsl-lite is now mostly maintained by @mbeutel (#175).
 
 Additions:
 - Describe versioning semantics in Readme
