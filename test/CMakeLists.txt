@@ -30,12 +30,6 @@ set( SOURCES
     string_span.t.cpp
     util.t.cpp
 )
-
-set( ALTERNATE_CONFIG_SOURCES
-    gsl-lite.t.cpp
-    not_null.t.cpp
-    # TODO: add more
-)
 # Configure gsl-lite for testing:
 
 set( GSL_CONFIG
@@ -191,42 +185,42 @@ enable_testing()
 
 if( NOT HAS_STD_FLAGS )
     make_test_target( ${PROGRAM}.t        "" "${SOURCES}" v0 )
-    make_test_target( ${PROGRAM}-altcfg.t "" "${ALTERNATE_CONFIG_SOURCES}" v1 )
+    make_test_target( ${PROGRAM}-altcfg.t "" "${SOURCES}" v1 )
 else()
     if( MSVC )
         # MSVC 2015 and later support /std:c++14 but ignore it because they are in C++14 mode by default, so we won't bother.
         make_test_target( ${PROGRAM}-base.t        "" "${SOURCES}" v0 )
-        make_test_target( ${PROGRAM}-altcfg-base.t "" "${ALTERNATE_CONFIG_SOURCES}" v1 )
+        make_test_target( ${PROGRAM}-altcfg-base.t "" "${SOURCES}" v1 )
     else()
         if( HAS_CPP98_FLAG )
             make_test_target( ${PROGRAM}-cpp98.t        98 "${SOURCES}" v0 )
-            make_test_target( ${PROGRAM}-altcfg-cpp98.t 98 "${ALTERNATE_CONFIG_SOURCES}" v1 )
+            make_test_target( ${PROGRAM}-altcfg-cpp98.t 98 "${SOURCES}" v1 )
         else()
             make_test_target( ${PROGRAM}-cpp98.t        "" "${SOURCES}" v0 )
-            make_test_target( ${PROGRAM}-altcfg-cpp98.t "" "${ALTERNATE_CONFIG_SOURCES}" v1 )
+            make_test_target( ${PROGRAM}-altcfg-cpp98.t "" "${SOURCES}" v1 )
         endif()
 
         if( HAS_CPP11_FLAG )
             make_test_target( ${PROGRAM}-cpp11.t        11 "${SOURCES}" v0 )
-            make_test_target( ${PROGRAM}-altcfg-cpp11.t 11 "${ALTERNATE_CONFIG_SOURCES}" v1 )
+            make_test_target( ${PROGRAM}-altcfg-cpp11.t 11 "${SOURCES}" v1 )
         endif()
 
         if( HAS_CPP14_FLAG )
             make_test_target( ${PROGRAM}-cpp14.t        14 "${SOURCES}" v0 )
-            make_test_target( ${PROGRAM}-altcfg-cpp14.t 14 "${ALTERNATE_CONFIG_SOURCES}" v1 )
+            make_test_target( ${PROGRAM}-altcfg-cpp14.t 14 "${SOURCES}" v1 )
         endif()
     endif()
 
     if( HAS_CPP17_FLAG )
         make_test_target( ${PROGRAM}-cpp17.t            17 "${SOURCES}" v0 )
         enable_msvs_guideline_checker( ${PROGRAM}-cpp17.t )
-        make_test_target( ${PROGRAM}-altcfg-cpp17.t     17 "${ALTERNATE_CONFIG_SOURCES}" v1 )
+        make_test_target( ${PROGRAM}-altcfg-cpp17.t     17 "${SOURCES}" v1 )
         enable_msvs_guideline_checker( ${PROGRAM}-altcfg-cpp17.t )
     endif()
 
     if( HAS_CPPLATEST_FLAG )
         make_test_target( ${PROGRAM}-cpplatest.t        latest "${SOURCES}" v0 )
-        make_test_target( ${PROGRAM}-altcfg-cpplatest.t latest "${ALTERNATE_CONFIG_SOURCES}" v1 )
+        make_test_target( ${PROGRAM}-altcfg-cpplatest.t latest "${SOURCES}" v1 )
     endif()
 endif()
 

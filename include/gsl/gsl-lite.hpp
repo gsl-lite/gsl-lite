@@ -1,6 +1,6 @@
 //
 // gsl-lite is based on GSL: Guidelines Support Library.
-// For more information see https://github.com/martinmoene/gsl-lite
+// For more information see https://github.com/gsl-lite/gsl-lite
 //
 // Copyright (c) 2015-2018 Martin Moene
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
@@ -31,8 +31,8 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  35
-#define  gsl_lite_PATCH  6
+#define  gsl_lite_MINOR  36
+#define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -44,7 +44,7 @@
 
 #ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
-# pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7.0; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+# pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
@@ -68,15 +68,15 @@
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
-# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS  1
+# define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
-# define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES  1
+# define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
-# define gsl_CONFIG_CONTRACT_LEVEL_OFF  1
+# define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 
 // Configuration: Features
@@ -103,6 +103,10 @@
 
 #ifndef  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 # define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0
+#endif
+
+#ifndef  gsl_FEATURE_GSL_LITE_NAMESPACE
+# define gsl_FEATURE_GSL_LITE_NAMESPACE  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
 #endif
 
 // Configuration: Other
@@ -149,7 +153,7 @@
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
-# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)
+# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
@@ -2476,7 +2480,7 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 // Tag to select span constructor taking a container:
 
 struct with_container_t { gsl_constexpr with_container_t() gsl_noexcept {} };
-const  gsl_constexpr   with_container_t with_container;
+const  gsl_constexpr   with_container_t with_container; // TODO: this can lead to ODR violations because the symbol will be defined in multiple translation units
 
 #endif
 
@@ -3142,7 +3146,7 @@ make_span( Ptr & ptr )
 #endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
 
 template< class Ptr >
-gsl_api inline span<typename Ptr::element_type>
+inline span<typename Ptr::element_type>
 make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
 {
     return span<typename Ptr::element_type>( ptr, count );
@@ -3231,8 +3235,8 @@ public:
 #endif
 
 #if gsl_HAVE( NULLPTR )
-    gsl_api gsl_constexpr basic_string_span( std::nullptr_t ptr ) gsl_noexcept
-    : span_( ptr, static_cast<index_type>( 0 ) )
+    gsl_api gsl_constexpr basic_string_span( std::nullptr_t ) gsl_noexcept
+    : span_( nullptr, static_cast<index_type>( 0 ) )
     {}
 #endif
 
@@ -3932,7 +3936,7 @@ public:
 
 #endif
 
-#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#if gsl_FEATURE_GSL_LITE_NAMESPACE
 
 // gsl_lite namespace:
 
@@ -4040,7 +4044,7 @@ using ::gsl::cwzstring_span;
 
 } // namespace gsl_lite
 
-#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
+#endif // gsl_FEATURE_GSL_LITE_NAMESPACE
 
 gsl_RESTORE_MSVC_WARNINGS()
 

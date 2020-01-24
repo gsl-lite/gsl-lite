@@ -26,7 +26,7 @@ platform:
     - x64
 
 matrix:
-    fast_finish: true
+    fast_finish: false
     #exclude:
     #    - image:      Visual Studio 2015
     #      generator: "Visual Studio 16 2019"

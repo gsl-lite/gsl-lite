@@ -1,4 +1,52 @@
-Changes for GSL Lite � Guidelines Support Library for C++98/03 and later
+Changes in gsl-lite
+===================
+
+version 0.36.0 2020-01-23
+
+The repository now moved to a dedicated GitHub organization: https://github.com/gsl-lite/gsl-lite
+
+gsl-lite is now mostly maintained by @mbeutel (#175).
+
+Additions:
+- Describe versioning semantics in Readme
+- Add audit-level contract checks `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` (#172)
+- Add `basic_zstring_span<>` and `zstring_span` (#136, #154, thanks to @chan-lee)
+- Add support for user-defined contract violation handler `fail_fast_assert_handler()`
+- Add macros `gsl_NORETURN`, `gsl_NODISCARD`, `gsl_DEPRECATED()`, gsl_constexpr17`, `gsl_constexpr20`
+- Add C++11 polyfills in `gsl::std11`: `remove_reference<>`
+- Add C++17 polyfills in `gsl::std17`: `conjunction<>`, `disjunction<>`, `negation<>`, `void_t`
+- Add C++20 polyfills in `gsl::std20`: `identity`, `type_identity<>`, `ssize()` (#144, #180), `remove_cvref<>`
+- Add configuration macro `gsl_CONFIG_TRANSPARENT_NOT_NULL` (#185)
+- Add configuration macro `gsl_CONFIG_INDEX_TYPE` which controls the type of `gsl::index` independently of `gsl::span<>::index_type` (#169)
+- Add language feature macro `gsl_HAVE_EXCEPTIONS`
+- Add macros `gsl_DEFINE_ENUM_BITMASK_OPERATORS()` and `gsl_DEFINE_ENUM_RELATIONAL_OPERATORS()`
+- Add header <gsl-lite/gsl-lite.hpp> and namespace `gsl_lite` to pave the way for future coexistence with M-GSL (#221, #222)
+- Add Continuous Integration for more versions of GCC (4.7 through 9), Clang (3.5 through 9), AppleClang (7.3 through 11), and MSVC (2010 through 2019)
+- Run tests with AddressSanitizer and UndefinedBehaviorSanitizer in CI (GCC 9, Clang 9)
+- Add Continuous Integration for NVCC 10.2 (with GCC 7, 8 on Linux, MSVC 2019 on Windows) to test CUDA support
+
+Changes:
+- `not_null<>` now fully supports smart pointers (#184, #197, huge thanks to @petamas)
+- Restructure contract checking configuration macros such that checking policy (off, on, audit), violation handling (throws, terminates, calls handler) and unenforced contract handling (assume, elide) can be configured independently (cf. https://github.com/martinmoene/gsl-lite/#contract-violation-response-macros)
+- `gsl_noexcept` no longer depends on contract violation settings (cf. https://github.com/martinmoene/gsl-lite/commit/0c296a9c986ac070997610fc7cf86e9c517558bf)
+- `gsl_FEATURE_IMPLICIT_MACRO` now defaults to 0 (#156, thanks to @tadeu)
+- AppleClang is now considered a separate compiler (use `gsl_COMPILER_APPLECLANG_VERSION` for checking)
+- CMake installs arch-independent by default
+- CMake doesn't install M-GSL compatibility headers by default
+- gsl-lite now compiles warning-free with MSVC at warning level 4
+- Many small improvements (thanks to @AraHaan, @codecircuit, @elnull, @ilyalesokhin-starkware, @ngrodzitski, @petamas, @stohrendorf, @theodelrieu)
+
+
+version 0.34.0 2019-03-21
+
+Additions:
+- Add macro gsl_REQUIRES_T() (nonstd lite issue 18)
+
+Changes
+- Change the CMake package folder name to gsl-lite (it was gsl)
+- Add a usage description for the Conda package manager to the Readme.
+- Update lest test framework to v1.35.1.
+
 
 version 0.33.0 2019-03-08
 

@@ -1,3 +1,4 @@
+
 os: linux
 dist: trusty
 sudo: false
@@ -177,7 +178,7 @@ matrix:
     #  compiler: clang
     #  env: COMPILER='clang++'
 
-  fast_finish: true
+  fast_finish: false
 
 script:
   - export CXX=${COMPILER}
