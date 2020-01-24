@@ -1,15 +1,9 @@
 # *gsl-lite*: Guidelines Support Library for C++98, C++11 up
 
-[![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
- [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
- [![Build Status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite)
- [![Build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)
- [![Build Status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master)
- [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases)
- [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)
- [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/conan/conan-center/gsl-lite%3A_/_latestVersion)
- [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/fKCm0ERwPgFTH72I)
- [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c)
+| metadata   | [![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases) |
+| CI         | [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite) [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) |
+| packages   | [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://github.com/microsoft/vcpkg/tree/master/ports/gsl-lite) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/conan/conan-center/gsl-lite%3A_/_latestVersion) [![single header](https://img.shields.io/badge/latest-single header file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp) |
+| try online | [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/fKCm0ERwPgFTH72I) [![Try it on Compiler Explorer online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) |
 
 
 *gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) based on [Microsoft GSL](https://github.com/microsoft/gsl).
