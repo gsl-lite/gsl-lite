@@ -66,9 +66,6 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     )
     set( DEFINITIONS "" )
 
-elseif( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
-    # as is
-    message( STATUS "Matched: Intel")
 else()
     # as is
     message( STATUS "Matched: nothing")
