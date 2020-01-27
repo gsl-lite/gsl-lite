@@ -3,10 +3,10 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://github.com/microsoft/vcpkg/tree/master/ports/gsl-lite) <br> [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/conan/conan-center/gsl-lite%3A_/_latestVersion) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/fKCm0ERwPgFTH72I)   |
+| [![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://github.com/microsoft/vcpkg/tree/master/ports/gsl-lite) <br> [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/conan/conan-center/gsl-lite%3A_/_latestVersion) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/p9YnfiUTOYEQx0QL)   |
 
 
-*gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) based on [Microsoft GSL](https://github.com/microsoft/gsl).
+*gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl).
 
 **Contents**  
 - [Example usage](#example-usage)
@@ -15,6 +15,7 @@
 - [Dependencies](#dependencies)
 - [Installation and use](#installation-and-use)
 - [Version semantics](#version-semantics)
+- [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
 - [Configuration options](#configuration-options)
 - [Features](#features)
 - [Deprecation](#deprecation)
@@ -325,19 +326,19 @@ Our goal is to make *gsl-lite* suitable for use in libraries; we want to address
 Example:
 
 ```cmake
-# foo/CMakeLists.txt
+# my-statistics-lib/CMakeLists.txt
 find_package( gsl-lite 0.36 REQUIRED )
 
-add_library( Foo STATIC foo.cpp )
-target_link_libraries( FOO PUBLIC gsl::gsl-lite-v1 )
+add_library( my-statistics-lib STATIC mean.cpp )
+target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )
 ```
 
 ```c++
-// foo/include/foo/bar.hpp
+// my-statistics-lib/include/my-statistics-lib/mean.hpp
 
 #include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
 
-namespace foo {
+namespace my_statistics_lib {
 
 namespace gsl = ::gsl_lite; // convenience alias
 
@@ -347,7 +348,7 @@ double mean( gsl::span< double const > elements )
     ...
 }
 
-} // namespace foo
+} // namespace my_statistics_lib
 ```
 
 The idea is that *gsl-lite* will move all its definitions to `namespace gsl_lite` in the next major version, and provide a `namespace gsl` with aliases only if the traditional header \<gsl/gsl-lite.hpp\> is
@@ -361,7 +362,7 @@ Configuration options
 - [API macro](#api-macro)
 - [Standard selection macro](#standard-selection-macro)
 - [Feature selection macros](#feature-selection-macros)
-- [Contract violation response macros](#contract-violation-response-macros)
+- [Contract checking configuration macros](#contract-checking-configuration-macros)
 - [Microsoft GSL compatibility macros](#microsoft-gsl-compatibility-macros)
 - [Other configuration macros](#other-configuration-macros)
 
@@ -399,7 +400,7 @@ Provide experimental types `final_action_return` and `final_action_error` and co
 Define this to additionally define a `namespace gsl_lite` with most of the *gsl-lite* API available, cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries). **Default is 0.**
 
 
-### Contract violation response macros
+### Contract checking configuration macros
 
 *gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
 
@@ -415,52 +416,51 @@ The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Exp
 
 The following macros control whether contracts are checked at runtime:
 
-#### `gsl_CONFIG_CONTRACT_CHECKING_AUDIT`
-Define this macro to have all contracts checked at runtime.
+- **`gsl_CONFIG_CONTRACT_CHECKING_AUDIT`**  
+  Define this macro to have all contracts checked at runtime.
 
-#### `gsl_CONFIG_CONTRACT_CHECKING_ON` (default)
-Define this macro to have contracts expressed with `gsl_Expects()` and `gsl_Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. **This is the default.**
+- **`gsl_CONFIG_CONTRACT_CHECKING_ON` (default)**  
+  Define this macro to have contracts expressed with `gsl_Expects()` and `gsl_Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. **This is the default.**
  
-#### `gsl_CONFIG_CONTRACT_CHECKING_OFF`
-Define this macro to disable all runtime checking of contracts.
+- **`gsl_CONFIG_CONTRACT_CHECKING_OFF`**  
+  Define this macro to disable all runtime checking of contracts.
 
 
 The following macros can be used to selectively disable checking for a particular kind of contract:
 
-#### `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`
-Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Expects()` and `gsl_ExpectsAudit()`.
+- **`gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`**  
+  Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Expects()` and `gsl_ExpectsAudit()`.
 
-#### `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`
-Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
+- **`gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`**  
+  Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
 
 
 The following macros control the handling of runtime contract violations:
 
-#### `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)
-Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, and `narrow`. **This is the default.**
+- **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)**  
+  Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, and `narrow`. **This is the default.**
 
-#### `gsl_CONFIG_CONTRACT_VIOLATION_THROWS`
-Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `gsl::narrow<>()`.
+- **`gsl_CONFIG_CONTRACT_VIOLATION_THROWS`**  
+  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `gsl::narrow<>()`.
 
-#### `gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`
-Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and call `std::terminate()` on discarding information in `gsl::narrow<>()`. The user must provide a definition of the following function:
+- **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
+  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and call `std::terminate()` on discarding information in `gsl::narrow<>()`. The user must provide a definition of the following function:
 
-```Cpp
-namespace gsl {
-	gsl_api void fail_fast_assert_handler(
-		char const * const expression, char const * const message,
-		char const * const file, int line );
-}
-```
-
+  ```c++
+  namespace gsl {
+      gsl_api void fail_fast_assert_handler(
+          char const * const expression, char const * const message,
+          char const * const file, int line );
+  }
+  ```
 
 The following macros control what happens with contract checks not enforced at runtime:
  
-#### `gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)
-Define this macro to disable all runtime checking and evaluation of contracts. **This is the default.**
+- **`gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)**  
+  Define this macro to disable all runtime checking and evaluation of contracts. **This is the default.**
 
-#### `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`
-Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()` and `gsl_Ensures()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
+- **`gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`**  
+  Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()` and `gsl_Ensures()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
 
 
 Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` is defined, the compiler is instructed that the
@@ -474,7 +474,7 @@ Therefore, `gsl_Expects()` and `gsl_Ensures()` should be used only for condition
 
 Example:
 
-```Cpp
+```c++
 template< class RandomIt >
 auto median( RandomIt first, RandomIt last )
 {

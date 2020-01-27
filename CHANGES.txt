@@ -12,9 +12,9 @@ Additions:
 - Add audit-level contract checks `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` (#172)
 - Add `basic_zstring_span<>` and `zstring_span` (#136, #154, thanks to @chan-lee)
 - Add support for user-defined contract violation handler `fail_fast_assert_handler()`
-- Add macros `gsl_NORETURN`, `gsl_NODISCARD`, `gsl_DEPRECATED()`, gsl_constexpr17`, `gsl_constexpr20`
+- Add macros `gsl_NORETURN`, `gsl_NODISCARD`, `gsl_DEPRECATED()`, `gsl_constexpr17`, `gsl_constexpr20`
 - Add C++11 polyfills in `gsl::std11`: `remove_reference<>`
-- Add C++17 polyfills in `gsl::std17`: `conjunction<>`, `disjunction<>`, `negation<>`, `void_t`
+- Add C++17 polyfills in `gsl::std17`: `conjunction<>`, `disjunction<>`, `negation<>`, `void_t<>`
 - Add C++20 polyfills in `gsl::std20`: `identity`, `type_identity<>`, `ssize()` (#144, #180), `remove_cvref<>`
 - Add configuration macro `gsl_CONFIG_TRANSPARENT_NOT_NULL` (#185)
 - Add configuration macro `gsl_CONFIG_INDEX_TYPE` which controls the type of `gsl::index` independently of `gsl::span<>::index_type` (#169)
@@ -26,7 +26,7 @@ Additions:
 - Add Continuous Integration for NVCC 10.2 (with GCC 7, 8 on Linux, MSVC 2019 on Windows) to test CUDA support
 
 Changes:
-- `not_null<>` now fully supports smart pointers (#184, #197, huge thanks to @petamas)
+- `not_null<>` now properly supports smart pointers (#184, #197, huge thanks to @petamas)
 - Restructure contract checking configuration macros such that checking policy (off, on, audit), violation handling (throws, terminates, calls handler) and unenforced contract handling (assume, elide) can be configured independently (cf. https://github.com/martinmoene/gsl-lite/#contract-violation-response-macros)
 - `gsl_noexcept` no longer depends on contract violation settings (cf. https://github.com/martinmoene/gsl-lite/commit/0c296a9c986ac070997610fc7cf86e9c517558bf)
 - `gsl_FEATURE_IMPLICIT_MACRO` now defaults to 0 (#156, thanks to @tadeu)
