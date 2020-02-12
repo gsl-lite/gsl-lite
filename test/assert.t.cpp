@@ -35,7 +35,7 @@ struct ConvertibleToBool
 };
 
 
-}
+} // anonymous namespace
 
 CASE( "gsl_Expects(): Allows a true expression" )
 {
@@ -87,7 +87,7 @@ CASE( "gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
 
 int testAssume( int i, std::vector<int> const& v )
 {
-    // The arguments to `__assume(x)` (MSVC) and `__builtin_assume(x)` (Clang) are never evaluated, so they cannot incur side-effects. We would like to implement
+    // The arguments to `__assume( x )` (MSVC) and `__builtin_assume( x )` (Clang) are never evaluated, so they cannot incur side-effects. We would like to implement
     // `gsl_ASSUME()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
     // `__attribute__ ((pure))` or `__attribute__ ((const))` is considered a potential side-effect (e.g. the call to `v.size()` below). In many cases Clang is capable
     // of inlining the expression and find it free of side-effects, cf. https://gcc.godbolt.org/z/ZcKfbp, but the warning is produced anyway.
@@ -103,6 +103,9 @@ void testConvertibleToBool()
 {
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     gsl_Expects( ConvertibleToBool() );
+
+    // `gsl_CONFIG_CONTRACT_CHECKING_OFF` should be compatible with explicit conversions to bool.
+    gsl_ELIDE_CONTRACT_( ConvertibleToBool() );
 
     if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }

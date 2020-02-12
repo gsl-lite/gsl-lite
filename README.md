@@ -40,12 +40,12 @@ int * use( gsl::not_null<int *> p )
 
 struct Widget
 {
-    Widget() : owned_ptr( new int(42) ) {}
-    ~Widget() { delete owned_ptr; }
+    Widget() : owned_ptr_( new int(42) ) {}
+    ~Widget() { delete owned_ptr_; }
 
-    void work() { non_owned_ptr_ = use( owned_ptr ); }
+    void work() { non_owned_ptr_ = use( owned_ptr_ ); }
     
-    owner<int *> owned_ptr_; // if alias template support
+    gsl::owner<int *> owned_ptr_; // if alias template support
     int * non_owned_ptr_;
 };
 
@@ -340,13 +340,13 @@ target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )
 
 namespace my_statistics_lib {
 
-namespace gsl = ::gsl_lite; // convenience alias
+    namespace gsl = ::gsl_lite; // convenience alias
 
-double mean( gsl::span< double const > elements )
-{
-    gsl_Expects( !elements.empty() ); // instead of Expects()
-    ...
-}
+    double mean( gsl::span<double const> elements )
+    {
+        gsl_Expects( !elements.empty() ); // instead of Expects()
+        ...
+    }
 
 } // namespace my_statistics_lib
 ```
