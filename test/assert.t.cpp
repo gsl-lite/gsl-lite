@@ -104,6 +104,9 @@ void testConvertibleToBool()
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     gsl_Expects( ConvertibleToBool() );
 
+    // `gsl_CONFIG_CONTRACT_CHECKING_OFF` should be compatible with explicit conversions to bool.
+    gsl_ELIDE_CONTRACT_( ConvertibleToBool() );
+
     if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }
 

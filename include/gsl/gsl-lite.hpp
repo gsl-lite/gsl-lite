@@ -1148,7 +1148,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 //
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_ELIDE_CONTRACT_( x )  static_assert(::std::is_convertible<decltype(( x )), bool>::value, "argument of contract check must be convertible to bool")
+# define gsl_ELIDE_CONTRACT_( x )  static_assert(::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool")
 #else
 # define gsl_ELIDE_CONTRACT_( x )
 #endif
