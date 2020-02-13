@@ -8,14 +8,14 @@ pr:
 
 resources:
   repositories:
-    - repository: templates
+    - repository: CImakeshift
       type: github
       name: mbeutel/CImakeshift
       endpoint: gsl-lite
       #ref: refs/tags/0.2
 
 jobs:
-- template: azure-pipelines-job-cmake.yml@templates
+- template: azure-pipelines/cmake.yml@CImakeshift
   parameters:
     cache: False
     cmakeBuildConfigurations: [Debug]
@@ -31,13 +31,6 @@ jobs:
       cudaCompilerVersion: 10_2
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-
-    # VS 2010, 2012, 2013, and 2015 are tested with AppVeyor
-    #- os: Windows
-    #  cxxCompiler: MSVC
-    #  cxxCompilerVersions: [16, 17, 18, 19]
-    #  cmakeGenerator: 'MSBuild' # required for CppCoreCheck
-    #  platforms: [x86, x64]
 
     - os: Windows
       cxxCompiler: MSVC
