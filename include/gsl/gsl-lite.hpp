@@ -603,7 +603,7 @@
 //     For functions, prefer return-type SFINAE if possible.
 //     If return-type SFINAE is not applicable, use `gsl_REQUIRES_A_()` or `typename std::enable_if< VA, int >::type = 0` in the function template argument list.
 //
-//     Use `gsl_REQUIRES_T_()` or `, typename std::enable_if< (VA), int >::type = 0` in class template argument lists.
+//     Use `gsl_REQUIRES_T_()` or `typename std::enable_if< (VA), int >::type = 0` in class template argument lists.
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
