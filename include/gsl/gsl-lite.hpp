@@ -612,7 +612,12 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_T_(VA) , typename std::enable_if< (VA), int >::type = 0
+# if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+// VS 2013 and earlier seem to have trouble with SFINAE for default non-type arguments
+#  define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
+# else
+#  define gsl_REQUIRES_T_(VA) , typename std::enable_if< ( VA ), int >::type = 0
+# endif
 #else
 # define gsl_REQUIRES_T_(VA)
 #endif
@@ -1085,13 +1090,12 @@ struct is_compatible_container : std17::bool_constant
 
 template<
     class C, class E
-        , typename = typename std::enable_if<
+        gsl_REQUIRES_T_((
             ! is_span< C >::value
             && ! is_array< C >::value
             && ! is_std_array< C >::value
             && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >::value)
-        //  &&   has_size_and_data< C >::value
-        , int>::type = 0
+        ))
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
