@@ -603,7 +603,7 @@
 //     For functions, prefer return-type SFINAE if possible.
 //     If return-type SFINAE is not applicable, use `gsl_REQUIRES_A_()` or `typename std::enable_if< VA, int >::type = 0` in the function template argument list.
 //
-//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, ::gsl::detail::enabler >::type` in class template argument lists.
+//     Use `gsl_REQUIRES_T_()` or `, typename std::enable_if< (VA), int >::type = 0` in class template argument lists.
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
@@ -612,7 +612,7 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
+# define gsl_REQUIRES_T_(VA) , typename std::enable_if< (VA), int >::type = 0
 #else
 # define gsl_REQUIRES_T_(VA)
 #endif
@@ -1091,7 +1091,7 @@ template<
             && ! is_std_array< C >::value
             && ( std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >::value)
         //  &&   has_size_and_data< C >::value
-        , enabler>::type
+        , int>::type = 0
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
