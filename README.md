@@ -289,6 +289,7 @@ Macro                                                                           
 [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
 [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
 [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
+[`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0) | 0                                                        | 1                 | enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)) |
 
 Note that the v1 defaults are not yet stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
 
@@ -538,6 +539,9 @@ Define this macro to 0 to omit the ability to compare spans of different types, 
 Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. **Default is 0.**
 
 Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl::with_container, cont)`.
+
+#### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=0`
+Define this macro to 1 to have `narrow<>()` throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead calls `std::terminate()` on information loss. **Default is 0.**
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. **Default is 0.**
