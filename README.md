@@ -647,9 +647,9 @@ Version | Level | Feature / Notes |
 0.31.0  |   5   | `span( std::array< U, N > [const] & arr )` |
 &nbsp;  |&nbsp; | `span( std::array< value_type, N > [const] & arr )` is used |
 0.29.0  |   4   | `span( std::shared_ptr<T> const & p )` |
-&nbsp;  |&nbsp; | |
+&nbsp;  |&nbsp; | &mdash; |
 0.29.0  |   4   | `span( std::unique_ptr<T> const & p )` |
-&nbsp;  |&nbsp; | |
+&nbsp;  |&nbsp; | &mdash; |
 0.29.0  |   3   | `span<>::length()` |
 &nbsp;  |&nbsp; | Use `span<>::size()` |
 0.29.0  |   3   | `span<>::length_bytes()` |
