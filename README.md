@@ -131,29 +131,29 @@ target_link_libraries( program PRIVATE gsl-lite )
 
 1. First install the *gsl-lite* CMake package from its source, for example:
 
-		cd ./gsl-lite
-		cmake -H. -B../build -DCMAKE_INSTALL_PREFIX="~/dev"
-		cmake --build ../build --target install
+        cd ./gsl-lite
+        cmake -H. -B../build -DCMAKE_INSTALL_PREFIX="~/dev"
+        cmake --build ../build --target install
 
 2. Next, you can use the *gsl-lite* CMake package, for example:
 
-	```CMake
-	cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-	
-	find_package( gsl-lite 0.36 REQUIRED )
-	
-	project( program-using-gsl-lite LANGUAGES CXX )
-	
-	add_executable(        program main.cpp )
-	target_link_libraries( program PRIVATE gsl::gsl-lite )
-	```
-	Configure and build:
+    ```CMake
+    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+    
+    find_package( gsl-lite 0.36 REQUIRED )
+    
+    project( program-using-gsl-lite LANGUAGES CXX )
+    
+    add_executable(        program main.cpp )
+    target_link_libraries( program PRIVATE gsl::gsl-lite )
+    ```
+    Configure and build:
 
-		cd ./gsl-lite/example/cmake-pkg
-		cmake -H. -B../build -DCMAKE_INSTALL_PREFIX=_stage -DCMAKE_PREFIX_PATH="~/dev"
-		cmake --build ../build
+        cd ./gsl-lite/example/cmake-pkg
+        cmake -H. -B../build -DCMAKE_INSTALL_PREFIX=_stage -DCMAKE_PREFIX_PATH="~/dev"
+        cmake --build ../build
 
-	See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
+    See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
 
 ### As Vcpkg package
 
@@ -558,23 +558,23 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 **1.1 Indirection**         | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 `not_null<>`                | ✓      | ✓      | ✓         | Wrap any indirection and enforce non-null,<br>see also [Other configuration macros](#other-configuration-macros) |
 `not_null_ic<>`             | -       | -       | ✓         | not_null with implicit constructor, allowing [copy-initialization](https://en.cppreference.com/w/cpp/language/copy_initialization) |
-`**1.2 Ownership**          | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-`owner<>`                   | ✓      | ✓      | ≥ C++11    | Owned raw pointers |
+**1.2 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`owner<>`                   | ✓      | ✓      | ≥&nbsp;C++11    | Owned raw pointers |
 `Owner()`                   | -       | -       | ✓         | Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
-`unique_ptr<>`              | ✓      | ✓      | ≥ C++11    | `std::unique_ptr<>` |
-`unique_ptr<>`              | -       | -       | < C++11    | VC10, VC11 |
-`shared_ptr<>`              | ✓      | ✓      | ≥ C++11    | `std::shared_ptr<>` |
-`shared_ptr<>`              | -       | -       | < C++11    | VC10, VC11 |
+`unique_ptr<>`              | ✓      | ✓      | ≥&nbsp;C++11    | `std::unique_ptr<>` |
+`unique_ptr<>`              | -       | -       | <&nbsp;C++11    | VC10, VC11 |
+`shared_ptr<>`              | ✓      | ✓      | ≥&nbsp;C++11    | `std::shared_ptr<>` |
+`shared_ptr<>`              | -       | -       | <&nbsp;C++11    | VC10, VC11 |
 `stack_array<>`             | ✓      | -       | -          | A stack-allocated array, fixed size |
 `dyn_array<>`               | ?       | -       | -          | A heap-allocated array, fixed size |
-`**2.Bounds&nbsp;safety**   | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-`**2.1 Tag Types**          | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+**2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+**2.1 Tag Types**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 `zstring`                   | ✓      | ✓      | ✓         | a `char*` (C-style string) |
 `wzstring`                  | -       | ✓      | ✓         | a `wchar_t*` (C-style string) |
 `czstring`                  | ✓      | ✓      | ✓         | a `const char*` (C-style string) |
 `cwzstring`                 | -       | ✓      | ✓         | a `const wchar_t*` (C-style string) |
 `**2.2 Views**              | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-`span<>`                    | ✓      | ✓      | 1D views   | A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0122) |
+`span<>`                    | ✓      | ✓      | 1D&nbsp;views   | A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0122) |
 `span_p<>`                  | ✓      | -       | -          | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
 `make_span()`               | -       | ✓      | ✓         | Create a span |
 `byte_span()`               | -       | -       | ✓         | Create a span of bytes from a single object |
@@ -591,29 +591,29 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `cwzstring_span`            | -       | ✓      | ✓         | `basic_zstring_span< const wchar_t >` |
 `ensure_z()`                | -       | ✓      | ✓         | Create a `cstring_span` or `cwstring_span` |
 `to_string()`               | -       | ✓      | ✓         | Convert a `string_span` to `std::string` or `std::wstring` |
-`**2.3 Indexing**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-`at()`                      | ✓      | ✓      | ≥ C++11    | Bounds-checked way of accessing<br>static arrays, `std::array<>`, `std::vector<>` |
-`at()`                      | -       | -       | < C++11    | static arrays, `std::vector<>`<br>`std::array<>` : VC11 |
-`**3. Assertions**          | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+**2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`at()`                      | ✓      | ✓      | ≥&nbsp;C++11    | Bounds-checked way of accessing<br>static arrays, `std::array<>`, `std::vector<>` |
+`at()`                      | -       | -       | <&nbsp;C++11    | static arrays, `std::vector<>`<br>`std::array<>` : VC11 |
+**3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 `Expects()`                 | ✓      | ✓      | ✓         | Precondition assertion |
 `Ensures()`                 | ✓      | ✓      | ✓         | Postcondition assertion |
 `gsl_Expects()`             | -       | -       | ✓         | Precondition assertion |
 `gsl_Ensures()`             | -       | -       | ✓         | Postcondition assertion |
 `gsl_ExpectsAudit()`        | -       | -       | ✓         | Audit-level precondition assertion |
 `gsl_EnsuresAudit()`        | -       | -       | ✓         | Audit-level postcondition assertion |
-`**4. Utilities**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+**4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 `index`                     | ✓      | ✓      | ✓         | type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
 `byte`                      | -       | ✓      | ✓         | byte type, see also proposal [p0298](http://wg21.link/p0298) |
-`final_action<>`            | ✓      | ✓      | ≥ C++11    | Action at the end of a scope |
-`final_action`              | -       | -       | < C++11    | Currently only `void(*)()` |
-`finally()`                 | ✓      | ✓      | ≥ C++11    | Make a `final_action<>` |
-`finally()`                 | -       | -       | < C++11    | Make a `final_action` |
-final_action_return`        | -       | -       | < C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
-`on_return()`               | -       | -       | ≥ C++11    | Make a `final_action_return<>, [experimental](#feature-selection-macros) |
-`on_return()`               | -       | -       | < C++11    | Make a `final_action_return, [experimental](#feature-selection-macros) |
-final_action_error`         | -       | -       | < C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
-`on_error()`                | -       | -       | ≥ C++11    | Make a `final_action_error<>`, [experimental](#feature-selection-macros) |
-`on_error()`                | -       | -       | < C++11    | Make a `final_action_error`, [experimental](#feature-selection-macros) |
+`final_action<>`            | ✓      | ✓      | ≥&nbsp;C++11    | Action at the end of a scope |
+`final_action`              | -       | -       | <&nbsp;C++11    | Currently only `void(*)()` |
+`finally()`                 | ✓      | ✓      | ≥&nbsp;C++11    | Make a `final_action<>` |
+`finally()`                 | -       | -       | <&nbsp;C++11    | Make a `final_action` |
+`final_action_return`       | -       | -       | <&nbsp;C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
+`on_return()`               | -       | -       | ≥&nbsp;C++11    | Make a `final_action_return<>, [experimental](#feature-selection-macros) |
+`on_return()`               | -       | -       | <&nbsp;C++11    | Make a `final_action_return, [experimental](#feature-selection-macros) |
+`final_action_error`        | -       | -       | <&nbsp;C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
+`on_error()`                | -       | -       | ≥&nbsp;C++11    | Make a `final_action_error<>`, [experimental](#feature-selection-macros) |
+`on_error()`                | -       | -       | <&nbsp;C++11    | Make a `final_action_error`, [experimental](#feature-selection-macros) |
 `narrow_cast<>`             | ✓      | ✓      | ✓         | Searchable narrowing casts of values |
 `narrow<>()`                | ✓      | ✓      | ✓         | Checked version of `narrow_cast()` |
 `narrow_failfast<>()`       | ✓      | ✓      | ✓         | Fail-fast narrowing cast |
@@ -763,6 +763,10 @@ In the test runner , the version of *gsl-lite* is available via tag `[.version]`
 
 <a id="a2"></a>
 ### A.2 *gsl-lite* test specification
+
+<details>
+<summary>click to expand</summary>
+<p>
 
 ```
 gsl_Expects(): Allows a true expression
@@ -1137,3 +1141,5 @@ narrow_failfast<>(): Allows narrowing without value loss
 narrow_failfast<>(): Terminates when narrowing with value loss
 narrow_failfast<>(): Terminates when narrowing with sign loss
 ```
+</p>
+</details>
