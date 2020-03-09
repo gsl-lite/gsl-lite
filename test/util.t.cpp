@@ -214,12 +214,12 @@ CASE( "narrow_cast<>: Allows narrowing with value loss" )
 }
 
 #if gsl_CPP11_OR_GREATER
-const  std::uint8_t  u8  = (std::numeric_limits< std::uint8_t>::max)() - 1;
-const std::uint16_t u16  = (std::numeric_limits<std::uint16_t>::max)() - 1;
-const   std::int8_t  i8n = (std::numeric_limits<  std::int8_t>::min)() + 1;
-const  std::int16_t i16n = (std::numeric_limits< std::int16_t>::min)() + 1;
-const   std::int8_t  i8p = (std::numeric_limits<  std::int8_t>::max)() - 1;
-const  std::int16_t i16p = (std::numeric_limits< std::int16_t>::max)() - 1;
+const  std::uint8_t  u8  =  std::uint8_t((std::numeric_limits< std::uint8_t>::max)() - 1);
+const std::uint16_t u16  = std::uint16_t((std::numeric_limits<std::uint16_t>::max)() - 1);
+const   std::int8_t  i8n =   std::int8_t((std::numeric_limits<  std::int8_t>::min)() + 1);
+const  std::int16_t i16n =  std::int16_t((std::numeric_limits< std::int16_t>::min)() + 1);
+const   std::int8_t  i8p =   std::int8_t((std::numeric_limits<  std::int8_t>::max)() - 1);
+const  std::int16_t i16p =  std::int16_t((std::numeric_limits< std::int16_t>::max)() - 1);
 #endif // gsl_CPP11_OR_GREATER
 
 CASE( "narrow<>(): Allows narrowing without value loss" )
