@@ -615,8 +615,8 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `on_error()`                | -       | -       | ≥&nbsp;C++11    | Make a `final_action_error<>`, [experimental](#feature-selection-macros) |
 `on_error()`                | -       | -       | <&nbsp;C++11    | Make a `final_action_error`, [experimental](#feature-selection-macros) |
 `narrow_cast<>`             | ✓      | ✓      | ✓         | Searchable narrowing casts of values |
-`narrow<>()`                | ✓      | ✓      | ✓         | Checked version of `narrow_cast()` |
-`narrow_failfast<>()`       | ✓      | ✓      | ✓         | Fail-fast narrowing cast |
+`narrow<>()`                | ✓      | ✓      | ✓         | Checked narrowing cast |
+`narrow_failfast<>()`       | -       | -       | ✓         | Fail-fast narrowing cast |
 `[[implicit]]`              | ✓      | -       | C++??      | Symmetric with explicit |
 `implicit`                  | -       | -       | ✓         | Macro, see [Feature selection macros](#feature-selection-macros) |
 `move_owner`                | ?       | -       | -          | ... |
