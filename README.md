@@ -281,16 +281,16 @@ a set of version-specific default options can be selected. Alternatively, when c
 The following table gives an overview of the configuration options affected by versioned defaults:
 
 
-Macro                                         | v0 default                                               | v1 default        | |
----------------------------------------------:|:---------------------------------------------------------|-------------------|-|
-`gsl_FEATURE_OWNER_MACRO`                     | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
-`gsl_FEATURE_GSL_LITE_NAMESPACE`              | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
-`gsl_CONFIG_DEPRECATE_TO_LEVEL`               | 0                                                        | 5                 | |
-`gsl_CONFIG_INDEX_TYPE`                       | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
-`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
-`gsl_CONFIG_TRANSPARENT_NOT_NULL`             | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
+Macro                                                                                | v0 default                                               | v1 default        | |
+------------------------------------------------------------------------------------:|:---------------------------------------------------------|-------------------|-|
+[`gsl_FEATURE_OWNER_MACRO`](#gsl_feature_owner_macro1)                               | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
+[`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)                 | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
+[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 5                 | |
+[`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
+[`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
+[`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
 
-Note that the v1 defaults are not stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
+Note that the v1 defaults are not yet stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
 
 
 
@@ -552,71 +552,73 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 ----------------------------|:-------:|:-------:|:----------:|:------|
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 **1.1 Indirection**         | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-not_null<>                  | &#10003;| &#10003;| &#10003;   | Wrap any indirection and enforce non-null,<br>see also [Other configuration macros](#other-configuration-macros) |
-not_null_ic<>               | -       | -       | &#10003;   | not_null with implicit constructor, allowing [copy-initialization](https://en.cppreference.com/w/cpp/language/copy_initialization) |
-**1.2 Ownership**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-owner<>                     | &#10003;| &#10003;| >=C++11    | Owned raw pointers |
-Owner()                     | -       | -       | &#10003;   | Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
-unique_ptr<>                | &#10003;| &#10003;| >=C++11    | std::unique_ptr<> |
-unique_ptr<>                | -       | -       | < C++11    | VC10, VC11 |
-shared_ptr<>                | &#10003;| &#10003;| >=C++11    | std::shared_ptr<> |
-shared_ptr<>                | -       | -       | < C++11    | VC10, VC11 |
-stack_array<>               | &#10003;| -       | -          | A stack-allocated array, fixed size |
-dyn_array<>                 | ?       | -       | -          | A heap-allocated array, fixed size |
-**2.Bounds&nbsp;safety**    | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-**2.1 Tag Types**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-zstring                     | &#10003;| &#10003;| &#10003;   | a char* (C-style string) |
-wzstring                    | -       | &#10003;| &#10003;   | a wchar_t* (C-style string) |
-czstring                    | &#10003;| &#10003;| &#10003;   | a const char* (C-style string) |
-cwzstring                   | -       | &#10003;| &#10003;   | a const wchar_t* (C-style string) |
-**2.2 Views**               | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-span<>                      | &#10003;| &#10003;| 1D views   | A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0122) |
-span_p<>                    | &#10003;| -       | -          | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
-make_span()                 | -       | &#10003;| &#10003;   | Create a span |
-byte_span()                 | -       | -       | &#10003;   | Create a span of bytes from a single object |
-as_bytes()                  | -       | &#10003;| &#10003;   | A span as bytes |
-as_writeable_bytes          | -       | &#10003;| &#10003;   | A span as writeable bytes |
-basic_string_span<>         | -       | &#10003;| &#10003;   | See also proposal [p0123](http://wg21.link/p0123) |
-string_span                 | &#10003;| &#10003;| &#10003;   | basic_string_span&lt;char> |
-wstring_span                | -       | &#10003;| &#10003;   | basic_string_span&lt;wchar_t > |
-cstring_span                | &#10003;| &#10003;| &#10003;   | basic_string_span&lt;const char> |
-cwstring_span               | -       | &#10003;| &#10003;   | basic_string_span&lt;const wchar_t > |
-zstring_span                | -       | &#10003;| &#10003;   | basic_zstring_span&lt;char> |
-wzstring_span               | -       | &#10003;| &#10003;   | basic_zstring_span&lt;wchar_t > |
-czstring_span               | -       | &#10003;| &#10003;   | basic_zstring_span&lt;const char> |
-cwzstring_span              | -       | &#10003;| &#10003;   | basic_zstring_span&lt;const wchar_t > |
-ensure_z()                  | -       | &#10003;| &#10003;   | Create a cstring_span or cwstring_span |
-to_string()                 | -       | &#10003;| &#10003;   | Convert a string_span to std::string or std::wstring |
-**2.3 Indexing**            | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-at()                        | &#10003;| &#10003;| >=C++11    | Bounds-checked way of accessing<br>static arrays, std::array, std::vector |
-at()                        | -       | -       | < C++11    | static arrays, std::vector<br>std::array : VC11 |
-**3. Assertions**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-Expects()                   | &#10003;| &#10003;| &#10003;   | Precondition assertion |
-Ensures()                   | &#10003;| &#10003;| &#10003;   | Postcondition assertion |
-gsl_ExpectsAudit()          | -       | -       | &#10003;   | Audit-level precondition assertion |
-gsl_EnsuresAudit()          | -       | -       | &#10003;   | Audit-level postcondition assertion |
-**4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-index                       | &#10003;| &#10003;| &#10003;   | type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
-byte                        | -       | &#10003;| &#10003;   | byte type, see also proposal [p0298](http://wg21.link/p0298) |
-final_action<>              | &#10003;| &#10003;| >=C++11    | Action at the end of a scope |
-final_action                | -       | -       | < C++11    | Currently only void(*)() |
-finally()                   | &#10003;| &#10003;| >=C++11    | Make a final_action<> |
-finally()                   | -       | -       | < C++11    | Make a final_action |
-final_action_return         | -       | -       | < C++11    | Currently only void(*)(), [experimental](#feature-selection-macros) |
-on_return()                 | -       | -       | >=C++11    | Make a final_action_return<>, [experimental](#feature-selection-macros) |
-on_return()                 | -       | -       | < C++11    | Make a final_action_return, [experimental](#feature-selection-macros) |
-final_action_error          | -       | -       | < C++11    | Currently only void(*)(), [experimental](#feature-selection-macros) |
-on_error()                  | -       | -       | >=C++11    | Make a final_action_error<>, [experimental](#feature-selection-macros) |
-on_error()                  | -       | -       | < C++11    | Make a final_action_error, [experimental](#feature-selection-macros) |
-narrow_cast<>               | &#10003;| &#10003;| &#10003;   | Searchable narrowing casts of values |
-narrow()                    | &#10003;| &#10003;| &#10003;   | Checked version of narrow_cast() |
-[[implicit]]                | &#10003;| -       | C++??      | Symmetric with explicit |
-implicit                    | -       | -       | &#10003;   | Macro, see [Feature selection macros](#feature-selection-macros) |
-move_owner                  | ?       | -       | -          | ... |
+`not_null<>`                | ✓      | ✓      | ✓         | Wrap any indirection and enforce non-null,<br>see also [Other configuration macros](#other-configuration-macros) |
+`not_null_ic<>`             | -       | -       | ✓         | not_null with implicit constructor, allowing [copy-initialization](https://en.cppreference.com/w/cpp/language/copy_initialization) |
+`**1.2 Ownership**          | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`owner<>`                   | ✓      | ✓      | ≥ C++11    | Owned raw pointers |
+`Owner()`                   | -       | -       | ✓         | Macro for pre-C++11;<br>see also [Feature selection macros](#feature-selection-macros) |
+`unique_ptr<>`              | ✓      | ✓      | ≥ C++11    | `std::unique_ptr<>` |
+`unique_ptr<>`              | -       | -       | < C++11    | VC10, VC11 |
+`shared_ptr<>`              | ✓      | ✓      | ≥ C++11    | `std::shared_ptr<>` |
+`shared_ptr<>`              | -       | -       | < C++11    | VC10, VC11 |
+`stack_array<>`             | ✓      | -       | -          | A stack-allocated array, fixed size |
+`dyn_array<>`               | ?       | -       | -          | A heap-allocated array, fixed size |
+`**2.Bounds&nbsp;safety**   | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`**2.1 Tag Types**          | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`zstring`                   | ✓      | ✓      | ✓         | a `char*` (C-style string) |
+`wzstring`                  | -       | ✓      | ✓         | a `wchar_t*` (C-style string) |
+`czstring`                  | ✓      | ✓      | ✓         | a `const char*` (C-style string) |
+`cwzstring`                 | -       | ✓      | ✓         | a `const wchar_t*` (C-style string) |
+`**2.2 Views**              | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`span<>`                    | ✓      | ✓      | 1D views   | A view of contiguous T's, replace (*,len),<br>see also proposal [p0122](http://wg21.link/p0122) |
+`span_p<>`                  | ✓      | -       | -          | A view of contiguous T's that ends at the first element for which predicate(*p) is true |
+`make_span()`               | -       | ✓      | ✓         | Create a span |
+`byte_span()`               | -       | -       | ✓         | Create a span of bytes from a single object |
+`as_bytes()`                | -       | ✓      | ✓         | A span as bytes |
+`as_writeable_bytes`        | -       | ✓      | ✓         | A span as writeable bytes |
+`basic_string_span<>`       | -       | ✓      | ✓         | See also proposal [p0123](http://wg21.link/p0123) |
+`string_span`               | ✓      | ✓      | ✓         | `basic_string_span< char >` |
+`wstring_span`              | -       | ✓      | ✓         | `basic_string_span< wchar_t >` |
+`cstring_span`              | ✓      | ✓      | ✓         | `basic_string_span< const char >` |
+`cwstring_span`             | -       | ✓      | ✓         | `basic_string_span< const wchar_t >` |
+`zstring_span`              | -       | ✓      | ✓         | `basic_zstring_span< char >` |
+`wzstring_span`             | -       | ✓      | ✓         | `basic_zstring_span< wchar_t >` |
+`czstring_span`             | -       | ✓      | ✓         | `basic_zstring_span< const char >` |
+`cwzstring_span`            | -       | ✓      | ✓         | `basic_zstring_span< const wchar_t >` |
+`ensure_z()`                | -       | ✓      | ✓         | Create a `cstring_span` or `cwstring_span` |
+`to_string()`               | -       | ✓      | ✓         | Convert a `string_span` to `std::string` or `std::wstring` |
+`**2.3 Indexing**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`at()`                      | ✓      | ✓      | ≥ C++11    | Bounds-checked way of accessing<br>static arrays, `std::array<>`, `std::vector<>` |
+`at()`                      | -       | -       | < C++11    | static arrays, `std::vector<>`<br>`std::array<>` : VC11 |
+`**3. Assertions**          | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`Expects()`                 | ✓      | ✓      | ✓         | Precondition assertion |
+`Ensures()`                 | ✓      | ✓      | ✓         | Postcondition assertion |
+`gsl_Expects()`             | -       | -       | ✓         | Precondition assertion |
+`gsl_Ensures()`             | -       | -       | ✓         | Postcondition assertion |
+`gsl_ExpectsAudit()`        | -       | -       | ✓         | Audit-level precondition assertion |
+`gsl_EnsuresAudit()`        | -       | -       | ✓         | Audit-level postcondition assertion |
+`**4. Utilities**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
+`index`                     | ✓      | ✓      | ✓         | type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
+`byte`                      | -       | ✓      | ✓         | byte type, see also proposal [p0298](http://wg21.link/p0298) |
+`final_action<>`            | ✓      | ✓      | ≥ C++11    | Action at the end of a scope |
+`final_action`              | -       | -       | < C++11    | Currently only `void(*)()` |
+`finally()`                 | ✓      | ✓      | ≥ C++11    | Make a `final_action<>` |
+`finally()`                 | -       | -       | < C++11    | Make a `final_action` |
+final_action_return`        | -       | -       | < C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
+`on_return()`               | -       | -       | ≥ C++11    | Make a `final_action_return<>, [experimental](#feature-selection-macros) |
+`on_return()`               | -       | -       | < C++11    | Make a `final_action_return, [experimental](#feature-selection-macros) |
+final_action_error`         | -       | -       | < C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
+`on_error()`                | -       | -       | ≥ C++11    | Make a `final_action_error<>`, [experimental](#feature-selection-macros) |
+`on_error()`                | -       | -       | < C++11    | Make a `final_action_error`, [experimental](#feature-selection-macros) |
+`narrow_cast<>`             | ✓      | ✓      | ✓         | Searchable narrowing casts of values |
+`narrow<>()`                | ✓      | ✓      | ✓         | Checked version of `narrow_cast()` |
+`[[implicit]]`              | ✓      | -       | C++??      | Symmetric with explicit |
+`implicit`                  | -       | -       | ✓         | Macro, see [Feature selection macros](#feature-selection-macros) |
+`move_owner`                | ?       | -       | -          | ... |
 **5. Algorithms**           | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-copy()                      | &nbsp;  | &nbsp;  | &nbsp;     | Copy from source span to destination span |
-size()                      | &nbsp;  | &nbsp;  | &nbsp;     | Size of span, unsigned |
-ssize()                     | &nbsp;  | &nbsp;  | &nbsp;     | Size of span, signed |
+`copy()`                    | &nbsp;  | &nbsp;  | &nbsp;     | Copy from source span to destination span |
+`size()`                    | &nbsp;  | &nbsp;  | &nbsp;     | Size of span, unsigned |
+`ssize()`                   | &nbsp;  | &nbsp;  | &nbsp;     | Size of span, signed |
 **6. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 
@@ -631,26 +633,26 @@ Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
 0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
 &nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
-0.31.0  |   5   | span( std::nullptr_t, index_type ) |
-&nbsp;  |&nbsp; | span( pointer, index_type ) is used |
-0.31.0  |   5   | span( U *, index_type size ) |
-&nbsp;  |&nbsp; | span( pointer, index_type ) is used |
-0.31.0  |   5   | span( U (&arr)[N] ) |
-&nbsp;  |&nbsp; | span( element_type (&arr)[N] ) is used |
-0.31.0  |   5   | span( std::array< U, N > [const] & arr ) |
-&nbsp;  |&nbsp; | span( std::array< value_type, N > [const] & arr ) is used |
-0.29.0  |   4   | span::span( std::shared_ptr<T> const & p ) |
-&nbsp;  |&nbsp; | Use span( p.get(), p.get() ? 1 : 0 ) or equivalent |
-0.29.0  |   4   | span::span( std::unique_ptr<T> const & p ) |
-&nbsp;  |&nbsp; | Use Use span( p.get(), p.get() ? 1 : 0 ) or equivalent  |
-0.29.0  |   3   | span::length() |
-&nbsp;  |&nbsp; | Use span::size() |
-0.29.0  |   3   | span::length_bytes() |
-&nbsp;  |&nbsp; | Use span::size_bytes() |
-0.17.0  |   2   | member span::as_bytes(), span::as_writeable_bytes() |
+0.31.0  |   5   | `span( std::nullptr_t, index_type )` |
+&nbsp;  |&nbsp; | `span( pointer, index_type )` is used |
+0.31.0  |   5   | `span( U *, index_type size )` |
+&nbsp;  |&nbsp; | `span( pointer, index_type )` is used |
+0.31.0  |   5   | `span( U (&arr)[N] )` |
+&nbsp;  |&nbsp; | `span( element_type (&arr)[N] )` is used |
+0.31.0  |   5   | `span( std::array< U, N > [const] & arr )` |
+&nbsp;  |&nbsp; | `span( std::array< value_type, N > [const] & arr )` is used |
+0.29.0  |   4   | `span( std::shared_ptr<T> const & p )` |
+&nbsp;  |&nbsp; | |
+0.29.0  |   4   | `span( std::unique_ptr<T> const & p )` |
+&nbsp;  |&nbsp; | |
+0.29.0  |   3   | `span<>::length()` |
+&nbsp;  |&nbsp; | Use `span<>::size()` |
+0.29.0  |   3   | `span<>::length_bytes()` |
+&nbsp;  |&nbsp; | Use `span<>::size_bytes()` |
+0.17.0  |   2   | member `span<>::as_bytes()`, `span<>::as_writeable_bytes()` |
 &nbsp;  |&nbsp; | &mdash; |
 0.7.0   |   -   | `gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR` |
-&nbsp;  |&nbsp; | Use `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR`,<br>or consider span(with_container, cont). |
+&nbsp;  |&nbsp; | Use `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR`,<br>or consider `span(with_container, cont)`. |
 
 
 Reported to work with
@@ -659,11 +661,11 @@ The table below mentions the compiler versions and platforms *gsl-lite* is repor
 
 Compiler             | OS              | Platforms | Versions          | CI |
 --------------------:|:----------------|-----------|------------------:|----|
-GCC                  | Linux           | x64       | 4.7 and newer     | [4.7 through 4.9](https://travis-ci.com/gsl-lite/gsl-lite/), [5 through 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | Linux           | x64       | 4.7 and newer     | [4.7, 4.8, 4.9, 5](https://travis-ci.com/gsl-lite/gsl-lite/), [6, 7, 8, 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
-GCC                  | MacOS           | x64       | 6 and newer       | [6 through 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [3.5 through 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4 through 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | MacOS           | x64       | 6 and newer       | [6, 7, 8, 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [3.5, 3.6, 3.7, 3.8, 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4, 5, 6, 7, 8, 9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | 9 and newer       | [9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2017, 2019](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9](https://travis-ci.com/gsl-lite/gsl-lite/), [9.1, 10, 10.0.1, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |

@@ -1590,22 +1590,22 @@ namespace detail {
 # if defined( __NVCC__ )
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
-    gsl_constexpr bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
     {
         return value < T();
     }
     template< class T >
-    gsl_constexpr std::false_type is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
+    gsl_constexpr gsl_api std::false_type is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
     {
         return std::false_type();
     }
     template< class T, class U >
-    gsl_constexpr std::true_type have_same_sign( T t, U u, std::true_type /*isSameSignedness*/ ) gsl_noexcept
+    gsl_constexpr gsl_api std::true_type have_same_sign( T t, U u, std::true_type /*isSameSignedness*/ ) gsl_noexcept
     {
         return std::true_type();
     }
     template< class T, class U >
-    gsl_constexpr bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
     {
         return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
     }

@@ -24,6 +24,8 @@ jobs:
 
     targets:
 
+    # VS 2010, 2012, 2013, and 2015 are tested with AppVeyor
+
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [19_2]
