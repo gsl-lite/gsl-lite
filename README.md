@@ -616,6 +616,7 @@ final_action_error`         | -       | -       | < C++11    | Currently only `v
 `on_error()`                | -       | -       | < C++11    | Make a `final_action_error`, [experimental](#feature-selection-macros) |
 `narrow_cast<>`             | ✓      | ✓      | ✓         | Searchable narrowing casts of values |
 `narrow<>()`                | ✓      | ✓      | ✓         | Checked version of `narrow_cast()` |
+`narrow_failfast<>()`       | ✓      | ✓      | ✓         | Fail-fast narrowing cast |
 `[[implicit]]`              | ✓      | -       | C++??      | Symmetric with explicit |
 `implicit`                  | -       | -       | ✓         | Macro, see [Feature selection macros](#feature-selection-macros) |
 `move_owner`                | ?       | -       | -          | ... |
@@ -764,10 +765,10 @@ In the test runner , the version of *gsl-lite* is available via tag `[.version]`
 ### A.2 *gsl-lite* test specification
 
 ```
-Expects(): Allows a true expression
-Ensures(): Allows a true expression
-Expects(): Terminates on a false expression
-Ensures(): Terminates on a false expression
+gsl_Expects(): Allows a true expression
+gsl_Ensures(): Allows a true expression
+gsl_Expects(): Terminates on a false expression
+gsl_Ensures(): Terminates on a false expression
 gsl_ExpectsAudit(): Allows a true expression
 gsl_EnsuresAudit(): Allows a true expression
 gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode
@@ -1132,4 +1133,7 @@ narrow_cast<>: Allows narrowing with value loss
 narrow<>(): Allows narrowing without value loss
 narrow<>(): Terminates when narrowing with value loss
 narrow<>(): Terminates when narrowing with sign loss
+narrow_failfast<>(): Allows narrowing without value loss
+narrow_failfast<>(): Terminates when narrowing with value loss
+narrow_failfast<>(): Terminates when narrowing with sign loss
 ```

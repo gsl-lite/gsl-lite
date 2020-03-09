@@ -223,4 +223,19 @@ CASE( "narrow<>(): Terminates when narrowing with sign loss" )
     EXPECT_THROWS_AS( narrow<unsigned>( -42 ), narrowing_error );
 }
 
+CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
+{
+    EXPECT( narrow_failfast<char>( 120 ) == 120 );
+}
+
+CASE( "narrow_failfast<>(): Terminates when narrowing with value loss" )
+{
+    EXPECT_THROWS_AS( narrow_failfast<char>( 300 ), fail_fast );
+}
+
+CASE( "narrow_failfast<>(): Terminates when narrowing with sign loss" )
+{
+    EXPECT_THROWS_AS( narrow_failfast<unsigned>( -42 ), fail_fast );
+}
+
 // end of file

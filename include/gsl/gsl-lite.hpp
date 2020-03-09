@@ -1661,6 +1661,30 @@ inline T narrow( U u )
 }
 #endif // gsl_HAVE( EXCEPTIONS ) || !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 
+template< class T, class U >
+gsl_api inline T narrow_failfast( U u )
+{
+    T t = static_cast<T>( u );
+
+    gsl_Expects( static_cast<U>( t ) == u );
+
+#if gsl_HAVE( TYPE_TRAITS )
+# if defined( __NVCC__ )
+    gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
+# else
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    gsl_Expects( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+# endif
+#else
+    // Don't assume T() works:
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    gsl_Expects( ( t < 0 ) == ( u < 0 ) );
+#endif
+
+    return t;
+}
+
+
 //
 // at() - Bounds-checked way of accessing static arrays, std::array, std::vector.
 //
@@ -4011,6 +4035,8 @@ using ::gsl::on_error;
 using ::gsl::narrow_cast;
 using ::gsl::narrowing_error;
 using ::gsl::narrow;
+using ::gsl::narrow_failfast;
+
 
 using ::gsl::at;
 
