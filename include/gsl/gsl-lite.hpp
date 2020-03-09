@@ -160,6 +160,10 @@
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0
 #endif
 
+#ifndef  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
+# define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
+#endif
+
 #if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
 # error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined
 #endif
@@ -1590,22 +1594,22 @@ namespace detail {
 # if defined( __NVCC__ )
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
-    gsl_constexpr bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
     {
         return value < T();
     }
     template< class T >
-    gsl_constexpr std::false_type is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
     {
-        return std::false_type();
+        return false;
     }
     template< class T, class U >
-    gsl_constexpr std::true_type have_same_sign( T t, U u, std::true_type /*isSameSignedness*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool have_same_sign( T t, U u, std::true_type /*isSameSignedness*/ ) gsl_noexcept
     {
-        return std::true_type();
+        return true;
     }
     template< class T, class U >
-    gsl_constexpr bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
     {
         return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
     }
@@ -1615,45 +1619,71 @@ namespace detail {
 
 #endif
 
+#if gsl_HAVE( EXCEPTIONS ) || !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 template< class T, class U >
-#if !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 gsl_api
-#endif // !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# endif // !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 inline T narrow( U u )
 {
     T t = static_cast<T>( u );
 
     if ( static_cast<U>( t ) != u )
     {
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
         throw narrowing_error();
-#else
+# else
         std::terminate();
-#endif
+# endif
     }
 
-#if gsl_HAVE( TYPE_TRAITS )
-# if defined( __NVCC__ )
+# if gsl_HAVE( TYPE_TRAITS )
+#  if defined( __NVCC__ )
     if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
-# else
+#  else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
-# endif
-#else
+#  endif
+# else
     // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( ( t < 0 ) != ( u < 0 ) )
-#endif
+# endif
     {
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
         throw narrowing_error();
-#else
+# else
         std::terminate();
-#endif
+# endif
     }
 
     return t;
 }
+#endif // gsl_HAVE( EXCEPTIONS ) || !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
+
+template< class T, class U >
+gsl_api inline T narrow_failfast( U u )
+{
+    T t = static_cast<T>( u );
+
+    gsl_Expects( static_cast<U>( t ) == u );
+
+#if gsl_HAVE( TYPE_TRAITS )
+# if defined( __NVCC__ )
+    gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
+# else
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    gsl_Expects( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+# endif
+#else
+    // Don't assume T() works:
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    gsl_Expects( ( t < 0 ) == ( u < 0 ) );
+#endif
+
+    return t;
+}
+
 
 //
 // at() - Bounds-checked way of accessing static arrays, std::array, std::vector.
@@ -4005,6 +4035,8 @@ using ::gsl::on_error;
 using ::gsl::narrow_cast;
 using ::gsl::narrowing_error;
 using ::gsl::narrow;
+using ::gsl::narrow_failfast;
+
 
 using ::gsl::at;
 
