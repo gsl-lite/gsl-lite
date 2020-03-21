@@ -19,7 +19,7 @@
 
 using namespace gsl;
 
-CASE( "span<>: free comparation functions fail for different const-ness" "[issue #32]" )
+CASE( "span<>: free comparation functions fail for different const-ness [issue #32]" )
 {
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )
 #if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
@@ -38,7 +38,7 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[issue
 #endif
 }
 
-CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function" "[issue #242]" )
+CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]" )
 {
     struct S
     {
@@ -58,7 +58,7 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
 #endif
 }
 
-CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[issue #34](GSL issue #313, PR #390)" )
+CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [issue #34](GSL issue #313, PR #390)" )
 {
     struct F {
         static int f( int & i, gsl::byte & r )
@@ -73,7 +73,7 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "
    EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte&>( i ) ) );
 }
 
-CASE( "string_span<>: must not include terminating '\\0'" "[issue #53]" )
+CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
 {
     char const data[] = "ab";
     char const * text = "ab";
@@ -93,7 +93,7 @@ CASE( "string_span<>: must not include terminating '\\0'" "[issue #53]" )
     EXPECT( a == b );
 }
 
-CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" "[issue #53a]" )
+CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) [issue #53a]" )
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     cstring_span span = "Hello world";

@@ -807,6 +807,12 @@ byte: Provides constexpr assignment operations (C++14)
 byte: Provides hash support (C++11)
 conjunction<> and disjunction<>: Short-circuiting is handled correctly
 conjunction<> and disjunction<>: First suitable type is chosen as base
+span<>: free comparation functions fail for different const-ness [issue #32]
+span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]
+byte: aliasing rules lead to undefined behaviour when using enum class [issue #34](GSL issue #313, PR #390)
+string_span<>: must not include terminating '\0' [issue #53]
+string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) [issue #53a]
+narrow<>(): Allows narrowing double to float without MSVC level 4 warning C4127: conditional expression is constant [issue #115]
 not_null<>: Disallows default construction (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from nullptr_t, NULL or 0 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 not_null<>: Disallows construction from a unique pointer to underlying type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
