@@ -1066,7 +1066,8 @@ template< class C, class E >
 struct is_compatible_element
 <
     C, E, std17::void_t<
-        decltype( std17::data(std::declval<C>()) ) >
+        decltype( std17::data(std::declval<C>()) ),
+        typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[] >
 > : std::is_convertible< typename std::remove_pointer<decltype( std17::data( std::declval<C&>() ) )>::type(*)[], E(*)[] >{};
 
 template< class C >

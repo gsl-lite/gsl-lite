@@ -38,7 +38,27 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
 #endif
 }
 
-CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[.issue #34](GSL issue #313, PR #390)" )
+CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function" "[issue #242]" )
+{
+    struct S
+    {
+        int data_{ };
+
+        explicit S( gsl::span<gsl::byte const> ) { }
+        int const & data() const { return data_; }
+    };
+
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+    // C is not a `contiguous_range`, hence the constructor should not be instantiable, but this needs to be a substitution
+    // failure, not a hard error.
+    EXPECT( std::is_copy_constructible< S >::value );
+    EXPECT( std::is_trivially_copy_constructible< S >::value );
+#else
+    EXPECT( !!"span<>: constrained container constructor is not available (gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR=0)" );
+#endif
+}
+
+CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[issue #34](GSL issue #313, PR #390)" )
 {
     struct F {
         static int f( int & i, gsl::byte & r )
