@@ -59,7 +59,7 @@ int main()
 ### Compile and run
 
 ```
-prompt>g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
+prompt> g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
 ```
 
 In a nutshell
@@ -85,102 +85,89 @@ Installation and use
 --------------------
 *gsl-lite* is a single-file header-only library. There are various ways to use it in your project.
 
-**Contents**  
-- [As copied header](#as-copied-header)
-- [As CMake package](#as-cmake-package)
-- [As Vcpkg package](#as-vcpkg-package)
-- [As Conan package](#as-conan-package)
-- [As Conda package](#as-conda-package)
-- [As external Git project](#as-external-git-project)
-
-### As copied header
-
-Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
-
-In project root folder:
-
-```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-
-project( use-gsl-lite LANGUAGES CXX )
-
-# Provide #include access to gsl-lite as 'gsl/gsl-lite.hpp': 
-
-add_library( gsl-lite INTERFACE )
-target_include_directories( gsl-lite INTERFACE include )  # adapt as necessary
-
-# Build program from src:
-
-add_subdirectory( src ) 
-```
-
-In folder src:
-
-```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-
-project( program-using-gsl-lite LANGUAGES CXX )
-
-# Make program executable:
-
-add_executable( program main.cpp )
-target_link_libraries( program PRIVATE gsl-lite )
-```
-
 ### As CMake package
 
-1. First install the *gsl-lite* CMake package from its source, for example:
-
-        cd ./gsl-lite
-        cmake -H. -B../build -DCMAKE_INSTALL_PREFIX="~/dev"
-        cmake --build ../build --target install
-
-2. Next, you can use the *gsl-lite* CMake package, for example:
+The recommended way to consume *gsl-lite* in your project is to use CMake, `find_package()`, and `target_link_libraries()`:
 
     ```CMake
-    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+    cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
     find_package( gsl-lite 0.36 REQUIRED )
     
-    project( program-using-gsl-lite LANGUAGES CXX )
+    project( my-program LANGUAGES CXX )
     
-    add_executable(        program main.cpp )
-    target_link_libraries( program PRIVATE gsl::gsl-lite )
+    add_executable(        my-program main.cpp )
+    target_link_libraries( my-program PRIVATE gsl::gsl-lite )
     ```
-    Configure and build:
 
-        cd ./gsl-lite/example/cmake-pkg
-        cmake -H. -B../build -DCMAKE_INSTALL_PREFIX=_stage -DCMAKE_PREFIX_PATH="~/dev"
-        cmake --build ../build
+There are various ways to make the `gsl-lite` package available to your project:
 
-    See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
+<details>
+<summary>Using Vcpkg</summary>
+<p>
 
-### As Vcpkg package
-
-For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run Vcpkg's install command:
+1. For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run Vcpkg's install command:
 
         vcpkg install gsl-lite
 
-Now *gsl-lite* can be consumed [as a CMake package](#as-cmake-package).
+2. Now, configure your project passing the Vcpkg toolchaing file as a parameter:
 
-### As Conan package
+        cd <my-program-source-dir>
+        mkdir build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=<vcpkg-root>/scripts/buildsystems/vcpkg.cmake ..
+        cmake --build ../build
 
-For the [conan package manager](https://www.conan.io/), follow these steps:
+</p></details>
+
+<details>
+<summary>Using an exported build directory</summary>
+<p>
+
+1. Clone the *gsl-lite* repository and configure a build directory with CMake:
+
+        git clone git@github.com:gsl-lite/gsl-lite.git <gsl-lite-source-dir>
+        cd <gsl-lite-source-dir>
+        mkdir build
+        cd build
+        cmake ..
+
+2. Now, configure your project passing the CMake build directory as a parameter:
+
+        cd <my-program-source-dir>
+        mkdir build
+        cd build
+        cmake -Dgsl-lite_DIR:PATH=<gsl-lite-source-dir>/build ..
+        cmake --build ../build
+
+    See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
+</p></details>
+
+<details>
+<summary>Using Conan</summary>
+<p>
+
+For the [Conan package manager](https://www.conan.io/), follow these steps:
 
 1. Add Conan Center to the conan remotes:
 
         conan remote add center https://api.bintray.com/conan/conan/conan-center
 
-2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file (TODO):
+2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.36.0@center/stable
+        gsl-lite/0.36@center/stable
 
 3. Run conan's install command:
 
         conan install gsl-lite
 
-### As Conda package
+Now *gsl-lite* can be consumed as a Conan package. (TODO: elaborate!)
+</p></details>
+
+<details>
+<summary>Using Conda</summary>
+<p>
 
 1. For the [conda package manager](https://conda.io), first use **one of these options** to install `gsl-lite` from the [`conda-forge`](https://conda-forge.org/) channel:
 
@@ -201,13 +188,20 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
         conda env update
 
 2. Then activate the environment using `conda activate env_name` (if not already activated) and proceed using the instructions from step 2 of ["As CMake package"](#as-cmake-package). Note that it's also useful to have the `cmake` package in the same environment, and explicitly passing `-DCMAKE_INSTALL_PREFIX` is not necessary.
+</p></details>
 
-### As external Git project
+### Other options
 
-Another approach is to automatically fetch the entire *gsl-lite* repository from Github and configure it as an external project.
+<details>
+<summary>As external Git project</summary>
+<p>
+
+TODO: this section needs updating
+
+Another approach is to automatically fetch the entire *gsl-lite* repository from GitHub and configure it as an external project.
 
 ```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
 
 project( use-gsl-lite LANGUAGES CXX )
 
@@ -246,7 +240,7 @@ add_subdirectory( src )
 
 In folder src:
 ```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
 
 project( program-using-gsl-lite LANGUAGES CXX )
 
@@ -257,6 +251,45 @@ target_link_libraries( program PRIVATE gsl::gsl-lite )
 ```
 
 This setup brings in more than you need, but also makes it easy to update *gsl-lite* to the latest version.  See [example/cmake-extern](example/cmake-extern) for a complete example.
+
+</p></details>
+
+<details>
+<summary>As copied header</summary>
+<p>
+
+Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
+
+In project root folder:
+
+```CMake
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
+
+project( use-gsl-lite LANGUAGES CXX )
+
+# Provide #include access to gsl-lite as 'gsl/gsl-lite.hpp': 
+
+add_library( gsl-lite INTERFACE )
+target_include_directories( gsl-lite INTERFACE include )  # adapt as necessary
+
+# Build program from src:
+
+add_subdirectory( src ) 
+```
+
+In folder src:
+
+```CMake
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
+
+project( program-using-gsl-lite LANGUAGES CXX )
+
+# Make program executable:
+
+add_executable( program main.cpp )
+target_link_libraries( program PRIVATE gsl-lite )
+```
+</p></details>
 
 
 Version semantics
@@ -285,8 +318,9 @@ Macro                                                                           
 ------------------------------------------------------------------------------------:|:---------------------------------------------------------|-------------------|-|
 [`gsl_FEATURE_OWNER_MACRO`](#gsl_feature_owner_macro1)                               | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
 [`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)                 | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
-[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 5                 | |
+[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 6                 | |
 [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
+[`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison1)           | 1                                                        | 0                 | C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear |
 [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
 [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
 [`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0) | 0                                                        | 1                 | enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)) |
@@ -532,6 +566,9 @@ Define this macro to 1 to have `not_null<>` support typical member functions of 
 #### `gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=0`
 Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. **Default is 0 for `T`.**
 
+#### `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=1`
+Define this macro to 0 to omit the ability to compare spans. C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear. **Default is 1.**
+
 #### `gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=1`
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. **Default is 1.**
 
@@ -579,7 +616,7 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `make_span()`               | -       | ✓      | ✓         | Create a span |
 `byte_span()`               | -       | -       | ✓         | Create a span of bytes from a single object |
 `as_bytes()`                | -       | ✓      | ✓         | A span as bytes |
-`as_writeable_bytes`        | -       | ✓      | ✓         | A span as writeable bytes |
+`as_writable_bytes`         | -       | ✓      | ✓         | A span as writable bytes |
 `basic_string_span<>`       | -       | ✓      | ✓         | See also proposal [p0123](http://wg21.link/p0123) |
 `string_span`               | ✓      | ✓      | ✓         | `basic_string_span< char >` |
 `wstring_span`              | -       | ✓      | ✓         | `basic_string_span< wchar_t >` |
@@ -627,7 +664,7 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 **6. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 
-Note: *gsl-lite* treats VC12 (VS2013) and VC14 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
+Note: *gsl-lite* treats VC12 (VS2013) and VC14 (VS2015) as C++11 (`gsl_CPP11_OR_GREATER`: 1).
 
 
 Deprecation
@@ -636,6 +673,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
+0.37.0  |   6   | `as_writeable_bytes()` spelling, call indexing for spans, and `span::at()` |
+&nbsp;  |&nbsp; | Use `as_writable_bytes()`, subscript indexing |
 0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
 &nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
 0.31.0  |   5   | `span( std::nullptr_t, index_type )` |
@@ -684,26 +723,26 @@ To build the tests:
 - [CMake](http://cmake.org), version 3.15 or later to be installed and in your PATH.
 - A [suitable compiler](#reported-to-work-with). 
 
-The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
+The [*lest* test framework](https://github.com/martinmoene/lest) is included in the [test folder](test).
  
 The following steps assume that the [*gsl-lite* source code](https://github.com/gsl-lite/gsl-lite) has been cloned into a directory named `C:\gsl-lite`.
 
-1. Create a directory for the build outputs for a particular architecture.  
-Here we use C:\\gsl-lite\\build-win-x86-vc10.
+1. Create a directory for the build outputs.  
+Here we use `C:\gsl-lite\build`.
 
         cd C:\gsl-lite
-        md build-win-x86-vc10
-        cd build-win-x86-vc10
+        mkdir build
+        cd build
 
-2. Configure CMake to use the compiler of your choice (run `cmake --help` for a list).
+2. Configure the build directory with CMake:
 
-        cmake -G "Visual Studio 10 2010" -DGSL_LITE_OPT_BUILD_TESTS=ON ..
+        cmake -DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug ..
 
-3. Build the test suite in the Debug configuration (alternatively use Release).    
+3. Build the test suite:
 
         cmake --build . --config Debug
 
-4. Run the test suite.    
+4. Run the test suite:
 
         ctest -V -C Debug
 
@@ -712,21 +751,20 @@ All tests should pass, indicating your platform is supported and you are ready t
 
 Other GSL implementations
 -------------------------
-- Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/gsl).
+- Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/GSL).
 - Vicente J. Botet Escriba. [Guidelines Support Library (GSL)](https://github.com/viboes/GSL).
-- Mattia Basaglia. CxxMiscLib [gsl.hpp](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/include/misclib/gsl.hpp), [tests](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/test/gsl.cpp).
 
 
 Notes and references
 --------------------
 ### Proposals, specification
-[1] [span on cppreference](http://en.cppreference.com/w/cpp/string/span).  
-[2] [span in C++20 Working Draft](http://eel.is/c++draft/views).  
-[3] [p0091 - Template argument deduction for class templates](http://wg21.link/p0091).  
-[4] [p0122 - span: bounds-safe views for sequences of objects](http://wg21.link/p0122).  
-[5] [p0123 - string_span: bounds-safe views for sequences of characters ](http://wg21.link/p0123).  
-[6] [p0298 - A byte type definition](http://wg21.link/p0298).  
-[7] [p0805 - Comparing Containers](http://wg21.link/p0805).  
+[1] [`std::span<>` on cppreference](https://en.cppreference.com/w/cpp/container/span).  
+[2] [`std::span<>` in C++20 Working Draft](http://eel.is/c++draft/views).  
+[3] [P0091 - Template argument deduction for class templates](http://wg21.link/p0091).  
+[4] [P0122 - span: bounds-safe views for sequences of objects](http://wg21.link/p0122).  
+[5] [P0123 - string_span: bounds-safe views for sequences of characters](http://wg21.link/p0123).  
+[6] [P0298 - A byte type definition](http://wg21.link/p0298).  
+[7] [P0805 - Comparing Containers](http://wg21.link/p0805).
 
 ### Articles
 [8] [Standard C++ Foundation](https://isocpp.org/).  
@@ -739,27 +777,19 @@ Notes and references
 [15] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). 21 Sep 2015.
 
 ### Compiler feature testing
-[16] cppreference.com. [Feature Test Recommendations](http://en.cppreference.com/w/cpp/experimental/feature_test).  
-[17] cppreference.com. [Feature testing macros](http://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros).  
+[16] cppreference.com. [Feature testing](https://en.cppreference.com/w/cpp/feature_test).
 
-### C++ features in various Visual C++ compilers
-[18] Visual C++ Team. [C++0x Core Language Features In VC10: The Table](http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx). Microsoft. 6 April 2010.  
-[19] Visual C++ Team. [C++11 Features in Visual C++ 11](http://blogs.msdn.com/b/vcblog/archive/2011/09/12/10209291.aspx). Microsoft. 12 September 2011.  
-[20] Joel Coehoorn. [C++11 features in Visual Studio 2012](http://stackoverflow.com/a/7422058/437272). StackOverflow. 14 September 2011.  
-[21] Stephan T. Lavavej. [C++11/14 Features In Visual Studio 14 CTP3](http://blogs.msdn.com/b/vcblog/archive/2014/08/21/c-11-14-features-in-visual-studio-14-ctp3.aspx). Microsoft. 21 August 2014.  
-[22] Stephan T. Lavavej. [C++11/14/17 Features In VS 2015 RTM](http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx). Microsoft. 19 June 2015.  
+### C++ features in various compilers
+[17] cppreference.com. [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support).
+
 
 Appendix
 --------
 
-**Contents**  
-- [A.1 Compile-time information](#a1)
-- [A.2 *gsl-lite* test specification](#a2)
-
 <a id="a1"></a>
 ### A.1 Compile-time information
 
-In the test runner , the version of *gsl-lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
+In the test runner, the version of *gsl-lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
 
 <a id="a2"></a>
 ### A.2 *gsl-lite* test specification
@@ -929,6 +959,7 @@ span<>: Terminates creation of a sub span of the first n elements for n exceedin
 span<>: Terminates creation of a sub span of the last n elements for n exceeding the span
 span<>: Terminates creation of a sub span outside the span
 span<>: Terminates access outside the span
+span<>: Terminates access with front() and back() on empty span
 span<>: Allows to default-construct
 span<>: Allows to construct from a nullptr and a zero size (C++11)
 span<>: Allows to construct from a single object (C++11)
@@ -975,10 +1006,12 @@ span<>: Allows const reverse iteration
 span<>: Allows to observe an element via array indexing
 span<>: Allows to observe an element via call indexing
 span<>: Allows to observe an element via at()
+span<>: Allows to observe an element via front() and back()
 span<>: Allows to observe an element via data()
 span<>: Allows to change an element via array indexing
 span<>: Allows to change an element via call indexing
 span<>: Allows to change an element via at()
+span<>: Allows to change an element via front() and back()
 span<>: Allows to change an element via data()
 span<>: Allows to compare equal to another span of the same type
 span<>: Allows to compare unequal to another span of the same type
@@ -1092,9 +1125,11 @@ string_span: Allows reverse iteration
 string_span: Allows const reverse iteration
 string_span: Allows to observe an element via array indexing
 string_span: Allows to observe an element via call indexing
+string_span: Allows to observe an element via front() and back()
 string_span: Allows to observe an element via data()
 string_span: Allows to change an element via array indexing
 string_span: Allows to change an element via call indexing
+string_span: Allows to change an element via front() and back()
 string_span: Allows to change an element via data()
 string_span: Allows to compare a string_span with another string_span
 string_span: Allows to compare empty span to non-empty span

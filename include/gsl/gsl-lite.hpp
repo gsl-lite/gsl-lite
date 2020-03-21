@@ -32,7 +32,7 @@
 
 #define  gsl_lite_MAJOR  0
 #define  gsl_lite_MINOR  36
-#define  gsl_lite_PATCH  0
+#define  gsl_lite_PATCH  1
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -117,7 +117,7 @@
 
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
-#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  5
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  6
 # else
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 # endif
@@ -150,6 +150,10 @@
 
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
+#endif
+
+#ifndef  gsl_CONFIG_ALLOWS_SPAN_COMPARISON
+# define gsl_CONFIG_ALLOWS_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
@@ -367,7 +371,7 @@
 
 #define gsl_HAVE_CONSTEXPR_14           ( gsl_CPP14_000 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 600 ) )
 #define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
-#define gsl_HAVE_DEPRECATED             gsl_CPP14_140
+#define gsl_HAVE_DEPRECATED             ( gsl_CPP14_140 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 142 ) )
 
 // Presence of C++17 language features:
 // MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
@@ -493,10 +497,12 @@
 # define gsl_NORETURN
 #endif
 
-#if gsl_HAVE( DEPRECATED )
-# define gsl_DEPRECATED( because ) [[deprecated( because )]]
+#if gsl_HAVE( DEPRECATED ) && !defined( gsl_TESTING_ )
+# define gsl_DEPRECATED             [[deprecated]]
+# define gsl_DEPRECATED_MSG( msg )  [[deprecated( msg )]]
 #else
-# define gsl_DEPRECATED( because )
+# define gsl_DEPRECATED
+# define gsl_DEPRECATED_MSG( msg )
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
@@ -1247,7 +1253,8 @@ gsl_api void fail_fast_assert_handler( char const * const expression, char const
 #if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 
 # if gsl_HAVE( EXCEPTIONS )
-gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_constexpr14 inline
+gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
+gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const message )
 {
     if ( !cond )
@@ -1257,7 +1264,8 @@ void fail_fast_assert( bool cond, char const * const message )
 
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 
-gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_api gsl_constexpr14 inline
+gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
+gsl_api gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
 {
     if ( !cond )
@@ -1266,7 +1274,8 @@ void fail_fast_assert( bool cond, char const * const expression, char const * co
 
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
 
-gsl_DEPRECATED("don't call gsl::fail_fast_assert() directly; use contract checking macros instead") gsl_constexpr14 inline
+gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
+gsl_constexpr14 inline
 void fail_fast_assert( bool cond ) gsl_noexcept
 {
     if ( !cond )
@@ -1722,9 +1731,9 @@ inline const gsl_constexpr14 T at( std::initializer_list<T> cont, size_t pos )
 #endif
 
 template< class T >
-gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
+gsl_api inline gsl_constexpr14 T & at( span<T> s, size_t pos )
 {
-    return s.at( pos );
+    return s[ pos ];
 }
 
 //
@@ -2553,6 +2562,7 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
 #if gsl_HAVE( NULLPTR )
+    gsl_DEPRECATED
     gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
         : first_( nullptr )
         , last_ ( nullptr )
@@ -2562,6 +2572,7 @@ public:
 #endif
 
 #if gsl_HAVE( IS_DELETE )
+    gsl_DEPRECATED
     gsl_api gsl_constexpr span( reference data_in )
         : span( &data_in, 1 )
     {}
@@ -2705,6 +2716,7 @@ public:
     // constructor taking shared_ptr deprecated since 0.29.0
 
 # if gsl_HAVE( SHARED_PTR )
+    gsl_DEPRECATED
     gsl_constexpr span( shared_ptr<element_type> const & ptr )
         : first_( ptr.get() )
         , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
@@ -2719,11 +2731,13 @@ public:
 #  else
     template< class ArrayElementType >
 #  endif
+    gsl_DEPRECATED
     gsl_constexpr span( unique_ptr<ArrayElementType> const & ptr, index_type count )
         : first_( ptr.get() )
         , last_ ( ptr.get() + count )
     {}
 
+    gsl_DEPRECATED
     gsl_constexpr span( unique_ptr<element_type> const & ptr )
         : first_( ptr.get() )
         , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
@@ -2819,20 +2833,36 @@ public:
 
     // 26.7.3.5 Element access [span.elem]
 
-    gsl_api gsl_constexpr reference operator[]( index_type pos ) const
+    gsl_api gsl_constexpr14 reference operator[]( index_type pos ) const
     {
-       return at( pos );
+        gsl_Expects( pos < size() );
+        return first_[ pos ];
     }
 
-    gsl_api gsl_constexpr reference operator()( index_type pos ) const
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+    gsl_DEPRECATED_MSG("use subscript indexing instead")
+    gsl_api gsl_constexpr14 reference operator()( index_type pos ) const
     {
-       return at( pos );
+        return (*this)[ pos ];
     }
 
+    gsl_DEPRECATED_MSG("use subscript indexing instead")
     gsl_api gsl_constexpr14 reference at( index_type pos ) const
     {
-       gsl_Expects( pos < size() );
-       return first_[ pos ];
+        return (*this)[ pos ];
+    }
+#endif // deprecate
+
+    gsl_api gsl_constexpr14 reference front() const
+    {
+        gsl_Expects( first_ != last_ );
+        return *first_;
+    }
+
+    gsl_api gsl_constexpr14 reference back() const
+    {
+        gsl_Expects( first_ != last_ );
+        return *(last_ - 1);
     }
 
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
@@ -2899,6 +2929,7 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 3 )
     // member length() deprecated since 0.29.0
 
+    gsl_DEPRECATED_MSG("use size() instead")
     gsl_api gsl_constexpr index_type length() const gsl_noexcept
     {
         return size();
@@ -2906,6 +2937,7 @@ public:
 
     // member length_bytes() deprecated since 0.29.0
 
+    gsl_DEPRECATED_MSG("use size_bytes() instead")
     gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
     {
         return size_bytes();
@@ -2915,11 +2947,13 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 2 )
     // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
 
+    gsl_DEPRECATED_MSG("use free function gsl::as_bytes() instead")
     gsl_api span< const byte > as_bytes() const gsl_noexcept
     {
         return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() ); // NOLINT
     }
 
+    gsl_DEPRECATED_MSG("use free function gsl::as_writable_bytes() instead")
     gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
     {
         return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() ); // NOLINT
@@ -2962,7 +2996,8 @@ span( Container const & ) -> span<const typename Container::value_type>;
 
 // 26.7.3.7 Comparison operators [span.comparison]
 
-#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+#if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
+# if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -2979,7 +3014,7 @@ inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const & r )
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#else
+# else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -2995,7 +3030,7 @@ inline gsl_constexpr bool operator< ( span<T> const & l, span<T> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
-#endif
+# endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 inline gsl_constexpr bool operator!=( span<T> const & l, span<U> const & r )
@@ -3020,6 +3055,7 @@ inline gsl_constexpr bool operator>=( span<T> const & l, span<U> const & r )
 {
     return !( l < r );
 }
+#endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 // span algorithms
 
@@ -3071,10 +3107,19 @@ gsl_api inline span< const byte > as_bytes( span<T> spn ) gsl_noexcept
 }
 
 template< class T>
+gsl_api inline span< byte > as_writable_bytes( span<T> spn ) gsl_noexcept
+{
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
+}
+
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+template< class T>
+gsl_DEPRECATED_MSG("use as_writable_bytes() (different spelling) instead")
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
+#endif // deprecate
 
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )
 
@@ -3169,6 +3214,7 @@ make_span( with_container_t, Container const & cont ) gsl_noexcept
 
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 template< class Ptr >
+gsl_DEPRECATED
 inline span<typename Ptr::element_type>
 make_span( Ptr & ptr )
 {
@@ -3177,6 +3223,7 @@ make_span( Ptr & ptr )
 #endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
 
 template< class Ptr >
+gsl_DEPRECATED
 inline span<typename Ptr::element_type>
 make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
 {
@@ -3465,14 +3512,27 @@ public:
         return size() == 0;
     }
 
-    gsl_api gsl_constexpr reference operator[]( index_type idx ) const
+    gsl_api gsl_constexpr14 reference operator[]( index_type idx ) const
     {
         return span_[idx];
     }
 
-    gsl_api gsl_constexpr reference operator()( index_type idx ) const
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+    gsl_DEPRECATED_MSG("use subscript indexing instead")
+    gsl_api gsl_constexpr14 reference operator()( index_type idx ) const
     {
         return span_[idx];
+    }
+#endif // deprecate
+
+    gsl_api gsl_constexpr14 reference front() const
+    {
+        return span_.front();
+    }
+
+    gsl_api gsl_constexpr14 reference back() const
+    {
+        return span_.back();
     }
 
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
@@ -4054,7 +4114,10 @@ using ::gsl::make_span;
 using ::gsl::byte_span;
 using ::gsl::copy;
 using ::gsl::as_bytes;
+using ::gsl::as_writable_bytes;
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 using ::gsl::as_writeable_bytes;
+#endif
 
 using ::gsl::basic_string_span;
 using ::gsl::string_span;

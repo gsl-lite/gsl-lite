@@ -139,16 +139,26 @@ CASE( "span<>: Terminates access outside the span" )
 {
     struct F {
         static void blow_ix(size_t i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v[i]; }
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
         static void blow_iv(size_t i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v(i); }
         static void blow_at(size_t i) { int arr[] = { 1, 2, 3, }; span<int> v( arr ); (void) v.at(i); }
+#endif // deprecate
     };
 
     EXPECT_NO_THROW( F::blow_ix(2) );
-    EXPECT_NO_THROW( F::blow_iv(2) );
-    EXPECT_NO_THROW( F::blow_at(2) );
     EXPECT_THROWS(   F::blow_ix(3) );
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+    EXPECT_NO_THROW( F::blow_iv(2) );
     EXPECT_THROWS(   F::blow_iv(3) );
+    EXPECT_NO_THROW( F::blow_at(2) );
     EXPECT_THROWS(   F::blow_at(3) );
+#endif // deprecate
+}
+
+CASE( "span<>: Terminates access with front() and back() on empty span" )
+{
+    EXPECT_THROWS( span<int>().front() );
+    EXPECT_THROWS( span<int>().back() );
 }
 
 CASE( "span<>: Allows to default-construct" )
@@ -787,11 +797,14 @@ CASE( "span<>: Allows to observe an element via array indexing" )
 
     for ( index_type i = 0; i < v.size(); ++i )
     {
-        EXPECT( v[i] == arr[i] );
-        EXPECT( w[i] == arr[i] );
+        EXPECT(  v[i] ==  arr[i] );
+        EXPECT( &v[i] == &arr[i] );
+        EXPECT(  w[i] ==  arr[i] );
+        EXPECT( &w[i] == &arr[i] );
     }
 }
 
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 CASE( "span<>: Allows to observe an element via call indexing" )
 {
     int arr[] = { 1, 2, 3, };
@@ -800,8 +813,10 @@ CASE( "span<>: Allows to observe an element via call indexing" )
 
     for ( index_type i = 0; i < v.size(); ++i )
     {
-        EXPECT( v(i) == arr[i] );
-        EXPECT( w(i) == arr[i] );
+        EXPECT(  v(i) ==  arr[i] );
+        EXPECT( &v(i) == &arr[i] );
+        EXPECT(  w(i) ==  arr[i] );
+        EXPECT( &w(i) == &arr[i] );
     }
 }
 
@@ -813,9 +828,24 @@ CASE( "span<>: Allows to observe an element via at()" )
 
     for ( index_type i = 0; i < v.size(); ++i )
     {
-        EXPECT( v.at(i) == arr[i] );
-        EXPECT( w.at(i) == arr[i] );
+        EXPECT(  v.at(i) ==  arr[i] );
+        EXPECT( &v.at(i) == &arr[i] );
+        EXPECT(  w.at(i) ==  arr[i] );
+        EXPECT( &w.at(i) == &arr[i] );
     }
+}
+#endif // deprecate
+
+CASE( "span<>: Allows to observe an element via front() and back()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+
+    EXPECT(  v.front() ==  arr[0] );
+    EXPECT( &v.front() == &arr[0] );
+    EXPECT(  w.back()  ==  arr[2] );
+    EXPECT( &w.back()  == &arr[2] );
 }
 
 CASE( "span<>: Allows to observe an element via data()" )
@@ -824,8 +854,10 @@ CASE( "span<>: Allows to observe an element via data()" )
     span<int>       v( arr );
     span<int> const w( arr );
 
-    EXPECT( *v.data() == *v.begin() );
-    EXPECT( *w.data() == *v.begin() );
+    EXPECT( *v.data() ==  *v.begin() );
+    EXPECT(  v.data() == &*v.begin() );
+    EXPECT( *w.data() ==  *v.begin() );
+    EXPECT(  w.data() == &*v.begin() );
 
     for ( index_type i = 0; i < v.size(); ++i )
     {
@@ -847,6 +879,7 @@ CASE( "span<>: Allows to change an element via array indexing" )
     EXPECT( 33 == arr[2] );
 }
 
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 CASE( "span<>: Allows to change an element via call indexing" )
 {
     int arr[] = { 1, 2, 3, };
@@ -872,6 +905,20 @@ CASE( "span<>: Allows to change an element via at()" )
     EXPECT( 22 == arr[1] );
     EXPECT( 33 == arr[2] );
 }
+#endif // deprecate
+
+CASE( "span<>: Allows to change an element via front() and back()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+
+    v.front() = 11;
+    v.back() = 33;
+
+    EXPECT( 11 == arr[0] );
+    EXPECT( 33 == arr[2] );
+}
 
 CASE( "span<>: Allows to change an element via data()" )
 {
@@ -887,6 +934,7 @@ CASE( "span<>: Allows to change an element via data()" )
     EXPECT( 33 == *w.data() );
 }
 
+#if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 CASE( "span<>: Allows to compare equal to another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
@@ -1005,6 +1053,7 @@ CASE( "span<>: Allows to compare empty spans as equal" )
     EXPECT( s == t );
 #endif
 }
+#endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 CASE( "span<>: Allows to test for empty span via empty(), empty case" )
 {
@@ -1111,8 +1160,8 @@ CASE( "span<>: Allows to swap with another span of the same type" )
 
     va.swap( vb );
 
-    EXPECT( va == vb0 );
-    EXPECT( vb == va0 );
+    EXPECT( va.data() == vb0.data() ); EXPECT( va.size() == vb0.size() );
+    EXPECT( vb.data() == va0.data() ); EXPECT( vb.size() == va0.size() );
 }
 
 static bool is_little_endian()
@@ -1177,7 +1226,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes " "[depr
     {
         type  a[] = { 0x0, };
         span<type> va( a );
-        span<gyte> vc( as_writeable_bytes(va) );
+        span<gyte> vc( as_writable_bytes(va) );
 
         for ( size_t i = 0; i < sizeof(type); ++i )
         {
@@ -1285,7 +1334,7 @@ CASE( "copy(): Allows to copy a span to another span of the same element type" )
 
     copy( src, dst );
 
-    EXPECT( src == dst.subspan( 0, src.size() ) );
+    EXPECT( std::equal(src.begin(), src.end(), dst.begin()) );
 }
 
 CASE( "copy(): Allows to copy a span to another span of a different element type" )

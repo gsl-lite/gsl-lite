@@ -813,10 +813,12 @@ CASE( "string_span: Allows to observe an element via array indexing" )
 
     for ( index_type i = 0; i < a.size(); ++i )
     {
-        EXPECT( a[i] == hello[i] );
+        EXPECT(  a[i] ==  hello[i] );
+        EXPECT( &a[i] == &hello[i] );
     }
 }
 
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 CASE( "string_span: Allows to observe an element via call indexing" )
 {
     char hello[] = "hello";
@@ -824,32 +826,34 @@ CASE( "string_span: Allows to observe an element via call indexing" )
 
     for ( index_type i = 0; i < a.size(); ++i )
     {
-        EXPECT( a(i) == hello[i] );
+        EXPECT(  a(i) ==  hello[i] );
+        EXPECT( &a(i) == &hello[i] );
     }
 }
+#endif // deprecate
 
-#if 0
-CASE( "string_span: Allows to observe an element via at()" )
+CASE( "string_span: Allows to observe an element via front() and back()" )
 {
     char hello[] = "hello";
     string_span a( hello );
 
-    for ( index_type i = 0; i < a.size(); ++i )
-    {
-        EXPECT( a.at(i) == hello[i] );
-    }
+    EXPECT(  a.front() ==  hello[0] );
+    EXPECT( &a.front() == &hello[0] );
+    EXPECT(  a.back() ==   hello[4] );
+    EXPECT( &a.back() ==  &hello[4] );
 }
-#endif
 
 CASE( "string_span: Allows to observe an element via data()" )
 {
     char hello[] = "hello";
     string_span a( hello );
 
-    EXPECT( *a.data() == *a.begin() );
+    EXPECT( *a.data() ==  *a.begin() );
+    EXPECT(  a.data() == &*a.begin() );
 
     for ( index_type i = 0; i < a.size(); ++i )
     {
+        EXPECT( a.data()[i] == hello[i] );
         EXPECT( a.data()[i] == hello[i] );
     }
 }
@@ -864,6 +868,7 @@ CASE( "string_span: Allows to change an element via array indexing" )
     EXPECT( hello[1] == '7' );
 }
 
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 CASE( "string_span: Allows to change an element via call indexing" )
 {
     char hello[] = "hello";
@@ -872,6 +877,19 @@ CASE( "string_span: Allows to change an element via call indexing" )
     a(1) = '7';
 
     EXPECT( hello[1] == '7' );
+}
+#endif // deprecate
+
+CASE( "string_span: Allows to change an element via front() and back()" )
+{
+    char hello[] = "hello";
+    string_span a( hello );
+
+    a.front() = '1';
+    a.back() = '2';
+
+    EXPECT( hello[0] == '1' );
+    EXPECT( hello[4] == '2' );
 }
 
 #if 0
