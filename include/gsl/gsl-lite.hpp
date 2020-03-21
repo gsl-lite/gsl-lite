@@ -588,7 +588,7 @@
     //ᅟ        multiplicative = 1,
     //ᅟ        power = 2
     //ᅟ    };
-    //ᅟ    gsl_DEFINE_ENUM_RELATIONAL_OPERATORS(OperatorPrecedence)
+    //ᅟ    gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
     //
 #define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
 
