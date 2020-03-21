@@ -887,6 +887,7 @@ CASE( "span<>: Allows to change an element via data()" )
     EXPECT( 33 == *w.data() );
 }
 
+#if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 CASE( "span<>: Allows to compare equal to another span of the same type" )
 {
     int a[] = { 1 }, b[] = { 2 }, c[] = { 1, 2 };
@@ -1005,6 +1006,7 @@ CASE( "span<>: Allows to compare empty spans as equal" )
     EXPECT( s == t );
 #endif
 }
+#endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 CASE( "span<>: Allows to test for empty span via empty(), empty case" )
 {
@@ -1111,8 +1113,8 @@ CASE( "span<>: Allows to swap with another span of the same type" )
 
     va.swap( vb );
 
-    EXPECT( va == vb0 );
-    EXPECT( vb == va0 );
+    EXPECT( va.data() == vb0.data() ); EXPECT( va.size() == vb0.size() );
+    EXPECT( vb.data() == va0.data() ); EXPECT( vb.size() == va0.size() );
 }
 
 static bool is_little_endian()
@@ -1285,7 +1287,7 @@ CASE( "copy(): Allows to copy a span to another span of the same element type" )
 
     copy( src, dst );
 
-    EXPECT( src == dst.subspan( 0, src.size() ) );
+    EXPECT( std::equal(src.begin(), src.end(), dst.begin()) );
 }
 
 CASE( "copy(): Allows to copy a span to another span of a different element type" )

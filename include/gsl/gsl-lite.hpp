@@ -117,7 +117,7 @@
 
 #ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
-#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  5
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  6
 # else
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 # endif
@@ -150,6 +150,10 @@
 
 #ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
+#endif
+
+#ifndef  gsl_CONFIG_ALLOWS_SPAN_COMPARISON
+# define gsl_CONFIG_ALLOWS_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)
 #endif
 
 #ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
@@ -2962,7 +2966,8 @@ span( Container const & ) -> span<const typename Container::value_type>;
 
 // 26.7.3.7 Comparison operators [span.comparison]
 
-#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+#if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
+# if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -2979,7 +2984,7 @@ inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const & r )
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#else
+# else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -2995,7 +3000,7 @@ inline gsl_constexpr bool operator< ( span<T> const & l, span<T> const & r )
 {
     return std::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
-#endif
+# endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 inline gsl_constexpr bool operator!=( span<T> const & l, span<U> const & r )
@@ -3020,6 +3025,7 @@ inline gsl_constexpr bool operator>=( span<T> const & l, span<U> const & r )
 {
     return !( l < r );
 }
+#endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 // span algorithms
 

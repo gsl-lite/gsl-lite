@@ -285,8 +285,9 @@ Macro                                                                           
 ------------------------------------------------------------------------------------:|:---------------------------------------------------------|-------------------|-|
 [`gsl_FEATURE_OWNER_MACRO`](#gsl_feature_owner_macro1)                               | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
 [`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)                 | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
-[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 5                 | |
+[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 6                 | |
 [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
+[`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison1)           | 1                                                        | 0                 | C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear |
 [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
 [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
 [`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0) | 0                                                        | 1                 | enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)) |
@@ -531,6 +532,9 @@ Define this macro to 1 to have `not_null<>` support typical member functions of 
 
 #### `gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=0`
 Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. **Default is 0 for `T`.**
+
+#### `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=1`
+Define this macro to 0 to omit the ability to compare spans. C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear. **Default is 1.**
 
 #### `gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=1`
 Define this macro to 0 to omit the ability to compare spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. **Default is 1.**
