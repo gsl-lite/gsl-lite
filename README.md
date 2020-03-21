@@ -85,90 +85,69 @@ Installation and use
 --------------------
 *gsl-lite* is a single-file header-only library. There are various ways to use it in your project.
 
-<details>
-<summary>As copied header</summary>
-<p>
+### As CMake package
 
-Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
-
-In project root folder:
-
-```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-
-project( use-gsl-lite LANGUAGES CXX )
-
-# Provide #include access to gsl-lite as 'gsl/gsl-lite.hpp': 
-
-add_library( gsl-lite INTERFACE )
-target_include_directories( gsl-lite INTERFACE include )  # adapt as necessary
-
-# Build program from src:
-
-add_subdirectory( src ) 
-```
-
-In folder src:
-
-```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-
-project( program-using-gsl-lite LANGUAGES CXX )
-
-# Make program executable:
-
-add_executable( program main.cpp )
-target_link_libraries( program PRIVATE gsl-lite )
-```
-</p></details>
-
-<details>
-<summary>As CMake package</summary>
-<p>
-
-1. First install the *gsl-lite* CMake package from its source, for example:
-
-        cd ./gsl-lite
-        cmake -H. -B../build -DCMAKE_INSTALL_PREFIX="~/dev"
-        cmake --build ../build --target install
-
-2. Next, you can use the *gsl-lite* CMake package, for example:
+The recommended way to consume *gsl-lite* in your project is to use CMake, `find_package()`, and `target_link_libraries()`:
 
     ```CMake
-    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+    cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
     find_package( gsl-lite 0.36 REQUIRED )
     
-    project( program-using-gsl-lite LANGUAGES CXX )
+    project( my-program LANGUAGES CXX )
     
-    add_executable(        program main.cpp )
-    target_link_libraries( program PRIVATE gsl::gsl-lite )
+    add_executable(        my-program main.cpp )
+    target_link_libraries( my-program PRIVATE gsl::gsl-lite )
     ```
-    Configure and build:
 
-        cd ./gsl-lite/example/cmake-pkg
-        cmake -H. -B../build -DCMAKE_INSTALL_PREFIX=_stage -DCMAKE_PREFIX_PATH="~/dev"
+There are various ways to make the `gsl-lite` package available to your project:
+
+<details>
+<summary>Using Vcpkg</summary>
+<p>
+
+1. For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run Vcpkg's install command:
+
+        vcpkg install gsl-lite
+
+2. Now, configure your project passing the Vcpkg toolchaing file as a parameter:
+
+        cd <my-program-source-dir>
+        mkdir build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=<vcpkg-root>/scripts/buildsystems/vcpkg.cmake ..
+        cmake --build ../build
+
+</p></details>
+
+<details>
+<summary>Using an exported build directory</summary>
+<p>
+
+1. Clone the *gsl-lite* repository and configure a build directory with CMake:
+
+        git clone git@github.com:gsl-lite/gsl-lite.git <gsl-lite-source-dir>
+        cd <gsl-lite-source-dir>
+        mkdir build
+        cd build
+        cmake ..
+
+2. Now, configure your project passing the CMake build directory as a parameter:
+
+        cd <my-program-source-dir>
+        mkdir build
+        cd build
+        cmake -Dgsl-lite_DIR:PATH=<gsl-lite-source-dir>/build ..
         cmake --build ../build
 
     See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
 </p></details>
 
 <details>
-<summary>As Vcpkg package</summary>
+<summary>Using Conan</summary>
 <p>
 
-For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run Vcpkg's install command:
-
-        vcpkg install gsl-lite
-
-Now *gsl-lite* can be consumed [as a CMake package](#as-cmake-package).
-</p></details>
-
-<details>
-<summary>As Conan package</summary>
-<p>
-
-For the [conan package manager](https://www.conan.io/), follow these steps:
+For the [Conan package manager](https://www.conan.io/), follow these steps:
 
 1. Add Conan Center to the conan remotes:
 
@@ -182,10 +161,12 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 3. Run conan's install command:
 
         conan install gsl-lite
+
+Now *gsl-lite* can be consumed as a Conan package. (TODO: elaborate!)
 </p></details>
 
 <details>
-<summary>As Conda package</summary>
+<summary>Using Conda</summary>
 <p>
 
 1. For the [conda package manager](https://conda.io), first use **one of these options** to install `gsl-lite` from the [`conda-forge`](https://conda-forge.org/) channel:
@@ -209,14 +190,18 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 2. Then activate the environment using `conda activate env_name` (if not already activated) and proceed using the instructions from step 2 of ["As CMake package"](#as-cmake-package). Note that it's also useful to have the `cmake` package in the same environment, and explicitly passing `-DCMAKE_INSTALL_PREFIX` is not necessary.
 </p></details>
 
+### Other options
+
 <details>
 <summary>As external Git project</summary>
 <p>
 
-Another approach is to automatically fetch the entire *gsl-lite* repository from Github and configure it as an external project.
+TODO: this section needs updating
+
+Another approach is to automatically fetch the entire *gsl-lite* repository from GitHub and configure it as an external project.
 
 ```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
 
 project( use-gsl-lite LANGUAGES CXX )
 
@@ -255,7 +240,7 @@ add_subdirectory( src )
 
 In folder src:
 ```CMake
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
 
 project( program-using-gsl-lite LANGUAGES CXX )
 
@@ -267,6 +252,43 @@ target_link_libraries( program PRIVATE gsl::gsl-lite )
 
 This setup brings in more than you need, but also makes it easy to update *gsl-lite* to the latest version.  See [example/cmake-extern](example/cmake-extern) for a complete example.
 
+</p></details>
+
+<details>
+<summary>As copied header</summary>
+<p>
+
+Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
+
+In project root folder:
+
+```CMake
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
+
+project( use-gsl-lite LANGUAGES CXX )
+
+# Provide #include access to gsl-lite as 'gsl/gsl-lite.hpp': 
+
+add_library( gsl-lite INTERFACE )
+target_include_directories( gsl-lite INTERFACE include )  # adapt as necessary
+
+# Build program from src:
+
+add_subdirectory( src ) 
+```
+
+In folder src:
+
+```CMake
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
+
+project( program-using-gsl-lite LANGUAGES CXX )
+
+# Make program executable:
+
+add_executable( program main.cpp )
+target_link_libraries( program PRIVATE gsl-lite )
+```
 </p></details>
 
 
