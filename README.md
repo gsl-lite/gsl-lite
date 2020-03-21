@@ -735,21 +735,20 @@ All tests should pass, indicating your platform is supported and you are ready t
 
 Other GSL implementations
 -------------------------
-- Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/gsl).
+- Microsoft. [Guidelines Support Library (GSL)](https://github.com/microsoft/GSL).
 - Vicente J. Botet Escriba. [Guidelines Support Library (GSL)](https://github.com/viboes/GSL).
-- Mattia Basaglia. CxxMiscLib [gsl.hpp](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/include/misclib/gsl.hpp), [tests](https://github.com/mbasaglia/Cxx-MiscLib/blob/master/test/gsl.cpp).
 
 
 Notes and references
 --------------------
 ### Proposals, specification
-[1] [span on cppreference](http://en.cppreference.com/w/cpp/string/span).  
-[2] [span in C++20 Working Draft](http://eel.is/c++draft/views).  
-[3] [p0091 - Template argument deduction for class templates](http://wg21.link/p0091).  
-[4] [p0122 - span: bounds-safe views for sequences of objects](http://wg21.link/p0122).  
-[5] [p0123 - string_span: bounds-safe views for sequences of characters ](http://wg21.link/p0123).  
-[6] [p0298 - A byte type definition](http://wg21.link/p0298).  
-[7] [p0805 - Comparing Containers](http://wg21.link/p0805).  
+[1] [`std::span<>` on cppreference](https://en.cppreference.com/w/cpp/container/span).  
+[2] [`std::span<>` in C++20 Working Draft](http://eel.is/c++draft/views).  
+[3] [P0091 - Template argument deduction for class templates](http://wg21.link/p0091).  
+[4] [P0122 - span: bounds-safe views for sequences of objects](http://wg21.link/p0122).  
+[5] [P0123 - string_span: bounds-safe views for sequences of characters](http://wg21.link/p0123).  
+[6] [P0298 - A byte type definition](http://wg21.link/p0298).  
+[7] [P0805 - Comparing Containers](http://wg21.link/p0805).
 
 ### Articles
 [8] [Standard C++ Foundation](https://isocpp.org/).  
@@ -762,27 +761,19 @@ Notes and references
 [15] Herb Sutter and Neil MacIntosh. [Lifetime Safety: Preventing Leaks and Dangling](https://github.com/isocpp/CppCoreGuidelines/raw/master/docs/Lifetimes%20I%20and%20II%20-%20v0.9.1.pdf). 21 Sep 2015.
 
 ### Compiler feature testing
-[16] cppreference.com. [Feature Test Recommendations](http://en.cppreference.com/w/cpp/experimental/feature_test).  
-[17] cppreference.com. [Feature testing macros](http://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros).  
+[16] cppreference.com. [Feature testing](https://en.cppreference.com/w/cpp/feature_test).
 
-### C++ features in various Visual C++ compilers
-[18] Visual C++ Team. [C++0x Core Language Features In VC10: The Table](http://blogs.msdn.com/b/vcblog/archive/2010/04/06/c-0x-core-language-features-in-vc10-the-table.aspx). Microsoft. 6 April 2010.  
-[19] Visual C++ Team. [C++11 Features in Visual C++ 11](http://blogs.msdn.com/b/vcblog/archive/2011/09/12/10209291.aspx). Microsoft. 12 September 2011.  
-[20] Joel Coehoorn. [C++11 features in Visual Studio 2012](http://stackoverflow.com/a/7422058/437272). StackOverflow. 14 September 2011.  
-[21] Stephan T. Lavavej. [C++11/14 Features In Visual Studio 14 CTP3](http://blogs.msdn.com/b/vcblog/archive/2014/08/21/c-11-14-features-in-visual-studio-14-ctp3.aspx). Microsoft. 21 August 2014.  
-[22] Stephan T. Lavavej. [C++11/14/17 Features In VS 2015 RTM](http://blogs.msdn.com/b/vcblog/archive/2015/06/19/c-11-14-17-features-in-vs-2015-rtm.aspx). Microsoft. 19 June 2015.  
+### C++ features in various compilers
+[18] cppreference.com. [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support).
+
 
 Appendix
 --------
 
-**Contents**  
-- [A.1 Compile-time information](#a1)
-- [A.2 *gsl-lite* test specification](#a2)
-
 <a id="a1"></a>
 ### A.1 Compile-time information
 
-In the test runner , the version of *gsl-lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
+In the test runner, the version of *gsl-lite* is available via tag `[.version]`. The following tags are available for information on the compiler and on the C++ standard library used: `[.compiler]`, `[.stdc++]`, `[.stdlanguage]` and `[.stdlibrary]`.
 
 <a id="a2"></a>
 ### A.2 *gsl-lite* test specification
