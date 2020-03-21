@@ -1726,7 +1726,7 @@ inline const gsl_constexpr14 T at( std::initializer_list<T> cont, size_t pos )
 #endif
 
 template< class T >
-gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
+gsl_api inline gsl_constexpr14 T & at( span<T> s, size_t pos )
 {
     return s[ pos ];
 }
@@ -2828,7 +2828,7 @@ public:
 
     // 26.7.3.5 Element access [span.elem]
 
-    gsl_api gsl_constexpr reference operator[]( index_type pos ) const
+    gsl_api gsl_constexpr14 reference operator[]( index_type pos ) const
     {
        gsl_Expects( pos < size() );
        return first_[ pos ];
@@ -2842,7 +2842,7 @@ public:
     }
 
     gsl_DEPRECATED("indexing spans with at() is deprecated; use subscript indexing instead")
-    gsl_api gsl_constexpr14 reference at( index_type pos ) const
+    gsl_api gsl_constexpr reference at( index_type pos ) const
     {
        return (*this)[ pos ];
     }
