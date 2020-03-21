@@ -155,6 +155,12 @@ CASE( "span<>: Terminates access outside the span" )
 #endif // deprecate
 }
 
+CASE( "span<>: Terminates access with front() and back() on empty span" )
+{
+    EXPECT_THROWS( span<int>().front() );
+    EXPECT_THROWS( span<int>().back() );
+}
+
 CASE( "span<>: Allows to default-construct" )
 {
     span<int> v;
@@ -830,6 +836,18 @@ CASE( "span<>: Allows to observe an element via at()" )
 }
 #endif // deprecate
 
+CASE( "span<>: Allows to observe an element via front() and back()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+
+    EXPECT(  v.front() ==  arr[0] );
+    EXPECT( &v.front() == &arr[0] );
+    EXPECT(  w.back()  ==  arr[2] );
+    EXPECT( &w.back()  == &arr[2] );
+}
+
 CASE( "span<>: Allows to observe an element via data()" )
 {
     int arr[] = { 1, 2, 3, };
@@ -888,6 +906,19 @@ CASE( "span<>: Allows to change an element via at()" )
     EXPECT( 33 == arr[2] );
 }
 #endif // deprecate
+
+CASE( "span<>: Allows to change an element via front() and back()" )
+{
+    int arr[] = { 1, 2, 3, };
+    span<int>       v( arr );
+    span<int> const w( arr );
+
+    v.front() = 11;
+    v.back() = 33;
+
+    EXPECT( 11 == arr[0] );
+    EXPECT( 33 == arr[2] );
+}
 
 CASE( "span<>: Allows to change an element via data()" )
 {

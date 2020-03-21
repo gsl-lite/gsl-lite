@@ -2843,6 +2843,18 @@ public:
     }
 #endif // deprecate
 
+    gsl_api gsl_constexpr14 reference front() const
+    {
+        gsl_Expects( first_ != last_ );
+        return *first_;
+    }
+
+    gsl_api gsl_constexpr14 reference back() const
+    {
+        gsl_Expects( first_ != last_ );
+        return *(last_ - 1);
+    }
+
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
     {
         return first_;
@@ -3496,6 +3508,16 @@ public:
         return span_[idx];
     }
 #endif // deprecate
+
+    gsl_api gsl_constexpr reference front() const
+    {
+        return span_.front();
+    }
+
+    gsl_api gsl_constexpr reference back() const
+    {
+        return span_.back();
+    }
 
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
     {
