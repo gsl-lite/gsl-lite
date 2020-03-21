@@ -59,7 +59,7 @@ int main()
 ### Compile and run
 
 ```
-prompt>g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
+prompt> g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
 ```
 
 In a nutshell
@@ -85,15 +85,10 @@ Installation and use
 --------------------
 *gsl-lite* is a single-file header-only library. There are various ways to use it in your project.
 
-**Contents**  
-- [As copied header](#as-copied-header)
-- [As CMake package](#as-cmake-package)
-- [As Vcpkg package](#as-vcpkg-package)
-- [As Conan package](#as-conan-package)
-- [As Conda package](#as-conda-package)
-- [As external Git project](#as-external-git-project)
+<details><summary>
 
 ### As copied header
+</summary><p>
 
 Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
 
@@ -126,8 +121,12 @@ project( program-using-gsl-lite LANGUAGES CXX )
 add_executable( program main.cpp )
 target_link_libraries( program PRIVATE gsl-lite )
 ```
+</p></details>
+
+<details><summary>
 
 ### As CMake package
+</summary><p>
 
 1. First install the *gsl-lite* CMake package from its source, for example:
 
@@ -154,16 +153,24 @@ target_link_libraries( program PRIVATE gsl-lite )
         cmake --build ../build
 
     See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
+</p></details>
+
+<details><summary>
 
 ### As Vcpkg package
+</summary><p>
 
 For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run Vcpkg's install command:
 
         vcpkg install gsl-lite
 
 Now *gsl-lite* can be consumed [as a CMake package](#as-cmake-package).
+</p></details>
+
+<details><summary>
 
 ### As Conan package
+</summary><p>
 
 For the [conan package manager](https://www.conan.io/), follow these steps:
 
@@ -171,16 +178,20 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 
         conan remote add center https://api.bintray.com/conan/conan/conan-center
 
-2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file (TODO):
+2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.36.0@center/stable
+        gsl-lite/0.36@center/stable
 
 3. Run conan's install command:
 
         conan install gsl-lite
+</p></details>
+
+<details><summary>
 
 ### As Conda package
+</summary><p>
 
 1. For the [conda package manager](https://conda.io), first use **one of these options** to install `gsl-lite` from the [`conda-forge`](https://conda-forge.org/) channel:
 
@@ -201,8 +212,12 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
         conda env update
 
 2. Then activate the environment using `conda activate env_name` (if not already activated) and proceed using the instructions from step 2 of ["As CMake package"](#as-cmake-package). Note that it's also useful to have the `cmake` package in the same environment, and explicitly passing `-DCMAKE_INSTALL_PREFIX` is not necessary.
+</p></details>
+
+<details><summary>
 
 ### As external Git project
+</summary><p>
 
 Another approach is to automatically fetch the entire *gsl-lite* repository from Github and configure it as an external project.
 
@@ -257,6 +272,8 @@ target_link_libraries( program PRIVATE gsl::gsl-lite )
 ```
 
 This setup brings in more than you need, but also makes it easy to update *gsl-lite* to the latest version.  See [example/cmake-extern](example/cmake-extern) for a complete example.
+
+</p></details>
 
 
 Version semantics
@@ -631,7 +648,7 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 **6. Concepts**             | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 ...                         | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 
-Note: *gsl-lite* treats VC12 (VS2013) and VC14 (VS2015) as C++11 (gsl_CPP11_OR_GREATER: 1).
+Note: *gsl-lite* treats VC12 (VS2013) and VC14 (VS2015) as C++11 (`gsl_CPP11_OR_GREATER`: 1).
 
 
 Deprecation
@@ -640,8 +657,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
-0.37.0  |   6   | `as_writeable_bytes()` spelling |
-&nbsp;  |&nbsp; | Use `as_writable_bytes()` |
+0.37.0  |   6   | `as_writeable_bytes()` spelling, call indexing for spans, and `span::at()` |
+&nbsp;  |&nbsp; | Use `as_writable_bytes()`, subscript indexing |
 0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
 &nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
 0.31.0  |   5   | `span( std::nullptr_t, index_type )` |
@@ -690,26 +707,26 @@ To build the tests:
 - [CMake](http://cmake.org), version 3.15 or later to be installed and in your PATH.
 - A [suitable compiler](#reported-to-work-with). 
 
-The [*lest* test framework](https://github.com/martinmoene/lest)  is included in the [test folder](test).
+The [*lest* test framework](https://github.com/martinmoene/lest) is included in the [test folder](test).
  
 The following steps assume that the [*gsl-lite* source code](https://github.com/gsl-lite/gsl-lite) has been cloned into a directory named `C:\gsl-lite`.
 
-1. Create a directory for the build outputs for a particular architecture.  
-Here we use C:\\gsl-lite\\build-win-x86-vc10.
+1. Create a directory for the build outputs.  
+Here we use `C:\gsl-lite\build`.
 
         cd C:\gsl-lite
-        md build-win-x86-vc10
-        cd build-win-x86-vc10
+        mkdir build
+        cd build
 
-2. Configure CMake to use the compiler of your choice (run `cmake --help` for a list).
+2. Configure the build directory with CMake:
 
-        cmake -G "Visual Studio 10 2010" -DGSL_LITE_OPT_BUILD_TESTS=ON ..
+        cmake -DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug ..
 
-3. Build the test suite in the Debug configuration (alternatively use Release).    
+3. Build the test suite:
 
         cmake --build . --config Debug
 
-4. Run the test suite.    
+4. Run the test suite:
 
         ctest -V -C Debug
 
