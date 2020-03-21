@@ -85,10 +85,9 @@ Installation and use
 --------------------
 *gsl-lite* is a single-file header-only library. There are various ways to use it in your project.
 
-<details><summary>
-
-### As copied header
-</summary><p>
+<details>
+<summary>As copied header</summary>
+<p>
 
 Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
 
@@ -123,10 +122,9 @@ target_link_libraries( program PRIVATE gsl-lite )
 ```
 </p></details>
 
-<details><summary>
-
-### As CMake package
-</summary><p>
+<details>
+<summary>As CMake package</summary>
+<p>
 
 1. First install the *gsl-lite* CMake package from its source, for example:
 
@@ -155,10 +153,9 @@ target_link_libraries( program PRIVATE gsl-lite )
     See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
 </p></details>
 
-<details><summary>
-
-### As Vcpkg package
-</summary><p>
+<details>
+<summary>As Vcpkg package</summary>
+<p>
 
 For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run Vcpkg's install command:
 
@@ -167,10 +164,9 @@ For the [Vcpkg package manager](https://github.com/microsoft/vcpkg/), simply run
 Now *gsl-lite* can be consumed [as a CMake package](#as-cmake-package).
 </p></details>
 
-<details><summary>
-
-### As Conan package
-</summary><p>
+<details>
+<summary>As Conan package</summary>
+<p>
 
 For the [conan package manager](https://www.conan.io/), follow these steps:
 
@@ -188,10 +184,9 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
         conan install gsl-lite
 </p></details>
 
-<details><summary>
-
-### As Conda package
-</summary><p>
+<details>
+<summary>As Conda package</summary>
+<p>
 
 1. For the [conda package manager](https://conda.io), first use **one of these options** to install `gsl-lite` from the [`conda-forge`](https://conda-forge.org/) channel:
 
@@ -214,10 +209,9 @@ For the [conan package manager](https://www.conan.io/), follow these steps:
 2. Then activate the environment using `conda activate env_name` (if not already activated) and proceed using the instructions from step 2 of ["As CMake package"](#as-cmake-package). Note that it's also useful to have the `cmake` package in the same environment, and explicitly passing `-DCMAKE_INSTALL_PREFIX` is not necessary.
 </p></details>
 
-<details><summary>
-
-### As external Git project
-</summary><p>
+<details>
+<summary>As external Git project</summary>
+<p>
 
 Another approach is to automatically fetch the entire *gsl-lite* repository from Github and configure it as an external project.
 
@@ -764,7 +758,7 @@ Notes and references
 [16] cppreference.com. [Feature testing](https://en.cppreference.com/w/cpp/feature_test).
 
 ### C++ features in various compilers
-[18] cppreference.com. [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support).
+[17] cppreference.com. [C++ compiler support](https://en.cppreference.com/w/cpp/compiler_support).
 
 
 Appendix
@@ -943,6 +937,7 @@ span<>: Terminates creation of a sub span of the first n elements for n exceedin
 span<>: Terminates creation of a sub span of the last n elements for n exceeding the span
 span<>: Terminates creation of a sub span outside the span
 span<>: Terminates access outside the span
+span<>: Terminates access with front() and back() on empty span
 span<>: Allows to default-construct
 span<>: Allows to construct from a nullptr and a zero size (C++11)
 span<>: Allows to construct from a single object (C++11)
@@ -989,10 +984,12 @@ span<>: Allows const reverse iteration
 span<>: Allows to observe an element via array indexing
 span<>: Allows to observe an element via call indexing
 span<>: Allows to observe an element via at()
+span<>: Allows to observe an element via front() and back()
 span<>: Allows to observe an element via data()
 span<>: Allows to change an element via array indexing
 span<>: Allows to change an element via call indexing
 span<>: Allows to change an element via at()
+span<>: Allows to change an element via front() and back()
 span<>: Allows to change an element via data()
 span<>: Allows to compare equal to another span of the same type
 span<>: Allows to compare unequal to another span of the same type
@@ -1106,9 +1103,11 @@ string_span: Allows reverse iteration
 string_span: Allows const reverse iteration
 string_span: Allows to observe an element via array indexing
 string_span: Allows to observe an element via call indexing
+string_span: Allows to observe an element via front() and back()
 string_span: Allows to observe an element via data()
 string_span: Allows to change an element via array indexing
 string_span: Allows to change an element via call indexing
+string_span: Allows to change an element via front() and back()
 string_span: Allows to change an element via data()
 string_span: Allows to compare a string_span with another string_span
 string_span: Allows to compare empty span to non-empty span
