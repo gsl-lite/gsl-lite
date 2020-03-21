@@ -1728,7 +1728,7 @@ inline const gsl_constexpr14 T at( std::initializer_list<T> cont, size_t pos )
 template< class T >
 gsl_api inline gsl_constexpr T & at( span<T> s, size_t pos )
 {
-    return s.at( pos );
+    return s[ pos ];
 }
 
 //
@@ -2825,19 +2825,23 @@ public:
 
     gsl_api gsl_constexpr reference operator[]( index_type pos ) const
     {
-       return at( pos );
-    }
-
-    gsl_api gsl_constexpr reference operator()( index_type pos ) const
-    {
-       return at( pos );
-    }
-
-    gsl_api gsl_constexpr14 reference at( index_type pos ) const
-    {
        gsl_Expects( pos < size() );
        return first_[ pos ];
     }
+
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+    gsl_DEPRECATED("call indexing for spans is deprecated; use subscript indexing instead")
+    gsl_api gsl_constexpr reference operator()( index_type pos ) const
+    {
+       return (*this)[ pos ];
+    }
+
+    gsl_DEPRECATED("indexing spans with at() is deprecated; use subscript indexing instead")
+    gsl_api gsl_constexpr14 reference at( index_type pos ) const
+    {
+       return (*this)[ pos ];
+    }
+#endif // deprecate
 
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
     {
@@ -3485,10 +3489,13 @@ public:
         return span_[idx];
     }
 
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+    gsl_DEPRECATED("call indexing for string views is deprecated; use subscript indexing instead")
     gsl_api gsl_constexpr reference operator()( index_type idx ) const
     {
         return span_[idx];
     }
+#endif // deprecate
 
     gsl_api gsl_constexpr pointer data() const gsl_noexcept
     {
