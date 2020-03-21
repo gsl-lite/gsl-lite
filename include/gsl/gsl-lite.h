@@ -20,7 +20,7 @@
 #ifndef GSL_GSL_LITE_H_INCLUDED
 #define GSL_GSL_LITE_H_INCLUDED
 
-#pragma message ("gsl-lite.h is deprecated since version 0.27.0, use gsl-lite.hpp instead.")
+#pragma message ("gsl/gsl-lite.h is deprecated since version 0.27.0, use gsl/gsl-lite.hpp instead.")
 
 #include "gsl-lite.hpp"
 

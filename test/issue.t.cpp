@@ -19,7 +19,7 @@
 
 using namespace gsl;
 
-CASE( "span<>: free comparation functions fail for different const-ness" "[.issue #32]" )
+CASE( "span<>: free comparation functions fail for different const-ness [issue #32]" )
 {
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )
 #if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
@@ -38,7 +38,26 @@ CASE( "span<>: free comparation functions fail for different const-ness" "[.issu
 #endif
 }
 
-CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "[.issue #34](GSL issue #313, PR #390)" )
+CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]" )
+{
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( TYPE_TRAITS )
+    struct S
+    {
+        int data_{ };
+
+        explicit S( gsl::span<gsl::byte const> ) { }
+        int const & data() const { return data_; }
+    };
+
+    // S is not a `contiguous_range`, hence the range constructor should not be instantiable, but this needs to be a substitution
+    // failure, not a hard error.
+    EXPECT( !(std::is_constructible< gsl::span< gsl::byte const >, S >::value) );
+#else
+    EXPECT( !!"span<>: constrained container constructor is not available (gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR=0)" );
+#endif
+}
+
+CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [issue #34](GSL issue #313, PR #390)" )
 {
     struct F {
         static int f( int & i, gsl::byte & r )
@@ -53,7 +72,7 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class" "
    EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte&>( i ) ) );
 }
 
-CASE( "string_span<>: must not include terminating '\\0'" "[.issue #53]" )
+CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
 {
     char const data[] = "ab";
     char const * text = "ab";
@@ -73,7 +92,7 @@ CASE( "string_span<>: must not include terminating '\\0'" "[.issue #53]" )
     EXPECT( a == b );
 }
 
-CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" "[.issue #53a]" )
+CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) [issue #53a]" )
 {
 #if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     cstring_span span = "Hello world";
@@ -81,7 +100,7 @@ CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's mo
 #endif
 }
 
-CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning C4127: conditional expression is constant [.issue #115]" )
+CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning C4127: conditional expression is constant [issue #115]" )
 {
     try { (void) narrow<float>( 1.0 ); } catch(...) {}
 }
