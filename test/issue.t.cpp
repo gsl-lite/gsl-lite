@@ -40,7 +40,7 @@ CASE( "span<>: free comparation functions fail for different const-ness [issue #
 
 CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]" )
 {
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( TYPE_TRAITS )
     struct S
     {
         int data_{ };
@@ -49,10 +49,9 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
         int const & data() const { return data_; }
     };
 
-    // C is not a `contiguous_range`, hence the constructor should not be instantiable, but this needs to be a substitution
+    // S is not a `contiguous_range`, hence the range constructor should not be instantiable, but this needs to be a substitution
     // failure, not a hard error.
-    EXPECT( std::is_copy_constructible< S >::value );
-    EXPECT( std::is_trivially_copy_constructible< S >::value );
+    EXPECT( !(std::is_constructible< gsl::span< gsl::byte const >, S >::value) );
 #else
     EXPECT( !!"span<>: constrained container constructor is not available (gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR=0)" );
 #endif
