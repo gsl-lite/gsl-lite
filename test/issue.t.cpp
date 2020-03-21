@@ -40,6 +40,7 @@ CASE( "span<>: free comparation functions fail for different const-ness [issue #
 
 CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]" )
 {
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     struct S
     {
         int data_{ };
@@ -48,7 +49,6 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
         int const & data() const { return data_; }
     };
 
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     // C is not a `contiguous_range`, hence the constructor should not be instantiable, but this needs to be a substitution
     // failure, not a hard error.
     EXPECT( std::is_copy_constructible< S >::value );
