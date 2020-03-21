@@ -1179,7 +1179,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes " "[depr
     {
         type  a[] = { 0x0, };
         span<type> va( a );
-        span<gyte> vc( as_writeable_bytes(va) );
+        span<gyte> vc( as_writable_bytes(va) );
 
         for ( size_t i = 0; i < sizeof(type); ++i )
         {
@@ -1199,7 +1199,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes " "[depr
     {
         type  a[] = { 0x0, };
         span<type> va( a );
-        span<gyte> vb( va.as_writeable_bytes() );
+        span<gyte> vb( va.as_writable_bytes() );
 
         for ( size_t i = 0; i < sizeof(type); ++i )
         {

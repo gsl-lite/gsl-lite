@@ -3077,10 +3077,19 @@ gsl_api inline span< const byte > as_bytes( span<T> spn ) gsl_noexcept
 }
 
 template< class T>
+gsl_api inline span< byte > as_writable_bytes( span<T> spn ) gsl_noexcept
+{
+    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
+}
+
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+template< class T>
+gsl_DEPRECATED("this spelling is deprecated; use as_writable_bytes() instead")
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
+#endif // deprecate
 
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )
 
@@ -4060,7 +4069,10 @@ using ::gsl::make_span;
 using ::gsl::byte_span;
 using ::gsl::copy;
 using ::gsl::as_bytes;
+using ::gsl::as_writable_bytes;
+#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 using ::gsl::as_writeable_bytes;
+#endif
 
 using ::gsl::basic_string_span;
 using ::gsl::string_span;

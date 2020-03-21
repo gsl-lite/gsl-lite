@@ -583,7 +583,7 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `make_span()`               | -       | ✓      | ✓         | Create a span |
 `byte_span()`               | -       | -       | ✓         | Create a span of bytes from a single object |
 `as_bytes()`                | -       | ✓      | ✓         | A span as bytes |
-`as_writeable_bytes`        | -       | ✓      | ✓         | A span as writeable bytes |
+`as_writable_bytes`         | -       | ✓      | ✓         | A span as writable bytes |
 `basic_string_span<>`       | -       | ✓      | ✓         | See also proposal [p0123](http://wg21.link/p0123) |
 `string_span`               | ✓      | ✓      | ✓         | `basic_string_span< char >` |
 `wstring_span`              | -       | ✓      | ✓         | `basic_string_span< wchar_t >` |
@@ -640,6 +640,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
+0.37.0  |   6   | `as_writeable_bytes()` spelling |
+&nbsp;  |&nbsp; | Use `as_writable_bytes()` |
 0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
 &nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
 0.31.0  |   5   | `span( std::nullptr_t, index_type )` |
