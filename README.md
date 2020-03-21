@@ -83,22 +83,21 @@ Dependencies
 
 Installation and use
 --------------------
-*gsl-lite* is a single-file header-only library. There are various ways to use it in your project.
 
 ### As CMake package
 
-The recommended way to consume *gsl-lite* in your project is to use CMake, `find_package()`, and `target_link_libraries()`:
+The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` and `target_link_libraries()`:
 
-    ```CMake
-    cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
+```CMake
+cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
-    find_package( gsl-lite 0.36 REQUIRED )
+find_package( gsl-lite 0.36 REQUIRED )
     
-    project( my-program LANGUAGES CXX )
+project( my-program LANGUAGES CXX )
     
-    add_executable(        my-program main.cpp )
-    target_link_libraries( my-program PRIVATE gsl::gsl-lite )
-    ```
+add_executable(        my-program main.cpp )
+target_link_libraries( my-program PRIVATE gsl::gsl-lite )
+```
 
 There are various ways to make the `gsl-lite` package available to your project:
 
@@ -673,8 +672,8 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
-0.37.0  |   6   | `as_writeable_bytes()` spelling, call indexing for spans, and `span::at()` |
-&nbsp;  |&nbsp; | Use `as_writable_bytes()`, subscript indexing |
+0.37.0  |   6   | `as_writeable_bytes()`, call indexing for spans, and `span::at()` |
+&nbsp;  |&nbsp; | `as_writable_bytes()`, subscript indexing is used |
 0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
 &nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
 0.31.0  |   5   | `span( std::nullptr_t, index_type )` |

@@ -2562,7 +2562,6 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
 #if gsl_HAVE( NULLPTR )
-    gsl_DEPRECATED
     gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
         : first_( nullptr )
         , last_ ( nullptr )
