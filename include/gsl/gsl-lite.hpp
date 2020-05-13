@@ -623,7 +623,7 @@
 //       Also, please note that `gsl_ENABLE_IF_()` doesn't enforce the constraint at all if no compiler/library support is available (i.e. pre-C++11).
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
 #  define gsl_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
 # else
 #  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
@@ -1896,8 +1896,8 @@ public:
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_constructible<T, U>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
 #  endif
     >
     gsl_constexpr14 explicit not_null( U other )
@@ -1919,8 +1919,8 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -1929,8 +1929,8 @@ public:
     }
 
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_convertible<U, T>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -1961,8 +1961,8 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
@@ -1971,8 +1971,8 @@ public:
     }
 
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_convertible<U, T>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
@@ -2067,8 +2067,8 @@ public:
     // explicit conversion operator
 
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit
     operator U() const
@@ -2081,8 +2081,8 @@ public:
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit
     operator U() &&
@@ -2094,8 +2094,8 @@ public:
 
     // implicit conversion operator
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14
     operator U() const
@@ -2108,8 +2108,8 @@ public:
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
-        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous, hence the check for `gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG`.
-        gsl_ENABLE_IF_( ( std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ) )
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14
     operator U() &&
