@@ -622,8 +622,8 @@
 //
 //       Also, please note that `gsl_ENABLE_IF_()` doesn't enforce the constraint at all if no compiler/library support is available (i.e. pre-C++11).
 
-#if gsl_HAVE( TYPE_TRAITS )
-# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
 #  define gsl_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
 # else
 #  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
@@ -1097,7 +1097,7 @@ template<
 #  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 // VS2013 has insufficient support for expression SFINAE; we cannot make `is_compatible_container<>` a proper type trait here
 struct is_compatible_container : std::true_type { };
-#  else // ^^^ gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) ^^^ / vvv ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) vvv
+#  else
 struct is_compatible_container_r { is_compatible_container_r(int); };
 template< class C, class E >
 std::true_type  is_compatible_container_f( is_compatible_container_r<C, E> );
