@@ -609,43 +609,27 @@
 
 // Method enabling (C++98, VC120 (VS2013) cannot use __VA_ARGS__)
 
-// Guidelines for SFINAE in gsl-lite:
-//
-//     The macros below are for conditional SFINAE, i.e. they apply SFINAE only if the necessary language support is available.
-//     Don't use these macros if language support can be assumed in the given context.
-//
-//     For functions, prefer return-type SFINAE if possible.
-//     If return-type SFINAE is not applicable, use `gsl_REQUIRES_A_()` or `typename std::enable_if< VA, int >::type = 0` in the function template argument list.
-//
-//     Use `gsl_REQUIRES_T_()` or `typename = typename std::enable_if< VA, ::gsl::detail::enabler >::type` in class template argument lists.
-
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
 #else
 # define gsl_DECLTYPE_(T, EXPR) T
 #endif
 
-#if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_T_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
-#else
-# define gsl_REQUIRES_T_(VA)
-#endif
-
-#if gsl_HAVE( TYPE_TRAITS )
-# define gsl_REQUIRES_R_(R, VA) typename std::enable_if< ( VA ), R >::type
-#else
-# define gsl_REQUIRES_R_(R, VA) R
-#endif
+// NOTE: When using SFINAE in gsl-lite, please note that overloads of function templates must always use SFINAE with non-type default arguments
+//       as explained in https://en.cppreference.com/w/cpp/types/enable_if#Notes. `gsl_ENABLE_IF_()` implements graceful fallback to default
+//       type arguments (for compilers that don't support non-type default arguments); please verify that this is appropriate in the given
+//       situation, and add additional checks if necessary.
+//
+//       Also, please note that `gsl_ENABLE_IF_()` doesn't enforce the constraint at all if no compiler/library support is available (i.e. pre-C++11).
 
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-# if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
-// VS 2013 and earlier seem to have trouble with SFINAE for default non-type arguments
-#  define gsl_REQUIRES_A_(VA) gsl_REQUIRES_T_(VA)
+# if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
+#  define gsl_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
 # else
-#  define gsl_REQUIRES_A_(VA) , typename std::enable_if< ( VA ), int >::type = 0
+#  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
 # endif
 #else
-# define  gsl_REQUIRES_A_(VA)
+# define  gsl_ENABLE_IF_(VA)
 #endif
 
 
@@ -1056,7 +1040,7 @@ struct is_array<T[]> : std::true_type{};
 template< class T, std::size_t N >
 struct is_array<T[N]> : std::true_type{};
 
-#if gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
+# if gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
 
 template< class, class = void >
 struct has_size_and_data : std::false_type{};
@@ -1096,7 +1080,7 @@ struct is_compatible_container : std17::bool_constant
     && is_compatible_element<C,E>::value
 >{};
 
-#else // gsl_CPP11_140
+# else // ^^^ gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 ) ^^^ / vvv ! gsl_CPP11_140 || gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 ) vvv
 
 template<
     class C, class E
@@ -1110,9 +1094,21 @@ template<
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
-struct is_compatible_container : std::true_type{};
+#  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+// VS2013 has insufficient support for expression SFINAE; we cannot make `is_compatible_container<>` a proper type trait here
+struct is_compatible_container : std::true_type { };
+#  else
+struct is_compatible_container_r { is_compatible_container_r(int); };
+template< class C, class E >
+std::true_type  is_compatible_container_f( is_compatible_container_r<C, E> );
+template< class C, class E >
+std::false_type is_compatible_container_f( ... );
 
-#endif // gsl_CPP11_140
+template< class C, class E >
+struct is_compatible_container : decltype( is_compatible_container_f< C, E >( 0 ) ) { };
+#  endif // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+
+# endif // gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
 
 #endif // gsl_HAVE( TYPE_TRAITS )
 
@@ -1139,7 +1135,9 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
   template< class T
-    gsl_REQUIRES_T_( std::is_pointer<T>::value )
+#if gsl_HAVE( TYPE_TRAITS )
+          , typename = typename std::enable_if< std::is_pointer<T>::value >::type
+#endif
   >
   using owner = T;
 #elif gsl_CONFIG_DEFAULTS_VERSION == 0
@@ -1899,7 +1897,7 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< std::is_constructible<T, U>::value, int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
 #  endif
     >
     gsl_constexpr14 explicit not_null( U other )
@@ -1922,7 +1920,7 @@ public:
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value, int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -1931,7 +1929,8 @@ public:
     }
 
     template< class U
-        , typename std::enable_if< std::is_convertible<U, T>::value, int >::type = 0
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -1963,7 +1962,7 @@ public:
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value, int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
@@ -1972,7 +1971,8 @@ public:
     }
 
     template< class U
-        , typename std::enable_if< std::is_convertible<U, T>::value, int >::type = 0
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
@@ -2067,7 +2067,8 @@ public:
     // explicit conversion operator
 
     template< class U
-        , typename std::enable_if< std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit
     operator U() const
@@ -2080,7 +2081,8 @@ public:
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
-        , typename std::enable_if< std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit
     operator U() &&
@@ -2092,7 +2094,8 @@ public:
 
     // implicit conversion operator
     template< class U
-        , typename std::enable_if< std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14
     operator U() const
@@ -2105,7 +2108,8 @@ public:
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
-        , typename std::enable_if< std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value, int>::type = 0
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14
     operator U() &&
@@ -2224,7 +2228,7 @@ class not_null_ic : public not_null<T>
 {
 public:
     template< class U
-        gsl_REQUIRES_A_(( std::is_constructible<T, U>::value ))
+        gsl_ENABLE_IF_(( std::is_constructible<T, U>::value ))
     >
     gsl_constexpr14
 #if gsl_HAVE( RVALUE_REFERENCE )
@@ -2397,7 +2401,7 @@ gsl_api inline gsl_constexpr byte to_byte( T v ) gsl_noexcept
 #endif
 }
 
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr IntegerType to_integer( byte b ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -2417,7 +2421,7 @@ gsl_api inline gsl_constexpr unsigned char to_uchar( int i ) gsl_noexcept
     return static_cast<unsigned char>( i );
 }
 
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -2427,13 +2431,13 @@ gsl_api inline gsl_constexpr14 byte & operator<<=( byte & b, IntegerType shift )
 #endif
 }
 
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr byte operator<<( byte b, IntegerType shift ) gsl_noexcept
 {
     return ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
 }
 
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
 #if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -2443,7 +2447,7 @@ gsl_api inline gsl_constexpr14 byte & operator>>=( byte & b, IntegerType shift )
 #endif
 }
 
-template< class IntegerType  gsl_REQUIRES_A_(( std::is_integral<IntegerType>::value )) >
+template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
 gsl_api inline gsl_constexpr byte operator>>( byte b, IntegerType shift ) gsl_noexcept
 {
     return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
@@ -2619,7 +2623,7 @@ public:
     {}
 #else
     template< size_t N
-        gsl_REQUIRES_A_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
+        gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
     gsl_api gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
         : first_( gsl_ADDRESSOF( arr[0] ) )
@@ -2645,7 +2649,7 @@ public:
 #else
 
     template< size_t N
-        gsl_REQUIRES_A_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
+        gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
     gsl_constexpr span( std::array< value_type, N > & arr )
         : first_( arr.data() )
@@ -2653,7 +2657,7 @@ public:
     {}
 
     template< size_t N
-        gsl_REQUIRES_A_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
+        gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
     gsl_constexpr span( std::array< value_type, N > const & arr )
         : first_( arr.data() )
@@ -2665,7 +2669,7 @@ public:
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container
-        gsl_REQUIRES_A_(( detail::is_compatible_container< Container, element_type >::value ))
+        gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_constexpr span( Container & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
@@ -2673,7 +2677,7 @@ public:
     {}
 
     template< class Container
-        gsl_REQUIRES_A_((
+        gsl_ENABLE_IF_((
             std::is_const< element_type >::value
             && detail::is_compatible_container< Container, element_type >::value
         ))
@@ -2772,7 +2776,7 @@ public:
 #endif
 
     template< class U
-        gsl_REQUIRES_A_(( std::is_convertible<U(*)[], element_type(*)[]>::value ))
+        gsl_ENABLE_IF_(( std::is_convertible<U(*)[], element_type(*)[]>::value ))
     >
     gsl_api gsl_constexpr span( span<U> const & other )
         : first_( other.begin() )
@@ -3360,7 +3364,7 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template< class Container
-        gsl_REQUIRES_A_((
+        gsl_ENABLE_IF_((
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
@@ -3374,7 +3378,7 @@ public:
     // Exclude: array, [basic_string,] basic_string_span
 
     template< class Container
-        gsl_REQUIRES_A_((
+        gsl_ENABLE_IF_((
             ! detail::is_std_array< Container >::value
             && ! detail::is_basic_string_span< Container >::value
             && std::is_convertible< typename Container::pointer, pointer >::value
@@ -3427,7 +3431,7 @@ public:
 #endif
 
     template< class U
-        gsl_REQUIRES_A_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
+        gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
@@ -3435,7 +3439,7 @@ public:
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
     template< class U
-        gsl_REQUIRES_A_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
+        gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
@@ -3635,7 +3639,7 @@ inline gsl_constexpr14 bool operator<( basic_string_span<T> const & l, U const &
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
-    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
+    gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
@@ -3647,7 +3651,7 @@ inline gsl_constexpr14 bool operator==( U const & u, basic_string_span<T> const 
 }
 
 template< class T, class U
-    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
+    gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
 >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 inline gsl_constexpr14 bool operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
@@ -3714,7 +3718,7 @@ inline gsl_constexpr14 bool operator>=( basic_string_span<T> const & l, U const 
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
-    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
+    gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
 >
 inline gsl_constexpr14 bool operator!=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3722,7 +3726,7 @@ inline gsl_constexpr14 bool operator!=( U const & l, basic_string_span<T> const 
 }
 
 template< class T, class U
-    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
+    gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
 >
 inline gsl_constexpr14 bool operator<=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3730,7 +3734,7 @@ inline gsl_constexpr14 bool operator<=( U const & l, basic_string_span<T> const 
 }
 
 template< class T, class U
-    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
+    gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
 >
 inline gsl_constexpr14 bool operator>( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
@@ -3738,7 +3742,7 @@ inline gsl_constexpr14 bool operator>( U const & l, basic_string_span<T> const &
 }
 
 template< class T, class U
-    gsl_REQUIRES_A_(( !detail::is_basic_string_span<U>::value ))
+    gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
 >
 inline gsl_constexpr14 bool operator>=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 {

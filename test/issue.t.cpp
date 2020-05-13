@@ -105,4 +105,11 @@ CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning
     try { (void) narrow<float>( 1.0 ); } catch(...) {}
 }
 
+CASE( "detail::is_compatible_container<>: Not a proper type trait [PR #238]" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+    static_assert( std::is_base_of<gsl::std11::false_type, gsl::detail::is_compatible_container< int, int > >::value, "static assertion failed" );
+#endif
+}
+
 // end of file
