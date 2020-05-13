@@ -1094,7 +1094,10 @@ template<
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
-struct is_compatible_container : std::true_type{};
+struct is_compatible_container_r { is_compatible_container_r(int); };
+template< class C, class E > std::true_type  is_compatible_container_f( is_compatible_container_r<C, E> );
+template< class C, class E > std::false_type is_compatible_container_f( ... );
+struct is_compatible_container : decltype( is_compatible_container_f( 0 ) ) { };
 
 # endif // gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
 
