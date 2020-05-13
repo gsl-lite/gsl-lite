@@ -472,13 +472,13 @@ The following macros can be used to selectively disable checking for a particula
 The following macros control the handling of runtime contract violations:
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)**  
-  Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, and `narrow`. **This is the default.**
+  Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`. **This is the default.**
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_THROWS`**  
-  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and throw a std::exception-derived exception `narrowing_error` on discarding information in `gsl::narrow<>()`.
+  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
-  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`, and call `std::terminate()` on discarding information in `gsl::narrow<>()`. The user must provide a definition of the following function:
+  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`. The user must provide a definition of the following function:
 
   ```c++
   namespace gsl {
@@ -577,7 +577,7 @@ Define this macro to 1 to add the unconstrained span constructor for containers 
 Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=0`
-Define this macro to 1 to have `narrow<>()` throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead calls `std::terminate()` on information loss. **Default is 0.**
+Define this macro to 1 to have `narrow<>()` always throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead calls `std::terminate()` on information loss. **Default is 0.**
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. **Default is 0.**
@@ -638,7 +638,10 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `gsl_ExpectsAudit()`        | -       | -       | ✓         | Audit-level precondition assertion |
 `gsl_EnsuresAudit()`        | -       | -       | ✓         | Audit-level postcondition assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
-`index`                     | ✓      | ✓      | ✓         | type for container indexes, subscripts, sizes,<br>see [Other configuration macros](#other-configuration-macros) |
+`index`                     | ✓      | ✓      | ✓         | type for container indexes and subscripts, <br>see [Other configuration macros](#other-configuration-macros) |
+`dim`                       | -      | -      | ✓         | type for container sizes |
+`stride`                    | -      | -      | ✓         | type for index strides |
+`diff`                      | -      | -      | ✓        | type for index differences |
 `byte`                      | -       | ✓      | ✓         | byte type, see also proposal [p0298](http://wg21.link/p0298) |
 `final_action<>`            | ✓      | ✓      | ≥&nbsp;C++11    | Action at the end of a scope |
 `final_action`              | -       | -       | <&nbsp;C++11    | Currently only `void(*)()` |
