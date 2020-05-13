@@ -1094,6 +1094,10 @@ template<
         , class = decltype( std17::size(std::declval<C>()) )
         , class = decltype( std17::data(std::declval<C>()) )
 >
+#  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+// VS2013 has insufficient support for expression SFINAE; we cannot make `is_compatible_container<>` a proper type trait here
+struct is_compatible_container : std::true_type { };
+#  else // ^^^ gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) ^^^ / vvv ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) vvv
 struct is_compatible_container_r { is_compatible_container_r(int); };
 template< class C, class E >
 std::true_type  is_compatible_container_f( is_compatible_container_r<C, E> );
@@ -1102,6 +1106,7 @@ std::false_type is_compatible_container_f( ... );
 
 template< class C, class E >
 struct is_compatible_container : decltype( is_compatible_container_f< C, E >( 0 ) ) { };
+#  endif // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 
 # endif // gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
 
