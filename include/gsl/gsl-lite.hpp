@@ -1080,7 +1080,7 @@ struct is_compatible_container : std17::bool_constant
     && is_compatible_element<C,E>::value
 >{};
 
-#else // gsl_CPP11_140
+# else // ^^^ gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 ) ^^^ / vvv ! gsl_CPP11_140 || gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 ) vvv
 
 template<
     class C, class E
@@ -1096,7 +1096,7 @@ template<
 >
 struct is_compatible_container : std::true_type{};
 
-#endif // gsl_CPP11_140
+# endif // gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 500 )
 
 #endif // gsl_HAVE( TYPE_TRAITS )
 
