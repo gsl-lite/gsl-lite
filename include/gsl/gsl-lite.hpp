@@ -394,7 +394,11 @@
 
 #define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_140_CPP0X_90
 #define gsl_HAVE_STD_DATA               gsl_CPP17_000
-#define gsl_HAVE_STD_SSIZE              ( gsl_COMPILER_GNUC_VERSION >= 1000 )
+#ifdef __cpp_lib_ssize
+# define gsl_HAVE_STD_SSIZE             1
+#else
+# define gsl_HAVE_STD_SSIZE             ( gsl_COMPILER_GNUC_VERSION >= 1000 && __cplusplus > 201703L )
+#endif
 
 #define gsl_HAVE_SIZED_TYPES            gsl_CPP11_140
 
