@@ -652,7 +652,7 @@ template< typename C >
 inline std::string make_tran_string( std::basic_string< C > const & txt )
 {
     std::ostringstream os;
-    for( std::basic_string< C >::const_iterator pos = txt.begin(); pos != txt.end(); ++pos )
+    for( typename std::basic_string< C >::const_iterator pos = txt.begin(); pos != txt.end(); ++pos )
         os << transformed( static_cast<char>( *pos ) );
     return os.str();
 }
