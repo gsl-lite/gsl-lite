@@ -91,7 +91,7 @@ The recommended way to consume *gsl-lite* in your CMake project is to use `find_
 ```CMake
 cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
-find_package( gsl-lite 0.36 REQUIRED )
+find_package( gsl-lite 0.37 REQUIRED )
     
 project( my-program LANGUAGES CXX )
     
@@ -155,7 +155,7 @@ For the [Conan package manager](https://www.conan.io/), follow these steps:
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.36@center/stable
+        gsl-lite/0.37@center/stable
 
 3. Run conan's install command:
 
@@ -361,7 +361,7 @@ Example:
 
 ```cmake
 # my-statistics-lib/CMakeLists.txt
-find_package( gsl-lite 0.36 REQUIRED )
+find_package( gsl-lite 0.37 REQUIRED )
 
 add_library( my-statistics-lib STATIC mean.cpp )
 target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )
@@ -1003,23 +1003,11 @@ span<>: Allows const forward iteration
 span<>: Allows reverse iteration
 span<>: Allows const reverse iteration
 span<>: Allows to observe an element via array indexing
-span<>: Allows to observe an element via call indexing
-span<>: Allows to observe an element via at()
 span<>: Allows to observe an element via front() and back()
 span<>: Allows to observe an element via data()
 span<>: Allows to change an element via array indexing
-span<>: Allows to change an element via call indexing
-span<>: Allows to change an element via at()
 span<>: Allows to change an element via front() and back()
 span<>: Allows to change an element via data()
-span<>: Allows to compare equal to another span of the same type
-span<>: Allows to compare unequal to another span of the same type
-span<>: Allows to compare less than another span of the same type
-span<>: Allows to compare less than or equal to another span of the same type
-span<>: Allows to compare greater than another span of the same type
-span<>: Allows to compare greater than or equal to another span of the same type
-span<>: Allows to compare to another span of the same type and different cv-ness (non-standard)
-span<>: Allows to compare empty spans as equal
 span<>: Allows to test for empty span via empty(), empty case
 span<>: Allows to test for empty span via empty(), non-empty case
 span<>: Allows to obtain the number of elements via size(), as configured
@@ -1123,11 +1111,9 @@ string_span: Allows const forward iteration
 string_span: Allows reverse iteration
 string_span: Allows const reverse iteration
 string_span: Allows to observe an element via array indexing
-string_span: Allows to observe an element via call indexing
 string_span: Allows to observe an element via front() and back()
 string_span: Allows to observe an element via data()
 string_span: Allows to change an element via array indexing
-string_span: Allows to change an element via call indexing
 string_span: Allows to change an element via front() and back()
 string_span: Allows to change an element via data()
 string_span: Allows to compare a string_span with another string_span

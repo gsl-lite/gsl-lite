@@ -31,8 +31,8 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  36
-#define  gsl_lite_PATCH  1
+#define  gsl_lite_MINOR  37
+#define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -203,7 +203,7 @@
 #define gsl_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
 
 // Compiler versions:
-//
+
 // MSVC++  6.0  _MSC_VER == 1200  gsl_COMPILER_MSVC_VERSION ==  60  (Visual Studio 6.0)
 // MSVC++  7.0  _MSC_VER == 1300  gsl_COMPILER_MSVC_VERSION ==  70  (Visual Studio .NET 2002)
 // MSVC++  7.1  _MSC_VER == 1310  gsl_COMPILER_MSVC_VERSION ==  71  (Visual Studio .NET 2003)
@@ -215,7 +215,19 @@
 // MSVC++ 14.0  _MSC_VER == 1900  gsl_COMPILER_MSVC_VERSION == 140  (Visual Studio 2015)
 // MSVC++ 14.1  _MSC_VER >= 1910  gsl_COMPILER_MSVC_VERSION == 141  (Visual Studio 2017)
 // MSVC++ 14.2  _MSC_VER >= 1920  gsl_COMPILER_MSVC_VERSION == 142  (Visual Studio 2019)
-//
+
+#if defined(_MSC_VER ) && !defined(__clang__)
+# define gsl_COMPILER_MSVC_VER           (_MSC_VER )
+# define gsl_COMPILER_MSVC_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
+# define gsl_COMPILER_MSVC_VERSION_FULL  (_MSC_VER - 100 * ( 5 + (_MSC_VER < 1900 ) ) )
+#else
+# define gsl_COMPILER_MSVC_VER           0
+# define gsl_COMPILER_MSVC_VERSION       0
+# define gsl_COMPILER_MSVC_VERSION_FULL  0
+#endif
+
+#define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
+
 // AppleClang  7.0.0  __apple_build_version__ ==  7000172  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.0, 7.0.1)          (LLVM 3.7.0)
 // AppleClang  7.0.0  __apple_build_version__ ==  7000176  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.1)                 (LLVM 3.7.0)
 // AppleClang  7.0.2  __apple_build_version__ ==  7000181  gsl_COMPILER_APPLECLANG_VERSION ==  702  (Xcode 7.2, 7.2.1)          (LLVM 3.7.0)
@@ -234,18 +246,6 @@
 // AppleClang 10.0.0  __apple_build_version__ == 10001145  gsl_COMPILER_APPLECLANG_VERSION == 1000  (Xcode 10.0, 10.1)          (LLVM 6.0.1?)
 // AppleClang 10.0.1  __apple_build_version__ == 10010046  gsl_COMPILER_APPLECLANG_VERSION == 1001  (Xcode 10.2, 10.2.1, 10.3)  (LLVM 7.0.0?)
 // AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3)    (LLVM 8.0.0?)
-
-#if defined(_MSC_VER ) && !defined(__clang__)
-# define gsl_COMPILER_MSVC_VER           (_MSC_VER )
-# define gsl_COMPILER_MSVC_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
-# define gsl_COMPILER_MSVC_VERSION_FULL  (_MSC_VER - 100 * ( 5 + (_MSC_VER < 1900 ) ) )
-#else
-# define gsl_COMPILER_MSVC_VER           0
-# define gsl_COMPILER_MSVC_VERSION       0
-# define gsl_COMPILER_MSVC_VERSION_FULL  0
-#endif
-
-#define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )

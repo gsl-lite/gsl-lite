@@ -1,6 +1,29 @@
 Changes in gsl-lite
 ===================
 
+version 0.37.0 2020-05-13
+
+Additions:
+- Add configuration option `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`
+- Add configuration option `gsl_CONFIG_ALLOWS_SPAN_COMPARISON`
+- Add `narrow_failfast<>()`, a fast-fail variant of `narrow<>()` (#52)
+- Add `front()` and `back()` to `span<>` and `basic_string_span<>` (#241, thanks to @ned14)
+
+Changes:
+- Rename `as_writeable_bytes()` -> `as_writable_bytes()` to follow C++20 in spelling; the old name is still provided for compatibility
+- Rename `gsl_DEPRECATED()` -> `gsl_DEPRECATED_MSG()`, add `gsl_DEPRECATED`
+- Add more `gsl_DEPRECATED()` annotations
+- Deprecate `span<>::at()`, `basic_string_span<>::at()`, and call indexing
+- Minor documentation improvements
+- Unify internal SFINAE macros to `gsl_ENABLE_IF_()` (#238; thanks to @martinmoene)
+- Add more comprehensive tests for `narrow<>()` and `narrow_failfast<>()`
+
+Fixes:
+- Fix spurious static assertion for pre-/postcondition check arguments explicitly convertible to bool if `gsl_CONFIG_CONTRACT_CHECKING_OFF` is defined
+- Fix hard failure in `span<>` constrained constructor (#242, thanks to @orangeturtle739)
+- Make `gsl::detail::is_compatible_container<>` a proper type trait
+
+
 version 0.36.0 2020-01-24
 
 The repository now moved to a dedicated GitHub organization: https://github.com/gsl-lite/gsl-lite
