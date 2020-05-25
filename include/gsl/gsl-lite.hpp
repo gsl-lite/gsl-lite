@@ -580,25 +580,25 @@
 
     //
     // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
-    //ᅟ
-    //ᅟ    enum class Vegetables {
-    //ᅟ        tomato   = 0b001,
-    //ᅟ        onion    = 0b010,
-    //ᅟ        eggplant = 0b100
-    //ᅟ    };
-    //ᅟ    gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
+    //
+    //     enum class Vegetables {
+    //         tomato   = 0b001,
+    //         onion    = 0b010,
+    //         eggplant = 0b100
+    //     };
+    //     gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
     //
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
 
     //
     // Defines relational operators `<`, `>`, `<=`, `>=` for the given enum type.
-    //ᅟ
-    //ᅟ    enum class OperatorPrecedence {
-    //ᅟ        additive = 0,
-    //ᅟ        multiplicative = 1,
-    //ᅟ        power = 2
-    //ᅟ    };
-    //ᅟ    gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
+    //
+    //     enum class OperatorPrecedence {
+    //         additive = 0,
+    //         multiplicative = 1,
+    //         power = 2
+    //     };
+    //     gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
     //
 #define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
 
