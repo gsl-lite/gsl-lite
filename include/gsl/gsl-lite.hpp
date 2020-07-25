@@ -345,7 +345,7 @@
 #define gsl_HAVE_AUTO                   gsl_CPP11_100
 #define gsl_HAVE_NULLPTR                gsl_CPP11_100
 #define gsl_HAVE_RVALUE_REFERENCE       gsl_CPP11_100
-#define gsl_HAVE_FUNCTION_REF_QUALIFIER ( gsl_CPP14_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
+#define gsl_HAVE_FUNCTION_REF_QUALIFIER ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
 
 #define gsl_HAVE_ENUM_CLASS             gsl_CPP11_110
 
