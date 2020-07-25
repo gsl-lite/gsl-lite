@@ -1886,7 +1886,7 @@ private:
     template< class U >
     friend class not_null;
 
-	template< class CVReference, class U >
+    template< class CVReference, class U >
     friend struct detail::as_nullable_helper;
 
 public:
