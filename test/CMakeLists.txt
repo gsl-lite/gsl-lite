@@ -86,7 +86,7 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
         message( STATUS "Matched: GNU")
 
-        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8.0 )
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7.0 )
             set( HAS_CPP11_FLAG TRUE )
         endif()
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9.2 )
