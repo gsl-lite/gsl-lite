@@ -292,18 +292,26 @@
 
 // Presence of language & library features:
 
-#if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500) || gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 360) || gsl_COMPILER_APPLECLANG_VERSION
-# ifdef __EXCEPTIONS
+#if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+# if __EXCEPTIONS && __has_feature(cxx_exceptions) // see https://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
 #  define gsl_HAVE_EXCEPTIONS  1
 # else
 #  define gsl_HAVE_EXCEPTIONS  0
-# endif // __EXCEPTIONS
-#elif gsl_COMPILER_GNUC_VERSION >= 500 || gsl_COMPILER_CLANG_VERSION >= 500
-# ifdef __cpp_exceptions
-#  define gsl_HAVE_EXCEPTIONS  1
+# endif // __EXCEPTIONS && __has_feature(cxx_exceptions)
+#elif gsl_COMPILER_GNUC_VERSION
+# if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
+#  ifdef __EXCEPTIONS
+#   define gsl_HAVE_EXCEPTIONS  1
+#  else
+#   define gsl_HAVE_EXCEPTIONS  0
+#  endif // __EXCEPTIONS
 # else
-#  define gsl_HAVE_EXCEPTIONS  0
-# endif // __cpp_exceptions
+#  ifdef __cpp_exceptions
+#   define gsl_HAVE_EXCEPTIONS  1
+#  else
+#   define gsl_HAVE_EXCEPTIONS  0
+#  endif // __cpp_exceptions
+# endif // gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
 #elif gsl_COMPILER_MSVC_VERSION
 # ifdef _CPPUNWIND
 #  define gsl_HAVE_EXCEPTIONS  1
