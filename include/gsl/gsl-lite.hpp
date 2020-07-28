@@ -2266,7 +2266,9 @@ struct as_nullable_helper< CVReference, not_null<T> >
     }
 #endif
 };
-} // namespace detail
+
+namespace as_nullable_disable_adl
+{
 
 #if gsl_HAVE( RVALUE_REFERENCE )
 template<class T>
@@ -2284,6 +2286,12 @@ as_nullable(T const & p)
     return detail::as_nullable_helper<T>::call(p);
 }
 #endif
+
+} // namespace as_nullable_disable_adl
+} // namespace detail
+
+// Prevent ADL-using as_nullable so client code remains compatible if user switches to zero-overhead "using not_null<T> = T"
+using namespace detail::as_nullable_disable_adl;
 
 // not_null with implicit constructor, allowing copy-initialization:
 
