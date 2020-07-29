@@ -293,11 +293,28 @@
 // Presence of language & library features:
 
 #if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
-# if __EXCEPTIONS && __has_feature(cxx_exceptions) // see https://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
-#  define gsl_HAVE_EXCEPTIONS  1
+# ifdef __OBJC__
+   // There are a bunch of inconsistencies about __EXCEPTIONS and __has_feature(cxx_exceptions) in clang 3.4/3.5/3.6
+   // We're interested in C++ exceptions, which can be checked by __has_feature(cxx_exceptions) in 3.5+
+   // In pre-3.5 __has_feature(cxx_exceptions) can be true if ObjC exceptions are enabled, but C++ exceptions are disabled
+   // Recommended way to check is "__EXCEPTIONS && __has_feature(cxx_exceptions)"
+   // See https://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
+   // Note: this is only relevant in Objective-C++, thus the ifdef
+#  if __EXCEPTIONS && __has_feature(cxx_exceptions)
+#   define gsl_HAVE_EXCEPTIONS  1
+#  else
+#   define gsl_HAVE_EXCEPTIONS  0
+#  endif // __EXCEPTIONS && __has_feature(cxx_exceptions)
 # else
-#  define gsl_HAVE_EXCEPTIONS  0
-# endif // __EXCEPTIONS && __has_feature(cxx_exceptions)
+   // clang-cl doesn't define __EXCEPTIONS for MSVC compatibility (see https://reviews.llvm.org/D4065)
+   // Neither does clang in MS-compatiblity mode
+   // Let's hope no one tries to build Objective-C++ code using MS-compatibility mode or clang-cl
+#  if __has_feature(cxx_exceptions)
+#   define gsl_HAVE_EXCEPTIONS  1
+#  else
+#   define gsl_HAVE_EXCEPTIONS  0
+#  endif
+# endif
 #elif gsl_COMPILER_GNUC_VERSION
 # if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
 #  ifdef __EXCEPTIONS
