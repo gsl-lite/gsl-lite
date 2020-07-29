@@ -146,6 +146,9 @@ CASE( "not_null<>: Convertibility is correctly reported by type traits" )
     static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 # endif
 
+    static_assert( !std::is_convertible< not_null < int* >, bool >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< not_null < std::unique_ptr< int > >, bool >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< not_null < std::shared_ptr< int > >, bool >::value, "static assertion failed" );
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
 }
 
@@ -224,6 +227,16 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     // Do not permit conversion to subclass pointer.
     static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
     static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >&, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+
+    // Do not permit conversion to bool
+    static_assert( !std::is_constructible< bool, not_null < int* > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, not_null < int* > >::value, "static assertion failed");
+
+    static_assert( !std::is_constructible< bool, not_null < std::unique_ptr< int > > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, not_null < std::unique_ptr< int > > >::value, "static assertion failed");
+
+    static_assert( !std::is_constructible< bool, not_null < std::shared_ptr< int > > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, not_null < std::shared_ptr< int > > >::value, "static assertion failed");
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 }
 
