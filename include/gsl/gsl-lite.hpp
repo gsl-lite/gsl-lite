@@ -1782,9 +1782,12 @@ struct element_type_helper< T* >
 #endif
 
 template< class T >
-struct is_not_null_oracle : std11::false_type { };
+struct is_not_null_or_bool_oracle : std11::false_type { };
 template< class T >
-struct is_not_null_oracle< not_null<T> > : std11::true_type { };
+struct is_not_null_or_bool_oracle< not_null<T> > : std11::true_type { };
+template<>
+struct is_not_null_or_bool_oracle< bool > : std11::true_type { };
+
 
 template< class T, bool IsCopyable = true >
 struct not_null_data;
@@ -2068,7 +2071,7 @@ public:
 
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit
     operator U() const
@@ -2082,7 +2085,7 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14 explicit
     operator U() &&
@@ -2095,7 +2098,7 @@ public:
     // implicit conversion operator
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14
     operator U() const
@@ -2109,7 +2112,7 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_oracle<U>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
     gsl_constexpr14
     operator U() &&
