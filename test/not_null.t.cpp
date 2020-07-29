@@ -169,61 +169,61 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     // Permit explicit construction from underlying pointer.
     static_assert(  std::is_constructible< not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-    static_assert( !std::is_assignable<    not_null< MyBase* >, MyDerived* >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< MyBase* >&, MyDerived* >::value, "static assertion failed" );
 # endif
 
     // Do not permit conversion to subclass pointer.
     static_assert( !std::is_constructible< MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
 # if !( defined( __NVCC__ ) && gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 800, 900 ) ) // oddly specific bug workaround
-    static_assert( !std::is_assignable<    MyDerived*, not_null< MyBase* > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    MyDerived*&, not_null< MyBase* > >::value, "static assertion failed" );
 # endif
 
     // Permit construction and assignment from subclass pointer.
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 # if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
-    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >&, std::unique_ptr< MyDerived > >::value, "static assertion failed" );
 # endif
 
     // Do not permit copy construction and assignment from move-only subclass pointer.
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
 # if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
-    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >&, std::unique_ptr< MyDerived > const & >::value, "static assertion failed" );
 # endif
 
     // Permit construction and assignment from `not_null<>` with subclass pointer.
     static_assert(  std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
-    static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    not_null< std::unique_ptr< MyBase > >&, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 
     // Do not permit copy construction and assignment from move-only `not_null<>` with subclass pointer.
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
 # if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
-    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyBase > >&, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
 # endif
 
     // Permit conversion to superclass pointer.
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     static_assert(  std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
-    static_assert(  std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
+    static_assert(  std::is_assignable<    std::unique_ptr< MyBase >&, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 # endif
 
     // Do not permit conversion with copy to move-only superclass pointer.
     static_assert( !std::is_constructible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
 # if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
-    static_assert( !std::is_assignable<    std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    std::unique_ptr< MyBase >&, not_null< std::unique_ptr< MyDerived > > const & >::value, "static assertion failed" );
 # endif
 
     // Do not permit construction and assignment from superclass pointer.
 # if !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
-    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, std::unique_ptr< MyBase > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >&, std::unique_ptr< MyBase > >::value, "static assertion failed" );
 
     static_assert( !std::is_constructible< not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
-    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    not_null< std::unique_ptr< MyDerived > >&, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 # endif
 
     // Do not permit conversion to subclass pointer.
     static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
-    static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
+    static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >&, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 }
 
