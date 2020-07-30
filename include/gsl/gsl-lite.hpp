@@ -1656,18 +1656,21 @@ namespace detail {
 
 #endif
 
-#if gsl_HAVE( EXCEPTIONS ) || !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
+// If narrow must throw (gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION), but exceptions are disabled (!gsl_HAVE_EXCEPTIONS), we cannot do anything
+#define gsl_NARROW_CAN_BE_DEFINED_ (gsl_HAVE( EXCEPTIONS ) || ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ))
+
+#if gsl_NARROW_CAN_BE_DEFINED_
 template< class T, class U >
-# if !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 gsl_api
-# endif // !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# endif // !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 inline T narrow( U u )
 {
     T t = static_cast<T>( u );
 
     if ( static_cast<U>( t ) != u )
     {
-# if gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
         throw narrowing_error();
 # else
         std::terminate();
@@ -1687,7 +1690,7 @@ inline T narrow( U u )
     if ( ( t < 0 ) != ( u < 0 ) )
 # endif
     {
-# if gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
         throw narrowing_error();
 # else
         std::terminate();
@@ -1696,7 +1699,7 @@ inline T narrow( U u )
 
     return t;
 }
-#endif // gsl_HAVE( EXCEPTIONS ) || !gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
+#endif // gsl_NARROW_CAN_BE_DEFINED_
 
 template< class T, class U >
 gsl_api inline T narrow_failfast( U u )
@@ -4130,7 +4133,9 @@ using ::gsl::on_error;
 
 using ::gsl::narrow_cast;
 using ::gsl::narrowing_error;
+#if gsl_NARROW_CAN_BE_DEFINED_
 using ::gsl::narrow;
+#endif
 using ::gsl::narrow_failfast;
 
 
@@ -4178,6 +4183,9 @@ using ::gsl::cwzstring_span;
 #endif // gsl_FEATURE_GSL_LITE_NAMESPACE
 
 gsl_RESTORE_MSVC_WARNINGS()
+
+// #undef internal macros
+#undef gsl_NARROW_CAN_BE_DEFINED_
 
 #endif // GSL_GSL_LITE_HPP_INCLUDED
 
