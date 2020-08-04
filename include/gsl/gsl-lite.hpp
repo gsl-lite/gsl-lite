@@ -2193,6 +2193,13 @@ public:
     gsl_constexpr14 not_null & operator=( not_null const & other ) = default;
 #endif
 
+    gsl_constexpr14 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    {
+        gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
+        using std::swap;
+        swap( lhs.data_.ptr_, rhs.data_.ptr_ );
+    }
+
 gsl_is_delete_access:
     not_null() gsl_is_delete;
     // prevent compilation when initialized with a nullptr or literal 0:

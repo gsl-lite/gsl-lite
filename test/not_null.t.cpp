@@ -433,6 +433,25 @@ CASE( "not_null<>: Allows dereferencing (raw pointer)" )
 }
 
 #if gsl_HAVE( SHARED_PTR )
+CASE( "not_null<>: Terminates swap of a moved-from value (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >( 12 );
+    not_null< shared_ptr< int > > p1( pi );
+    not_null< shared_ptr< int > > p2( std::move( p1 ) );
+
+    EXPECT_THROWS( swap( p1, p2 ) );
+    EXPECT_THROWS( swap( p2, p1 ) );
+}
+
+CASE( "not_null<>: Terminates self-swap of a moved-from value (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >( 12 );
+    not_null< shared_ptr< int > > p1( pi );
+    not_null< shared_ptr< int > > p2( std::move( p1 ) );
+
+    EXPECT_THROWS( swap( p1, p1 ) );
+}
+
 CASE( "not_null<>: Terminates construction from a null pointer value (shared_ptr)" )
 {
     struct F { static void blow() { shared_ptr< int > z = gsl_nullptr; not_null< shared_ptr< int > > p(z); } };
@@ -473,6 +492,27 @@ CASE( "not_null<>: Terminates propagation of a moved-from value (shared_ptr)" )
     EXPECT_THROWS( not_null< shared_ptr< int > > v( std::move( p ) ) );
     EXPECT_THROWS( q = p );
     EXPECT_THROWS( q = std::move( p ) );
+}
+
+CASE( "not_null<>: Allows self-swap (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >( 12 );
+    not_null< shared_ptr< int > > p( pi );
+
+    EXPECT_NO_THROW( swap( p, p ) );
+    EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Allows swap (shared_ptr)" )
+{
+    shared_ptr< int > pi1 = make_shared< int >( 12 );
+    shared_ptr< int > pi2 = make_shared< int >( 34 );
+    not_null< shared_ptr< int > > p1( pi1 );
+    not_null< shared_ptr< int > > p2( pi2 );
+
+    EXPECT_NO_THROW( swap( p1, p2 ) );
+    EXPECT( p1 == pi2 );
+    EXPECT( p2 == pi1 );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)" )
@@ -665,6 +705,25 @@ unique_ptr<T> make_unique(Arg&& arg)
 }
 # endif
 
+CASE( "not_null<>: Terminates swap of a moved-from value (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >( 12 );
+    not_null< unique_ptr< int > > p1( std::move( pi ) );
+    not_null< unique_ptr< int > > p2( std::move( p1 ) );
+
+    EXPECT_THROWS( swap( p1, p2 ) );
+    EXPECT_THROWS( swap( p2, p1 ) );
+}
+
+CASE( "not_null<>: Terminates self-swap of a moved-from value (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >( 12 );
+    not_null< unique_ptr< int > > p1( std::move( pi ) );
+    not_null< unique_ptr< int > > p2( std::move( p1 ) );
+
+    EXPECT_THROWS( swap(p1, p1) );
+}
+
 CASE( "not_null<>: Terminates construction from a null pointer value (unique_ptr)" )
 {
     struct F { static void blow() { unique_ptr< int > z = gsl_nullptr; not_null< unique_ptr< int > > p(std::move(z)); } };
@@ -703,6 +762,30 @@ CASE( "not_null<>: Terminates propagation of a moved-from value (unique_ptr)" )
 
     EXPECT_THROWS( not_null< unique_ptr< int > >( std::move( p ) ) );
     EXPECT_THROWS( q = std::move( p ) );
+}
+
+CASE( "not_null<>: Allows self-swap (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >( 12 );
+    int* raw( pi.get() );
+    not_null< unique_ptr< int > > p( std::move( pi ) );
+
+    EXPECT_NO_THROW( swap( p, p ) );
+    EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows swap (unique_ptr)" )
+{
+    unique_ptr< int > pi1 = make_unique< int >( 12 );
+    unique_ptr< int > pi2 = make_unique< int >( 34 );
+    int* raw1( pi1.get() );
+    int* raw2( pi2.get() );
+    not_null< unique_ptr< int > > p1( std::move( pi1 ) );
+    not_null< unique_ptr< int > > p2( std::move( pi2 ) );
+
+    EXPECT_NO_THROW( swap( p1, p2 ) );
+    EXPECT( &*p1 == raw2 );
+    EXPECT( &*p2 == raw1 );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)" )
