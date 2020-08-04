@@ -80,7 +80,7 @@ list( TRANSFORM OPTIONS PREPEND -Xcompiler= )
 enable_testing()
 
 function( make_cuda_test_target target sources extraOptions langVersion )
-    message( STATUS "Make CUDA target: '${extraOptions}-${langVersion}'" )
+    message( STATUS "Make CUDA target: '${target}'" )
 
     add_executable            ( ${target} ${sources} )
     target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-v1 )
@@ -97,8 +97,8 @@ endfunction()
 make_cuda_test_target( ${PROGRAM}-cuda14.t "${SOURCES};${CUDA_SOURCES}" "" 14 )
 make_cuda_test_target( ${PROGRAM}-cuda14-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" 14 )
 
-if( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
-    make_cuda_test_target( ${PROGRAM}-cuda17.t "${SOURCES};${CUDA_SOURCES}" "" 17)
+if( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA" AND CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
+    make_cuda_test_target( ${PROGRAM}-cuda17.t "${SOURCES};${CUDA_SOURCES}" "" 17 )
     make_cuda_test_target( ${PROGRAM}-cuda17-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" 17 )
 endif()
 

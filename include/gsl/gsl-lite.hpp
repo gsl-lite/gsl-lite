@@ -2648,7 +2648,7 @@ public:
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
     template< class U, size_t N >
-    gsl_api gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
+    gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
         : first_( gsl_ADDRESSOF( arr[0] ) )
         , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
     {}
@@ -2656,7 +2656,7 @@ public:
     template< size_t N
         gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
-    gsl_api gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
+    gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
         : first_( gsl_ADDRESSOF( arr[0] ) )
         , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
     {}
@@ -3176,7 +3176,7 @@ make_span( T * first, T * last )
 }
 
 template< class T, size_t N >
-gsl_api inline gsl_constexpr span<T>
+inline gsl_constexpr span<T>
 make_span( T (&arr)[N] )
 {
     return span<T>( gsl_ADDRESSOF( arr[0] ), N );
@@ -3372,7 +3372,7 @@ public:
     {}
 
     template< std::size_t N >
-    gsl_api gsl_constexpr basic_string_span( element_type (&arr)[N] )
+    gsl_constexpr basic_string_span( element_type (&arr)[N] )
     : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
     {}
 
@@ -3930,7 +3930,7 @@ std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t,
 namespace detail {
 
 template< class T, class SizeType, const T Sentinel >
-gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_limits<SizeType>::max)() )
+gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_limits<SizeType>::max)() )
 {
     typedef T * pointer;
 
@@ -3953,13 +3953,13 @@ gsl_api static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_li
 //
 
 template< class T >
-gsl_api inline span<T> ensure_z( T * const & sz, size_t max = (std::numeric_limits<size_t>::max)() )
+inline gsl_constexpr14 span<T> ensure_z( T * const & sz, size_t max = (std::numeric_limits<size_t>::max)() )
 {
     return detail::ensure_sentinel<T, size_t, 0>( sz, max );
 }
 
 template< class T, size_t N >
-gsl_api inline span<T> ensure_z( T (&sz)[N] )
+inline gsl_constexpr14 span<T> ensure_z( T (&sz)[N] )
 {
     return ::gsl::ensure_z( gsl_ADDRESSOF( sz[0] ), N );
 }
@@ -3967,7 +3967,7 @@ gsl_api inline span<T> ensure_z( T (&sz)[N] )
 # if gsl_HAVE( TYPE_TRAITS )
 
 template< class Container >
-inline span< typename std::remove_pointer<typename Container::pointer>::type >
+inline gsl_constexpr14 span< typename std::remove_pointer<typename Container::pointer>::type >
 ensure_z( Container & cont )
 {
     return ::gsl::ensure_z( cont.data(), cont.length() );
