@@ -2193,7 +2193,7 @@ public:
     gsl_constexpr14 not_null & operator=( not_null const & other ) = default;
 #endif
 
-    gsl_constexpr14 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
     {
         gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
         using std::swap;
