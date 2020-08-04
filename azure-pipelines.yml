@@ -30,7 +30,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [19_2]
       cudaCompiler: NVCC
-      cudaCompilerVersion: 10_2
+      cudaCompilerVersions: [10_2, 11_0]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -42,7 +42,7 @@ jobs:
 
     - os: Windows
       cxxCompiler: Clang
-      cxxCompilerVersions: [9]
+      cxxCompilerVersions: [9, 10]
       platforms: [x86, x64]
 
     # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
@@ -58,7 +58,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [9]
+      cxxCompilerVersions: [10]
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
@@ -78,7 +78,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [9]
+      cxxCompilerVersions: [10]
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
@@ -89,16 +89,24 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [7, 8]
       cudaCompiler: NVCC
-      cudaCompilerVersion: 10_2
+      cudaCompilerVersions: [10_2]
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [9]
+      cudaCompiler: NVCC
+      cudaCompilerVersions: [11_0]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     - os: MacOS
       cxxCompiler: GCC
-      cxxCompilerVersions: [6, 7, 8, 9]
+      cxxCompilerVersions: [6, 7, 8, 9, 10]
       platforms: [x64]
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [9_1, 10, 10_0_1, 11]
+      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3]
       platforms: [x64]

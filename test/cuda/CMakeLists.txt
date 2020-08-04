@@ -5,7 +5,7 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.17 FATAL_ERROR )
 
 project( gsl-lite-test-cuda LANGUAGES CXX CUDA )
 
@@ -79,24 +79,27 @@ list( TRANSFORM OPTIONS PREPEND -Xcompiler= )
 
 enable_testing()
 
-function( make_cuda_test_target target sources extraOptions )
-    message( STATUS "Make CUDA target: '${extraOptions}'" )
+function( make_cuda_test_target target sources extraOptions langVersion )
+    message( STATUS "Make CUDA target: '${target}'" )
 
     add_executable            ( ${target} ${sources} )
     target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-v1 )
     target_compile_options    ( ${target} PRIVATE ${NVCC_OPTIONS} ${OPTIONS} ${extraOptions} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
-    target_compile_features   ( ${target} PRIVATE cxx_std_14 )
-    set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD 14 )
-    if( CMAKE_VERSION VERSION_GREATER_EQUAL 3.16 )
-        target_precompile_headers( ${target} PRIVATE ../gsl-lite.t.hpp )
-    endif()
+    #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} ) # apparently not supported yet 
+    set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD ${langVersion} )
+    target_precompile_headers ( ${target} PRIVATE ../gsl-lite.t.hpp )
 
     add_test( NAME ${target} COMMAND ${target} )
 
 endfunction()
 
-make_cuda_test_target( ${PROGRAM}-cuda.t "${SOURCES};${CUDA_SOURCES}" "" )
-make_cuda_test_target( ${PROGRAM}-cuda-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" )
+make_cuda_test_target( ${PROGRAM}-cuda14.t "${SOURCES};${CUDA_SOURCES}" "" 14 )
+make_cuda_test_target( ${PROGRAM}-cuda14-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" 14 )
+
+if( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA" AND CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
+    make_cuda_test_target( ${PROGRAM}-cuda17.t "${SOURCES};${CUDA_SOURCES}" "" 17 )
+    make_cuda_test_target( ${PROGRAM}-cuda17-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" 17 )
+endif()
 
 # end of file
