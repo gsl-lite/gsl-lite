@@ -3878,20 +3878,20 @@ Stream & write_to_stream( Stream & os, Span const & spn )
     if ( !os )
         return os;
 
-    const std::streamsize length = narrow<std::streamsize>( spn.length() );
+    const std::streamsize length = gsl::narrow_failfast<std::streamsize>( spn.length() );
 
     // Whether, and how, to pad
     const bool pad = ( length < os.width() );
     const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::right;
 
     if ( left_pad )
-        write_padding( os, os.width() - length );
+        detail::write_padding( os, os.width() - length );
 
     // Write span characters
     os.rdbuf()->sputn( spn.begin(), length );
 
     if ( pad && !left_pad )
-        write_padding( os, os.width() - length );
+        detail::write_padding( os, os.width() - length );
 
     // Reset output stream width
     os.width(0);
@@ -3952,7 +3952,7 @@ gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::nu
 
     gsl_Expects( *cur == Sentinel );
 
-    return span<T>( seq, narrow_cast< typename span<T>::index_type >( cur - seq ) );
+    return span<T>( seq, gsl::narrow_cast< typename span<T>::index_type >( cur - seq ) );
 }
 } // namespace detail
 
