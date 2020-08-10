@@ -109,7 +109,7 @@ There are various ways to make the `gsl-lite` package available to your project:
 
         vcpkg install gsl-lite
 
-2. Now, configure your project passing the Vcpkg toolchaing file as a parameter:
+2. Now, configure your project passing the Vcpkg toolchain file as a parameter:
 
         cd <my-program-source-dir>
         mkdir build
@@ -872,11 +872,15 @@ not_null<>: Allows assignment from a not_null related pointer type (raw pointer)
 not_null<>: Allows assignment to a const pointer from a not_null related pointer type (raw pointer)
 not_null<>: Allows indirect member access (raw pointer)
 not_null<>: Allows dereferencing (raw pointer)
+not_null<>: Terminates swap of a moved-from value (shared_ptr)
+not_null<>: Terminates self-swap of a moved-from value (shared_ptr)
 not_null<>: Terminates construction from a null pointer value (shared_ptr)
 not_null<>: Terminates construction from related pointer types for null pointer value (shared_ptr)
 not_null<>: Terminates assignment from a null pointer value (shared_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)
 not_null<>: Terminates propagation of a moved-from value (shared_ptr)
+not_null<>: Allows self-swap (shared_ptr)
+not_null<>: Allows swap (shared_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)
 not_null<>: Allows to construct from a non-null raw pointer with explicit conversion (shared_ptr)
 not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)
@@ -894,11 +898,15 @@ not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)
 not_null<>: Allows assignment to a const pointer from a not_null related pointer type (shared_ptr)
 not_null<>: Allows indirect member access (shared_ptr)
 not_null<>: Allows dereferencing (shared_ptr)
+not_null<>: Terminates swap of a moved-from value (unique_ptr)
+not_null<>: Terminates self-swap of a moved-from value (unique_ptr)
 not_null<>: Terminates construction from a null pointer value (unique_ptr)
 not_null<>: Terminates construction from related pointer types for null pointer value (unique_ptr)
 not_null<>: Terminates assignment from a null pointer value (unique_ptr)
 not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)
 not_null<>: Terminates propagation of a moved-from value (unique_ptr)
+not_null<>: Allows self-swap (unique_ptr)
+not_null<>: Allows swap (unique_ptr)
 not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)
 not_null<>: Allows to construct from a non-null raw pointer with explicit conversion (unique_ptr)
 not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)
