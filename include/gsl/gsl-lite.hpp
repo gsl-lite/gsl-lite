@@ -535,6 +535,12 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
+# define gsl_STATIC_ASSERT_( cond, msg ) static_assert( cond, msg )
+#else
+# define gsl_STATIC_ASSERT_( cond, msg ) ( ( void )sizeof( char[1 - 2*!!( cond ) ] ) )
+#endif
+
+#if gsl_HAVE( TYPE_TRAITS )
 
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                    \
     gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
@@ -883,6 +889,8 @@ template < bool V0, class T0, class... Ts > struct disjunction_ { using type = T
 template < class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
 
 #endif
+
+template <typename> struct dependent_false : std11::integral_constant<bool, false> { };
 
 } // namespace detail
 
@@ -1656,50 +1664,52 @@ namespace detail {
 
 #endif
 
-// If narrow must throw (gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION), but exceptions are disabled (!gsl_HAVE_EXCEPTIONS), we cannot do anything
-#define gsl_NARROW_CAN_BE_DEFINED_ (gsl_HAVE( EXCEPTIONS ) || ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ))
-
-#if gsl_NARROW_CAN_BE_DEFINED_
 template< class T, class U >
-# if !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#if !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 gsl_api
-# endif // !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#endif // !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 inline T narrow( U u )
 {
+#if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && ! gsl_HAVE( EXCEPTIONS )
+    gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
+        "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
+        "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
+        "violation if the given value cannot be represented in the target type." );
+#endif
+
     T t = static_cast<T>( u );
 
     if ( static_cast<U>( t ) != u )
     {
-# if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
         throw narrowing_error();
-# else
+#else
         std::terminate();
-# endif
+#endif
     }
 
-# if gsl_HAVE( TYPE_TRAITS )
-#  if defined( __NVCC__ )
+#if gsl_HAVE( TYPE_TRAITS )
+# if defined( __NVCC__ )
     if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
-#  else
+# else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
-#  endif
-# else
+# endif
+#else
     // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( ( t < 0 ) != ( u < 0 ) )
-# endif
+#endif
     {
-# if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
         throw narrowing_error();
-# else
+#else
         std::terminate();
-# endif
+#endif
     }
 
     return t;
 }
-#endif // gsl_NARROW_CAN_BE_DEFINED_
 
 template< class T, class U >
 gsl_api inline T narrow_failfast( U u )
@@ -3868,20 +3878,20 @@ Stream & write_to_stream( Stream & os, Span const & spn )
     if ( !os )
         return os;
 
-    const std::streamsize length = narrow<std::streamsize>( spn.length() );
+    const std::streamsize length = gsl::narrow_failfast<std::streamsize>( spn.length() );
 
     // Whether, and how, to pad
     const bool pad = ( length < os.width() );
     const bool left_pad = pad && ( os.flags() & std::ios_base::adjustfield ) == std::ios_base::right;
 
     if ( left_pad )
-        write_padding( os, os.width() - length );
+        detail::write_padding( os, os.width() - length );
 
     // Write span characters
     os.rdbuf()->sputn( spn.begin(), length );
 
     if ( pad && !left_pad )
-        write_padding( os, os.width() - length );
+        detail::write_padding( os, os.width() - length );
 
     // Reset output stream width
     os.width(0);
@@ -3942,7 +3952,7 @@ gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::nu
 
     gsl_Expects( *cur == Sentinel );
 
-    return span<T>( seq, narrow_cast< typename span<T>::index_type >( cur - seq ) );
+    return span<T>( seq, gsl::narrow_cast< typename span<T>::index_type >( cur - seq ) );
 }
 } // namespace detail
 
@@ -4133,9 +4143,7 @@ using ::gsl::on_error;
 
 using ::gsl::narrow_cast;
 using ::gsl::narrowing_error;
-#if gsl_NARROW_CAN_BE_DEFINED_
 using ::gsl::narrow;
-#endif
 using ::gsl::narrow_failfast;
 
 
@@ -4185,7 +4193,9 @@ using ::gsl::cwzstring_span;
 gsl_RESTORE_MSVC_WARNINGS()
 
 // #undef internal macros
-#undef gsl_NARROW_CAN_BE_DEFINED_
+#undef gsl_STATIC_ASSERT_
+#undef gsl_ENABLE_IF_
+#undef gsl_DECLTYPE_
 
 #endif // GSL_GSL_LITE_HPP_INCLUDED
 
