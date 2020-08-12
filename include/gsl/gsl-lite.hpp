@@ -2609,7 +2609,7 @@ public:
 
     // 26.7.3.2 Constructors, copy, and assignment [span.cons]
 
-    gsl_api gsl_constexpr14 span() gsl_noexcept
+    gsl_api gsl_constexpr span() gsl_noexcept
         : first_( gsl_nullptr )
         , last_ ( gsl_nullptr )
     {
