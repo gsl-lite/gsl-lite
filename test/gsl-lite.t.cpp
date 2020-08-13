@@ -53,7 +53,11 @@ CASE( "__cplusplus" "[.stdc++]" )
 
 CASE( "_MSVC_LANG" "[.stdc++]" )
 {
+#ifdef _MSVC_LANG
     gsl_PRINT_NUMERIC( _MSVC_LANG );
+#else
+    gsl_ABSENT(        _MSVC_LANG );
+#endif
 }
 
 CASE( "gsl_CPP11_OR_GREATER" "[.stdc++]" )
