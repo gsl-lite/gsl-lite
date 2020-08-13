@@ -18,7 +18,7 @@
 #ifndef GSL_LITE_GSL_LITE_HPP_INCLUDED
 #define GSL_LITE_GSL_LITE_HPP_INCLUDED
 
-#if !defined( gsl_CONFIG_DEFAULTS_VERSION ) || gsl_CONFIG_DEFAULTS_VERSION == 0
+#if ! defined( gsl_CONFIG_DEFAULTS_VERSION ) || gsl_CONFIG_DEFAULTS_VERSION == 0
 # error Header <gsl-lite/gsl-lite.hpp> requires version 1 defaults; set gsl_CONFIG_DEFAULTS_VERSION=1 or link to CMake target "gsl::gsl-lite-v1"
 #endif
 

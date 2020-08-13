@@ -580,12 +580,12 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
 
 CASE( "span<>: Allows to default construct in a constexpr context")
 {
-#if gsl_HAVE_CONSTEXPR_11
+#if gsl_HAVE( CONSTEXPR_11 )
     constexpr auto spn = gsl::span<int>{ };
     EXPECT( spn.size() == index_type( 0 ) );
 #else
     EXPECT( !!"construction in a constexpr context is not available (C++11)");
-#endif    
+#endif
 }
 
 CASE( "span<>: Allows to copy-construct from another span of the same type" )
