@@ -143,11 +143,11 @@ CASE( "Presence of C++ library features" "[.stdlibrary]" )
 
 CASE( "gsl-lite configuration" "[.gsl-configuration]" )
 {
-#if gsl_CHECK_CFG_NO_VALUE_( gsl_api )
-    gsl_PRINT_NO_VALUE( gsl_api );
-#else
-    gsl_PRINT_TOKEN( gsl_api );
-#endif
+//#if gsl_CHECK_CFG_NO_VALUE_( gsl_api )
+//    gsl_PRINT_NO_VALUE( gsl_api );
+//#else
+//    gsl_PRINT_TOKEN( gsl_api );
+//#endif
 
 #ifdef gsl_CONFIG_CONTRACT_CHECKING_AUDIT
     gsl_PRESENT( gsl_CONFIG_CONTRACT_CHECKING_AUDIT );
