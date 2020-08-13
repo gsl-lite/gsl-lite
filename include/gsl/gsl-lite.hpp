@@ -36,30 +36,75 @@
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
+#define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
+#define gsl_STRINGIFY_( x )  #x
+#define gsl_CONCAT_(  a, b )  gsl_CONCAT2_( a, b )
+#define gsl_CONCAT2_( a, b )  a##b
+#define gsl_EVALF_( f )  f()
+
+// configuration argument checking:
+
+#define gsl_DETAIL_CFG_TOGGLE_VALUE_1  1
+#define gsl_DETAIL_CFG_TOGGLE_VALUE_0  1
+#define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_1  1
+#define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_0  1
+#define gsl_DETAIL_CFG_STD_VALUE_98  1
+#define gsl_DETAIL_CFG_STD_VALUE_3   1
+#define gsl_DETAIL_CFG_STD_VALUE_03  1
+#define gsl_DETAIL_CFG_STD_VALUE_11  1
+#define gsl_DETAIL_CFG_STD_VALUE_14  1
+#define gsl_DETAIL_CFG_STD_VALUE_17  1
+#define gsl_DETAIL_CFG_STD_VALUE_20  1
+#define gsl_DETAIL_CFG_NO_VALUE_  1
+#define gsl_CHECK_CFG_TOGGLE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_TOGGLE_VALUE_, x )
+#define gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_, x )
+#define gsl_CHECK_CFG_STD_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_STD_VALUE_, x )
+#define gsl_CHECK_CFG_NO_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_NO_VALUE_, x )
+
 // gsl-lite backward compatibility:
 
-#if !defined( gsl_CONFIG_DEFAULTS_VERSION )
-# define gsl_CONFIG_DEFAULTS_VERSION gsl_lite_MAJOR
+#if defined( gsl_CONFIG_DEFAULTS_VERSION )
+# if ! gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( gsl_CONFIG_DEFAULTS_VERSION )
+#  pragma message ("invalid configuration value gsl_CONFIG_DEFAULTS_VERSION=" gsl_STRINGIFY(gsl_CONFIG_DEFAULTS_VERSION) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_DEFAULTS_VERSION  gsl_lite_MAJOR  // default
 #endif
+# define gsl_CONFIG_DEFAULTS_VERSION_()  gsl_CONFIG_DEFAULTS_VERSION
 
-#ifdef gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
+#if defined( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR )
+#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
+# endif
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
 # pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ON )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ON) "; macro must be defined without value")
+# endif
 # pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ON.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 #endif
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_OFF) "; macro must be defined without value")
+# endif
 # pragma message ("gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 #if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY) "; macro must be defined without value")
+# endif
 # pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF
 #elif defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY) "; macro must be defined without value")
+# endif
 # pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF
@@ -68,54 +113,106 @@
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
+#  pragma message ("invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
+# endif
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
+#  pragma message ("invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
+# endif
 # define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
+#  pragma message ("invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
+# endif
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 
 // Configuration: Features
 
-#ifndef  gsl_FEATURE_WITH_CONTAINER_TO_STD
-# define gsl_FEATURE_WITH_CONTAINER_TO_STD  99
+#if defined( gsl_FEATURE_WITH_CONTAINER_TO_STD )
+# if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_WITH_CONTAINER_TO_STD )
+#  pragma message ("invalid configuration value gsl_FEATURE_WITH_CONTAINER_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_WITH_CONTAINER_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
+# endif
+#else
+# define gsl_FEATURE_WITH_CONTAINER_TO_STD  99  // default
 #endif
+#define gsl_FEATURE_WITH_CONTAINER_TO_STD_()  gsl_FEATURE_WITH_CONTAINER_TO_STD
 
-#ifndef  gsl_FEATURE_MAKE_SPAN_TO_STD
-# define gsl_FEATURE_MAKE_SPAN_TO_STD  99
+#if defined( gsl_FEATURE_MAKE_SPAN_TO_STD )
+# if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_MAKE_SPAN_TO_STD )
+#  pragma message ("invalid configuration value gsl_FEATURE_MAKE_SPAN_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_MAKE_SPAN_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
+# endif
+#else
+# define gsl_FEATURE_MAKE_SPAN_TO_STD  99  // default
 #endif
+#define gsl_FEATURE_MAKE_SPAN_TO_STD_()  gsl_FEATURE_MAKE_SPAN_TO_STD
 
-#ifndef  gsl_FEATURE_BYTE_SPAN_TO_STD
-# define gsl_FEATURE_BYTE_SPAN_TO_STD  99
+#if defined( gsl_FEATURE_BYTE_SPAN_TO_STD )
+# if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_BYTE_SPAN_TO_STD )
+#  pragma message ("invalid configuration value gsl_FEATURE_BYTE_SPAN_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_BYTE_SPAN_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
+# endif
+#else
+# define gsl_FEATURE_BYTE_SPAN_TO_STD  99  // default
 #endif
+#define gsl_FEATURE_BYTE_SPAN_TO_STD_()  gsl_FEATURE_BYTE_SPAN_TO_STD
 
-#ifndef  gsl_FEATURE_IMPLICIT_MACRO
-# define gsl_FEATURE_IMPLICIT_MACRO  0
+#if defined( gsl_FEATURE_IMPLICIT_MACRO )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_IMPLICIT_MACRO )
+#  pragma message ("invalid configuration value gsl_FEATURE_IMPLICIT_MACRO=" gsl_STRINGIFY(gsl_FEATURE_IMPLICIT_MACRO) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_IMPLICIT_MACRO  0  // default
 #endif
+#define gsl_FEATURE_IMPLICIT_MACRO_()  gsl_FEATURE_IMPLICIT_MACRO
 
-#ifndef  gsl_FEATURE_OWNER_MACRO
-# define gsl_FEATURE_OWNER_MACRO  (gsl_CONFIG_DEFAULTS_VERSION == 0)
+#if defined( gsl_FEATURE_OWNER_MACRO )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_OWNER_MACRO )
+#  pragma message ("invalid configuration value gsl_FEATURE_OWNER_MACRO=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_OWNER_MACRO  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
+#define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
-#ifndef  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
-# define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0
+#if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
+#  pragma message ("invalid configuration value gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=" gsl_STRINGIFY(gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0 // default
 #endif
+# define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD_()  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 
-#ifndef  gsl_FEATURE_GSL_LITE_NAMESPACE
-# define gsl_FEATURE_GSL_LITE_NAMESPACE  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
+#if defined( gsl_FEATURE_GSL_LITE_NAMESPACE )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_LITE_NAMESPACE )
+#  pragma message ("invalid configuration value gsl_FEATURE_GSL_LITE_NAMESPACE=" gsl_STRINGIFY(gsl_FEATURE_GSL_LITE_NAMESPACE) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_GSL_LITE_NAMESPACE  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
 #endif
+#define gsl_FEATURE_GSL_LITE_NAMESPACE_()  gsl_FEATURE_GSL_LITE_NAMESPACE
 
 // Configuration: Other
 
-#if defined( gsl_CONFIG_TRANSPARENT_NOT_NULL ) && gsl_CONFIG_TRANSPARENT_NOT_NULL && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
-# error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_TRANSPARENT_NOT_NULL=1
+#if defined( gsl_CONFIG_TRANSPARENT_NOT_NULL )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_TRANSPARENT_NOT_NULL )
+#  pragma message ("invalid configuration value gsl_CONFIG_TRANSPARENT_NOT_NULL=" gsl_STRINGIFY(gsl_CONFIG_TRANSPARENT_NOT_NULL) ", must be 0 or 1")
+# endif
+# if gsl_CONFIG_TRANSPARENT_NOT_NULL && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
+#  error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_TRANSPARENT_NOT_NULL=1
+# endif
+#else
+# define gsl_CONFIG_TRANSPARENT_NOT_NULL  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
 #endif
+# define gsl_CONFIG_TRANSPARENT_NOT_NULL_()  gsl_CONFIG_TRANSPARENT_NOT_NULL
 
-#ifndef  gsl_CONFIG_DEPRECATE_TO_LEVEL
+#if ! defined( gsl_CONFIG_DEPRECATE_TO_LEVEL )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  6
 # else
@@ -123,11 +220,12 @@
 # endif
 #endif
 
-#ifndef  gsl_CONFIG_SPAN_INDEX_TYPE
+#if ! defined( gsl_CONFIG_SPAN_INDEX_TYPE )
 # define gsl_CONFIG_SPAN_INDEX_TYPE  std::size_t
 #endif
+# define gsl_CONFIG_SPAN_INDEX_TYPE_()  gsl_CONFIG_SPAN_INDEX_TYPE
 
-#ifndef  gsl_CONFIG_INDEX_TYPE
+#if ! defined( gsl_CONFIG_INDEX_TYPE )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
 // p0122r3 uses std::ptrdiff_t
 #  define gsl_CONFIG_INDEX_TYPE  std::ptrdiff_t
@@ -135,38 +233,71 @@
 #  define gsl_CONFIG_INDEX_TYPE  gsl_CONFIG_SPAN_INDEX_TYPE
 # endif
 #endif
+# define gsl_CONFIG_INDEX_TYPE_()  gsl_CONFIG_INDEX_TYPE
 
-#ifndef  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
-# define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
+#if defined( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
+#  pragma message ("invalid configuration value gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
 #endif
+#define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR_()  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
 
-#ifndef  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
-# define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0
+#if defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
+#  pragma message ("invalid configuration value gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0  // default
 #endif
+#define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF_()  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
 
-#ifndef  gsl_CONFIG_TRANSPARENT_NOT_NULL
-# define gsl_CONFIG_TRANSPARENT_NOT_NULL  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
+#if defined( gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=" gsl_STRINGIFY(gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0  // default
 #endif
+#define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS_()  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 
-#ifndef  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
-# define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0
+#if defined( gsl_CONFIG_ALLOWS_SPAN_COMPARISON )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_SPAN_COMPARISON )
+#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_SPAN_COMPARISON=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_COMPARISON) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_ALLOWS_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
+#define gsl_CONFIG_ALLOWS_SPAN_COMPARISON_()  gsl_CONFIG_ALLOWS_SPAN_COMPARISON
 
-#ifndef  gsl_CONFIG_ALLOWS_SPAN_COMPARISON
-# define gsl_CONFIG_ALLOWS_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)
+#if defined( gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON )
+#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1  // default
 #endif
+#define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON_()  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
 
-#ifndef  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
-# define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1
+#if defined( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR )
+#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0  // default
 #endif
+#define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR_()  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 
-#ifndef  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
-# define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0
+#if defined( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
+#  pragma message ("invalid configuration value gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=" gsl_STRINGIFY(gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
 #endif
+#define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_()  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 
-#ifndef  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
-# define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION  (gsl_CONFIG_DEFAULTS_VERSION >= 1)
-#endif
 
 #if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
 # error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined
@@ -277,10 +408,10 @@
 #define gsl_IN_STD( v )  ( ((v) == 98 ? 3 : (v)) >= gsl_CPLUSPLUS_V )
 
 #define gsl_DEPRECATE_TO_LEVEL( level )  ( level <= gsl_CONFIG_DEPRECATE_TO_LEVEL )
-#define gsl_FEATURE_TO_STD(   feature )  ( gsl_IN_STD( gsl_FEATURE( feature##_TO_STD ) ) )
-#define gsl_FEATURE(          feature )  ( gsl_FEATURE_##feature )
-#define gsl_CONFIG(           feature )  ( gsl_CONFIG_##feature )
-#define gsl_HAVE(             feature )  ( gsl_HAVE_##feature )
+#define gsl_FEATURE_TO_STD(   feature )  gsl_IN_STD( gsl_FEATURE( feature##_TO_STD ) )
+#define gsl_FEATURE(          feature )  gsl_EVALF_( gsl_FEATURE_##feature##_ )
+#define gsl_CONFIG(           feature )  gsl_EVALF_( gsl_CONFIG_##feature##_ )
+#define gsl_HAVE(             feature )  gsl_EVALF_( gsl_HAVE_##feature##_ )
 
 // Presence of wide character support:
 
@@ -289,26 +420,27 @@
 #else
 # define gsl_HAVE_WCHAR 1
 #endif
+#define gsl_HAVE_WCHAR_()  gsl_HAVE_WCHAR
 
 // Presence of language & library features:
 
 #if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 # ifdef __OBJC__
-   // There are a bunch of inconsistencies about __EXCEPTIONS and __has_feature(cxx_exceptions) in clang 3.4/3.5/3.6
-   // We're interested in C++ exceptions, which can be checked by __has_feature(cxx_exceptions) in 3.5+
-   // In pre-3.5 __has_feature(cxx_exceptions) can be true if ObjC exceptions are enabled, but C++ exceptions are disabled
-   // Recommended way to check is "__EXCEPTIONS && __has_feature(cxx_exceptions)"
+   // There are a bunch of inconsistencies about __EXCEPTIONS and __has_feature(cxx_exceptions) in Clang 3.4/3.5/3.6.
+   // We're interested in C++ exceptions, which can be checked by __has_feature(cxx_exceptions) in 3.5+.
+   // In pre-3.5, __has_feature(cxx_exceptions) can be true if ObjC exceptions are enabled, but C++ exceptions are disabled.
+   // The recommended way to check is `__EXCEPTIONS && __has_feature(cxx_exceptions)`.
    // See https://releases.llvm.org/3.6.0/tools/clang/docs/ReleaseNotes.html#the-exceptions-macro
-   // Note: this is only relevant in Objective-C++, thus the ifdef
+   // Note: this is only relevant in Objective-C++, thus the ifdef.
 #  if __EXCEPTIONS && __has_feature(cxx_exceptions)
 #   define gsl_HAVE_EXCEPTIONS  1
 #  else
 #   define gsl_HAVE_EXCEPTIONS  0
 #  endif // __EXCEPTIONS && __has_feature(cxx_exceptions)
 # else
-   // clang-cl doesn't define __EXCEPTIONS for MSVC compatibility (see https://reviews.llvm.org/D4065)
-   // Neither does clang in MS-compatiblity mode
-   // Let's hope no one tries to build Objective-C++ code using MS-compatibility mode or clang-cl
+   // clang-cl doesn't define __EXCEPTIONS for MSVC compatibility (see https://reviews.llvm.org/D4065).
+   // Neither does Clang in MS-compatiblity mode.
+   // Let's hope no one tries to build Objective-C++ code using MS-compatibility mode or clang-cl.
 #  if __has_feature(cxx_exceptions)
 #   define gsl_HAVE_EXCEPTIONS  1
 #  else
@@ -339,8 +471,9 @@
 // For all other compilers, assume exceptions are always enabled.
 # define  gsl_HAVE_EXCEPTIONS  1
 #endif
+#define gsl_HAVE_EXCEPTIONS_()  gsl_HAVE_EXCEPTIONS
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) && !gsl_HAVE( EXCEPTIONS )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) && ! gsl_HAVE_EXCEPTIONS
 # error Cannot use gsl_CONFIG_CONTRACT_VIOLATION_THROWS if exceptions are disabled.
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) && !gsl_HAVE( EXCEPTIONS )
 
@@ -367,84 +500,120 @@
 
 // Presence of C++11 language features:
 
-#define gsl_HAVE_AUTO                   gsl_CPP11_100
-#define gsl_HAVE_NULLPTR                gsl_CPP11_100
-#define gsl_HAVE_RVALUE_REFERENCE       gsl_CPP11_100
-#define gsl_HAVE_FUNCTION_REF_QUALIFIER ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
-
-#define gsl_HAVE_ENUM_CLASS             gsl_CPP11_110
-
-#define gsl_HAVE_ALIAS_TEMPLATE         gsl_CPP11_120
+#define gsl_HAVE_AUTO                      gsl_CPP11_100
+#define gsl_HAVE_NULLPTR                   gsl_CPP11_100
+#define gsl_HAVE_RVALUE_REFERENCE          gsl_CPP11_100
+#define gsl_HAVE_FUNCTION_REF_QUALIFIER  ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
+#define gsl_HAVE_ENUM_CLASS                gsl_CPP11_110
+#define gsl_HAVE_ALIAS_TEMPLATE            gsl_CPP11_120
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_120
-#define gsl_HAVE_EXPLICIT               gsl_CPP11_120
-#define gsl_HAVE_INITIALIZER_LIST       gsl_CPP11_120
-#define gsl_HAVE_VARIADIC_TEMPLATE      gsl_CPP11_120
-#define gsl_HAVE_IS_DELETE              gsl_CPP11_120
+#define gsl_HAVE_EXPLICIT                  gsl_CPP11_120
+#define gsl_HAVE_INITIALIZER_LIST          gsl_CPP11_120
+#define gsl_HAVE_VARIADIC_TEMPLATE         gsl_CPP11_120
+#define gsl_HAVE_IS_DELETE                 gsl_CPP11_120
+#define gsl_HAVE_CONSTEXPR_11              gsl_CPP11_140
+#define gsl_HAVE_IS_DEFAULT                gsl_CPP11_140
+#define gsl_HAVE_NOEXCEPT                  gsl_CPP11_140
+#define gsl_HAVE_NORETURN                  ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 ) )
+#define gsl_HAVE_EXPRESSION_SFINAE         gsl_CPP11_140
 
-#define gsl_HAVE_CONSTEXPR_11           gsl_CPP11_140
-#define gsl_HAVE_IS_DEFAULT             gsl_CPP11_140
-#define gsl_HAVE_NOEXCEPT               gsl_CPP11_140
-#define gsl_HAVE_NORETURN               ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 ) )
-
-#define gsl_HAVE_EXPRESSION_SFINAE      gsl_CPP11_140
-
-#if gsl_CPP11_OR_GREATER
-// see above
-#endif
+#define gsl_HAVE_AUTO_()                   gsl_HAVE_AUTO
+#define gsl_HAVE_NULLPTR_()                gsl_HAVE_NULLPTR
+#define gsl_HAVE_RVALUE_REFERENCE_()       gsl_HAVE_RVALUE_REFERENCE
+#define gsl_HAVE_FUNCTION_REF_QUALIFIER_()  gsl_HAVE_FUNCTION_REF_QUALIFIER
+#define gsl_HAVE_ENUM_CLASS_()             gsl_HAVE_ENUM_CLASS
+#define gsl_HAVE_ALIAS_TEMPLATE_()         gsl_HAVE_ALIAS_TEMPLATE
+#define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG_()  gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
+#define gsl_HAVE_EXPLICIT_()               gsl_HAVE_EXPLICIT
+#define gsl_HAVE_INITIALIZER_LIST_()       gsl_HAVE_INITIALIZER_LIST
+#define gsl_HAVE_VARIADIC_TEMPLATE_()      gsl_HAVE_VARIADIC_TEMPLATE
+#define gsl_HAVE_IS_DELETE_()              gsl_HAVE_IS_DELETE
+#define gsl_HAVE_CONSTEXPR_11_()           gsl_HAVE_CONSTEXPR_11
+#define gsl_HAVE_IS_DEFAULT_()             gsl_HAVE_IS_DEFAULT
+#define gsl_HAVE_NOEXCEPT_()               gsl_HAVE_NOEXCEPT
+#define gsl_HAVE_NORETURN_()               gsl_HAVE_NORETURN
+#define gsl_HAVE_EXPRESSION_SFINAE_()      gsl_HAVE_EXPRESSION_SFINAE
 
 // Presence of C++14 language features:
 
-#define gsl_HAVE_CONSTEXPR_14           ( gsl_CPP14_000 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 600 ) )
-#define gsl_HAVE_DECLTYPE_AUTO          gsl_CPP14_140
-#define gsl_HAVE_DEPRECATED             ( gsl_CPP14_140 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 142 ) )
+#define gsl_HAVE_CONSTEXPR_14              ( gsl_CPP14_000 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 600 ) )
+#define gsl_HAVE_DECLTYPE_AUTO             gsl_CPP14_140
+#define gsl_HAVE_DEPRECATED                ( gsl_CPP14_140 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 142 ) )
+
+#define gsl_HAVE_CONSTEXPR_14_()           gsl_HAVE_CONSTEXPR_14
+#define gsl_HAVE_DECLTYPE_AUTO_()          gsl_HAVE_DECLTYPE_AUTO
+#define gsl_HAVE_DEPRECATED_()             gsl_HAVE_DEPRECATED
 
 // Presence of C++17 language features:
 // MSVC: template parameter deduction guides since Visual Studio 2017 v15.7
 
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE  gsl_CPP17_000
-#define gsl_HAVE_DEDUCTION_GUIDES       ( gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
-#define gsl_HAVE_NODISCARD              gsl_CPP17_000
-#define gsl_HAVE_CONSTEXPR_17           gsl_CPP17_OR_GREATER
+#define gsl_HAVE_DEDUCTION_GUIDES          ( gsl_CPP17_000 && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION_FULL, 1, 1414 ) )
+#define gsl_HAVE_NODISCARD                 gsl_CPP17_000
+#define gsl_HAVE_CONSTEXPR_17              gsl_CPP17_OR_GREATER
+
+#define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE_()  gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
+#define gsl_HAVE_DEDUCTION_GUIDES_()       gsl_HAVE_DEDUCTION_GUIDES
+#define gsl_HAVE_NODISCARD_()              gsl_HAVE_NODISCARD
+#define gsl_HAVE_CONSTEXPR_17_()           gsl_HAVE_CONSTEXPR_17
 
 // Presence of C++20 language features:
 
-#define gsl_HAVE_CONSTEXPR_20           gsl_CPP20_OR_GREATER
+#define gsl_HAVE_CONSTEXPR_20              gsl_CPP20_OR_GREATER
+
+#define gsl_HAVE_CONSTEXPR_20_()           gsl_HAVE_CONSTEXPR_20
 
 // Presence of C++ library features:
 
-#define gsl_HAVE_ADDRESSOF              gsl_CPP17_000
-#define gsl_HAVE_ARRAY                  gsl_CPP11_110
-#define gsl_HAVE_TYPE_TRAITS            gsl_CPP11_110
-#define gsl_HAVE_TR1_TYPE_TRAITS        gsl_CPP11_110
-
-#define gsl_HAVE_CONTAINER_DATA_METHOD  gsl_CPP11_140_CPP0X_90
-#define gsl_HAVE_STD_DATA               gsl_CPP17_000
+#define gsl_HAVE_ADDRESSOF                 gsl_CPP17_000
+#define gsl_HAVE_ARRAY                     gsl_CPP11_110
+#define gsl_HAVE_TYPE_TRAITS               gsl_CPP11_110
+#define gsl_HAVE_TR1_TYPE_TRAITS           gsl_CPP11_110
+#define gsl_HAVE_CONTAINER_DATA_METHOD     gsl_CPP11_140_CPP0X_90
+#define gsl_HAVE_STD_DATA                  gsl_CPP17_000
 #ifdef __cpp_lib_ssize
-# define gsl_HAVE_STD_SSIZE             1
+# define gsl_HAVE_STD_SSIZE                1
 #else
-# define gsl_HAVE_STD_SSIZE             ( gsl_COMPILER_GNUC_VERSION >= 1000 && __cplusplus > 201703L )
+# define gsl_HAVE_STD_SSIZE                ( gsl_COMPILER_GNUC_VERSION >= 1000 && __cplusplus > 201703L )
 #endif
+#define gsl_HAVE_SIZED_TYPES               gsl_CPP11_140
+#define gsl_HAVE_MAKE_SHARED               gsl_CPP11_140_CPP0X_100
+#define gsl_HAVE_SHARED_PTR                gsl_CPP11_140_CPP0X_100
+#define gsl_HAVE_UNIQUE_PTR                gsl_CPP11_140_CPP0X_100
+#define gsl_HAVE_MAKE_UNIQUE               gsl_CPP14_120
+#define gsl_HAVE_UNCAUGHT_EXCEPTIONS       gsl_CPP17_140
+#define gsl_HAVE_ADD_CONST                 gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_INTEGRAL_CONSTANT         gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_REMOVE_CONST              gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_REMOVE_REFERENCE          gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_REMOVE_CVREF              gsl_CPP20_OR_GREATER
+#define gsl_HAVE_TR1_ADD_CONST             gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_TR1_INTEGRAL_CONSTANT     gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_TR1_REMOVE_CONST          gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_TR1_REMOVE_REFERENCE      gsl_HAVE_TR1_TYPE_TRAITS
 
-#define gsl_HAVE_SIZED_TYPES            gsl_CPP11_140
-
-#define gsl_HAVE_MAKE_SHARED            gsl_CPP11_140_CPP0X_100
-#define gsl_HAVE_SHARED_PTR             gsl_CPP11_140_CPP0X_100
-#define gsl_HAVE_UNIQUE_PTR             gsl_CPP11_140_CPP0X_100
-
-#define gsl_HAVE_MAKE_UNIQUE            gsl_CPP14_120
-
-#define gsl_HAVE_UNCAUGHT_EXCEPTIONS    gsl_CPP17_140
-
-#define gsl_HAVE_ADD_CONST              gsl_HAVE_TYPE_TRAITS
-#define gsl_HAVE_INTEGRAL_CONSTANT      gsl_HAVE_TYPE_TRAITS
-#define gsl_HAVE_REMOVE_CONST           gsl_HAVE_TYPE_TRAITS
-#define gsl_HAVE_REMOVE_REFERENCE       gsl_HAVE_TYPE_TRAITS
-#define gsl_HAVE_REMOVE_CVREF           gsl_CPP20_OR_GREATER
-
-#define gsl_HAVE_TR1_ADD_CONST          gsl_HAVE_TR1_TYPE_TRAITS
-#define gsl_HAVE_TR1_INTEGRAL_CONSTANT  gsl_HAVE_TR1_TYPE_TRAITS
-#define gsl_HAVE_TR1_REMOVE_CONST       gsl_HAVE_TR1_TYPE_TRAITS
-#define gsl_HAVE_TR1_REMOVE_REFERENCE   gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_ADDRESSOF_()              gsl_HAVE_ADDRESSOF
+#define gsl_HAVE_ARRAY_()                  gsl_HAVE_ARRAY
+#define gsl_HAVE_TYPE_TRAITS_()            gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_TR1_TYPE_TRAITS_()        gsl_HAVE_TR1_TYPE_TRAITS
+#define gsl_HAVE_CONTAINER_DATA_METHOD_()  gsl_HAVE_CONTAINER_DATA_METHOD
+#define gsl_HAVE_STD_DATA_()               gsl_HAVE_STD_DATA
+#define gsl_HAVE_STD_SSIZE_()              gsl_HAVE_STD_SSIZE
+#define gsl_HAVE_SIZED_TYPES_()            gsl_HAVE_SIZED_TYPES
+#define gsl_HAVE_MAKE_SHARED_()            gsl_HAVE_MAKE_SHARED
+#define gsl_HAVE_SHARED_PTR_()             gsl_HAVE_SHARED_PTR
+#define gsl_HAVE_UNIQUE_PTR_()             gsl_HAVE_UNIQUE_PTR
+#define gsl_HAVE_MAKE_UNIQUE_()            gsl_HAVE_MAKE_UNIQUE
+#define gsl_HAVE_UNCAUGHT_EXCEPTIONS_()    gsl_HAVE_UNCAUGHT_EXCEPTIONS
+#define gsl_HAVE_ADD_CONST_()              gsl_HAVE_ADD_CONST
+#define gsl_HAVE_INTEGRAL_CONSTANT_()      gsl_HAVE_INTEGRAL_CONSTANT
+#define gsl_HAVE_REMOVE_CONST_()           gsl_HAVE_REMOVE_CONST
+#define gsl_HAVE_REMOVE_REFERENCE_()       gsl_HAVE_REMOVE_REFERENCE
+#define gsl_HAVE_REMOVE_CVREF_()           gsl_HAVE_REMOVE_CVREF
+#define gsl_HAVE_TR1_ADD_CONST_()          gsl_HAVE_TR1_ADD_CONST
+#define gsl_HAVE_TR1_INTEGRAL_CONSTANT_()  gsl_HAVE_TR1_INTEGRAL_CONSTANT
+#define gsl_HAVE_TR1_REMOVE_CONST_()       gsl_HAVE_TR1_REMOVE_CONST
+#define gsl_HAVE_TR1_REMOVE_REFERENCE_()   gsl_HAVE_TR1_REMOVE_REFERENCE
 
 // C++ feature usage:
 
@@ -526,7 +695,7 @@
 # define gsl_NORETURN
 #endif
 
-#if gsl_HAVE( DEPRECATED ) && !defined( gsl_TESTING_ )
+#if gsl_HAVE( DEPRECATED ) && ! defined( gsl_TESTING_ )
 # define gsl_DEPRECATED             [[deprecated]]
 # define gsl_DEPRECATED_MSG( msg )  [[deprecated( msg )]]
 #else
@@ -535,9 +704,9 @@
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_STATIC_ASSERT_( cond, msg ) static_assert( cond, msg )
+# define gsl_STATIC_ASSERT_( cond, msg )  static_assert( cond, msg )
 #else
-# define gsl_STATIC_ASSERT_( cond, msg ) ( ( void )sizeof( char[1 - 2*!!( cond ) ] ) )
+# define gsl_STATIC_ASSERT_( cond, msg )  ( ( void )sizeof( char[1 - 2*!!( cond ) ] ) )
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
@@ -666,12 +835,12 @@
 
 // Other features:
 
-#define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR  \
-    ( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD )
+#define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR       ( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD )
+#define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR_()    gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
 
 // Note: !defined(__NVCC__) doesn't work with nvcc here:
-#define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR  \
-    ( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
+#define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR     ( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
+#define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR_()  gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 
 // GSL API (e.g. for CUDA platform):
 
@@ -1173,12 +1342,13 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #endif
   >
   using owner = T;
-#elif gsl_CONFIG_DEFAULTS_VERSION == 0
+#elif gsl_CONFIG( DEFAULTS_VERSION ) == 0
   // TODO vNext: remove
   template< class T > struct owner { typedef T type; };
 #endif
 
-#define gsl_HAVE_OWNER_TEMPLATE  gsl_HAVE_ALIAS_TEMPLATE
+#define gsl_HAVE_OWNER_TEMPLATE     gsl_HAVE_ALIAS_TEMPLATE
+#define gsl_HAVE_OWNER_TEMPLATE_()  gsl_HAVE_OWNER_TEMPLATE
 
 // TODO vNext: remove
 #if gsl_FEATURE( OWNER_MACRO )
@@ -1256,9 +1426,6 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #else
 # define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
 #endif
-
-#define gsl_STRINGIFY(  x )  gsl_STRINGIFY_( x )
-#define gsl_STRINGIFY_( x )  #x
 
 struct fail_fast : public std::logic_error
 {
@@ -1667,7 +1834,7 @@ namespace detail {
 template< class T, class U >
 #if !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 gsl_api
-#endif // !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#endif
 inline T narrow( U u )
 {
 #if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && ! gsl_HAVE( EXCEPTIONS )
@@ -1839,7 +2006,7 @@ struct not_null_data< T, false >
     : ptr_( std::move( _ptr ) )
     {
     }
-    
+
     gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
     : ptr_( std::move( other.ptr_ ) )
     {
@@ -1870,7 +2037,7 @@ struct not_null_data< T, true >
     : ptr_( std::move( _ptr ) )
     {
     }
-    
+
     gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
     : ptr_( std::move( other.ptr_ ) )
     {
@@ -4082,7 +4249,7 @@ public:
 
 #endif
 
-#if gsl_FEATURE_GSL_LITE_NAMESPACE
+#if gsl_FEATURE( GSL_LITE_NAMESPACE )
 
 // gsl_lite namespace:
 
@@ -4195,7 +4362,7 @@ using ::gsl::cwzstring_span;
 
 } // namespace gsl_lite
 
-#endif // gsl_FEATURE_GSL_LITE_NAMESPACE
+#endif // gsl_FEATURE( GSL_LITE_NAMESPACE )
 
 gsl_RESTORE_MSVC_WARNINGS()
 
