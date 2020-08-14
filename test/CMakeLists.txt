@@ -77,4 +77,18 @@ make_test_targets( "${PROGRAM}-v0" "${SOURCES}" 99 "" v0 )
 make_test_targets( "${PROGRAM}-v1" "${SOURCES}" 99 "" v1 )
 
 
+# Add test targets for special configurations:
+
+set( SPECIAL_SOURCES
+    gsl-lite.t.cpp
+    not_null.t.cpp
+)
+set( SPECIAL_OPTIONS
+    -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1
+    -Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t
+    -Dgsl_CONFIG_NOT_NULL_DIRECT_CTOR=0
+)
+make_test_targets( "${PROGRAM}-v1-special" "${SPECIAL_SOURCES}" 11 "${SPECIAL_OPTIONS}" v1 )
+
+
 # end of file
