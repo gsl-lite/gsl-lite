@@ -6,7 +6,7 @@ project( use-gsl-lite LANGUAGES CXX )
 
 # Set default ExternalProject root directory and add gsl-lite:
 
-set( GSL_LITE_URL https://github.com/martinmoene/gsl-lite.git )
+set( GSL_LITE_URL https://github.com/gsl-lite/gsl-lite.git )
 
 include( ExternalProject )
 find_package( Git REQUIRED )
