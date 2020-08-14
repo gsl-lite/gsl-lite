@@ -552,7 +552,7 @@ CASE( "not_null<>: Allows to move from a not_null pointer to an underlying point
     not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
     pi = std::move(p); // ...and back again.
 
-    EXPECT_THROWS( *p );
+    EXPECT_THROWS( (void) *p );
     EXPECT( pi.get() == raw );
 #endif
 }
@@ -829,7 +829,7 @@ CASE( "not_null<>: Allows to move from a not_null pointer to an underlying point
     not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
     pi = std::move(p); // ...and back again.
 
-    EXPECT_THROWS( *p );
+    EXPECT_THROWS( (void) *p );
     EXPECT( pi.get() == raw );
 #endif
 }
@@ -842,7 +842,7 @@ CASE( "not_null<>: Allows to move to a related pointer from a not_null pointer (
     not_null< unique_ptr< MyDerived > > p ( std::move(pderived) );
     unique_ptr< MyBase > pbase = std::move(p);
 
-    EXPECT_THROWS( *p );
+    EXPECT_THROWS( (void) *p );
     EXPECT( pbase.get() == raw );
 #endif
 }

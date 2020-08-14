@@ -1397,7 +1397,7 @@ CASE( "ensure_z(): Allows to specify ultimate location of the sentinel and ensur
 {
     const char * s = "hello"; // not: s[]
 
-    EXPECT_THROWS( ensure_z( s, index_type( 3 ) ) );
+    EXPECT_THROWS( (void) ensure_z( s, index_type( 3 ) ) );
 }
 
 CASE ( "operator<<: Allows printing a string_span to an output stream" )

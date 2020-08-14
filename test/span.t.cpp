@@ -157,8 +157,8 @@ CASE( "span<>: Terminates access outside the span" )
 
 CASE( "span<>: Terminates access with front() and back() on empty span" )
 {
-    EXPECT_THROWS( span<int>().front() );
-    EXPECT_THROWS( span<int>().back() );
+    EXPECT_THROWS( (void) span<int>().front() );
+    EXPECT_THROWS( (void) span<int>().back() );
 }
 
 CASE( "span<>: Allows to default-construct" )
