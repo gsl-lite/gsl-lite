@@ -2509,10 +2509,11 @@ template< class U >
 not_null( not_null<U> ) -> not_null<U>;
 #endif
 
-#if gsl_HAVE( NULLPTR )
+#if gsl_CONFIG( NOT_NULL_DIRECT_CTOR )
+# if gsl_HAVE( NULLPTR )
 void make_not_null( std::nullptr_t ) gsl_is_delete;
-#endif // gsl_HAVE( NULLPTR )
-#if gsl_HAVE( RVALUE_REFERENCE )
+# endif // gsl_HAVE( NULLPTR )
+# if gsl_HAVE( RVALUE_REFERENCE )
 template< class U >
 gsl_NODISCARD gsl_constexpr14 not_null<U>
 make_not_null( U u )
@@ -2525,7 +2526,7 @@ make_not_null( not_null<U> u )
 {
     return std::move( u );
 }
-#else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+# else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
 template< class U >
 gsl_NODISCARD not_null<U>
 make_not_null( U const & u )
@@ -2538,7 +2539,8 @@ make_not_null( not_null<U> const & u )
 {
     return u;
 }
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+# endif // gsl_HAVE( RVALUE_REFERENCE )
+#endif // gsl_CONFIG( NOT_NULL_DIRECT_CTOR )
 
 
 #if gsl_HAVE( RVALUE_REFERENCE )
@@ -2905,9 +2907,6 @@ public:
     typedef T element_type;
     typedef typename std11::remove_cv< T >::type value_type;
 
-    typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
-    typedef typename std::iterator_traits< iterator >::difference_type difference_type;
-
     typedef T & reference;
     typedef T * pointer;
     typedef T const * const_pointer;
@@ -2918,6 +2917,9 @@ public:
 
     typedef std::reverse_iterator< iterator >       reverse_iterator;
     typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
+
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
+    typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
     // 26.7.3.2 Constructors, copy, and assignment [span.cons]
 
@@ -4506,11 +4508,11 @@ using namespace std14;
 using namespace std17;
 using namespace std20;
 
-#if gsl_HAVE( SHARED_PTR )
+# if gsl_HAVE( SHARED_PTR )
 using std::unique_ptr;
 using std::shared_ptr;
 using std::make_shared;
-#endif
+# endif
 
 using ::gsl::index;
 
@@ -4523,17 +4525,17 @@ typedef gsl_CONFIG_INDEX_TYPE stride;
 // Integer type for pointer, iterator, or index differences.
 typedef gsl_CONFIG_INDEX_TYPE diff;
 
-#if  gsl_HAVE( ALIAS_TEMPLATE )
+# if gsl_HAVE( ALIAS_TEMPLATE )
 using ::gsl::owner;
-#endif
+# endif
 
 using ::gsl::fail_fast;
 
 using ::gsl::finally;
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 using ::gsl::on_return;
 using ::gsl::on_error;
-#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 using ::gsl::narrow_cast;
 using ::gsl::narrowing_error;
@@ -4544,7 +4546,9 @@ using ::gsl::narrow_failfast;
 using ::gsl::at;
 
 using ::gsl::not_null;
+# if gsl_CONFIG( NOT_NULL_DIRECT_CTOR )
 using ::gsl::make_not_null;
+# endif
 
 using ::gsl::byte;
 
@@ -4557,9 +4561,9 @@ using ::gsl::byte_span;
 using ::gsl::copy;
 using ::gsl::as_bytes;
 using ::gsl::as_writable_bytes;
-#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 using ::gsl::as_writeable_bytes;
-#endif
+# endif
 
 using ::gsl::basic_string_span;
 using ::gsl::string_span;
@@ -4572,13 +4576,13 @@ using ::gsl::czstring_span;
 using ::gsl::zstring;
 using ::gsl::czstring;
 
-#if gsl_HAVE( WCHAR )
+# if gsl_HAVE( WCHAR )
 using ::gsl::wzstring;
 using ::gsl::cwzstring;
 
 using ::gsl::wzstring_span;
 using ::gsl::cwzstring_span;
-#endif // gsl_HAVE( WCHAR )
+# endif // gsl_HAVE( WCHAR )
 
 } // namespace gsl_lite
 
