@@ -23,7 +23,7 @@ CASE( "at(): Terminates access to non-existing C-array elements" )
 {
     int a[] = { 1, 2, 3, 4 };
 
-    EXPECT_THROWS( at(a, 4) );
+    EXPECT_THROWS( (void) at(a, 4) );
 }
 
 CASE( "at(): Terminates access to non-existing std::array elements (C++11)" )
@@ -31,7 +31,7 @@ CASE( "at(): Terminates access to non-existing std::array elements (C++11)" )
 #if gsl_HAVE( ARRAY )
     std::array<int, 4> a = {{ 1, 2, 3, 4 }};
 
-    EXPECT_THROWS( at(a, 4) );
+    EXPECT_THROWS( (void) at(a, 4) );
 #else
     EXPECT( !!"std::array<> is not available (no C++11)" );
 #endif
@@ -46,7 +46,7 @@ CASE( "at(): Terminates access to non-existing std::vector elements" )
         a.push_back( i + 1 );
     }
 
-    EXPECT_THROWS( at(a, 4) );
+    EXPECT_THROWS( (void) at(a, 4) );
 }
 
 CASE( "at(): Terminates access to non-existing std::initializer_list elements (C++11)" )
@@ -56,7 +56,7 @@ CASE( "at(): Terminates access to non-existing std::initializer_list elements (C
 #if gsl_HAVE( INITIALIZER_LIST ) && ( !gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_GNUC_VERSION >= 473 )
     std::initializer_list<int> a = { 1, 2, 3, 4 };
 
-    EXPECT_THROWS( at(a, 4) );
+    EXPECT_THROWS( (void) at(a, 4) );
 #else
     EXPECT( !!"std::initializer_list<> is not available (no C++11)" );
 #endif
@@ -67,7 +67,7 @@ CASE( "at(): Terminates access to non-existing gsl::span elements" )
     int arr[] = { 1, 2, 3, 4 };
     span<int> a( arr );
 
-    EXPECT_THROWS( at(a, 4) );
+    EXPECT_THROWS( (void) at(a, 4) );
 }
 
 CASE( "at(): Allows to access existing C-array elements" )

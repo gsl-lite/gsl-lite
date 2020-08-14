@@ -130,7 +130,7 @@ CASE( "finally: Allows moving final_action to throw" "[.]")
     struct action
     {
         int & i_;
-        void operator()(){ i_ += 1; }     
+        void operator()(){ i_ += 1; }
         action( int & i ) : i_( i ) {}
         action( action && other ) : i_( other.i_) { throw std::runtime_error("action move-ctor"); }
     };
@@ -138,7 +138,7 @@ CASE( "finally: Allows moving final_action to throw" "[.]")
     int i = 0;
     {
         {
-            EXPECT_THROWS( finally( action( i ) ) );
+            EXPECT_THROWS( (void) finally( action( i ) ) );
         }
         EXPECT( i == 1 );
     }
@@ -257,34 +257,34 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
 
 CASE( "narrow<>(): Terminates when narrowing with value loss" )
 {
-    EXPECT_THROWS_AS( narrow<char>( 300 ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<char>( 300 ), narrowing_error );
 
 #if gsl_CPP11_OR_GREATER
     // uint <-> uint
-    EXPECT_THROWS_AS( narrow< std::uint8_t>( std::uint16_t( u16) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>( std::uint16_t( u16) ), narrowing_error );
 
     // int <-> int
-    EXPECT_THROWS_AS( narrow<  std::int8_t>(  std::int16_t(i16n) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow<  std::int8_t>(  std::int16_t(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>(  std::int16_t(i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>(  std::int16_t(i16p) ), narrowing_error );
 
     // uint <-> int
-    EXPECT_THROWS_AS( narrow<  std::int8_t>(  std::uint8_t( u8 ) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow< std::uint8_t>(  std::int16_t(i16p) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow<  std::int8_t>( std::uint16_t( u8 ) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow<  std::int8_t>( std::uint16_t(u16 ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>(  std::uint8_t( u8 ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t( u8 ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t(u16 ) ), narrowing_error );
 #endif // gsl_CPP11_OR_GREATER
 }
 
 CASE( "narrow<>(): Terminates when narrowing with sign loss" )
 {
-    EXPECT_THROWS_AS( narrow<unsigned>( -42 ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<unsigned>( -42 ), narrowing_error );
 
 #if gsl_CPP11_OR_GREATER
     // uint <-> int
-    EXPECT_THROWS_AS( narrow<std::uint16_t>(   std::int8_t( i8n) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow< std::uint8_t>(   std::int8_t( i8n) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow< std::uint8_t>(  std::int16_t( i8n) ), narrowing_error );
-    EXPECT_THROWS_AS( narrow< std::uint8_t>(  std::int16_t(i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint16_t>(   std::int8_t( i8n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(   std::int8_t( i8n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t( i8n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16n) ), narrowing_error );
 #endif // gsl_CPP11_OR_GREATER
 }
 
@@ -323,34 +323,34 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 
 CASE( "narrow_failfast<>(): Terminates when narrowing with value loss" )
 {
-    EXPECT_THROWS_AS( narrow_failfast<char>( 300 ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<char>( 300 ), fail_fast );
 
 #if gsl_CPP11_OR_GREATER
     // uint <-> uint
-    EXPECT_THROWS_AS( narrow_failfast< std::uint8_t>( std::uint16_t( u16) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>( std::uint16_t( u16) ), fail_fast );
 
     // int <-> int
-    EXPECT_THROWS_AS( narrow_failfast<  std::int8_t>(  std::int16_t(i16n) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast<  std::int8_t>(  std::int16_t(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>(  std::int16_t(i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>(  std::int16_t(i16p) ), fail_fast );
 
     // uint <-> int
-    EXPECT_THROWS_AS( narrow_failfast<  std::int8_t>(  std::uint8_t( u8 ) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast< std::uint8_t>(  std::int16_t(i16p) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast<  std::int8_t>( std::uint16_t( u8 ) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast<  std::int8_t>( std::uint16_t(u16 ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>(  std::uint8_t( u8 ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>( std::uint16_t( u8 ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>( std::uint16_t(u16 ) ), fail_fast );
 #endif // gsl_CPP11_OR_GREATER
 }
 
 CASE( "narrow_failfast<>(): Terminates when narrowing with sign loss" )
 {
-    EXPECT_THROWS_AS( narrow_failfast<unsigned>( -42 ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<unsigned>( -42 ), fail_fast );
 
 #if gsl_CPP11_OR_GREATER
     // uint <-> int
-    EXPECT_THROWS_AS( narrow_failfast<std::uint16_t>(   std::int8_t( i8n) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast< std::uint8_t>(   std::int8_t( i8n) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast< std::uint8_t>(  std::int16_t( i8n) ), fail_fast );
-    EXPECT_THROWS_AS( narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint16_t>(   std::int8_t( i8n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(   std::int8_t( i8n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t( i8n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
 #endif // gsl_CPP11_OR_GREATER
 }
 
