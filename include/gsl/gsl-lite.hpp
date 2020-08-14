@@ -4221,13 +4221,13 @@ inline std::basic_string< typename std::remove_const<T>::type > to_string( basic
 gsl_NODISCARD inline std::string
 to_string( string_span const & spn )
 {
-    return std::string( spn.data(), spn.length() );
+    return std::string( spn.data(), std::size_t( spn.length() ) );
 }
 
 gsl_NODISCARD inline std::string
 to_string( cstring_span const & spn )
 {
-    return std::string( spn.data(), spn.length() );
+    return std::string( spn.data(), std::size_t( spn.length() ) );
 }
 
 #if gsl_HAVE( WCHAR )
@@ -4235,13 +4235,13 @@ to_string( cstring_span const & spn )
 gsl_NODISCARD inline std::wstring
 to_string( wstring_span const & spn )
 {
-    return std::wstring( spn.data(), spn.length() );
+    return std::wstring( spn.data(), std::size_t( spn.length() ) );
 }
 
 gsl_NODISCARD inline std::wstring
 to_string( cwstring_span const & spn )
 {
-    return std::wstring( spn.data(), spn.length() );
+    return std::wstring( spn.data(), std::size_t( spn.length() ) );
 }
 
 #endif // gsl_HAVE( WCHAR )

@@ -62,8 +62,8 @@ jobs:
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v0-cpp17|gsl-lite-v1-cpp17'
 
     # Clang 3.5, 3.6, 3.7, 3.8, and 3.9 are tested with Travis
     #- os: Linux
@@ -82,8 +82,8 @@ jobs:
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-cpp17|gsl-lite-altcfg-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v0-cpp17|gsl-lite-v1-cpp17'
 
     - os: Linux
       cxxCompiler: GCC
