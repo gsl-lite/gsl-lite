@@ -258,6 +258,13 @@ CASE( "not_null<>: Terminates construction from a null pointer value (raw pointe
     EXPECT_THROWS( F::blow() );
 }
 
+CASE( "not_null<>: Terminates construction from a null pointer value with require_not_null() (raw pointer)" )
+{
+    struct F { static void blow() { int * z = gsl_nullptr; (void) require_not_null(z); } };
+
+    EXPECT_THROWS( F::blow() );
+}
+
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value (raw pointer)" )
 {
     struct F { static void blow() { MyDerived * z = gsl_nullptr; not_null<MyBase*> p(z); } };
@@ -308,6 +315,15 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw p
     int i = 12;
 
     not_null< int* > p = make_not_null( &i );
+
+    EXPECT( p == &i );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (raw pointer) with require_not_null()" )
+{
+    int i = 12;
+
+    not_null< int* > p = require_not_null( &i );
 
     EXPECT( p == &i );
 }
@@ -459,6 +475,13 @@ CASE( "not_null<>: Terminates construction from a null pointer value (shared_ptr
     EXPECT_THROWS( F::blow() );
 }
 
+CASE( "not_null<>: Terminates construction from a null pointer value with require_not_null (shared_ptr)" )
+{
+    struct F { static void blow() { shared_ptr< int > z = gsl_nullptr; (void) require_not_null(z); } };
+
+    EXPECT_THROWS( F::blow() );
+}
+
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value (shared_ptr)" )
 {
     struct F { static void blow() { shared_ptr< MyDerived > z = gsl_nullptr; not_null< shared_ptr< MyBase > > p(z); } };
@@ -562,6 +585,15 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
     shared_ptr< int > pi = make_shared< int >(12);
 
     not_null< shared_ptr< int > > p = make_not_null( pi );
+
+    EXPECT( p == pi );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with require_not_null()" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+
+    not_null< shared_ptr< int > > p = require_not_null( pi );
 
     EXPECT( p == pi );
 }
@@ -731,6 +763,13 @@ CASE( "not_null<>: Terminates construction from a null pointer value (unique_ptr
     EXPECT_THROWS( F::blow() );
 }
 
+CASE( "not_null<>: Terminates construction from a null pointer value with require_not_null (unique_ptr)" )
+{
+    struct F { static void blow() { unique_ptr< int > z = gsl_nullptr; (void) require_not_null(std::move(z)); } };
+
+    EXPECT_THROWS( F::blow() );
+}
+
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value (unique_ptr)" )
 {
     struct F { static void blow() { unique_ptr< MyDerived > z = gsl_nullptr; not_null< unique_ptr< MyBase > > p(std::move(z)); } };
@@ -853,6 +892,16 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
     int* raw(pi.get());
 
     not_null< unique_ptr< int > > p = make_not_null( std::move(pi) );
+
+    EXPECT( &*p == raw );
+}
+
+CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with require_not_null()" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null< unique_ptr< int > > p = require_not_null( std::move(pi) );
 
     EXPECT( &*p == raw );
 }

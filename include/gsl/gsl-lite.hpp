@@ -235,9 +235,21 @@
 #endif
 # define gsl_CONFIG_INDEX_TYPE_()  gsl_CONFIG_INDEX_TYPE
 
+#if defined( gsl_CONFIG_NOT_NULL_DIRECT_CTOR )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_DIRECT_CTOR )
+#  pragma message ("invalid configuration value gsl_CONFIG_NOT_NULL_DIRECT_CTOR=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_DIRECT_CTOR) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_NOT_NULL_DIRECT_CTOR  1  // default
+#endif
+#define gsl_CONFIG_NOT_NULL_DIRECT_CTOR_()  gsl_CONFIG_NOT_NULL_DIRECT_CTOR
+
 #if defined( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
 #  pragma message ("invalid configuration value gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR) ", must be 0 or 1")
+# endif
+# if ! gsl_CONFIG_NOT_NULL_DIRECT_CTOR
+#  error configuration option gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR is meaningless if gsl_CONFIG_NOT_NULL_DIRECT_CTOR=0
 # endif
 #else
 # define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
@@ -2105,7 +2117,38 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 };
 #endif
 
+// Tag for unchecked `not_null<>` construction from underlying type, used by `require_not_null()`:
+
+struct unchecked_tag { gsl_constexpr unchecked_tag( ) gsl_noexcept { } };
+
 } // namespace detail
+
+
+#if gsl_HAVE( NULLPTR )
+void require_not_null( std::nullptr_t ) gsl_is_delete;
+#endif // gsl_HAVE( NULLPTR )
+#if gsl_HAVE( RVALUE_REFERENCE )
+template< class U >
+gsl_NODISCARD gsl_constexpr14 not_null<U>
+require_not_null( U u );
+template< class U >
+gsl_NODISCARD gsl_constexpr14 not_null<U>
+require_not_null( not_null<U> u ) gsl_is_delete;
+//template< class U >
+//gsl_constexpr14 not_null<U>
+//require_not_null( not_null<U> u );
+#else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+template< class U >
+gsl_NODISCARD not_null<U>
+require_not_null( U const & u );
+template< class U >
+gsl_NODISCARD not_null<U>
+require_not_null( not_null<U> const & u ) gsl_is_delete;
+//template< class U >
+//not_null<U>
+//require_not_null( not_null<U> const & u );
+#endif // gsl_HAVE( RVALUE_REFERENCE )
+
 
 template< class T >
 class not_null
@@ -2117,6 +2160,27 @@ private:
     template< class U >
     friend class not_null;
 
+    // need to construct from underlying pointer verified to be not null
+#if gsl_HAVE( RVALUE_REFERENCE )
+    friend gsl_constexpr14 not_null<T> require_not_null<T>( T );
+#else
+    friend not_null<T> require_not_null<T>( T const & );
+#endif
+
+#if gsl_HAVE( RVALUE_REFERENCE )
+    gsl_constexpr
+    not_null( T _ptr, detail::unchecked_tag )
+        : data_( std::move( _ptr ) )
+    {
+    }
+#else
+    gsl_constexpr
+    not_null( T const & _ptr, detail::unchecked_tag )
+        : data_( _ptr )
+    {
+    }
+#endif
+
 public:
     typedef typename detail::element_type_helper<T>::type element_type;
 
@@ -2124,12 +2188,20 @@ public:
     static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
+    // constructors from underlying type:
+
+#if gsl_CONFIG( NOT_NULL_DIRECT_CTOR )
+public:
+#else
+protected: // constructors are required by `not_null_ic<>`
+#endif
+
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 # if gsl_HAVE( RVALUE_REFERENCE )
     template< class U
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
 #  endif
@@ -2139,7 +2211,7 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-# else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+# else // a.k.a. ! gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_constexpr14 explicit not_null( U const& other )
     : data_( T( other ) )
@@ -2147,11 +2219,11 @@ public:
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
 # endif // gsl_HAVE( RVALUE_REFERENCE )
-#else // a.k.a. !gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+#else // a.k.a. ! gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 # if gsl_HAVE( RVALUE_REFERENCE )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
@@ -2171,7 +2243,7 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#  else // a.k.a. ! ( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
     gsl_constexpr14 not_null( U other )
@@ -2179,8 +2251,8 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-# else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+# else // a.k.a. ! gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_constexpr14 not_null( U const& other )
     : data_( T( other ) )
@@ -2466,6 +2538,37 @@ make_not_null( not_null<U> const & u )
 {
     return u;
 }
+#endif // gsl_HAVE( RVALUE_REFERENCE )
+
+
+#if gsl_HAVE( RVALUE_REFERENCE )
+template< class U >
+gsl_NODISCARD gsl_constexpr14 not_null<U>
+require_not_null( U u )
+{
+    gsl_Expects( u != gsl_nullptr );
+    return not_null<U>( std::move( u ), detail::unchecked_tag( ) );
+}
+//template< class U >
+//gsl_NODISCARD gsl_constexpr14 not_null<U>
+//require_not_null( not_null<U> u )
+//{
+//    return std::move( u );
+//}
+#else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+template< class U >
+gsl_NODISCARD not_null<U>
+require_not_null( U const & u )
+{
+    gsl_Expects( u != gsl_nullptr );
+    return not_null<U>( u, detail::unchecked_tag( ) );
+}
+//template< class U >
+//gsl_NODISCARD not_null<U>
+//require_not_null( not_null<U> const & u )
+//{
+//    return u;
+//}
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
 
