@@ -33,6 +33,10 @@ struct RefCounted
     RefCounted( T * p ) : p_( p ) {}
     operator T *() const { return p_; }
     T * p_;
+
+#if ! gsl_CPP11_OR_GREATER
+    typedef T element_type;
+#endif
 };
 
 template< class T >
