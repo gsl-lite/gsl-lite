@@ -2762,6 +2762,9 @@ public:
     typedef T element_type;
     typedef typename std11::remove_cv< T >::type value_type;
 
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
+    typedef typename std::iterator_traits< iterator >::difference_type difference_type;
+
     typedef T & reference;
     typedef T * pointer;
     typedef T const * const_pointer;
@@ -2772,8 +2775,6 @@ public:
 
     typedef std::reverse_iterator< iterator >       reverse_iterator;
     typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
-
-    typedef typename std::iterator_traits< iterator >::difference_type difference_type;
 
     // 26.7.3.2 Constructors, copy, and assignment [span.cons]
 
