@@ -2154,7 +2154,7 @@ private:
     friend class not_null;
 
     // need to construct from underlying pointer verified to be not null
-    friend detail::require_not_null_helper;
+    friend struct detail::require_not_null_helper;
 
 #if gsl_HAVE( RVALUE_REFERENCE )
     gsl_constexpr

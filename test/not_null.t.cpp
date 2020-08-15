@@ -284,9 +284,12 @@ CASE( "not_null<>: Terminates construction from a null pointer value (raw pointe
 
 CASE( "not_null<>: Terminates construction from a null pointer value with require_not_null() (raw pointer)" )
 {
+#if ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 )
+    // GCC 4.7 wrongly instantiates `not_null<>_::operator void()`
     struct F { static void blow() { int * z = gsl_nullptr; (void) require_not_null(z); } };
 
     EXPECT_THROWS( F::blow() );
+#endif
 }
 
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value (raw pointer)" )
@@ -523,9 +526,12 @@ CASE( "not_null<>: Terminates construction from a null pointer value (shared_ptr
 
 CASE( "not_null<>: Terminates construction from a null pointer value with require_not_null (shared_ptr)" )
 {
+# if ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 )
+    // GCC 4.7 wrongly instantiates `not_null<>_::operator void()`
     struct F { static void blow() { shared_ptr< int > z = gsl_nullptr; (void) require_not_null(z); } };
 
     EXPECT_THROWS( F::blow() );
+# endif
 }
 
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value (shared_ptr)" )
@@ -835,9 +841,12 @@ CASE( "not_null<>: Terminates construction from a null pointer value (unique_ptr
 
 CASE( "not_null<>: Terminates construction from a null pointer value with require_not_null (unique_ptr)" )
 {
+#if ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 )
+    // GCC 4.7 wrongly instantiates `not_null<>_::operator void()`
     struct F { static void blow() { unique_ptr< int > z = gsl_nullptr; (void) require_not_null(std::move(z)); } };
 
     EXPECT_THROWS( F::blow() );
+# endif
 }
 
 CASE( "not_null<>: Terminates construction from related pointer types for null pointer value (unique_ptr)" )
