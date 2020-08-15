@@ -2121,33 +2121,26 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 
 struct unchecked_tag { gsl_constexpr unchecked_tag( ) gsl_noexcept { } };
 
-} // namespace detail
-
-
-#if gsl_HAVE( NULLPTR )
-void require_not_null( std::nullptr_t ) gsl_is_delete;
-#endif // gsl_HAVE( NULLPTR )
+struct require_not_null_helper
+{
 #if gsl_HAVE( RVALUE_REFERENCE )
-template< class U >
-gsl_NODISCARD gsl_constexpr14 not_null<U>
-require_not_null( U u );
-template< class U >
-gsl_NODISCARD gsl_constexpr14 not_null<U>
-require_not_null( not_null<U> u ) gsl_is_delete;
-//template< class U >
-//gsl_constexpr14 not_null<U>
-//require_not_null( not_null<U> u );
-#else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
-template< class U >
-gsl_NODISCARD not_null<U>
-require_not_null( U const & u );
-template< class U >
-gsl_NODISCARD not_null<U>
-require_not_null( not_null<U> const & u ) gsl_is_delete;
-//template< class U >
-//not_null<U>
-//require_not_null( not_null<U> const & u );
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+    template< class T >
+    static gsl_constexpr14 not_null<T>
+    make( T ptr )
+    {
+        return not_null<T>( std::move( ptr ), unchecked_tag( ) );
+    }
+#else
+    template< class T >
+    static not_null<T>
+    make( T const & ptr )
+    {
+        return not_null<T>( ptr, unchecked_tag( ) );
+    }
+#endif
+};
+
+} // namespace detail
 
 
 template< class T >
@@ -2161,11 +2154,7 @@ private:
     friend class not_null;
 
     // need to construct from underlying pointer verified to be not null
-#if gsl_HAVE( RVALUE_REFERENCE )
-    friend gsl_constexpr14 not_null<T> require_not_null<T>( T );
-#else
-    friend not_null<T> require_not_null<T>( T const & );
-#endif
+    friend detail::require_not_null_helper;
 
 #if gsl_HAVE( RVALUE_REFERENCE )
     gsl_constexpr
@@ -2429,7 +2418,7 @@ public:
 # endif
 #else // a.k.a. #if !( gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
     template< class U >
-    gsl_NODISCARD gsl_constexpr14
+    gsl_constexpr14
     operator U() const
     {
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
@@ -2528,13 +2517,13 @@ make_not_null( not_null<U> u )
 }
 # else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
 template< class U >
-gsl_NODISCARD not_null<U>
+not_null<U>
 make_not_null( U const & u )
 {
     return not_null<U>( u );
 }
 template< class U >
-gsl_NODISCARD not_null<U>
+not_null<U>
 make_not_null( not_null<U> const & u )
 {
     return u;
@@ -2544,12 +2533,15 @@ make_not_null( not_null<U> const & u )
 
 
 #if gsl_HAVE( RVALUE_REFERENCE )
+# if gsl_HAVE( NULLPTR )
+void require_not_null( std::nullptr_t ) gsl_is_delete;
+# endif // gsl_HAVE( NULLPTR )
 template< class U >
 gsl_NODISCARD gsl_constexpr14 not_null<U>
 require_not_null( U u )
 {
     gsl_Expects( u != gsl_nullptr );
-    return not_null<U>( std::move( u ), detail::unchecked_tag( ) );
+    return detail::require_not_null_helper::make( std::move( u ) );
 }
 //template< class U >
 //gsl_NODISCARD gsl_constexpr14 not_null<U>
@@ -2559,14 +2551,14 @@ require_not_null( U u )
 //}
 #else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
 template< class U >
-gsl_NODISCARD not_null<U>
+not_null<U>
 require_not_null( U const & u )
 {
     gsl_Expects( u != gsl_nullptr );
-    return not_null<U>( u, detail::unchecked_tag( ) );
+    return detail::require_not_null_helper::make( u );
 }
 //template< class U >
-//gsl_NODISCARD not_null<U>
+//not_null<U>
 //require_not_null( not_null<U> const & u )
 //{
 //    return u;
