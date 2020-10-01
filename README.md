@@ -1,4 +1,4 @@
-# *gsl-lite*: Guidelines Support Library for C++98, C++11 up
+# *gsl-lite*: Guidelines Support Library for C++98, C++11 up  [an amazing project ] :-
 
 
 | metadata | build  | packages | try online |
