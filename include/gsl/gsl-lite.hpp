@@ -499,25 +499,53 @@
 #define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1500 && gsl_HAS_CPP0X))
 #define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1600 && gsl_HAS_CPP0X))
 
+#if defined(__ARMCC_VERSION) && __ARMCC_VERSION < 6000000
+#define gsl_HAVE_ARRAY                              0
+#define gsl_HAVE_INITIALIZER_LIST                   0
+#define gsl_HAVE_TYPE_TRAITS                        0
+#define gsl_HAVE_TR1_TYPE_TRAITS                    0
+#define gsl_HAVE_UNIQUE_PTR                         0
+#define gsl_HAVE_SHARED_PTR                         0
+#define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR    0
+#define GSL_HAVE_REMOVE_REFERENCE                   0
+#define gsl_HAVE_NULLPTR                            0
+#define gsl_HAVE_EXPRESSION_SFINAE                  0
+#define gsl_HAVE_FORWARD                            0
+#define gsl_HAVE_HASH                               0
+#define gsl_HAVE_RVALUE_REFERENCE                   0
+#endif
 // Presence of C++11 language features:
 
+#ifndef gsl_HAVE_HASH
+#define gsl_HAVE_HASH                      gsl_CPP11_100
+#endif
+#ifndef gsl_HAVE_FORWARD
+#define gsl_HAVE_FORWARD                   gsl_CPP11_100
+#endif
 #define gsl_HAVE_AUTO                      gsl_CPP11_100
+#ifndef gsl_HAVE_NULLPTR
 #define gsl_HAVE_NULLPTR                   gsl_CPP11_100
+#endif
+#ifndef gsl_HAVE_RVALUE_REFERENCE
 #define gsl_HAVE_RVALUE_REFERENCE          gsl_CPP11_100
+#endif
 #define gsl_HAVE_FUNCTION_REF_QUALIFIER  ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
 #define gsl_HAVE_ENUM_CLASS                gsl_CPP11_110
 #define gsl_HAVE_ALIAS_TEMPLATE            gsl_CPP11_120
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_120
 #define gsl_HAVE_EXPLICIT                  gsl_CPP11_120
+#ifndef gsl_HAVE_INITIALIZER_LIST
 #define gsl_HAVE_INITIALIZER_LIST          gsl_CPP11_120
+#endif
 #define gsl_HAVE_VARIADIC_TEMPLATE         gsl_CPP11_120
 #define gsl_HAVE_IS_DELETE                 gsl_CPP11_120
 #define gsl_HAVE_CONSTEXPR_11              gsl_CPP11_140
 #define gsl_HAVE_IS_DEFAULT                gsl_CPP11_140
 #define gsl_HAVE_NOEXCEPT                  gsl_CPP11_140
 #define gsl_HAVE_NORETURN                  ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 ) )
+#ifndef gsl_HAVE_EXPRESSION_SFINAE
 #define gsl_HAVE_EXPRESSION_SFINAE         gsl_CPP11_140
-
+#endif
 #define gsl_HAVE_AUTO_()                   gsl_HAVE_AUTO
 #define gsl_HAVE_NULLPTR_()                gsl_HAVE_NULLPTR
 #define gsl_HAVE_RVALUE_REFERENCE_()       gsl_HAVE_RVALUE_REFERENCE
@@ -567,9 +595,15 @@
 // Presence of C++ library features:
 
 #define gsl_HAVE_ADDRESSOF                 gsl_CPP17_000
+#ifndef gsl_HAVE_ARRAY
 #define gsl_HAVE_ARRAY                     gsl_CPP11_110
+#endif
+#ifndef gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_TYPE_TRAITS               gsl_CPP11_110
+#endif
+#ifndef gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_TR1_TYPE_TRAITS           gsl_CPP11_110
+#endif
 #define gsl_HAVE_CONTAINER_DATA_METHOD     gsl_CPP11_140_CPP0X_90
 #define gsl_HAVE_STD_DATA                  gsl_CPP17_000
 #ifdef __cpp_lib_ssize
@@ -579,8 +613,12 @@
 #endif
 #define gsl_HAVE_SIZED_TYPES               gsl_CPP11_140
 #define gsl_HAVE_MAKE_SHARED               gsl_CPP11_140_CPP0X_100
+#ifndef gsl_HAVE_SHARED_PTR
 #define gsl_HAVE_SHARED_PTR                gsl_CPP11_140_CPP0X_100
+#endif
+#ifndef gsl_HAVE_UNIQUE_PTR
 #define gsl_HAVE_UNIQUE_PTR                gsl_CPP11_140_CPP0X_100
+#endif
 #define gsl_HAVE_MAKE_UNIQUE               gsl_CPP14_120
 #define gsl_HAVE_UNCAUGHT_EXCEPTIONS       gsl_CPP17_140
 #define gsl_HAVE_ADD_CONST                 gsl_HAVE_TYPE_TRAITS
@@ -835,8 +873,9 @@
 
 
 // Other features:
-
+#ifndef gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
 #define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR       ( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD )
+#endif
 #define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR_()    gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
 
 // Note: !defined(__NVCC__) doesn't work with nvcc here:
@@ -1543,7 +1582,7 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
 } // namespace std11
 #endif
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110
+#if gsl_HAVE_RVALUE_REFERENCE && (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110)
 
 template< class F >
 class final_action
@@ -1591,12 +1630,14 @@ finally( F const & action ) gsl_noexcept
     return final_action<F>( action );
 }
 
+#if gsl_HAVE_FORWARD
 template< class F >
 gsl_NODISCARD inline final_action<F>
 finally( F && action ) gsl_noexcept
 {
     return final_action<F>( std::forward<F>( action ) );
 }
+#endif
 
 #if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
@@ -1791,7 +1832,7 @@ inline final_action_error on_error( F const & action )
 
 #endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 110
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
+#if gsl_HAVE_FORWARD && (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
 
 template< class T, class U >
 gsl_NODISCARD gsl_api inline gsl_constexpr T
@@ -1983,7 +2024,7 @@ class not_null;
 namespace detail {
 
 // helper class to figure out the pointed-to type of a pointer
-#if gsl_CPP11_OR_GREATER
+#if gsl_HAVE_REMOVE_REFERENCE
 template< class T, class E = void >
 struct element_type_helper
 {
@@ -4348,7 +4389,7 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 
 } // namespace gsl
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
+#if gsl_HAVE_HASH && (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120)
 
 namespace std {
 
