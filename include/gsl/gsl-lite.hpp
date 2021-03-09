@@ -1834,7 +1834,7 @@ namespace detail {
         return false;
     }
     template< class T, class U >
-    gsl_constexpr gsl_api bool have_same_sign( T t, U u, std::true_type /*isSameSignedness*/ ) gsl_noexcept
+    gsl_constexpr gsl_api bool have_same_sign( T, U, std::true_type /*isSameSignedness*/ ) gsl_noexcept
     {
         return true;
     }
