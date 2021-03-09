@@ -60,6 +60,19 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [10]
       platforms: [x64]
+      tag: 'memcheck'
+      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
+      postSetupSteps:
+      - bash: |
+          sudo apt install valgrind
+        displayName: 'Install Valgrind'
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [10]
+      platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-cpp17.t gsl-lite-altcfg-cpp17.t'
