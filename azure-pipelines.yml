@@ -28,7 +28,7 @@ jobs:
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [19_2]
+      cxxCompilerVersions: [VS2019]
       cudaCompiler: NVCC
       cudaCompilerVersions: [11_0, 11_1, 11_2]
       platforms: [x64]
@@ -36,13 +36,13 @@ jobs:
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [19_1, 19_2]
+      cxxCompilerVersions: [VS2017, VS2019]
       cmakeGenerator: 'MSBuild' # required for CppCoreCheck
       platforms: [x86, x64]
 
     - os: Windows
       cxxCompiler: Clang
-      cxxCompilerVersions: [9, 10]
+      cxxCompilerVersions: [VS2019]
       platforms: [x86, x64]
 
     # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
