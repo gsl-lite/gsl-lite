@@ -30,7 +30,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [19_2]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [10_2, 11_0]
+      cudaCompilerVersions: [11_0, 11_1, 11_2]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -87,17 +87,9 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [7, 8]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [10_2]
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-
-    - os: Linux
-      cxxCompiler: GCC
       cxxCompilerVersions: [9]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_0]
+      cudaCompilerVersions: [11_0, 11_1, 11_2]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -108,5 +100,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3]
+      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3, 12]
       platforms: [x64]
