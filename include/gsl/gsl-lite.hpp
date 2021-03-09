@@ -4441,6 +4441,7 @@ using ::gsl::narrow_failfast;
 using ::gsl::at;
 
 using ::gsl::not_null;
+using ::gsl::not_null_ic;
 using ::gsl::make_not_null;
 
 using ::gsl::byte;
