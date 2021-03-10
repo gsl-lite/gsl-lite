@@ -2129,7 +2129,7 @@ public:
     template< class U
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
 #  endif
@@ -2151,7 +2151,7 @@ public:
 # if gsl_HAVE( RVALUE_REFERENCE )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
-#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
@@ -2171,7 +2171,7 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
     gsl_constexpr14 not_null( U other )
@@ -2179,8 +2179,8 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && !gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-# else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+# else // a.k.a. ! gsl_HAVE( RVALUE_REFERENCE )
     template< class U >
     gsl_constexpr14 not_null( U const& other )
     : data_( T( other ) )
@@ -4116,13 +4116,13 @@ inline std::basic_string< typename std::remove_const<T>::type > to_string( basic
 gsl_NODISCARD inline std::string
 to_string( string_span const & spn )
 {
-    return std::string( spn.data(), spn.length() );
+    return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 gsl_NODISCARD inline std::string
 to_string( cstring_span const & spn )
 {
-    return std::string( spn.data(), spn.length() );
+    return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 #if gsl_HAVE( WCHAR )
@@ -4130,13 +4130,13 @@ to_string( cstring_span const & spn )
 gsl_NODISCARD inline std::wstring
 to_string( wstring_span const & spn )
 {
-    return std::wstring( spn.data(), spn.length() );
+    return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 gsl_NODISCARD inline std::wstring
 to_string( cwstring_span const & spn )
 {
-    return std::wstring( spn.data(), spn.length() );
+    return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
 #endif // gsl_HAVE( WCHAR )
@@ -4403,11 +4403,11 @@ using namespace std14;
 using namespace std17;
 using namespace std20;
 
-#if gsl_HAVE( SHARED_PTR )
+# if gsl_HAVE( SHARED_PTR )
 using std::unique_ptr;
 using std::shared_ptr;
 using std::make_shared;
-#endif
+# endif
 
 using ::gsl::index;
 
@@ -4420,17 +4420,17 @@ typedef gsl_CONFIG_INDEX_TYPE stride;
 // Integer type for pointer, iterator, or index differences.
 typedef gsl_CONFIG_INDEX_TYPE diff;
 
-#if  gsl_HAVE( ALIAS_TEMPLATE )
+# if gsl_HAVE( ALIAS_TEMPLATE )
 using ::gsl::owner;
-#endif
+# endif
 
 using ::gsl::fail_fast;
 
 using ::gsl::finally;
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 using ::gsl::on_return;
 using ::gsl::on_error;
-#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 using ::gsl::narrow_cast;
 using ::gsl::narrowing_error;
@@ -4455,9 +4455,9 @@ using ::gsl::byte_span;
 using ::gsl::copy;
 using ::gsl::as_bytes;
 using ::gsl::as_writable_bytes;
-#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 using ::gsl::as_writeable_bytes;
-#endif
+# endif
 
 using ::gsl::basic_string_span;
 using ::gsl::string_span;
@@ -4470,13 +4470,13 @@ using ::gsl::czstring_span;
 using ::gsl::zstring;
 using ::gsl::czstring;
 
-#if gsl_HAVE( WCHAR )
+# if gsl_HAVE( WCHAR )
 using ::gsl::wzstring;
 using ::gsl::cwzstring;
 
 using ::gsl::wzstring_span;
 using ::gsl::cwzstring_span;
-#endif // gsl_HAVE( WCHAR )
+# endif // gsl_HAVE( WCHAR )
 
 } // namespace gsl_lite
 
