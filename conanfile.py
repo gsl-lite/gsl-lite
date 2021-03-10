@@ -5,7 +5,7 @@ class GslLiteConan(ConanFile):
     name = "gsl-lite"
     description = "A single-file header-only version of ISO C++ Guidelines Support Library (GSL) for C++98, C++11 and later"
     license = "MIT License. https://opensource.org/licenses/MIT"
-    url = "https://github.com/martinmoene/gsl-lite.git"
+    url = "https://github.com/gsl-lite/gsl-lite.git"
     exports_sources = "include/gsl/gsl-lite.hpp", "include/gsl-lite/gsl-lite.hpp", "CMakeLists.txt", "cmake/*", "LICENSE"
     settings = "compiler", "build_type", "arch"
     build_policy = "missing"

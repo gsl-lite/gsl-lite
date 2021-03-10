@@ -15,7 +15,21 @@ set( PROGRAM   ${unit_name}-lite )
 
 message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")
 
-# Test sources:
+include(${CMAKE_CURRENT_SOURCE_DIR}/../MakeTestTarget.cmake)
+
+
+function(make_cuda_test_targets nameRoot srcs maxStd extraOptions )
+    if( HAS_CUDA14_FLAG AND NOT maxStd LESS 14 )
+        make_cuda_test_target( ${nameRoot}-cuda14.t "${srcs}" 14 "${extraOptions}" )
+    endif()
+
+    if( HAS_CUDA17_FLAG AND NOT maxStd LESS 17 )
+        make_cuda_test_target( ${nameRoot}-cuda17.t "${srcs}" 17 "${extraOptions}" )
+    endif()
+endfunction()
+
+
+# Add test targets for all CUDA versions :
 
 set( CUDA_SOURCES
     cuda.t.cu
@@ -34,72 +48,9 @@ set( SOURCES
     ../util.t.cpp
 )
 set_property( SOURCE ${SOURCES} PROPERTY LANGUAGE CUDA ) # compile .cpp files with the CUDA compiler
-# Configure gsl-lite for testing:
 
-set( GSL_CONFIG
-    -Dgsl_TESTING_
-    -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS
-    -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT
-)
-# Set NVCC-specific options:
-set( NVCC_OPTIONS --Werror all-warnings -G )
+make_cuda_test_targets( "${PROGRAM}" "${SOURCES};${CUDA_SOURCES}" 99 "" )
+make_cuda_test_targets( "${PROGRAM}-expt" "${SOURCES};${CUDA_SOURCES}" 99 "--expt-relaxed-constexpr" )
 
-# Determine compiler-specifics for MSVC, GNUC, Clang:
-
-if( MSVC )
-    message( STATUS "Matched: MSVC")
-
-    set( OPTIONS     /EHsc /WX /W4 )
-    set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
-
-elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
-    message( STATUS "CompilerId: '${CMAKE_CXX_COMPILER_ID}'")
-
-    set( OPTIONS ${OPTIONS}
-        -Werror
-        -Wall
-        -Wno-missing-braces
-        -Wconversion
-        -Wsign-conversion
-        -fno-elide-constructors
-        -fstrict-aliasing -Wstrict-aliasing=2
-    )
-    set( DEFINITIONS "" )
-
-else()
-    # as is
-    message( STATUS "Matched: nothing")
-endif()
-
-# Have NVCC forward the host compiler options with "-Xcompiler=<opt>:
-
-list( TRANSFORM OPTIONS PREPEND -Xcompiler= )
-
-# Add targets and configure unit tests via CTest:
-
-enable_testing()
-
-function( make_cuda_test_target target sources extraOptions langVersion )
-    message( STATUS "Make CUDA target: '${target}'" )
-
-    add_executable            ( ${target} ${sources} )
-    target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-v1 )
-    target_compile_options    ( ${target} PRIVATE ${NVCC_OPTIONS} ${OPTIONS} ${extraOptions} )
-    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
-    #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} ) # apparently not supported yet 
-    set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD ${langVersion} )
-    target_precompile_headers ( ${target} PRIVATE ../gsl-lite.t.hpp )
-
-    add_test( NAME ${target} COMMAND ${target} )
-
-endfunction()
-
-make_cuda_test_target( ${PROGRAM}-cuda14.t "${SOURCES};${CUDA_SOURCES}" "" 14 )
-make_cuda_test_target( ${PROGRAM}-cuda14-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" 14 )
-
-if( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA" AND CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
-    make_cuda_test_target( ${PROGRAM}-cuda17.t "${SOURCES};${CUDA_SOURCES}" "" 17 )
-    make_cuda_test_target( ${PROGRAM}-cuda17-expt.t "${SOURCES};${CUDA_SOURCES}" "--expt-relaxed-constexpr" 17 )
-endif()
 
 # end of file
