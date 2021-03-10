@@ -2105,6 +2105,9 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 };
 #endif
 
+template< class CVReference, class T = typename std20::remove_cvref<CVReference>::type>
+struct as_nullable_helper;
+
 } // namespace detail
 
 template< class T >
@@ -2116,6 +2119,9 @@ private:
     // need to access `not_null<U>::data_`
     template< class U >
     friend class not_null;
+
+    template< class CVReference, class U >
+    friend struct detail::as_nullable_helper;
 
 public:
     typedef typename detail::element_type_helper<T>::type element_type;
@@ -2468,6 +2474,72 @@ make_not_null( not_null<U> const & u )
 }
 #endif // gsl_HAVE( RVALUE_REFERENCE )
 
+namespace detail
+{
+
+// Generic case handling anything that is not a not_null
+template< class CVReference, class T /* = typename std20::remove_cvref<CVReference>::type */>
+struct as_nullable_helper
+{
+    typedef T nullable_type;
+
+    static nullable_type const & call(nullable_type const & p)
+    {
+        return p;
+    }
+
+#if gsl_HAVE( RVALUE_REFERENCE )
+    static nullable_type && call(nullable_type && p)
+    {
+        return std::move(p);
+    }
+#endif
+};
+
+// Specific case handling not_null
+template< class CVReference, class T >
+struct as_nullable_helper< CVReference, not_null<T> >
+{
+    typedef T nullable_type;
+
+    static nullable_type const & call(not_null<nullable_type> const & p)
+    {
+        return p.data_.ptr_;
+    }
+
+#if gsl_HAVE( RVALUE_REFERENCE )
+    static nullable_type && call(not_null<nullable_type> && p)
+    {
+        return std::move(p.data_.ptr_);
+    }
+#endif
+};
+
+namespace as_nullable_disable_adl
+{
+
+#if gsl_HAVE( RVALUE_REFERENCE )
+template<class T>
+auto
+as_nullable(T && p)
+-> decltype(detail::as_nullable_helper<T>::call(std::forward<T>(p)))
+{
+    return detail::as_nullable_helper<T>::call(std::forward<T>(p));
+}
+#else
+template<class T>
+typename detail::as_nullable_helper<T>::nullable_type const &
+as_nullable(T const & p)
+{
+    return detail::as_nullable_helper<T>::call(p);
+}
+#endif
+
+} // namespace as_nullable_disable_adl
+} // namespace detail
+
+// Prevent ADL-using as_nullable so client code remains compatible if user switches to zero-overhead "using not_null<T> = T"
+using namespace detail::as_nullable_disable_adl;
 
 // not_null with implicit constructor, allowing copy-initialization:
 

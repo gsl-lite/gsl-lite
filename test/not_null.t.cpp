@@ -340,6 +340,14 @@ CASE( "not_null<>: Converts to underlying pointer (raw pointer)" )
     take_raw<int>( p );
 }
 
+CASE( "as_nullable: Converts to underlying pointer (raw pointer)" )
+{
+    int i = 12;
+    not_null< int* > p( &i );
+
+    take_raw<int>( as_nullable( p ) );
+}
+
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
 {
     MyDerived derived;
@@ -390,6 +398,14 @@ CASE( "not_null<>: Converts to a related pointer (raw pointer)" )
     not_null< MyDerived* > p( &derived );
 
     take_raw<MyBase>( p );
+}
+
+CASE( "as_nullable: Converts to a related pointer (raw pointer)" )
+{
+    MyDerived derived;
+    not_null< MyDerived* > p( &derived );
+
+    take_raw<MyBase>( as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (raw pointer)" )
@@ -557,6 +573,18 @@ CASE( "not_null<>: Allows to move from a not_null pointer to an underlying point
 #endif
 }
 
+CASE( "as_nullable: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >(12);
+    int* raw(pi.get());
+
+    not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
+    pi = as_nullable( std::move(p) ); // ...and back again.
+
+    EXPECT_THROWS( *p );
+    EXPECT( pi.get() == raw );
+}
+
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()" )
 {
     shared_ptr< int > pi = make_shared< int >(12);
@@ -592,6 +620,15 @@ CASE( "not_null<>: Converts to underlying pointer (shared_ptr)" )
 
     take_shared_by_val<int>( p );
     take_shared_by_ref<int>( p );
+}
+
+CASE( "as_nullable: Converts to underlying pointer (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >();
+    not_null< shared_ptr< int > > p( pi );
+
+    take_shared_by_val<int>( as_nullable(p) );
+    take_shared_by_ref<int>( as_nullable(p) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -645,6 +682,15 @@ CASE( "not_null<>: Converts to a related pointer (shared_ptr)" )
 
     take_shared_by_val<MyBase>( p );
     take_shared_by_ref<MyBase>( p );
+}
+
+CASE( "as_nullable: Converts to a related pointer (shared_ptr)" )
+{
+    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    not_null< shared_ptr< MyDerived > > p( pderived );
+
+    take_shared_by_val<MyBase>( as_nullable(p) );
+    take_shared_by_ref<MyBase>( as_nullable(p) );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)" )
@@ -834,6 +880,18 @@ CASE( "not_null<>: Allows to move from a not_null pointer to an underlying point
 #endif
 }
 
+CASE( "as_nullable: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >(12);
+    int* raw(pi.get());
+
+    not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
+    pi = as_nullable( std::move(p) ); // ...and back again.
+
+    EXPECT_THROWS( *p );
+    EXPECT( pi.get() == raw );
+}
+
 CASE( "not_null<>: Allows to move to a related pointer from a not_null pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
@@ -845,6 +903,17 @@ CASE( "not_null<>: Allows to move to a related pointer from a not_null pointer (
     EXPECT_THROWS( (void) *p );
     EXPECT( pbase.get() == raw );
 #endif
+}
+
+CASE( "as_nullable: Allows to move to a related pointer from a not_null pointer (unique_ptr)" )
+{
+    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    MyDerived* raw(pderived.get());
+    not_null< unique_ptr< MyDerived > > p ( std::move(pderived) );
+    unique_ptr< MyBase > pbase = as_nullable( std::move(p) );
+
+    EXPECT_THROWS( *p );
+    EXPECT( pbase.get() == raw );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()" )
@@ -887,6 +956,15 @@ CASE( "not_null<>: Converts to underlying pointer (unique_ptr)" )
     take_unique_by_val<int>( std::move(p) );
     //take_unique_by_ref<int>( p ); // We sacrifice the ability to convert to `unique_ptr<> const &`, cf. comment regarding conversion operators in gsl-lite.hpp.
 #endif
+}
+
+CASE( "as_nullable: Converts to underlying pointer (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >();
+    not_null< unique_ptr< int > > p( std::move(pi) );
+
+    take_unique_by_val<int>( as_nullable( std::move(p) ) );
+    take_unique_by_ref<int>( as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_ptr)" )
@@ -946,6 +1024,14 @@ CASE( "not_null<>: Converts to a related pointer (unique_ptr)" )
     take_unique_by_val<MyBase>( std::move(p) );
     //take_unique_by_ref<MyBase>( p ); // We sacrifice the ability to convert to `unique_ptr<> const &`, cf. comment regarding conversion operators in gsl-lite.hpp.
 #endif
+}
+
+CASE( "as_nullable: Converts to a related pointer (unique_ptr)" )
+{
+    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
+
+    take_unique_by_val<MyBase>( as_nullable( std::move(p) ) );
 }
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (unique_ptr)" )
