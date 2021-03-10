@@ -1,6 +1,6 @@
 # Copyright 2015-2018 by Martin Moene
 #
-# https://github.com/martinmoene/gsl-lite
+# https://github.com/gsl-lite/gsl-lite
 #
 # gsl-lite is based on GSL: Guidelines Support Library,
 # https://github.com/microsoft/gsl
@@ -15,7 +15,7 @@ project(
     gsl_lite
     VERSION 0.37.0
 #   DESCRIPTION "A single-file header-only version of ISO C++ Guideline Support Library (GSL) for C++98, C++11 and later"
-#   HOMEPAGE_URL "https://github.com/martinmoene/gsl-lite"
+#   HOMEPAGE_URL "https://github.com/gsl-lite/gsl-lite"
     LANGUAGES CXX )
 
 # Package information:
