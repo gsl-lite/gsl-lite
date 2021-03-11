@@ -711,7 +711,7 @@ GCC                  | Linux           | x64       | 4.7 and newer     | [4.7, 4
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
 GCC                  | MacOS           | x64       | 6 and newer       | [6, 7, 8, 9, 10](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [3.5, 3.6, 3.7, 3.8, 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4, 5, 6, 7, 8, 9, 10](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [3.5, 3.6, 3.7, 3.8, 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4, 5, 6, 7, 8, 9, 10, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS 2019 | [latest](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2017, 2019](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9](https://travis-ci.com/gsl-lite/gsl-lite/), [9.1, 10, 10.0.1, 11, 11.0.3, 12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
