@@ -102,7 +102,7 @@ jobs:
       cxxCompiler: Clang
       cxxCompilerVersions: [11]
       platforms: [x64]
-      tag: 'libstdc++'
+      tag: 'libstdcxx'
       cmakeConfigArgs: '-DCMAKE_CXX_FLAGS=-stdlib=libstdc++"'
       postSetupSteps:
       - bash: |
