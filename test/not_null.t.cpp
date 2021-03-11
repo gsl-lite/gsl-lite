@@ -581,7 +581,7 @@ CASE( "as_nullable: Allows to move from a not_null pointer to an underlying poin
     not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
     pi = as_nullable( std::move(p) ); // ...and back again.
 
-    EXPECT_THROWS( *p );
+    EXPECT_THROWS( (void) *p );
     EXPECT( pi.get() == raw );
 }
 
@@ -888,7 +888,7 @@ CASE( "as_nullable: Allows to move from a not_null pointer to an underlying poin
     not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
     pi = as_nullable( std::move(p) ); // ...and back again.
 
-    EXPECT_THROWS( *p );
+    EXPECT_THROWS( (void) *p );
     EXPECT( pi.get() == raw );
 }
 
@@ -912,7 +912,7 @@ CASE( "as_nullable: Allows to move to a related pointer from a not_null pointer 
     not_null< unique_ptr< MyDerived > > p ( std::move(pderived) );
     unique_ptr< MyBase > pbase = as_nullable( std::move(p) );
 
-    EXPECT_THROWS( *p );
+    EXPECT_THROWS( (void) *p );
     EXPECT( pbase.get() == raw );
 }
 
