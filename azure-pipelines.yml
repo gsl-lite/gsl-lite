@@ -86,17 +86,29 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [4, 5, 6, 7, 8, 9]
+      cxxCompilerVersions: [4, 5, 6, 7, 8, 9, 10]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [10]
+      cxxCompilerVersions: [11]
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$CXXFLAGS -fsanitize=address -fsanitize=undefined"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v0-cpp17|gsl-lite-v1-cpp17'
+
+    - os: Linux
+      cxxCompiler: Clang
+      cxxCompilerVersions: [11]
+      platforms: [x64]
+      tag: 'libstdc++'
+      cmakeConfigArgs: '-DCMAKE_CXX_FLAGS=-stdlib=libstdc++"'
+      postSetupSteps:
+      - bash: |
+          sudo apt-add-repository ppa:ubuntu-toolchain-r/test
+          sudo apt install gcc-10 g++-10
+        displayName: 'Install GCC 10 (for libstdc++)'
 
     - os: Linux
       cxxCompiler: GCC
