@@ -1550,7 +1550,7 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
 
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
-    return static_cast<unsigned char>( ( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) );
+    return static_cast<unsigned char>( ( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) ) );
 }
 
 #  endif
