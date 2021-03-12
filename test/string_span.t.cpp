@@ -1117,6 +1117,12 @@ CASE( "string_span: Allows to view the elements as read-only bytes" )
 //------------------------------------------------------------------------
 // zstring_span
 
+CASE( "zstring_span: Terminates construction of a zstring_span from an empty span" )
+{
+    span<char> s;
+    EXPECT_THROWS( (void) zstring_span( s ) );
+}
+
 CASE( "zstring_span: Allows to construct a zstring_span from a zero-terminated empty string (via span)" )
 {
     char zero[] = "";
@@ -1159,6 +1165,12 @@ CASE( "zstring_span: Terminates construction of a zstring_span from a non-zero-t
 }
 
 #if gsl_HAVE( WCHAR )
+
+CASE( "zstring_span: Terminates construction of a wzstring_span from an empty span" )
+{
+    span<wchar_t> s;
+    EXPECT_THROWS( (void) wzstring_span( s ) );
+}
 
 CASE( "zstring_span: Allows to construct a wzstring_span from a zero-terminated empty string (via span)" )
 {
