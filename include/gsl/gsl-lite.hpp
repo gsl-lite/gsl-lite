@@ -885,6 +885,29 @@
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
+#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+
+// Declare __cxa_get_globals() or equivalent in namespace gsl::detail for uncaught_exceptions():
+
+# if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
+#  if gsl_COMPILER_MSVC_VERSION                                     // libstl :)
+namespace gsl { namespace detail { extern "C" char * __cdecl _getptd(); } }
+#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+#   if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
+#    include  <cxxabi.h>
+#   elif ! defined( BOOST_CORE_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED_ )  // libc++: prototype from Boost?
+#    if defined( __FreeBSD__ ) || defined( __OpenBSD__ )
+namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals(); }
+#    else
+namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals() gsl_noexcept; }
+#    endif
+#   endif
+    namespace gsl { namespace detail { using ::__cxxabiv1::__cxa_get_globals; } }
+#  endif
+# endif // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
+#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+
+
 // MSVC warning suppression macros:
 
 #if gsl_COMPILER_MSVC_VERSION >= 140 && !defined(__NVCC__)
@@ -1215,7 +1238,7 @@ template< class T > struct remove_cvref { typedef typename std11::remove_cv< typ
 
 namespace detail {
 
-/// for nsel_REQUIRES_T
+/// for gsl_ENABLE_IF_()
 
 /*enum*/ class enabler{};
 
@@ -1506,74 +1529,35 @@ void fail_fast_assert( bool cond ) gsl_noexcept
 // Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
 // Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
 
-namespace detail {
-
-gsl_NODISCARD gsl_api inline unsigned char to_uchar( unsigned x ) gsl_noexcept
-{
-    return static_cast<unsigned char>( x );
-}
-
-} // namespace detail
-
 namespace std11 {
-
-// Declare __cxa_get_globals() or equivalent in namespace nonstd::scope for uncaught_exceptions():
-
-#if !gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-# if gsl_COMPILER_MSVC_VERSION                                // libstl :)
-    namespace nonstd { namespace scope { extern "C" char * __cdecl _getptd(); }}
-# elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
-# if defined(__GLIBCXX__) || defined(__GLIBCPP__)               // libstdc++: prototype from cxxabi.h
-#   include  <cxxabi.h>
-# elif !defined(BOOST_CORE_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED_)   // libc++: prototype from Boost?
-# if defined(__FreeBSD__) || defined(__OpenBSD__)
-    namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals(); }
-# else
-    namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals() gsl_noexcept; }
-# endif
-# endif
-    namespace nonstd { namespace scope { using ::__cxxabiv1::__cxa_get_globals; }}
-# endif // gsl_COMPILER_MSVC_VERSION
-#endif // !gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 
 # if gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 
-namespace std11 {
-
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
-    return detail::to_uchar( std::uncaught_exceptions() );
+    return static_cast<unsigned char>( std::uncaught_exceptions() );
 }
-
-} // namespace std11
 
 # else // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 #  if gsl_COMPILER_MSVC_VERSION
 
-namespace std11 {
-
-extern "C" char * __cdecl _getptd();
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
-    return detail::to_uchar( *reinterpret_cast<unsigned*>(_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90) ) );
+    return static_cast<unsigned char>( *reinterpret_cast<unsigned*>( detail::_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90 ) ) );
 }
-
-} // namespace std11
 
 #  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 
-namespace std11 {
-
-extern "C" char * __cxa_get_globals();
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
-    return detail::to_uchar( *reinterpret_cast<unsigned*>(__cxa_get_globals() + sizeof(void*) ) );
+    return static_cast<unsigned char>( *reinterpret_cast<unsigned*>(detail::__cxa_get_globals() + sizeof(void*) ) );
 }
-
-} // namespace std11
 
 #  endif
 # endif
+
+} // namespace std11
+
 #endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 #if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110
