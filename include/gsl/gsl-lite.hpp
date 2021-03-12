@@ -890,7 +890,7 @@
 // Declare __cxa_get_globals() or equivalent in namespace gsl::detail for uncaught_exceptions():
 
 # if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-#  if gsl_COMPILER_MSVC_VERSION                                     // libstl :)
+#  if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
 namespace gsl { namespace detail { extern "C" char * __cdecl _getptd(); } }
 #  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 #   if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
@@ -1539,18 +1539,18 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
 }
 
 # else // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-#  if gsl_COMPILER_MSVC_VERSION
+#  if defined( _MSC_VER ) // MS-STL with either MSVC or clang-cl
 
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
-    return static_cast<unsigned char>( *reinterpret_cast<unsigned*>( detail::_getptd() + (sizeof(void*) == 8 ? 0x100 : 0x90 ) ) );
+    return static_cast<unsigned char>( *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) ) );
 }
 
 #  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
-    return static_cast<unsigned char>( *reinterpret_cast<unsigned*>(detail::__cxa_get_globals() + sizeof(void*) ) );
+    return static_cast<unsigned char>( ( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) );
 }
 
 #  endif
