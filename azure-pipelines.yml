@@ -95,7 +95,7 @@ jobs:
       cxxCompiler: Clang
       cxxCompilerVersions: [11]
       cxxStandardLibraryDebugMode: true
-      cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
+      cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'

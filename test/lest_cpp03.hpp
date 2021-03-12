@@ -668,8 +668,8 @@ inline std::string to_string( wchar_t const * const & txt ) { return "\"" + make
 inline std::string to_string( char const *    const & txt ) { return "\"" + make_tran_string( std::string(    txt ) ) + "\""; }
 inline std::string to_string(          char   const & chr ) { return  "'" + make_tran_string( std::string( 1, chr ) ) +  "'"; }
 
-inline std::string to_string(   signed char const & chr ) { return to_string( static_cast<char const &>( chr ) ); }
-inline std::string to_string( unsigned char const & chr ) { return to_string( static_cast<char const &>( chr ) ); }
+inline std::string to_string(   signed char const & chr ) { return to_string( static_cast<char>( chr ) ); }
+inline std::string to_string( unsigned char const & chr ) { return to_string( static_cast<char>( chr ) ); }
 
 inline std::ostream & operator<<( std::ostream & os, approx const & appr )
 {
