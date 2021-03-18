@@ -224,9 +224,10 @@ const  std::int16_t i16p =  std::int16_t((std::numeric_limits< std::int16_t>::ma
 
 CASE( "narrow<>(): Allows narrowing without value loss" )
 {
+#if gsl_HAVE( EXCEPTIONS )
     EXPECT( narrow<char>( 120 ) == 120 );
 
-#if gsl_CPP11_OR_GREATER
+# if gsl_CPP11_OR_GREATER
     std::uint8_t lu8;
     std::uint16_t lu16;
     std::int8_t li8;
@@ -252,14 +253,16 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
     EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>( std::uint8_t(i8p)))); EXPECT( li8 == i8p);
     EXPECT_NO_THROW(( lu8 = narrow< std::uint8_t>( std::int16_t(i8p)))); EXPECT( lu8 == i8p);
     EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>(std::uint16_t(i8p)))); EXPECT( li8 == i8p);
-#endif // gsl_CPP11_OR_GREATER
+# endif // gsl_CPP11_OR_GREATER
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "narrow<>(): Terminates when narrowing with value loss" )
 {
+#if gsl_HAVE( EXCEPTIONS )
     EXPECT_THROWS_AS( (void) narrow<char>( 300 ), narrowing_error );
 
-#if gsl_CPP11_OR_GREATER
+# if gsl_CPP11_OR_GREATER
     // uint <-> uint
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>( std::uint16_t( u16) ), narrowing_error );
 
@@ -272,20 +275,23 @@ CASE( "narrow<>(): Terminates when narrowing with value loss" )
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16p) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t( u8 ) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t(u16 ) ), narrowing_error );
-#endif // gsl_CPP11_OR_GREATER
+# endif // gsl_CPP11_OR_GREATER
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "narrow<>(): Terminates when narrowing with sign loss" )
 {
+#if gsl_HAVE( EXCEPTIONS )
     EXPECT_THROWS_AS( (void) narrow<unsigned>( -42 ), narrowing_error );
 
-#if gsl_CPP11_OR_GREATER
+# if gsl_CPP11_OR_GREATER
     // uint <-> int
     EXPECT_THROWS_AS( (void) narrow<std::uint16_t>(   std::int8_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(   std::int8_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16n) ), narrowing_error );
-#endif // gsl_CPP11_OR_GREATER
+# endif // gsl_CPP11_OR_GREATER
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "narrow_failfast<>(): Allows narrowing without value loss" )

@@ -782,7 +782,7 @@ CASE( "span<>: Allows reverse iteration" )
 
     for ( span<int>::reverse_iterator pos = v.rbegin(); pos != v.rend(); ++pos )
     {
-        size_t dist = narrow<size_t>( std::distance(v.rbegin(), pos) );
+        size_t dist = narrow_failfast<size_t>( std::distance(v.rbegin(), pos) );
         EXPECT( *pos == arr[ v.size() - 1 - dist ] );
     }
 }
@@ -794,7 +794,7 @@ CASE( "span<>: Allows const reverse iteration" )
 
     for ( span<int>::const_reverse_iterator pos = v.crbegin(); pos != v.crend(); ++pos )
     {
-        size_t dist = narrow<size_t>( std::distance(v.crbegin(), pos) );
+        size_t dist = narrow_failfast<size_t>( std::distance(v.crbegin(), pos) );
         EXPECT( *pos == arr[ v.size() - 1 - dist ] );
     }
 }

@@ -765,7 +765,7 @@ CASE( "string_span: Allows forward iteration" )
 
     for ( string_span::iterator pos = a.begin(); pos != a.end(); ++pos )
     {
-        index_type i = narrow<index_type>( std::distance( a.begin(), pos ) );
+        index_type i = narrow_failfast<index_type>( std::distance( a.begin(), pos ) );
         EXPECT( *pos == a[i] );
     }
 }
@@ -777,7 +777,7 @@ CASE( "string_span: Allows const forward iteration" )
 
     for ( string_span::const_iterator pos = a.begin(); pos != a.end(); ++pos )
     {
-        index_type i = narrow<index_type>( std::distance( a.cbegin(), pos ) );
+        index_type i = narrow_failfast<index_type>( std::distance( a.cbegin(), pos ) );
         EXPECT( *pos == a[i] );
     }
 }
@@ -789,7 +789,7 @@ CASE( "string_span: Allows reverse iteration" )
 
     for ( string_span::reverse_iterator pos = a.rbegin(); pos != a.rend(); ++pos )
     {
-        index_type dist = narrow<index_type>( std::distance( a.rbegin(), pos ) );
+        index_type dist = narrow_failfast<index_type>( std::distance( a.rbegin(), pos ) );
         EXPECT( *pos == a[ a.size() - 1 - dist ] );
     }
 }
@@ -801,7 +801,7 @@ CASE( "string_span: Allows const reverse iteration" )
 
     for ( string_span::const_reverse_iterator pos = a.crbegin(); pos != a.crend(); ++pos )
     {
-        index_type dist = narrow<index_type>( std::distance( a.crbegin(), pos ) );
+        index_type dist = narrow_failfast<index_type>( std::distance( a.crbegin(), pos ) );
         EXPECT( *pos == a[ a.size() - 1 - dist ] );
     }
 }

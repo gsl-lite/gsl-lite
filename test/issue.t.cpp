@@ -102,7 +102,9 @@ CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's mo
 
 CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning C4127: conditional expression is constant [issue #115]" )
 {
+#if gsl_HAVE( EXCEPTIONS )
     try { (void) narrow<float>( 1.0 ); } catch(...) {}
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "detail::is_compatible_container<>: Not a proper type trait [PR #238]" )
