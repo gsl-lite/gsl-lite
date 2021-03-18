@@ -17,7 +17,6 @@ set( _makeTestTarget )
 
 set( GSL_CONFIG
     "-Dgsl_TESTING_"
-    "-Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS"
     "-Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT"
 )
 
@@ -45,14 +44,20 @@ set( OPTION_PREFIX "" )
 if( MSVC )
     set( HAS_STD_FLAGS TRUE )
 
-    # remove "/Wx" from CMAKE_CXX_FLAGS if present, as VC++ doesn't tolerate more than one "/Wx" flag
-    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-        string(REGEX REPLACE "/W[0-4]" " " CMAKE_CXX_FLAGS_NEW "${CMAKE_CXX_FLAGS}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_NEW}")
+    # remove "/EHx" from CMAKE_CXX_FLAGS if present
+    if( CMAKE_CXX_FLAGS MATCHES "/EH[ascr-]+" )
+        string( REGEX REPLACE "/EH[ascr-]+" " " CMAKE_CXX_FLAGS_NEW "${CMAKE_CXX_FLAGS}" )
+        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_NEW}" )
+    endif()
+    
+    # remove "/Wx" from CMAKE_CXX_FLAGS if present
+    if( CMAKE_CXX_FLAGS MATCHES "/W[0-4]" )
+        string( REGEX REPLACE "/W[0-4]" " " CMAKE_CXX_FLAGS_NEW "${CMAKE_CXX_FLAGS}" )
+        set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_NEW}" )
     endif()
 
-    set( OPTIONS     /EHsc /WX /W4 )
-    set( DEFINITIONS -D_SCL_SECURE_NO_WARNINGS )
+    set( OPTIONS     "/WX" "/W4" )
+    set( DEFINITIONS "-D_SCL_SECURE_NO_WARNINGS" )
 
     # clang-cl: available std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
@@ -163,7 +168,7 @@ if( CUDA IN_LIST _languages )
 
         # Set NVCC-specific options:
         set( OPTION_PREFIX "-Xcompiler=" )
-        set( CUDA_CONFIG ${CUDA_CONFIG} --Werror all-warnings -G )
+        set( CUDA_CONFIG ${CUDA_CONFIG} "--Werror" "all-warnings" "-G" )
 
         set( HAS_CUDA14_FLAG TRUE )
         if( CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
@@ -188,7 +193,7 @@ endfunction()
 
 function( make_test_target target )
 
-    set( options CUDA )
+    set( options CUDA NO_EXCEPTIONS )
     set( oneValueArgs STD DEFAULTS_VERSION )
     set( multiValueArgs SOURCES EXTRA_OPTIONS )
     cmake_parse_arguments( PARSE_ARGV 1 "SCOPE" "${options}" "${oneValueArgs}" "${multiValueArgs}" )
@@ -223,6 +228,19 @@ function( make_test_target target )
         #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} )  # apparently not supported yet 
     else()
         target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${SCOPE_EXTRA_OPTIONS} )
+    endif()
+    if( SCOPE_NO_EXCEPTIONS )
+        if( MSVC )
+            target_compile_definitions( ${target} PRIVATE ${OPTIONS} "_HAS_EXCEPTIONS=0" )
+            target_compile_options( ${target} PRIVATE ${OPTIONS} "/EHs-" )
+        elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
+            target_compile_options( ${target} PRIVATE ${OPTIONS} "-fno-exceptions" )
+        endif()
+    else()
+        target_compile_definitions( ${target} PRIVATE "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
+        if( MSVC )
+            target_compile_options( ${target} PRIVATE ${OPTIONS} "/EHsc" )
+        endif()
     endif()
 
     if( NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5

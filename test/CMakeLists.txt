@@ -72,6 +72,11 @@ make_test_targets( "${PROGRAM}-v0" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v0 )
 make_test_targets( "${PROGRAM}-v1" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 )
 
 
+# Add test targets for no-exception build:
+
+make_test_targets( "${PROGRAM}-v1-no-exc" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 NO_EXCEPTIONS )
+
+
 # Add test targets for special configurations:
 
 set( SPECIAL_SOURCES
