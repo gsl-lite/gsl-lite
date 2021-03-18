@@ -18,13 +18,12 @@ message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../MakeTestTarget.cmake)
 
 
-function(make_cuda_test_targets nameRoot srcs maxStd extraOptions )
+function(make_cuda_test_targets nameRoot maxStd )
     if( HAS_CUDA14_FLAG AND NOT maxStd LESS 14 )
-        make_cuda_test_target( ${nameRoot}-cuda14.t "${srcs}" 14 "${extraOptions}" )
+        make_test_target( ${nameRoot}-cuda14.t STD 14 ${ARGN} DEFAULTS_VERSION v1 CUDA )
     endif()
-
     if( HAS_CUDA17_FLAG AND NOT maxStd LESS 17 )
-        make_cuda_test_target( ${nameRoot}-cuda17.t "${srcs}" 17 "${extraOptions}" )
+        make_test_target( ${nameRoot}-cuda17.t STD 17 ${ARGN} DEFAULTS_VERSION v1 CUDA )
     endif()
 endfunction()
 
@@ -49,8 +48,8 @@ set( SOURCES
 )
 set_property( SOURCE ${SOURCES} PROPERTY LANGUAGE CUDA ) # compile .cpp files with the CUDA compiler
 
-make_cuda_test_targets( "${PROGRAM}" "${SOURCES};${CUDA_SOURCES}" 99 "" )
-make_cuda_test_targets( "${PROGRAM}-expt" "${SOURCES};${CUDA_SOURCES}" 99 "--expt-relaxed-constexpr" )
+make_cuda_test_targets( "${PROGRAM}" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} )
+make_cuda_test_targets( "${PROGRAM}-expt" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} EXTRA_OPTIONS "--expt-relaxed-constexpr" )
 
 
 # end of file

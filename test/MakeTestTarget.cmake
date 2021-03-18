@@ -16,9 +16,9 @@ set( _makeTestTarget )
 # Configure gsl-lite for testing:
 
 set( GSL_CONFIG
-    -Dgsl_TESTING_
-    -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS
-    -Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT
+    "-Dgsl_TESTING_"
+    "-Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS"
+    "-Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT"
 )
 
 set( CUDA_CONFIG )
@@ -85,13 +85,15 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     set( HAS_CPP98_FLAG TRUE )
 
     set( OPTIONS
-        -Werror
-        -Wall
-        -Wno-missing-braces
-        -Wconversion
-        -Wsign-conversion
-        -fno-elide-constructors
-        -fstrict-aliasing -Wstrict-aliasing=2
+        "-Werror"
+        "-Wall"
+        "-Wextra"
+        "-pedantic"
+        #"-Wno-missing-braces"
+        "-Wconversion"
+        "-Wsign-conversion"
+        "-fno-elide-constructors"
+        "-fstrict-aliasing" "-Wstrict-aliasing=2"
     )
     set( DEFINITIONS "" )
 
@@ -184,51 +186,62 @@ endfunction()
 
 # Make target, compile for given standard if specified:
 
-function( make_test_target target sources std extraOptions defaultsVersion )
+function( make_test_target target )
+
+    set( options CUDA )
+    set( oneValueArgs STD DEFAULTS_VERSION )
+    set( multiValueArgs SOURCES EXTRA_OPTIONS )
+    cmake_parse_arguments( PARSE_ARGV 1 "SCOPE" "${options}" "${oneValueArgs}" "${multiValueArgs}" )
+    if( SCOPE_UNPARSED_ARGUMENTS )
+        list( JOIN SCOPE_UNPARSED_ARGUMENTS "\", \"" SCOPE_UNPARSED_ARGUMENTS_STR )
+        list( JOIN "${oneValueArgs};${multiValueArgs}" "\", \"" POSSIBLE_ARGUMENTS_STR )
+        message( SEND_ERROR "make_test_target(): Invalid argument keyword(s) \"${SCOPE_UNPARSED_ARGUMENTS_STR}\"; expected one of \"${POSSIBLE_ARGUMENTS_STR}\"" )
+    endif()
+    if( SCOPE_KEYWORDS_MISSING_VALUES )
+        list( JOIN SCOPE_KEYWORDS_MISSING_VALUES "\", \"" SCOPE_KEYWORDS_MISSING_VALUES_STR )
+        message( SEND_ERROR "make_test_target(): argument keyword(s) \"${SCOPE_KEYWORDS_MISSING_VALUES_STR}\" missing values" )
+    endif()
+    if( NOT SCOPE_SOURCES )
+        message( SEND_ERROR "make_test_target(): no argument specified for SCOPE_SOURCES" )
+    endif()
+    if( NOT SCOPE_DEFAULTS_VERSION )
+        message( SEND_ERROR "make_test_target(): no argument specified for DEFAULTS_VERSION" )
+    endif()
+
     message( STATUS "Make target: '${target}'" )
 
-    add_executable            ( ${target} ${sources}  )
-    target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-${defaultsVersion} )
-    target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${extraOptions} )
+    add_executable            ( ${target} ${SCOPE_SOURCES} )
+    target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
+    if( SCOPE_CUDA )
+        set( prefixedOptions ${OPTIONS} )
+        list( TRANSFORM prefixedOptions PREPEND "${OPTION_PREFIX}" )
+        target_compile_options    ( ${target} PRIVATE ${CUDA_OPTIONS} ${prefixedOptions} ${SCOPE_EXTRA_OPTIONS} )
+        if( SCOPE_STD )
+            set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD ${SCOPE_STD} )
+        endif()
+        #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} )  # apparently not supported yet 
+    else()
+        target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${SCOPE_EXTRA_OPTIONS} )
+    endif()
 
     if( NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
         target_precompile_headers( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
     endif()
 
-    if( std )
+    if( SCOPE_STD )
         if( MSVC )
-            target_compile_options( ${target} PRIVATE -std:c++${std} )
+            target_compile_options( ${target} PRIVATE "-std:c++${SCOPE_STD}" )
         else()
             # Necessary for clang 3.x:
-            target_compile_options( ${target} PRIVATE -std=c++${std} )
+            target_compile_options( ${target} PRIVATE "-std=c++${SCOPE_STD}" )
             # Ok for clang 4 and later:
             # set( CMAKE_CXX_STANDARD ${std} )
             # set( CMAKE_CXX_STANDARD_REQUIRED ON )
             # set( CMAKE_CXX_EXTENSIONS OFF )
         endif()
     endif()
-
-    add_test(     NAME ${target}             COMMAND ${target} )
-    set_property( TEST ${target} PROPERTY FAIL_REGULAR_EXPRESSION "Sanitizer" )
-
-endfunction()
-
-
-function( make_cuda_test_target target sources std extraOptions )
-    message( STATUS "Make CUDA target: '${target}'" )
-
-    set( prefixedOptions ${OPTIONS} )
-    list( TRANSFORM prefixedOptions PREPEND "${OPTION_PREFIX}" )
-
-    add_executable            ( ${target} ${sources} )
-    target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-v1 )
-    target_compile_options    ( ${target} PRIVATE ${CUDA_OPTIONS} ${prefixedOptions} ${extraOptions} )
-    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
-    #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} )  # apparently not supported yet 
-    set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD ${std} )
-    target_precompile_headers ( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
 
     add_test( NAME ${target} COMMAND ${target} )
 

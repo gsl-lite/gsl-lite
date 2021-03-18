@@ -18,41 +18,36 @@ message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")
 include(${CMAKE_CURRENT_SOURCE_DIR}/MakeTestTarget.cmake)
 
 
-function(make_test_targets nameRoot srcs maxStd extraOptions defaultsVersion )
+function( make_test_targets nameRoot maxStd )
     if( NOT HAS_STD_FLAGS )
-        make_test_target( ${nameRoot}.t "${srcs}" "" "${extraOptions}" ${defaultsVersion} )
+        make_test_target( ${nameRoot}.t ${ARGN} )
     else()
         if( MSVC )
             # MSVC 2015 and later support /std:c++14 but ignore it because they are in C++14 mode by default, so we won't bother.
-            make_test_target( ${nameRoot}-cpp14.t "${srcs}" "" "${extraOptions}" ${defaultsVersion} )
+            make_test_target( ${nameRoot}-cpp14.t ${ARGN} )
         else()
             if( HAS_CPP98_FLAG )
-                make_test_target( ${nameRoot}-cpp98.t "${srcs}" 98 "${extraOptions}" ${defaultsVersion} )
+                make_test_target( ${nameRoot}-cpp98.t STD 98 ${ARGN} )
             else()
-                make_test_target( ${nameRoot}-cpp98.t "${srcs}" "" "${extraOptions}" ${defaultsVersion} )
+                make_test_target( ${nameRoot}-cpp98.t ${ARGN} )
             endif()
-
             if( HAS_CPP11_FLAG AND NOT maxStd LESS 11 )
-                make_test_target( ${nameRoot}-cpp11.t "${srcs}" 11 "${extraOptions}" ${defaultsVersion} )
+                make_test_target( ${nameRoot}-cpp11.t STD 11 ${ARGN} )
             endif()
-
             if( HAS_CPP14_FLAG AND NOT maxStd LESS 14 )
-                make_test_target( ${nameRoot}-cpp14.t "${srcs}" 14 "${extraOptions}" ${defaultsVersion} )
+                make_test_target( ${nameRoot}-cpp14.t STD 14 ${ARGN} )
             endif()
         endif()
-
         if( HAS_CPP17_FLAG AND NOT maxStd LESS 17 )
-            make_test_target( ${nameRoot}-cpp17.t "${srcs}" 17 "${extraOptions}" ${defaultsVersion} )
+            make_test_target( ${nameRoot}-cpp17.t STD 17 ${ARGN} )
             enable_msvs_guideline_checker( ${nameRoot}-cpp17.t )
         endif()
-
         if( HAS_CPP20_FLAG AND NOT maxStd LESS 20 )
-            make_test_target( ${nameRoot}-cpp20.t "${srcs}" 20 "${extraOptions}" ${defaultsVersion} )
+            make_test_target( ${nameRoot}-cpp20.t STD 20 ${ARGN} )
             enable_msvs_guideline_checker( ${nameRoot}-cpp20.t )
         endif()
-
         if( HAS_CPPLATEST_FLAG AND maxStd GREATER 20 )
-            make_test_target( ${nameRoot}-cpplatest.t "${srcs}" latest "${extraOptions}" ${defaultsVersion} )
+            make_test_target( ${nameRoot}-cpplatest.t STD latest ${ARGN} )
         endif()
     endif()
 endfunction()
@@ -73,8 +68,8 @@ set( SOURCES
     string_span.t.cpp
     util.t.cpp
 )
-make_test_targets( "${PROGRAM}-v0" "${SOURCES}" 99 "" v0 )
-make_test_targets( "${PROGRAM}-v1" "${SOURCES}" 99 "" v1 )
+make_test_targets( "${PROGRAM}-v0" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v0 )
+make_test_targets( "${PROGRAM}-v1" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 )
 
 
 # Add test targets for special configurations:
@@ -84,10 +79,10 @@ set( SPECIAL_SOURCES
     not_null.t.cpp
 )
 set( SPECIAL_OPTIONS
-    -Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1
-    -Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t
+    "-Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1"
+    "-Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t"
 )
-make_test_targets( "${PROGRAM}-v1-special" "${SPECIAL_SOURCES}" 11 "${SPECIAL_OPTIONS}" v1 )
+make_test_targets( "${PROGRAM}-v1-special" 11 SOURCES ${SPECIAL_SOURCES} EXTRA_OPTIONS ${SPECIAL_OPTIONS} DEFAULTS_VERSION v1 )
 
 
 # end of file
