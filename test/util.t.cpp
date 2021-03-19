@@ -126,7 +126,8 @@ CASE( "finally: Allows to move final_action" )
 
 CASE( "finally: Allows moving final_action to throw" "[.]")
 {
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_HAVE( EXCEPTIONS )
+# if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct action
     {
         int & i_;
@@ -144,63 +145,68 @@ CASE( "finally: Allows moving final_action to throw" "[.]")
     }
 
     // ... 
-#else
+# else
     EXPECT( !!"lambda is not available (no C++11)" );
-#endif
+# endif
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_HAVE( EXCEPTIONS )
+# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+#  if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
         static void pass() { try { auto _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
         static void fail() { try { auto _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
     };
-#else
+#  else
     struct F { 
         static void incr() { g_i += 1; }
         static void pass() { try { final_action_return _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
         static void fail() { try { final_action_return _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
     };
-#endif
+#  endif
     struct G {
         ~G() { F::pass(); }
     };
     { g_i = 0; F::pass(); EXPECT( g_i == 1 ); }
     { g_i = 0; F::fail(); EXPECT( g_i == 0 ); }
     { g_i = 0; try { G g; throw std::exception(); } catch (...) {}; EXPECT( g_i == 1 ); }
-#else
+# else
     EXPECT( !!"on_return not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
-#endif
+# endif
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_HAVE( EXCEPTIONS )
+# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+#  if gsl_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
         static void pass() { try { auto _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
         static void fail() { try { auto _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
     };
-#else
+#  else
     struct F { 
         static void incr() { g_i += 1; }
         static void pass() { try { final_action_error _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
         static void fail() { try { final_action_error _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
     };
-#endif
+#  endif
     struct G {
         ~G() { F::pass(); }
     };
     { g_i = 0; F::pass(); EXPECT( g_i == 0 ); }
     { g_i = 0; F::fail(); EXPECT( g_i == 1 ); }
     { g_i = 0; try { G g; throw std::exception(); } catch (...) {}; EXPECT( g_i == 0 ); }
-#else
+# else
     EXPECT( !!"on_error not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
-#endif
+# endif
+#endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "narrow_cast<>: Allows narrowing without value loss" )

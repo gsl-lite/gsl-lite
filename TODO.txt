@@ -1,0 +1,32 @@
+cimakeshift:
+X replace + with x
+- toolchain: <file>
+- standardLibrary: default|MS-STL|libstdc++|libc++
+- standardLibraryDebugMode: false|true
+- sanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
+
+gsl-lite:
+- Expects/Ensures could handle extra arg with varargs; check how context impl is done in MS-GSL, try to be compatible
+- GSL assertion message should include assertion
+- gsl_Assert(), gsl_FailFast()
+- We *should* have the ability to produce a stack trace in gsl-lite upon assertion failure (for every violation handler); perhaps prototype with a custom handler
+- make ASSUME and levels orthogonal
+- noexcept and nodiscard hygiene
+- review MS-GSL PRs, change log
+- hoist missing types (dim, diff) to namespace gsl?
+- (?) dim, diff, stride; to_array(); hoist std* into gsl_lite namespace; second dedicated-library header
+- [?] `final_action<>` should inherit from the functor to save space if
+functor is stateless.
+- [ ] have `narrow_cast<>()` use `Expects()` to enforce contract; clarify
+with CG
+- [?] Don't bother with returning `unsigned char` in
+`uncaught_exceptions()`; the narrowing should be a decision of the caller
+(i.e. `final_action_return<>`, `final_action_error<>`)
+? we should also have a precondition ASSERT() and something like FAIL()
+- can we improve assertions such that `Expects(std::false_type{ })` triggers
+a static_assert()?
+- static_assert() in expression: 1 ? (void)([]{static_assert(true, "");}) :
+(void) 0;
+Also cf.
+https://www.boost.org/doc/libs/1_71_0/doc/html/boost_staticassert.html,
+https://www.boost.org/doc/libs/1_52_0/doc/html/boost_staticassert/how.html

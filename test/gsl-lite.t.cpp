@@ -235,6 +235,15 @@ CASE( "gsl-lite features" "[.gsl-features]" )
 
 int main( int argc, char * argv[] )
 {
+        // We only run tests for targets with exceptions enabled. lest has been modified to permit compilation without exceptions
+        // so we can test compiling gsl-lite without exceptions, but the no-exception tests will not run correctly because lest
+        // relies on exceptions for running tests and therefore cannot function correctly without.
+    if ( ! gsl_HAVE( EXCEPTIONS ) )
+    {
+        std::cerr << "Cannot run test suite with exceptions disabled; exiting.\n";
+        return 1;
+    }
+
     return lest::run( specification(), argc, argv );
 }
 

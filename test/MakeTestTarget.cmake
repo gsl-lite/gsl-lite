@@ -215,32 +215,47 @@ function( make_test_target target )
 
     message( STATUS "Make target: '${target}'" )
 
-    add_executable            ( ${target} ${SCOPE_SOURCES} )
-    target_link_libraries     ( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
-    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
-    if( SCOPE_CUDA )
-        set( prefixedOptions ${OPTIONS} )
-        list( TRANSFORM prefixedOptions PREPEND "${OPTION_PREFIX}" )
-        target_compile_options    ( ${target} PRIVATE ${CUDA_OPTIONS} ${prefixedOptions} ${SCOPE_EXTRA_OPTIONS} )
-        if( SCOPE_STD )
-            set_target_properties     ( ${target} PROPERTIES CUDA_STANDARD ${SCOPE_STD} )
-        endif()
-        #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} )  # apparently not supported yet 
-    else()
-        target_compile_options    ( ${target} PRIVATE ${OPTIONS} ${SCOPE_EXTRA_OPTIONS} )
-    endif()
+    add_executable( ${target} ${SCOPE_SOURCES} )
+
+    set( localOptions ${OPTIONS} )
+
     if( SCOPE_NO_EXCEPTIONS )
         if( MSVC )
             target_compile_definitions( ${target} PRIVATE ${OPTIONS} "_HAS_EXCEPTIONS=0" )
-            target_compile_options( ${target} PRIVATE ${OPTIONS} "/EHs-" )
+            list( APPEND localOptions "/EHs-" )
         elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
-            target_compile_options( ${target} PRIVATE ${OPTIONS} "-fno-exceptions" )
+            list( APPEND localOptions "-fno-exceptions" )
         endif()
     else()
         target_compile_definitions( ${target} PRIVATE "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
         if( MSVC )
-            target_compile_options( ${target} PRIVATE ${OPTIONS} "/EHsc" )
+            list( APPEND localOptions "/EHsc" )
         endif()
+    endif()
+
+    if( SCOPE_STD )
+        if( MSVC )
+            list( APPEND localOptions "/std:c++${SCOPE_STD}" )
+        else()
+            list( APPEND localOptions "-std:c++${SCOPE_STD}" )
+        endif()
+    endif()
+
+    if( SCOPE_CUDA )
+        list( TRANSFORM localOptions PREPEND "${OPTION_PREFIX}" )
+        target_compile_options( ${target} PRIVATE ${CUDA_OPTIONS} )
+        if( SCOPE_STD )
+            set_target_properties( ${target} PROPERTIES CUDA_STANDARD ${SCOPE_STD} )
+        endif()
+    endif()
+
+    target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
+    target_link_libraries( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
+    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
+    if( SCOPE_CUDA )
+        #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} )  # apparently not supported yet 
+    else()
+        target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
     endif()
 
     if( NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
@@ -248,19 +263,11 @@ function( make_test_target target )
         target_precompile_headers( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
     endif()
 
-    if( SCOPE_STD )
-        if( MSVC )
-            target_compile_options( ${target} PRIVATE "-std:c++${SCOPE_STD}" )
-        else()
-            # Necessary for clang 3.x:
-            target_compile_options( ${target} PRIVATE "-std=c++${SCOPE_STD}" )
-            # Ok for clang 4 and later:
-            # set( CMAKE_CXX_STANDARD ${std} )
-            # set( CMAKE_CXX_STANDARD_REQUIRED ON )
-            # set( CMAKE_CXX_EXTENSIONS OFF )
-        endif()
+    if( NOT SCOPE_NO_EXCEPTIONS )
+        # We only add tests for targets with exceptions enabled. lest has been modified to permit compilation without exceptions
+        # so we can test compiling gsl-lite without exceptions, but the no-exception tests will not run correctly because lest
+        # relies on exceptions for running tests and therefore cannot function correctly without.
+        add_test( NAME ${target} COMMAND ${target} )
     endif()
-
-    add_test( NAME ${target} COMMAND ${target} )
 
 endfunction()

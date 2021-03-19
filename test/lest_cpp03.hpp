@@ -106,6 +106,7 @@
 # define lest_SUPPRESS_WSHADOW         __pragma(warning(push))  __pragma(warning(disable: 4456))
 # define lest_SUPPRESS_WUNUSED         __pragma(warning(push))  __pragma(warning(disable: 4100))
 # define lest_SUPPRESS_WUNREACHABLE    __pragma(warning(push))  __pragma(warning(disable: 4702))
+# define lest_SUPPRESS_WNORETVAL       __pragma(warning(push))  __pragma(warning(disable: 4715))
 # define lest_RESTORE_WARNINGS         __pragma(warning(pop ))
 #else
 # define lest_SUPPRESS_WSHADOW         /*empty*/
@@ -202,7 +203,7 @@
 #  endif
 # endif
 #elif lest_COMPILER_GNUC_VERSION
-# if lest_BETWEEN(lest_COMPILER_GNUC_VERSION, 1, 500)
+# if lest_COMPILER_GNUC_VERSION >= 1 && lest_COMPILER_GNUC_VERSION < 500
 #  ifdef __EXCEPTIONS
 #   define lest_HAVE_EXCEPTIONS  1
 #  else
@@ -214,7 +215,7 @@
 #  else
 #   define lest_HAVE_EXCEPTIONS  0
 #  endif // __cpp_exceptions
-# endif // lest_BETWEEN(lest_COMPILER_GNUC_VERSION, 1, 500)
+# endif // lest_COMPILER_GNUC_VERSION >= 1 && lest_COMPILER_GNUC_VERSION < 500
 #elif lest_COMPILER_MSVC_VERSION
 # ifdef _CPPUNWIND
 #  define lest_HAVE_EXCEPTIONS  1
@@ -1385,6 +1386,7 @@ inline bool is_number( text arg )
         && text::npos == arg.find_first_not_of( digits );
 }
 
+lest_SUPPRESS_WNORETVAL
 inline seed_t seed( text opt, text arg )
 {
     // std::time_t: implementation dependent
@@ -1407,6 +1409,7 @@ inline int repeat( text opt, text arg )
 
     lest_THROW( std::runtime_error( "expecting '-1' or positive number with option '" + opt + "', got '" + arg + "' (try option --help)" ) );
 }
+lest_RESTORE_WARNINGS
 
 inline std::pair<text, text>
 split_option( text arg )
