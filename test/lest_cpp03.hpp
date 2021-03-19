@@ -92,7 +92,8 @@
                                        _Pragma( "clang diagnostic ignored \"-Wshadow\"" )
 # define lest_SUPPRESS_WUNUSED         _Pragma( "clang diagnostic push" ) \
                                        _Pragma( "clang diagnostic ignored \"-Wunused-value\"" )
-# define lest_SUPPRESS_WUNREACHABLE    _Pragma( "GCC diagnostic push" )
+# define lest_SUPPRESS_WUNREACHABLE    _Pragma( "clang diagnostic push" )
+# define lest_SUPPRESS_WNORETVAL       _Pragma( "clang diagnostic push" )
 # define lest_RESTORE_WARNINGS         _Pragma( "clang diagnostic pop"  )
 
 #elif defined (__GNUC__)
@@ -101,6 +102,7 @@
 # define lest_SUPPRESS_WUNUSED         _Pragma( "GCC diagnostic push" ) \
                                        _Pragma( "GCC diagnostic ignored \"-Wunused-value\"" )
 # define lest_SUPPRESS_WUNREACHABLE    _Pragma( "GCC diagnostic push" )
+# define lest_SUPPRESS_WNORETVAL       _Pragma( "GCC diagnostic push" )
 # define lest_RESTORE_WARNINGS         _Pragma( "GCC diagnostic pop"  )
 #elif defined( _MSC_VER)
 # define lest_SUPPRESS_WSHADOW         __pragma(warning(push))  __pragma(warning(disable: 4456))
@@ -112,6 +114,7 @@
 # define lest_SUPPRESS_WSHADOW         /*empty*/
 # define lest_SUPPRESS_WUNUSED         /*empty*/
 # define lest_SUPPRESS_WUNREACHABLE    /*empty*/
+# define lest_SUPPRESS_WNORETVAL       /*empty*/
 # define lest_RESTORE_WARNINGS         /*empty*/
 #endif
 

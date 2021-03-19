@@ -193,10 +193,10 @@ endfunction()
 
 function( make_test_target target )
 
-    set( options CUDA NO_EXCEPTIONS )
+    set( optionArgs CUDA NO_EXCEPTIONS )
     set( oneValueArgs STD DEFAULTS_VERSION )
     set( multiValueArgs SOURCES EXTRA_OPTIONS )
-    cmake_parse_arguments( PARSE_ARGV 1 "SCOPE" "${options}" "${oneValueArgs}" "${multiValueArgs}" )
+    cmake_parse_arguments( PARSE_ARGV 1 "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" )
     if( SCOPE_UNPARSED_ARGUMENTS )
         list( JOIN SCOPE_UNPARSED_ARGUMENTS "\", \"" SCOPE_UNPARSED_ARGUMENTS_STR )
         list( JOIN "${oneValueArgs};${multiValueArgs}" "\", \"" POSSIBLE_ARGUMENTS_STR )
@@ -221,7 +221,7 @@ function( make_test_target target )
 
     if( SCOPE_NO_EXCEPTIONS )
         if( MSVC )
-            target_compile_definitions( ${target} PRIVATE ${OPTIONS} "_HAS_EXCEPTIONS=0" )
+            target_compile_definitions( ${target} PRIVATE "_HAS_EXCEPTIONS=0" )
             list( APPEND localOptions "/EHs-" )
         elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
             list( APPEND localOptions "-fno-exceptions" )
@@ -252,11 +252,6 @@ function( make_test_target target )
     target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
     target_link_libraries( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
     target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
-    if( SCOPE_CUDA )
-        #target_compile_features   ( ${target} PRIVATE cxx_std_${langVersion} cuda_std_${langVersion} )  # apparently not supported yet 
-    else()
-        target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
-    endif()
 
     if( NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
