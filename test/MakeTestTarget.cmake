@@ -237,7 +237,7 @@ function( make_test_target target )
         if( MSVC )
             list( APPEND localOptions "/std:c++${SCOPE_STD}" )
         else()
-            list( APPEND localOptions "-std:c++${SCOPE_STD}" )
+            list( APPEND localOptions "-std=c++${SCOPE_STD}" )
         endif()
     endif()
 
