@@ -204,6 +204,9 @@ function( make_test_target target )
     if( MSVC )
         list( APPEND localOptions "/WX" "/W4" )
         list( APPEND localDefinitions "_SCL_SECURE_NO_WARNINGS" )
+        if( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VC++ 2010 and earlier
+            list( APPEND localOptions "/wd4275" ) # suppress C4275: non dll-interface class 'stdext::exception' used as base for dll-interface class 'std::bad_cast'
+        endif()
     elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
         list( APPEND localOptions
             "-Werror"
