@@ -16,11 +16,11 @@ set( _makeTestTarget )
 # Configure gsl-lite for testing:
 
 set( GSL_CONFIG
-    "-Dgsl_TESTING_"
-    "-Dgsl_CONFIG_CONTRACT_CHECKING_AUDIT"
+    "gsl_TESTING_"
+    "gsl_CONFIG_CONTRACT_CHECKING_AUDIT"
 )
 
-set( CUDA_CONFIG )
+set( CUDA_OPTIONS )
 
 # Preset available C++ language compiler flags:
 
@@ -37,7 +37,7 @@ set( HAS_CPPLATEST_FLAG FALSE )
 set( HAS_CUDA14_FLAG FALSE )
 set( HAS_CUDA17_FLAG FALSE )
 
-set( OPTION_PREFIX "" )
+set( HOST_COMPILER_PREFIX "" )
 
 # Determine compiler-specifics for MSVC, GNUC, Clang:
 
@@ -55,9 +55,6 @@ if( MSVC )
         string( REGEX REPLACE "/W[0-4]" " " CMAKE_CXX_FLAGS_NEW "${CMAKE_CXX_FLAGS}" )
         set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_NEW}" )
     endif()
-
-    set( OPTIONS     "/WX" "/W4" )
-    set( DEFINITIONS "-D_SCL_SECURE_NO_WARNINGS" )
 
     # clang-cl: available std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
@@ -84,23 +81,9 @@ if( MSVC )
     endif()
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
-    message( STATUS "CompilerId: '${CMAKE_CXX_COMPILER_ID}'")
 
     set( HAS_STD_FLAGS  TRUE )
     set( HAS_CPP98_FLAG TRUE )
-
-    set( OPTIONS
-        "-Werror"
-        "-Wall"
-        "-Wextra"
-        "-pedantic"
-        #"-Wno-missing-braces"
-        "-Wconversion"
-        "-Wsign-conversion"
-        "-fno-elide-constructors"
-        "-fstrict-aliasing" "-Wstrict-aliasing=2"
-    )
-    set( DEFINITIONS "" )
 
     # GNU: available -std flags depends on version
     if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
@@ -152,11 +135,9 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     endif()
 
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
-    # as is
     message( STATUS "Matched: Intel ${CMAKE_CXX_COMPILER_VERSION}" )
 else()
-    # as is
-    message( STATUS "Matched: nothing" )
+    message( STATUS "Matched: nothing (CompilerId: '${CMAKE_CXX_COMPILER_ID}')")
 endif()
 
 # Determine compiler-specifics for NVCC:
@@ -167,8 +148,8 @@ if( CUDA IN_LIST _languages )
         message( STATUS "Matched: NVCC ${CMAKE_CUDA_COMPILER_VERSION}" )
 
         # Set NVCC-specific options:
-        set( OPTION_PREFIX "-Xcompiler=" )
-        set( CUDA_CONFIG ${CUDA_CONFIG} "--Werror" "all-warnings" "-G" )
+        set( HOST_COMPILER_PREFIX "-Xcompiler=" )
+        list( APPEND CUDA_OPTIONS "--Werror" "all-warnings" "-G" )
 
         set( HAS_CUDA14_FLAG TRUE )
         if( CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
@@ -218,16 +199,39 @@ function( make_test_target target )
     add_executable( ${target} ${SCOPE_SOURCES} )
 
     set( localOptions ${OPTIONS} )
+    set( localDefinitions ${GSL_CONFIG} )
+
+    if( MSVC )
+        list( APPEND localOptions "/WX" "/W4" )
+        list( APPEND localDefinitions "_SCL_SECURE_NO_WARNINGS" )
+    elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
+        list( APPEND localOptions
+            "-Werror"
+            "-Wall"
+            "-Wextra"
+            #"-Wno-missing-braces"
+            "-Wconversion"
+            "-Wsign-conversion"
+            "-fno-elide-constructors"
+            "-fstrict-aliasing" "-Wstrict-aliasing=2"
+        )
+        if( NOT SCOPE_CUDA )
+            list( APPEND localOptions "-pedantic" ) # NVCC and "-pedantic" don't mix (GCC complains that NVCC-generated GCC-specific code is GCC specific)
+        endif()
+        if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
+            list( APPEND localOptions "-Wno-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
+        endif()
+    endif()
 
     if( SCOPE_NO_EXCEPTIONS )
         if( MSVC )
-            target_compile_definitions( ${target} PRIVATE "_HAS_EXCEPTIONS=0" )
             list( APPEND localOptions "/EHs-" )
+            list( APPEND localDefinitions "_HAS_EXCEPTIONS=0" )
         elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
             list( APPEND localOptions "-fno-exceptions" )
         endif()
     else()
-        target_compile_definitions( ${target} PRIVATE "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
+        list( APPEND localDefinitions "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
         if( MSVC )
             list( APPEND localOptions "/EHsc" )
         endif()
@@ -242,7 +246,7 @@ function( make_test_target target )
     endif()
 
     if( SCOPE_CUDA )
-        list( TRANSFORM localOptions PREPEND "${OPTION_PREFIX}" )
+        list( TRANSFORM localOptions PREPEND "${HOST_COMPILER_PREFIX}" )
         target_compile_options( ${target} PRIVATE ${CUDA_OPTIONS} )
         if( SCOPE_STD )
             set_target_properties( ${target} PROPERTIES CUDA_STANDARD ${SCOPE_STD} )
@@ -250,8 +254,8 @@ function( make_test_target target )
     endif()
 
     target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
+    target_compile_definitions( ${target} PRIVATE ${localDefinitions} )
     target_link_libraries( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
-    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} ${GSL_CONFIG} )
 
     if( NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
