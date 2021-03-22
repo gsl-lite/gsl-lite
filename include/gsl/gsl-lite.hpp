@@ -320,6 +320,12 @@
 # endif
 #endif
 
+// C++ standard library version:
+
+#ifndef  gsl_CPLUSPLUS_STDLIB
+# define gsl_CPLUSPLUS_STDLIB  gsl_CPLUSPLUS
+#endif
+
 #define gsl_CPP98_OR_GREATER  ( gsl_CPLUSPLUS >= 199711L )
 #define gsl_CPP11_OR_GREATER  ( gsl_CPLUSPLUS >= 201103L )
 #define gsl_CPP14_OR_GREATER  ( gsl_CPLUSPLUS >= 201402L )
@@ -347,7 +353,7 @@
 // MSVC++ 14.1  _MSC_VER >= 1910  gsl_COMPILER_MSVC_VERSION == 141  (Visual Studio 2017)
 // MSVC++ 14.2  _MSC_VER >= 1920  gsl_COMPILER_MSVC_VERSION == 142  (Visual Studio 2019)
 
-#if defined(_MSC_VER ) && !defined(__clang__)
+#if defined( _MSC_VER ) && ! defined( __clang__ )
 # define gsl_COMPILER_MSVC_VER           (_MSC_VER )
 # define gsl_COMPILER_MSVC_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
 # define gsl_COMPILER_MSVC_VERSION_FULL  (_MSC_VER - 100 * ( 5 + (_MSC_VER < 1900 ) ) )
@@ -359,41 +365,43 @@
 
 #define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
-// AppleClang  7.0.0  __apple_build_version__ ==  7000172  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.0, 7.0.1)               (LLVM 3.7.0)
-// AppleClang  7.0.0  __apple_build_version__ ==  7000176  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.1)                      (LLVM 3.7.0)
-// AppleClang  7.0.2  __apple_build_version__ ==  7000181  gsl_COMPILER_APPLECLANG_VERSION ==  702  (Xcode 7.2, 7.2.1)               (LLVM 3.7.0)
-// AppleClang  7.3.0  __apple_build_version__ ==  7030029  gsl_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3)                      (LLVM 3.8.0)
-// AppleClang  7.3.0  __apple_build_version__ ==  7030031  gsl_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3.1)                    (LLVM 3.8.0)
-// AppleClang  8.0.0  __apple_build_version__ ==  8000038  gsl_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.0)                      (LLVM 3.9.0)
-// AppleClang  8.0.0  __apple_build_version__ ==  8000042  gsl_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.1, 8.2, 8.2.1)          (LLVM 3.9.0)
-// AppleClang  8.1.0  __apple_build_version__ ==  8020038  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3)                      (LLVM 3.9.0)
-// AppleClang  8.1.0  __apple_build_version__ ==  8020041  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.1)                    (LLVM 3.9.0)
-// AppleClang  8.1.0  __apple_build_version__ ==  8020042  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.2, 8.3.3)             (LLVM 3.9.0)
-// AppleClang  9.0.0  __apple_build_version__ ==  9000037  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.0)                      (LLVM 4.0.0?)
-// AppleClang  9.0.0  __apple_build_version__ ==  9000038  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.1)                      (LLVM 4.0.0?)
-// AppleClang  9.0.0  __apple_build_version__ ==  9000039  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.2)                      (LLVM 4.0.0?)
-// AppleClang  9.1.0  __apple_build_version__ ==  9020039  gsl_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.3, 9.3.1)               (LLVM 5.0.2?)
-// AppleClang  9.1.0  __apple_build_version__ ==  9020039  gsl_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.4, 9.4.1)               (LLVM 5.0.2?)
-// AppleClang 10.0.0  __apple_build_version__ == 10001145  gsl_COMPILER_APPLECLANG_VERSION == 1000  (Xcode 10.0, 10.1)               (LLVM 6.0.1?)
-// AppleClang 10.0.1  __apple_build_version__ == 10010046  gsl_COMPILER_APPLECLANG_VERSION == 1001  (Xcode 10.2, 10.2.1, 10.3)       (LLVM 7.0.0?)
-// AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3, 11.3.1) (LLVM 8.0.0?)
-// AppleClang 11.0.3  __apple_build_version__ == 11030032  gsl_COMPILER_APPLECLANG_VERSION == 1103  (Xcode 11.4, 11.4.1, 11.5, 11.6) (LLVM 9.0.0?)
+// AppleClang  7.0.0  __apple_build_version__ ==  7000172  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.0, 7.0.1)               (LLVM  3.7.0)
+// AppleClang  7.0.0  __apple_build_version__ ==  7000176  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.1)                      (LLVM  3.7.0)
+// AppleClang  7.0.2  __apple_build_version__ ==  7000181  gsl_COMPILER_APPLECLANG_VERSION ==  702  (Xcode 7.2, 7.2.1)               (LLVM  3.7.0)
+// AppleClang  7.3.0  __apple_build_version__ ==  7030029  gsl_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3)                      (LLVM  3.8.0)
+// AppleClang  7.3.0  __apple_build_version__ ==  7030031  gsl_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3.1)                    (LLVM  3.8.0)
+// AppleClang  8.0.0  __apple_build_version__ ==  8000038  gsl_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.0)                      (LLVM  3.9.0)
+// AppleClang  8.0.0  __apple_build_version__ ==  8000042  gsl_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.1, 8.2, 8.2.1)          (LLVM  3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020038  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3)                      (LLVM  3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020041  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.1)                    (LLVM  3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020042  gsl_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.2, 8.3.3)             (LLVM  3.9.0)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000037  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.0)                      (LLVM  4.0.0)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000038  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.1)                      (LLVM  4.0.0)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000039  gsl_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.2)                      (LLVM  4.0.0)
+// AppleClang  9.1.0  __apple_build_version__ ==  9020039  gsl_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.3, 9.3.1)               (LLVM  5.0.2)
+// AppleClang  9.1.0  __apple_build_version__ ==  9020039  gsl_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.4, 9.4.1)               (LLVM  5.0.2)
+// AppleClang 10.0.0  __apple_build_version__ == 10001145  gsl_COMPILER_APPLECLANG_VERSION == 1000  (Xcode 10.0, 10.1)               (LLVM  6.0.1)
+// AppleClang 10.0.1  __apple_build_version__ == 10010046  gsl_COMPILER_APPLECLANG_VERSION == 1001  (Xcode 10.2, 10.2.1, 10.3)       (LLVM  7.0.0)
+// AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3, 11.3.1) (LLVM  8.0.0)
+// AppleClang 11.0.3  __apple_build_version__ == 11030032  gsl_COMPILER_APPLECLANG_VERSION == 1103  (Xcode 11.4, 11.4.1, 11.5, 11.6) (LLVM  9.0.0)
+// AppleClang 12.0.0  __apple_build_version__ == 12000032  gsl_COMPILER_APPLECLANG_VERSION == 1200  (Xcode 12.0–12.4)                (LLVM 10.0.0)
+// AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 10.0.0)
 
 #if defined( __apple_build_version__ )
-# define gsl_COMPILER_APPLECLANG_VERSION gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
-# define gsl_COMPILER_CLANG_VERSION 0
+# define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
+# define gsl_COMPILER_CLANG_VERSION       0
 #elif defined( __clang__ )
-# define gsl_COMPILER_APPLECLANG_VERSION 0
-# define gsl_COMPILER_CLANG_VERSION gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
+# define gsl_COMPILER_APPLECLANG_VERSION  0
+# define gsl_COMPILER_CLANG_VERSION       gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
 #else
-# define gsl_COMPILER_APPLECLANG_VERSION 0
-# define gsl_COMPILER_CLANG_VERSION 0
+# define gsl_COMPILER_APPLECLANG_VERSION  0
+# define gsl_COMPILER_CLANG_VERSION       0
 #endif
 
-#if defined(__GNUC__) && !defined(__clang__)
-# define gsl_COMPILER_GNUC_VERSION gsl_COMPILER_VERSION( __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ )
+#if defined( __GNUC__ ) && ! defined( __clang__ )
+# define gsl_COMPILER_GNUC_VERSION  gsl_COMPILER_VERSION( __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ )
 #else
-# define gsl_COMPILER_GNUC_VERSION 0
+# define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
 // Compiler non-strict aliasing:
@@ -502,14 +510,12 @@
 // Presence of C++11 language features:
 
 #define gsl_HAVE_AUTO                      gsl_CPP11_100
-#define gsl_HAVE_NULLPTR                   gsl_CPP11_100
 #define gsl_HAVE_RVALUE_REFERENCE          gsl_CPP11_100
-#define gsl_HAVE_FUNCTION_REF_QUALIFIER  ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
+#define gsl_HAVE_FUNCTION_REF_QUALIFIER    ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
 #define gsl_HAVE_ENUM_CLASS                gsl_CPP11_110
 #define gsl_HAVE_ALIAS_TEMPLATE            gsl_CPP11_120
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  gsl_CPP11_120
 #define gsl_HAVE_EXPLICIT                  gsl_CPP11_120
-#define gsl_HAVE_INITIALIZER_LIST          gsl_CPP11_120
 #define gsl_HAVE_VARIADIC_TEMPLATE         gsl_CPP11_120
 #define gsl_HAVE_IS_DELETE                 gsl_CPP11_120
 #define gsl_HAVE_CONSTEXPR_11              gsl_CPP11_140
@@ -519,14 +525,12 @@
 #define gsl_HAVE_EXPRESSION_SFINAE         gsl_CPP11_140
 
 #define gsl_HAVE_AUTO_()                   gsl_HAVE_AUTO
-#define gsl_HAVE_NULLPTR_()                gsl_HAVE_NULLPTR
 #define gsl_HAVE_RVALUE_REFERENCE_()       gsl_HAVE_RVALUE_REFERENCE
 #define gsl_HAVE_FUNCTION_REF_QUALIFIER_()  gsl_HAVE_FUNCTION_REF_QUALIFIER
 #define gsl_HAVE_ENUM_CLASS_()             gsl_HAVE_ENUM_CLASS
 #define gsl_HAVE_ALIAS_TEMPLATE_()         gsl_HAVE_ALIAS_TEMPLATE
 #define gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG_()  gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG
 #define gsl_HAVE_EXPLICIT_()               gsl_HAVE_EXPLICIT
-#define gsl_HAVE_INITIALIZER_LIST_()       gsl_HAVE_INITIALIZER_LIST
 #define gsl_HAVE_VARIADIC_TEMPLATE_()      gsl_HAVE_VARIADIC_TEMPLATE
 #define gsl_HAVE_IS_DELETE_()              gsl_HAVE_IS_DELETE
 #define gsl_HAVE_CONSTEXPR_11_()           gsl_HAVE_CONSTEXPR_11
@@ -566,28 +570,53 @@
 
 // Presence of C++ library features:
 
-#define gsl_HAVE_ADDRESSOF                 gsl_CPP17_000
-#define gsl_HAVE_ARRAY                     gsl_CPP11_110
-#define gsl_HAVE_TYPE_TRAITS               gsl_CPP11_110
-#define gsl_HAVE_TR1_TYPE_TRAITS           gsl_CPP11_110
-#define gsl_HAVE_CONTAINER_DATA_METHOD     gsl_CPP11_140_CPP0X_90
-#define gsl_HAVE_STD_DATA                  gsl_CPP17_000
+#define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
+#define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
+#define gsl_STDLIB_CPP14_OR_GREATER  gsl_CPP14_OR_GREATER
+#define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
+#define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
+
+#define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
+#define gsl_STDLIB_CPP11_110  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1700)
+#define gsl_STDLIB_CPP11_120  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
+#define gsl_STDLIB_CPP11_140  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+
+#define gsl_STDLIB_CPP14_000  (gsl_STDLIB_CPP14_OR_GREATER)
+#define gsl_STDLIB_CPP14_120  (gsl_STDLIB_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
+#define gsl_STDLIB_CPP14_140  (gsl_STDLIB_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+
+#define gsl_STDLIB_CPP17_000  (gsl_STDLIB_CPP17_OR_GREATER)
+#define gsl_STDLIB_CPP17_140  (gsl_STDLIB_CPP17_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+
+#define gsl_STDLIB_CPP11_140_CPP0X_90   (gsl_STDLIB_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1500 && gsl_HAS_CPP0X))
+#define gsl_STDLIB_CPP11_140_CPP0X_100  (gsl_STDLIB_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1600 && gsl_HAS_CPP0X))
+
+#define gsl_HAVE_ADDRESSOF                 gsl_STDLIB_CPP17_000
+#define gsl_HAVE_ARRAY                     gsl_STDLIB_CPP11_110
+#define gsl_HAVE_TYPE_TRAITS               gsl_STDLIB_CPP11_110
+#define gsl_HAVE_TR1_TYPE_TRAITS           gsl_STDLIB_CPP11_110
+#define gsl_HAVE_CONTAINER_DATA_METHOD     gsl_STDLIB_CPP11_140_CPP0X_90
+#define gsl_HAVE_STD_DATA                  gsl_STDLIB_CPP17_000
 #ifdef __cpp_lib_ssize
 # define gsl_HAVE_STD_SSIZE                1
 #else
 # define gsl_HAVE_STD_SSIZE                ( gsl_COMPILER_GNUC_VERSION >= 1000 && __cplusplus > 201703L )
 #endif
-#define gsl_HAVE_SIZED_TYPES               gsl_CPP11_140
-#define gsl_HAVE_MAKE_SHARED               gsl_CPP11_140_CPP0X_100
-#define gsl_HAVE_SHARED_PTR                gsl_CPP11_140_CPP0X_100
-#define gsl_HAVE_UNIQUE_PTR                gsl_CPP11_140_CPP0X_100
-#define gsl_HAVE_MAKE_UNIQUE               gsl_CPP14_120
-#define gsl_HAVE_UNCAUGHT_EXCEPTIONS       gsl_CPP17_140
+#define gsl_HAVE_HASH                      gsl_STDLIB_CPP11_120
+#define gsl_HAVE_SIZED_TYPES               gsl_STDLIB_CPP11_140
+#define gsl_HAVE_MAKE_SHARED               gsl_STDLIB_CPP11_140_CPP0X_100
+#define gsl_HAVE_SHARED_PTR                gsl_STDLIB_CPP11_140_CPP0X_100
+#define gsl_HAVE_UNIQUE_PTR                gsl_STDLIB_CPP11_140_CPP0X_100
+#define gsl_HAVE_MAKE_UNIQUE               gsl_STDLIB_CPP14_120
+#define gsl_HAVE_MOVE_FORWARD              gsl_STDLIB_CPP11_100
+#define gsl_HAVE_NULLPTR                   gsl_STDLIB_CPP11_100
+#define gsl_HAVE_UNCAUGHT_EXCEPTIONS       gsl_STDLIB_CPP17_140
 #define gsl_HAVE_ADD_CONST                 gsl_HAVE_TYPE_TRAITS
+#define gsl_HAVE_INITIALIZER_LIST          gsl_STDLIB_CPP11_120
 #define gsl_HAVE_INTEGRAL_CONSTANT         gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_REMOVE_CONST              gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_REMOVE_REFERENCE          gsl_HAVE_TYPE_TRAITS
-#define gsl_HAVE_REMOVE_CVREF              gsl_CPP20_OR_GREATER
+#define gsl_HAVE_REMOVE_CVREF              gsl_STDLIB_CPP20_OR_GREATER
 #define gsl_HAVE_TR1_ADD_CONST             gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_TR1_INTEGRAL_CONSTANT     gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_TR1_REMOVE_CONST          gsl_HAVE_TR1_TYPE_TRAITS
@@ -598,15 +627,19 @@
 #define gsl_HAVE_TYPE_TRAITS_()            gsl_HAVE_TYPE_TRAITS
 #define gsl_HAVE_TR1_TYPE_TRAITS_()        gsl_HAVE_TR1_TYPE_TRAITS
 #define gsl_HAVE_CONTAINER_DATA_METHOD_()  gsl_HAVE_CONTAINER_DATA_METHOD
+#define gsl_HAVE_HASH_()                   gsl_HAVE_HASH
 #define gsl_HAVE_STD_DATA_()               gsl_HAVE_STD_DATA
 #define gsl_HAVE_STD_SSIZE_()              gsl_HAVE_STD_SSIZE
 #define gsl_HAVE_SIZED_TYPES_()            gsl_HAVE_SIZED_TYPES
 #define gsl_HAVE_MAKE_SHARED_()            gsl_HAVE_MAKE_SHARED
+#define gsl_HAVE_MOVE_FORWARD_()           gsl_HAVE_MOVE_FORWARD
+#define gsl_HAVE_NULLPTR_()                gsl_HAVE_NULLPTR  // It's a language feature but needs library support, so we list it as a library feature.
 #define gsl_HAVE_SHARED_PTR_()             gsl_HAVE_SHARED_PTR
 #define gsl_HAVE_UNIQUE_PTR_()             gsl_HAVE_UNIQUE_PTR
 #define gsl_HAVE_MAKE_UNIQUE_()            gsl_HAVE_MAKE_UNIQUE
 #define gsl_HAVE_UNCAUGHT_EXCEPTIONS_()    gsl_HAVE_UNCAUGHT_EXCEPTIONS
 #define gsl_HAVE_ADD_CONST_()              gsl_HAVE_ADD_CONST
+#define gsl_HAVE_INITIALIZER_LIST_()       gsl_HAVE_INITIALIZER_LIST  // It's a language feature but needs library support, so we list it as a library feature.
 #define gsl_HAVE_INTEGRAL_CONSTANT_()      gsl_HAVE_INTEGRAL_CONSTANT
 #define gsl_HAVE_REMOVE_CONST_()           gsl_HAVE_REMOVE_CONST
 #define gsl_HAVE_REMOVE_REFERENCE_()       gsl_HAVE_REMOVE_REFERENCE
@@ -1560,7 +1593,7 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
 
 #endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110
+#if gsl_STDLIB_CPP11_110
 
 template< class F >
 class final_action
@@ -1615,7 +1648,7 @@ finally( F && action ) gsl_noexcept
     return final_action<F>( std::forward<F>( action ) );
 }
 
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 template< class F >
 class final_action_return : public final_action<F>
@@ -1701,9 +1734,9 @@ on_error( F && action ) gsl_noexcept
     return final_action_error<F>( std::forward<F>( action ) );
 }
 
-#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-#else // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110
+#else // ! gsl_STDLIB_CPP11_110
 
 class final_action
 {
@@ -1804,11 +1837,11 @@ inline final_action_error on_error( F const & action )
     return final_action_error( action );
 }
 
-#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+# endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-#endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION == 110
+#endif // gsl_STDLIB_CPP11_110
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
+#if gsl_STDLIB_CPP11_120
 
 template< class T, class U >
 gsl_NODISCARD gsl_api inline gsl_constexpr T
@@ -1817,7 +1850,7 @@ narrow_cast( U && u ) gsl_noexcept
     return static_cast<T>( std::forward<U>( u ) );
 }
 
-#else
+#else // ! gsl_STDLIB_CPP11_120
 
 template< class T, class U >
 gsl_api inline T
@@ -1826,7 +1859,7 @@ narrow_cast( U u ) gsl_noexcept
     return static_cast<T>( u );
 }
 
-#endif // gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
+#endif // gsl_STDLIB_CPP11_120
 
 struct narrowing_error : public std::exception {};
 
@@ -1835,8 +1868,7 @@ struct narrowing_error : public std::exception {};
 namespace detail {
 
     template< class T, class U >
-    struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value>
-    {};
+    struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
 
 # if defined( __NVCC__ )
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
@@ -2000,7 +2032,7 @@ class not_null;
 namespace detail {
 
 // helper class to figure out the pointed-to type of a pointer
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
 template< class T, class E = void >
 struct element_type_helper
 {
@@ -2014,7 +2046,7 @@ struct element_type_helper< T, std17::void_t< typename T::element_type > >
     // For types with a member element_type
     typedef typename T::element_type type;
 };
-#else
+#else // ! gsl_STDLIB_CPP11_OR_GREATER
 // Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
 template< class T, class E = void >
 struct element_type_helper
@@ -2027,7 +2059,7 @@ struct element_type_helper< T* >
 {
     typedef T type;
 };
-#endif
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 
 template< class T >
 struct is_not_null_or_bool_oracle : std11::false_type { };
@@ -2039,7 +2071,7 @@ struct is_not_null_or_bool_oracle< bool > : std11::true_type { };
 
 template< class T, bool IsCopyable = true >
 struct not_null_data;
-#if gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS )
+#if gsl_HAVE( MOVE_FORWARD )
 template< class T >
 struct not_null_data< T, false >
 {
@@ -2064,7 +2096,7 @@ gsl_is_delete_access:
     not_null_data( not_null_data const & other ) gsl_is_delete;
     not_null_data & operator=( not_null_data const & other ) gsl_is_delete;
 };
-#endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS )
+#endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
 struct not_null_data< T, true >
 {
@@ -2075,7 +2107,7 @@ struct not_null_data< T, true >
     {
     }
 
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
     gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
     : ptr_( std::move( _ptr ) )
     {
@@ -2090,7 +2122,7 @@ struct not_null_data< T, true >
         ptr_ = std::move( other.ptr_ );
         return *this;
     }
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+#endif // gsl_HAVE( MOVE_FORWARD )
 
     gsl_constexpr14 not_null_data( not_null_data const & other )
     : ptr_( other.ptr_ )
@@ -2148,7 +2180,7 @@ public:
 #endif
 
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# if gsl_HAVE( RVALUE_REFERENCE )
+# if gsl_HAVE( MOVE_FORWARD )
     template< class U
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
@@ -2162,16 +2194,16 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-# else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+# else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
     gsl_constexpr14 explicit not_null( U const& other )
     : data_( T( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-# endif // gsl_HAVE( RVALUE_REFERENCE )
+# endif // gsl_HAVE( MOVE_FORWARD )
 #else // a.k.a. !gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# if gsl_HAVE( RVALUE_REFERENCE )
+# if gsl_HAVE( MOVE_FORWARD )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
@@ -2203,18 +2235,18 @@ public:
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
 #  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-# else // a.k.a. ! gsl_HAVE( RVALUE_REFERENCE )
+# else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
     gsl_constexpr14 not_null( U const& other )
     : data_( T( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-# endif // gsl_HAVE( RVALUE_REFERENCE )
+# endif // gsl_HAVE( MOVE_FORWARD )
 #endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 
 public:
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 # if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
@@ -2253,7 +2285,7 @@ public:
         return *this;
     }
 # endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
-#else // a.k.a. ! gsl_HAVE( RVALUE_REFERENCE )
+#else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
     gsl_constexpr14 not_null( not_null<U> const& other )
     : data_( T( other.data_.ptr_ ) )
@@ -2267,7 +2299,7 @@ public:
         data_.ptr_ = other.data_.ptr_;
         return *this;
     }
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+#endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     gsl_NODISCARD gsl_constexpr14 element_type *
@@ -2323,7 +2355,7 @@ public:
     //     std::shared_ptr<U> vs = sp; // no extra copy
     //     std::unique_ptr<U> vu = std::move( p );
 
-#if gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+#if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
     // explicit conversion operator
 
     template< class U
@@ -2378,7 +2410,7 @@ public:
         return std::move( data_.ptr_ );
     }
 # endif
-#else // a.k.a. #if !( gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
+#else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
     template< class U >
     gsl_NODISCARD gsl_constexpr14
     operator U() const
@@ -2386,7 +2418,7 @@ public:
         gsl_Ensures( data_.ptr_ != gsl_nullptr );
         return data_.ptr_;
     }
-#endif // gsl_HAVE( RVALUE_REFERENCE ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
     gsl_NODISCARD gsl_constexpr14 T const &
     operator->() const
@@ -2402,7 +2434,7 @@ public:
         return *data_.ptr_;
     }
 
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
     // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
     gsl_constexpr14 not_null( not_null && other ) gsl_noexcept
     : data_( std::move( other.data_ ) )
@@ -2415,7 +2447,7 @@ public:
         data_ = std::move( other.data_ );
         return *this;
     }
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+#endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr14 not_null( not_null const & other ) = default;
@@ -2463,7 +2495,7 @@ not_null( not_null<U> ) -> not_null<U>;
 #if gsl_HAVE( NULLPTR )
 void make_not_null( std::nullptr_t ) gsl_is_delete;
 #endif // gsl_HAVE( NULLPTR )
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
 template< class U >
 gsl_NODISCARD gsl_constexpr14 not_null<U>
 make_not_null( U u )
@@ -2476,7 +2508,7 @@ make_not_null( not_null<U> u )
 {
     return std::move( u );
 }
-#else // a.k.a. !gsl_HAVE( RVALUE_REFERENCE )
+#else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
 template< class U >
 gsl_NODISCARD not_null<U>
 make_not_null( U const & u )
@@ -2489,7 +2521,7 @@ make_not_null( not_null<U> const & u )
 {
     return u;
 }
-#endif // gsl_HAVE( RVALUE_REFERENCE )
+#endif // gsl_HAVE( MOVE_FORWARD )
 
 namespace detail {
 
@@ -2504,12 +2536,12 @@ struct as_nullable_helper
         return p;
     }
 
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
     static nullable_type call( nullable_type && p )
     {
         return std::move(p);
     }
-#endif
+#endif // gsl_HAVE( MOVE_FORWARD )
 };
 
 // Specific case handling not_null
@@ -2523,17 +2555,17 @@ struct as_nullable_helper< CVReference, not_null<T> >
         return p.data_.ptr_;
     }
 
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
     static nullable_type call( not_null<nullable_type> && p )
     {
         return std::move(p.data_.ptr_);
     }
-#endif
+#endif // gsl_HAVE( MOVE_FORWARD )
 };
 
 namespace no_adl {
 
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
 template< class T >
 auto
 as_nullable( T && p )
@@ -2541,14 +2573,14 @@ as_nullable( T && p )
 {
     return detail::as_nullable_helper<T>::call(std::forward<T>(p));
 }
-#else
+#else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
 typename detail::as_nullable_helper<T>::nullable_type const &
 as_nullable( T const & p )
 {
     return detail::as_nullable_helper<T>::call(p);
 }
-#endif
+#endif // gsl_HAVE( MOVE_FORWARD )
 
 } // namespace no_adl
 } // namespace detail
@@ -2565,13 +2597,13 @@ public:
         gsl_ENABLE_IF_(( std::is_constructible<T, U>::value ))
     >
     gsl_constexpr14
-#if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( MOVE_FORWARD )
     not_null_ic( U && u )
     : not_null<T>( std::forward<U>( u ) )
-#else
+#else // ! gsl_HAVE( MOVE_FORWARD )
     not_null_ic( U const & u )
     : not_null<T>( u )
-#endif
+#endif // gsl_HAVE( MOVE_FORWARD )
     {}
 };
 
@@ -3807,14 +3839,14 @@ public:
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
+#if gsl_STDLIB_CPP11_120
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
-#endif
+#endif // gsl_STDLIB_CPP11_120
 
     template< class CharTraits, class Allocator >
     gsl_constexpr basic_string_span(
@@ -4434,7 +4466,7 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 
 } // namespace gsl
 
-#if gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 120
+#if gsl_HAVE( HASH )
 
 namespace std {
 
@@ -4450,7 +4482,7 @@ public:
 
 } // namespace std
 
-#endif
+#endif // gsl_HAVE( HASH )
 
 #if gsl_FEATURE( GSL_LITE_NAMESPACE )
 
