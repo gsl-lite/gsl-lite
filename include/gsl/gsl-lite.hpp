@@ -1637,10 +1637,10 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # endif
 #elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && x )
+# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # define   gsl_FAILFAST_()                ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && x )
+# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # if ! defined( NDEBUG )
 #  define  gsl_FAILFAST_()                assert( "GSL: failure" && false )
 # else
