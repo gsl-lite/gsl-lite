@@ -57,7 +57,7 @@
 #define gsl_CHECK_CFG_TOGGLE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_TOGGLE_VALUE_, x )
 #define gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_, x )
 #define gsl_CHECK_CFG_STD_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_STD_VALUE_, x )
-#define gsl_CHECK_CFG_NO_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_NO_VALUE_, x )
+#define gsl_CHECK_CFG_NO_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_NO_VALUE, gsl_CONCAT_( _, x ) )
 
 // gsl-lite backward compatibility:
 
@@ -79,53 +79,55 @@
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ON )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ON )
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ON) "; macro must be defined without value")
 # endif
 # pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ON.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 #endif
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_OFF )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_OFF )
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_OFF) "; macro must be defined without value")
 # endif
 # pragma message ("gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 #if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY) "; macro must be defined without value")
 # endif
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF.")
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF
+# define gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF
 #elif defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY) "; macro must be defined without value")
 # endif
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF.")
+# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF
+# define gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF
 #endif
 
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
+# if ! gsl_CHECK_CFG_NO_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
+# if ! gsl_CHECK_CFG_NO_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
 # define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
+# if ! gsl_CHECK_CFG_NO_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
@@ -296,15 +298,97 @@
 #endif
 #define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_()  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_AUDIT=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_AUDIT) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_ON )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_ON )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ON) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_OFF )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_THROWS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_THROWS) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_TRAPS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_TRAPS) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+#  pragma message ("invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
+# endif
+#endif
+#if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
+#  pragma message ("invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
+# endif
+#endif
 
 #if 1 < defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
 # error only one of gsl_CONFIG_CONTRACT_CHECKING_AUDIT, gsl_CONFIG_CONTRACT_CHECKING_ON, and gsl_CONFIG_CONTRACT_CHECKING_OFF may be defined
 #endif
-#if 1 < defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined
+#if 1 < defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# error only one of gsl_CONFIG_CONTRACT_VIOLATION_THROWS, gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES, gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS, gsl_CONFIG_CONTRACT_VIOLATION_TRAPS, and gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER may be defined
 #endif
 #if 1 < defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
 # error only one of gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME and gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE may be defined
+#endif
+
+#if 0 == defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) + defined( gsl_CONFIG_CONTRACT_CHECKING_ON ) + defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
+// select default
+# define gsl_CONFIG_CONTRACT_CHECKING_ON
+#endif
+#if 0 == defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+// select default
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  define gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS
+# else
+#  define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
+# endif
+#endif
+#if 0 == defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
+// select default
+# define gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE
 #endif
 
 // C++ language version detection (C++20 is speculative):
@@ -943,6 +1027,16 @@
 # include <initializer_list>
 #endif
 
+#if gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS
+# include <cassert>
+#endif
+
+#if gsl_CONFIG_CONTRACT_VIOLATION_TRAPS
+# if gsl_COMPILER_MSVC_VERSION
+#  include <intrin.h>
+# endif
+#endif
+
 #if gsl_HAVE( TYPE_TRAITS )
 # include <type_traits> // for enable_if<>,
                         // add_const<>, add_pointer<>, common_type<>, make_signed<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, remove_cvref<>, remove_pointer<>, underlying_type<>,
@@ -1506,21 +1600,60 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #elif defined(__has_builtin)
 # if __has_builtin(__builtin_unreachable)
 #  define gsl_ASSUME( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
-# define  gsl_ASSUME_UNREACHABLE()  __builtin_unreachable()
+#  define gsl_ASSUME_UNREACHABLE()  __builtin_unreachable()
+# else
+#  define gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
+#  define gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* unknown compiler; cannot rely on assume intrinsic */
 # endif
 #else
 # define  gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
 # define  gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* unknown compiler; cannot rely on assume intrinsic */
 #endif
 
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+# if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#  define  gsl_TRAP_()  __trap()
+# elif gsl_COMPILER_MSVC_VERSION
+#  define  gsl_TRAP_()  __failfast()
+# elif gsl_COMPILER_GNUC_VERSION
+#  define  gsl_TRAP_()  __builtin_trap()
+# elif defined(__has_builtin)
+#  if __has_builtin(__builtin_trap)
+#   define gsl_TRAP_()  __builtin_trap()
+#  else
+#   error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: don't know how to generate a trap instruction for this compiler. Use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead.
+#  endif
+# else
+#  error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: don't know how to generate a trap instruction for this compiler. Use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead.
+# endif
+#endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
+# if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), __trap() ) /* do not let the custom assertion handler continue execution */
+# else
+#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
+# endif
 #elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  define  gsl_CONTRACT_CHECK_( str, x )  assert( ( x ) && str )
-#elif   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( assert( ( x ) && str ) )
+# define   gsl_FAILFAST_()                ( __trap() )
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( assert( ( x ) && str ) )
+# if ! defined( NDEBUG )
+#  define  gsl_FAILFAST_()                ( assert( false && "GSL: failure" ) )
+# else
+#  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
+# endif
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() ) )
+# define   gsl_FAILFAST_()                ( gsl_TRAP_() )
+#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+# define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
+# define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
@@ -1570,7 +1703,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "Assertion failure (audit)", x )
 #endif
 
-#define   gsl_FailFast()        gsl_CONTRACT_CHECK_( "Failure", false )
+#define   gsl_FailFast()        gsl_FAILFAST_()
 
 
 struct fail_fast : public std::logic_error

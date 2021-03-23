@@ -323,6 +323,7 @@ Macro                                                                           
 [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
 [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
 [`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0) | 0                                                        | 1                 | enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)) |
+[`gsl_CONFIG_CONTRACT_VIOLATION_*`](#contract-checking-configuration-macros)         | `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`               | `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` | |
 
 Note that the v1 defaults are not yet stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
 
@@ -457,7 +458,7 @@ The following macros control whether contracts are checked at runtime:
   Define this macro to have all contracts checked at runtime.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ON` (default)**  
-  Define this macro to have contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. **This is the default.**
+  Define this macro to have contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and `gsl_FailFast()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. **This is the default.**
  
 - **`gsl_CONFIG_CONTRACT_CHECKING_OFF`**  
   Define this macro to disable all runtime checking of contracts and invariants. (Note that `gsl_FailFast()` checks will trigger runtime failure even if runtime checking is disabled.)
@@ -472,7 +473,7 @@ The following macros can be used to selectively disable checking for a particula
   Define this macro to disable runtime checking of postcondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`**  
-  Define this macro to disable runtime checking of assertions expressed with `gsl_Assert()`, and `gsl_AssertAudit()`.
+  Define this macro to disable runtime checking of assertions expressed with `gsl_Assert()` and `gsl_AssertAudit()`.
 
 
 The following macros control the handling of runtime contract violations:
@@ -480,11 +481,17 @@ The following macros control the handling of runtime contract violations:
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)**  
   Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. **This is the default.**
 
+- **`gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS`**  
+  If this macro is defined, the `assert()` macro is used to check GSL contracts expressed with `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. (Note that `gsl_FailFast()` will call `std::terminate()` if `NDEBUG` is defined.)
+
+- **`gsl_CONFIG_CONTRACT_VIOLATION_TRAPS`**  
+  Define this macro to execute a trap instruction on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`.
+
 - **`gsl_CONFIG_CONTRACT_VIOLATION_THROWS`**  
-  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`.
+  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
-  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. The user must provide a definition of the following function:
+  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. The user must provide a definition of the following function:
 
   ```c++
   namespace gsl {
@@ -493,6 +500,9 @@ The following macros control the handling of runtime contract violations:
           char const * const file, int line );
   }
   ```
+
+Note that `gsl_FailFast()` will call `std::terminate()` if `fail_fast_assert_handler()` returns.
+
 
 The following macros control what happens with contract checks not enforced at runtime:
  
