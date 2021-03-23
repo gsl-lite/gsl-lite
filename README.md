@@ -513,10 +513,10 @@ The following macros control what happens with contract checks not enforced at r
   Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
 
 
-Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` is defined, the compiler is instructed that the
-condition expressed by regular contracts can be assumed to hold true. This is meant to be an aid for the optimizer; runtime evaluation of the condition is not desired. However, because the GSL implements contract checks
-with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers will
-generate the runtime function call.
+Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. Defining `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` instructs the compiler that the
+conditions expressed by GSL contracts can be assumed to hold true. This is meant to be an aid for the optimizer; runtime evaluation of the condition is not desired. However, because the GSL implements contract checks
+with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers
+will generate the runtime function call.
 
 Therefore, `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` for everything else. In practice, this implies that `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
 
