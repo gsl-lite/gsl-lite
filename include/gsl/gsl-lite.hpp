@@ -53,7 +53,8 @@
 #define gsl_DETAIL_CFG_STD_VALUE_14  1
 #define gsl_DETAIL_CFG_STD_VALUE_17  1
 #define gsl_DETAIL_CFG_STD_VALUE_20  1
-#define gsl_DETAIL_CFG_NO_VALUE_  1
+#define gsl_DETAIL_CFG_NO_VALUE_   1
+#define gsl_DETAIL_CFG_NO_VALUE_1  1 // many compilers treat the command-line parameter "-Dfoo" as equivalent to "-Dfoo=1", so we tolerate that
 #define gsl_CHECK_CFG_TOGGLE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_TOGGLE_VALUE_, x )
 #define gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_, x )
 #define gsl_CHECK_CFG_STD_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_STD_VALUE_, x )
@@ -1027,11 +1028,11 @@
 # include <initializer_list>
 #endif
 
-#if gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # include <cassert>
 #endif
 
-#if gsl_CONFIG_CONTRACT_VIOLATION_TRAPS
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 # if gsl_COMPILER_MSVC_VERSION
 #  include <intrin.h>
 # endif
@@ -1614,7 +1615,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 #  define  gsl_TRAP_()  __trap()
 # elif gsl_COMPILER_MSVC_VERSION
-#  define  gsl_TRAP_()  __failfast()
+#  define  gsl_TRAP_()  __fastfail( 0 )  // legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes"
 # elif gsl_COMPILER_GNUC_VERSION
 #  define  gsl_TRAP_()  __builtin_trap()
 # elif defined(__has_builtin)
@@ -1629,27 +1630,27 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, "GSL: " str, __FILE__, __LINE__ ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) )
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), __trap() ) /* do not let the custom assertion handler continue execution */
 # else
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # endif
 #elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( assert( ( x ) && str ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && x )
 # define   gsl_FAILFAST_()                ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( assert( ( x ) && str ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && x )
 # if ! defined( NDEBUG )
-#  define  gsl_FAILFAST_()                ( assert( false && "GSL: failure" ) )
+#  define  gsl_FAILFAST_()                assert( "GSL: failure" && false )
 # else
 #  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 # endif
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() )
 # define   gsl_FAILFAST_()                ( gsl_TRAP_() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 # define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
 # define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
@@ -1663,13 +1664,13 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  define gsl_Expects( x )       gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "Precondition failure", x )
+# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "GSL: Precondition failure", x )
 #endif
 #define   Expects( x )           gsl_Expects( x )
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
-# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "Precondition failure (audit)", x )
+# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (audit)", x )
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
@@ -1679,13 +1680,13 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  define gsl_Ensures( x )       gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "Postcondition failure", x )
+# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "GSL: Postcondition failure", x )
 #endif
 #define   Ensures( x )           gsl_Ensures( x )
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
-# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
+# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (audit)", x )
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
@@ -1695,12 +1696,12 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  define gsl_Assert( x )       gsl_ELIDE_CONTRACT_( x )
 # endif
 #else
-# define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "Assertion failure", x )
+# define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "GSL: Assertion failure", x )
 #endif
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_AssertAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
-# define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "Assertion failure (audit)", x )
+# define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (audit)", x )
 #endif
 
 #define   gsl_FailFast()        gsl_FAILFAST_()

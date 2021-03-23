@@ -24,8 +24,8 @@ __global__ void preconditionAssertionKernel( int i, int j )
 {
     gsl_Expects( i >= 0 );
     gsl_ExpectsAudit( i < j );
-    gsl_Ensure( i >= 0 );
-    gsl_EnsureAudit( i < j );
+    gsl_Ensures( i >= 0 );
+    gsl_EnsuresAudit( i < j );
     gsl_Assert( i >= 0 );
     gsl_AssertAudit( i < j );
     gsl_FailFast( );

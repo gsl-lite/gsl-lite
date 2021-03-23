@@ -175,7 +175,7 @@ endfunction()
 function( make_test_target target )
 
     set( optionArgs CUDA NO_EXCEPTIONS COMPILE_ONLY NO_PCH )
-    set( oneValueArgs STD DEFAULTS_VERSION )
+    set( oneValueArgs STD DEFAULTS_VERSION CONTRACT_VIOLATION )
     set( multiValueArgs SOURCES EXTRA_OPTIONS )
     cmake_parse_arguments( "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     if( SCOPE_UNPARSED_ARGUMENTS )
@@ -193,13 +193,16 @@ function( make_test_target target )
     if( NOT SCOPE_DEFAULTS_VERSION )
         message( SEND_ERROR "make_test_target(): no argument specified for DEFAULTS_VERSION" )
     endif()
+    if( NOT SCOPE_CONTRACT_VIOLATION )
+        set( SCOPE_CONTRACT_VIOLATION "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
+    endif()
 
     message( STATUS "Make target: '${target}'" )
 
     add_executable( ${target} ${SCOPE_SOURCES} )
 
     set( localOptions ${OPTIONS} )
-    set( localDefinitions ${GSL_CONFIG} )
+    set( localDefinitions ${GSL_CONFIG} "gsl_CONFIG_CONTRACT_VIOLATION_${SCOPE_CONTRACT_VIOLATION}" )
 
     if( MSVC )
         list( APPEND localOptions "/WX" "/W4" )
@@ -239,7 +242,6 @@ function( make_test_target target )
             list( APPEND localOptions "-fno-exceptions" )
         endif()
     else()
-        list( APPEND localDefinitions "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
         if( MSVC )
             list( APPEND localOptions "/EHsc" )
         endif()
@@ -271,7 +273,7 @@ function( make_test_target target )
         target_precompile_headers( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
     endif()
 
-    if( NOT SCOPE_NO_EXCEPTIONS AND NOT SCOPE_COMPILE_ONLY )
+    if( NOT SCOPE_COMPILE_ONLY )
         # We only add tests for targets with exceptions enabled. lest has been modified to permit compilation without exceptions
         # so we can test compiling gsl-lite without exceptions, but the no-exception tests will not run correctly because lest
         # relies on exceptions for running tests and therefore cannot function correctly without.
