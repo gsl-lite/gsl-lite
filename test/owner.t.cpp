@@ -48,6 +48,16 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 
     EXPECT( *p == 121 );
     delete p;
+
+#if gsl_FEATURE( GSL_LITE_NAMESPACE )
+    // Also try to consume `owner<>` from the `gsl_lite` namespace
+    gsl_lite::owner<int*> p2 = new int( 120 );
+    EXPECT( ( p2 != NULL ) );
+    EXPECT( *p2 == 120 );
+    F::incr( p2 );
+    EXPECT( *p2 == 121 );
+    delete p2;
+#endif
 #else
     EXPECT( !!"owner<> alias template is not available." );
 #endif

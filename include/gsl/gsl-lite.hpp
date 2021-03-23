@@ -4540,8 +4540,7 @@ public:
 // unprefixed `Expects()` and `Ensures()` macros to avoid collision with M-GSL. To ensure backward compatibility, the
 // old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
 
-namespace gsl_lite
-{
+namespace gsl_lite {
 
 namespace std11 = ::gsl::std11;
 namespace std14 = ::gsl::std14;
@@ -4571,7 +4570,16 @@ typedef gsl_CONFIG_INDEX_TYPE stride;
 typedef gsl_CONFIG_INDEX_TYPE diff;
 
 # if gsl_HAVE( ALIAS_TEMPLATE )
+#  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 141 )  // VS 2015 and earlier have trouble with `using` for alias templates
+  template< class T
+#   if gsl_HAVE( TYPE_TRAITS )
+          , typename = typename std::enable_if< std::is_pointer<T>::value >::type
+#   endif
+  >
+  using owner = T;
+#  else
 using ::gsl::owner;
+#  endif
 # endif
 
 using ::gsl::fail_fast;
