@@ -438,12 +438,15 @@ Define this to additionally define a `namespace gsl_lite` with most of the *gsl-
 
 *gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
 
-There are four macros for expressing pre- and postconditions:
+There are several macros for expressing preconditions, postconditions, and invariants:
 
-- `gsl_Expects()` for simple preconditions
-- `gsl_Ensures()` for simple postconditions
-- `gsl_ExpectsAudit()` for preconditions that are expensive or include potentially opaque function calls
-- `gsl_EnsuresAudit()` for postconditions that are expensive or include potentially opaque function calls
+- `gsl_Expects( cond )` for simple preconditions
+- `gsl_Ensures( cond )` for simple postconditions
+- `gsl_Assert( cond )` for simple assertions
+- `gsl_FailFast()` to indicate unreachable code
+- `gsl_ExpectsAudit( cond )` for preconditions that are expensive or include potentially opaque function calls
+- `gsl_EnsuresAudit( cond )` for postconditions that are expensive or include potentially opaque function calls
+- `gsl_AssertAudit( cond )` for assertions that are expensive or include potentially opaque function calls
 
 The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
@@ -454,10 +457,10 @@ The following macros control whether contracts are checked at runtime:
   Define this macro to have all contracts checked at runtime.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ON` (default)**  
-  Define this macro to have contracts expressed with `gsl_Expects()` and `gsl_Ensures()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. **This is the default.**
+  Define this macro to have contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. **This is the default.**
  
 - **`gsl_CONFIG_CONTRACT_CHECKING_OFF`**  
-  Define this macro to disable all runtime checking of contracts.
+  Define this macro to disable all runtime checking of contracts and invariants. (Note that `gsl_FailFast()` checks will trigger runtime failure even if runtime checking is disabled.)
 
 
 The following macros can be used to selectively disable checking for a particular kind of contract:
@@ -466,19 +469,22 @@ The following macros can be used to selectively disable checking for a particula
   Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Expects()` and `gsl_ExpectsAudit()`.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`**  
-  Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
+  Define this macro to disable runtime checking of postcondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
+
+- **`gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`**  
+  Define this macro to disable runtime checking of assertions expressed with `gsl_Assert()`, and `gsl_AssertAudit()`.
 
 
 The following macros control the handling of runtime contract violations:
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)**  
-  Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`. **This is the default.**
+  Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. **This is the default.**
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_THROWS`**  
-  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`.
+  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
-  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, and `gsl_EnsuresAudit()`. The user must provide a definition of the following function:
+  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` instead of calling `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. The user must provide a definition of the following function:
 
   ```c++
   namespace gsl {
@@ -491,10 +497,10 @@ The following macros control the handling of runtime contract violations:
 The following macros control what happens with contract checks not enforced at runtime:
  
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)**  
-  Define this macro to disable all runtime checking and evaluation of contracts. **This is the default.**
+  Define this macro to disable all runtime checking and evaluation of unenforced contracts and invariants. (Note that `gsl_FailFast()` calls are never elided.) **This is the default.**
 
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`**  
-  Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()` and `gsl_Ensures()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
+  Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
 
 
 Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. When `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` is defined, the compiler is instructed that the
@@ -502,8 +508,7 @@ condition expressed by regular contracts can be assumed to hold true. This is me
 with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers will
 generate the runtime function call.
 
-Therefore, `gsl_Expects()` and `gsl_Ensures()` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit()` and `gsl_EnsuresAudit()` for everything else. In practice, this implies that
-`gsl_Expects()` and `gsl_Ensures()` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
+Therefore, `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` for everything else. In practice, this implies that `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
 
 
 Example:
@@ -635,8 +640,11 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `Ensures()`                 | ✓      | ✓      | ✓         | Postcondition assertion |
 `gsl_Expects()`             | -       | -       | ✓         | Precondition assertion |
 `gsl_Ensures()`             | -       | -       | ✓         | Postcondition assertion |
+`gsl_Assert()`              | -       | -       | ✓         | Assertion |
+`gsl_FailFast()`            | -       | -       | ✓         | Fail-fast termination |
 `gsl_ExpectsAudit()`        | -       | -       | ✓         | Audit-level precondition assertion |
 `gsl_EnsuresAudit()`        | -       | -       | ✓         | Audit-level postcondition assertion |
+`gsl_AssertAudit()`         | -       | -       | ✓         | Audit-level assertion |
 **4. Utilities**            | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 `index`                     | ✓      | ✓      | ✓         | type for container indexes and subscripts, <br>see [Other configuration macros](#other-configuration-macros) |
 `dim`                       | -      | -      | ✓         | type for container sizes |
@@ -804,12 +812,17 @@ In the test runner, the version of *gsl-lite* is available via tag `[.version]`.
 ```
 gsl_Expects(): Allows a true expression
 gsl_Ensures(): Allows a true expression
+gsl_Assert(): Allows a true expression
 gsl_Expects(): Terminates on a false expression
 gsl_Ensures(): Terminates on a false expression
+gsl_Assert(): Terminates on a false expression
+gsl_FailFast(): Terminates
 gsl_ExpectsAudit(): Allows a true expression
 gsl_EnsuresAudit(): Allows a true expression
+gsl_AssertAudit(): Allows a true expression
 gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode
 gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode
+gsl_AssertAudit(): Terminates on a false expression in AUDIT mode
 at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements (C++11)
 at(): Terminates access to non-existing std::vector elements

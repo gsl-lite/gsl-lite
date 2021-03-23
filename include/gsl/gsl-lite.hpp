@@ -1492,19 +1492,25 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #else
 # define gsl_ELIDE_CONTRACT_( x )
 #endif
+#define gsl_NO_OP_()               ((void) 0)
 
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT_( x ) /* there is no assume intrinsic in CUDA device code */
+# define  gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* there is no assume intrinsic in CUDA device code */
+# define  gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* there is no assume intrinsic in CUDA device code */
 #elif gsl_COMPILER_MSVC_VERSION
-# define  gsl_ASSUME( x )  __assume( x )
+# define  gsl_ASSUME( x )           __assume( x )
+# define  gsl_ASSUME_UNREACHABLE()  __assume( 0 )
 #elif gsl_COMPILER_GNUC_VERSION
-#  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
+#  define gsl_ASSUME( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+# define  gsl_ASSUME_UNREACHABLE()  __builtin_unreachable()
 #elif defined(__has_builtin)
 # if __has_builtin(__builtin_unreachable)
-#  define gsl_ASSUME( x )  (( x ) ? static_cast<void>(0) : __builtin_unreachable())
+#  define gsl_ASSUME( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+# define  gsl_ASSUME_UNREACHABLE()  __builtin_unreachable()
 # endif
 #else
-# define  gsl_ASSUME( x )  gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
+# define  gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
+# define  gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* unknown compiler; cannot rely on assume intrinsic */
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
@@ -1527,7 +1533,6 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "Precondition failure", x )
 #endif
 #define   Expects( x )           gsl_Expects( x )
-
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
@@ -1544,12 +1549,29 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "Postcondition failure", x )
 #endif
 #define   Ensures( x )           gsl_Ensures( x )
-
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresAudit( x )  gsl_ELIDE_CONTRACT_( x )
 #else
 # define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "Postcondition failure (audit)", x )
 #endif
+
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+#  define gsl_Assert( x )       gsl_ASSUME( x )
+# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
+#  define gsl_Assert( x )       gsl_ELIDE_CONTRACT_( x )
+# endif
+#else
+# define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "Assertion failure", x )
+#endif
+#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+# define  gsl_AssertAudit( x )  gsl_ELIDE_CONTRACT_( x )
+#else
+# define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "Assertion failure (audit)", x )
+#endif
+
+#define   gsl_FailFast()        gsl_CONTRACT_CHECK_( "Failure", false )
+
 
 struct fail_fast : public std::logic_error
 {
@@ -2383,23 +2405,26 @@ public:
     gsl_NODISCARD gsl_constexpr14 element_type *
     get() const
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return data_.ptr_.get();
+        element_type * result = data_.ptr_.get();
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 #else
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_constexpr14 T const &
     get() const
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return data_.ptr_;
+        T const & result = data_.ptr_;
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 # else
     gsl_NODISCARD gsl_constexpr14 T
     get() const
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return data_.ptr_;
+        T result = data_.ptr_;
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 # endif
 #endif
@@ -2446,8 +2471,9 @@ public:
     &
 # endif
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return U( data_.ptr_ );
+        U result( data_.ptr_ );
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
@@ -2457,8 +2483,9 @@ public:
     gsl_NODISCARD gsl_constexpr14 explicit
     operator U() &&
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return U( std::move( data_.ptr_ ) );
+        U result( std::move( data_.ptr_ ) );
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 # endif
 
@@ -2473,8 +2500,9 @@ public:
     &
 # endif
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return data_.ptr_;
+        U result( data_.ptr_ );
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
@@ -2484,8 +2512,9 @@ public:
     gsl_NODISCARD gsl_constexpr14
     operator U() &&
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return std::move( data_.ptr_ );
+        U result( std::move( data_.ptr_ ) );
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 # endif
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
@@ -2493,22 +2522,24 @@ public:
     gsl_NODISCARD gsl_constexpr14
     operator U() const
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return data_.ptr_;
+        U result( data_.ptr_ );
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
     gsl_NODISCARD gsl_constexpr14 T const &
     operator->() const
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
-        return data_.ptr_;
+        T const & result( data_.ptr_ );
+        gsl_Ensures( result != gsl_nullptr );
+        return result;
     }
 
     gsl_NODISCARD gsl_constexpr14 element_type &
     operator*() const
     {
-        gsl_Ensures( data_.ptr_ != gsl_nullptr );
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
         return *data_.ptr_;
     }
 

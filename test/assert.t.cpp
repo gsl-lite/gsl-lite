@@ -23,8 +23,11 @@ namespace {
 
 bool expects( bool x ) { gsl_Expects( x ); return x; } 
 bool ensures( bool x ) { gsl_Ensures( x ); return x; }
+bool assert_( bool x ) { gsl_Assert( x ); return x; }
+void failFast() { gsl_FailFast(); }
 bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; } 
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
+bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
 
 struct ConvertibleToBool
 {
@@ -47,6 +50,11 @@ CASE( "gsl_Ensures(): Allows a true expression" )
     EXPECT_NO_THROW( ensures( true  ) );
 }
 
+CASE( "gsl_Assert(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assert_( true  ) );
+}
+
 CASE( "gsl_Expects(): Terminates on a false expression" )
 {
     EXPECT_THROWS( expects( false ) );
@@ -57,6 +65,16 @@ CASE( "gsl_Ensures(): Terminates on a false expression" )
     EXPECT_THROWS( ensures( false ) );
 }
 
+CASE( "gsl_Assert(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( assert_( false ) );
+}
+
+CASE( "gsl_FailFast(): Terminates" )
+{
+    EXPECT_THROWS( failFast() );
+}
+
 CASE( "gsl_ExpectsAudit(): Allows a true expression" )
 {
     EXPECT_NO_THROW( expectsAudit( true  ) );
@@ -65,6 +83,11 @@ CASE( "gsl_ExpectsAudit(): Allows a true expression" )
 CASE( "gsl_EnsuresAudit(): Allows a true expression" )
 {
     EXPECT_NO_THROW( ensuresAudit( true  ) );
+}
+
+CASE( "gsl_AssertAudit(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assertAudit( true  ) );
 }
 
 CASE( "gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
@@ -82,6 +105,15 @@ CASE( "gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
     EXPECT_THROWS( ensuresAudit( false ) );
 #else
     EXPECT_NO_THROW( ensuresAudit( false ) );
+#endif
+}
+
+CASE( "gsl_AssertAudit(): Terminates on a false expression in AUDIT mode" )
+{
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( assertAudit( false ) );
+#else
+    EXPECT_NO_THROW( assertAudit( false ) );
 #endif
 }
 
