@@ -647,7 +647,7 @@ CASE( "string_span: Allows to copy-construct from another span of a compatible t
 
 CASE( "string_span: Allows to move-construct from another span of the same type (C++11)" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     char hello[] = "hello";
 
     string_span a(( string_span( hello ) ));
@@ -673,7 +673,7 @@ CASE( "string_span: Allows to copy-assign from another span of the same type" )
 
 CASE( "string_span: Allows to move-assign from another span of the same type (C++11)" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     char hello[] = "hello";
     string_span a;
 

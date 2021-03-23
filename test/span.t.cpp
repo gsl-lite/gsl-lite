@@ -356,7 +356,7 @@ CASE( "span<>: Allows to construct from a const C-array with size via decay to p
 
 CASE( "span<>: Allows to construct from a std::initializer_list<> (C++11)" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_HAVE( INITIALIZER_LIST )
     auto il = { 1, 2, 3, 4, 5, };
 
     span<int const> v( il );
@@ -618,7 +618,7 @@ CASE( "span<>: Allows to copy-construct from another span of a compatible type" 
 
 CASE( "span<>: Allows to move-construct from another span of the same type (C++11)" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<      int> v(( span<      int>( arr ) ));
@@ -650,7 +650,7 @@ CASE( "span<>: Allows to copy-assign from another span of the same type" )
 
 CASE( "span<>: Allows to move-assign from another span of the same type (C++11)" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
     span<      int> v;
     span<const int> w;
@@ -1461,7 +1461,7 @@ CASE( "make_span(): Allows to build from a const C-array" )
 
 CASE( "make_span(): Allows building from a std::initializer_list<> (C++11)" )
 {
-#if gsl_CPP11_OR_GREATER
+#if gsl_HAVE( INITIALIZER_LIST )
     auto il = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<int const> v = make_span( il );

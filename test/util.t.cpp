@@ -18,18 +18,18 @@
 #include "gsl-lite.t.hpp"
 #include <functional>
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
 # include <limits>
 # include <cstdint>
-#endif // gsl_CPP11_OR_GREATER
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 
-#define gsl_CPP11_OR_GREATER_WRT_FINAL ( gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110 )
+#define gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL ( gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110 )
 
 using namespace gsl;
 
 CASE( "finally: Allows to run lambda on leaving scope" )
 {
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -45,7 +45,7 @@ CASE( "finally: Allows to run lambda on leaving scope" )
 
 CASE( "finally: Allows to run function (bind) on leaving scope" )
 {
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -65,7 +65,7 @@ CASE( "finally: Allows to run function (pointer) on leaving scope" )
 {
     struct F { static void incr() { g_i += 1; } };
 
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
 
     g_i = 0;
     {
@@ -85,7 +85,7 @@ CASE( "finally: Allows to run function (pointer) on leaving scope" )
 
 CASE( "finally: Allows to move final_action" )
 {
-#if gsl_CPP11_OR_GREATER_WRT_FINAL
+#if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -127,7 +127,7 @@ CASE( "finally: Allows to move final_action" )
 CASE( "finally: Allows moving final_action to throw" "[.]")
 {
 #if gsl_HAVE( EXCEPTIONS )
-# if gsl_CPP11_OR_GREATER_WRT_FINAL
+# if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
     struct action
     {
         int & i_;
@@ -155,7 +155,7 @@ CASE( "on_return: Allows to perform action on leaving scope without exception (g
 {
 #if gsl_HAVE( EXCEPTIONS )
 # if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-#  if gsl_CPP11_OR_GREATER_WRT_FINAL
+#  if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
         static void pass() { try { auto _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
@@ -184,7 +184,7 @@ CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl
 {
 #if gsl_HAVE( EXCEPTIONS )
 # if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-#  if gsl_CPP11_OR_GREATER_WRT_FINAL
+#  if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
     struct F { 
         static void incr() { g_i += 1; }
         static void pass() { try { auto _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
@@ -219,7 +219,7 @@ CASE( "narrow_cast<>: Allows narrowing with value loss" )
     EXPECT( narrow_cast<unsigned char>( 300 ) == 44 );
 }
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
 const  std::uint8_t  u8  =  std::uint8_t((std::numeric_limits< std::uint8_t>::max)() - 1);
 const std::uint16_t u16  = std::uint16_t((std::numeric_limits<std::uint16_t>::max)() - 1);
 const   std::int8_t  i8n =   std::int8_t((std::numeric_limits<  std::int8_t>::min)() + 1);
@@ -233,7 +233,7 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
 #if gsl_HAVE( EXCEPTIONS )
     EXPECT( narrow<char>( 120 ) == 120 );
 
-# if gsl_CPP11_OR_GREATER
+# if gsl_STDLIB_CPP11_OR_GREATER
     std::uint8_t lu8;
     std::uint16_t lu16;
     std::int8_t li8;
@@ -259,7 +259,7 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
     EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>( std::uint8_t(i8p)))); EXPECT( li8 == i8p);
     EXPECT_NO_THROW(( lu8 = narrow< std::uint8_t>( std::int16_t(i8p)))); EXPECT( lu8 == i8p);
     EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>(std::uint16_t(i8p)))); EXPECT( li8 == i8p);
-# endif // gsl_CPP11_OR_GREATER
+# endif // gsl_STDLIB_CPP11_OR_GREATER
 #endif // gsl_HAVE( EXCEPTIONS )
 }
 
@@ -268,7 +268,7 @@ CASE( "narrow<>(): Terminates when narrowing with value loss" )
 #if gsl_HAVE( EXCEPTIONS )
     EXPECT_THROWS_AS( (void) narrow<char>( 300 ), narrowing_error );
 
-# if gsl_CPP11_OR_GREATER
+# if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> uint
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>( std::uint16_t( u16) ), narrowing_error );
 
@@ -281,7 +281,7 @@ CASE( "narrow<>(): Terminates when narrowing with value loss" )
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16p) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t( u8 ) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t(u16 ) ), narrowing_error );
-# endif // gsl_CPP11_OR_GREATER
+# endif // gsl_STDLIB_CPP11_OR_GREATER
 #endif // gsl_HAVE( EXCEPTIONS )
 }
 
@@ -290,13 +290,13 @@ CASE( "narrow<>(): Terminates when narrowing with sign loss" )
 #if gsl_HAVE( EXCEPTIONS )
     EXPECT_THROWS_AS( (void) narrow<unsigned>( -42 ), narrowing_error );
 
-# if gsl_CPP11_OR_GREATER
+# if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> int
     EXPECT_THROWS_AS( (void) narrow<std::uint16_t>(   std::int8_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(   std::int8_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16n) ), narrowing_error );
-# endif // gsl_CPP11_OR_GREATER
+# endif // gsl_STDLIB_CPP11_OR_GREATER
 #endif // gsl_HAVE( EXCEPTIONS )
 }
 
@@ -304,7 +304,7 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 {
     EXPECT( narrow_failfast<char>( 120 ) == 120 );
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     std::uint8_t lu8;
     std::uint16_t lu16;
     std::int8_t li8;
@@ -330,14 +330,14 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
     EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>( std::uint8_t(i8p)))); EXPECT( li8 == i8p);
     EXPECT_NO_THROW(( lu8 = narrow_failfast< std::uint8_t>( std::int16_t(i8p)))); EXPECT( lu8 == i8p);
     EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>(std::uint16_t(i8p)))); EXPECT( li8 == i8p);
-#endif // gsl_CPP11_OR_GREATER
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
 CASE( "narrow_failfast<>(): Terminates when narrowing with value loss" )
 {
     EXPECT_THROWS_AS( (void) narrow_failfast<char>( 300 ), fail_fast );
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> uint
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>( std::uint16_t( u16) ), fail_fast );
 
@@ -350,20 +350,20 @@ CASE( "narrow_failfast<>(): Terminates when narrowing with value loss" )
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16p) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>( std::uint16_t( u8 ) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>( std::uint16_t(u16 ) ), fail_fast );
-#endif // gsl_CPP11_OR_GREATER
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
 CASE( "narrow_failfast<>(): Terminates when narrowing with sign loss" )
 {
     EXPECT_THROWS_AS( (void) narrow_failfast<unsigned>( -42 ), fail_fast );
 
-#if gsl_CPP11_OR_GREATER
+#if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> int
     EXPECT_THROWS_AS( (void) narrow_failfast<std::uint16_t>(   std::int8_t( i8n) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(   std::int8_t( i8n) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t( i8n) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
-#endif // gsl_CPP11_OR_GREATER
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
 // end of file

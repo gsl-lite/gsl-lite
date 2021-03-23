@@ -80,6 +80,26 @@ CASE( "gsl_CPP20_OR_GREATER" "[.stdc++]" )
     gsl_PRINT_BOOLEAN( gsl_CPP20_OR_GREATER );
 }
 
+CASE( "gsl_STDLIB_CPP11_OR_GREATER" "[.stdc++]" )
+{
+    gsl_PRINT_BOOLEAN( gsl_STDLIB_CPP11_OR_GREATER );
+}
+
+CASE( "gsl_STDLIB_CPP14_OR_GREATER" "[.stdc++]" )
+{
+    gsl_PRINT_BOOLEAN( gsl_STDLIB_CPP14_OR_GREATER );
+}
+
+CASE( "gsl_STDLIB_CPP17_OR_GREATER" "[.stdc++]" )
+{
+    gsl_PRINT_BOOLEAN( gsl_STDLIB_CPP17_OR_GREATER );
+}
+
+CASE( "gsl_STDLIB_CPP20_OR_GREATER" "[.stdc++]" )
+{
+    gsl_PRINT_BOOLEAN( gsl_STDLIB_CPP20_OR_GREATER );
+}
+
 CASE( "Presence of C++ language features" "[.stdlanguage]" )
 {
     gsl_PRINT_BOOLEAN( gsl_HAVE( ALIAS_TEMPLATE ) );
@@ -117,8 +137,10 @@ CASE( "Presence of C++ library features" "[.stdlibrary]" )
     gsl_PRINT_BOOLEAN( gsl_HAVE( ARRAY ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( CONTAINER_DATA_METHOD ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( INTEGRAL_CONSTANT ) );
+    gsl_PRINT_BOOLEAN( gsl_HAVE( HASH ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( MAKE_SHARED ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( MAKE_UNIQUE ) );
+    gsl_PRINT_BOOLEAN( gsl_HAVE( MOVE_FORWARD ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( REMOVE_CONST ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( REMOVE_CVREF ) );
     gsl_PRINT_BOOLEAN( gsl_HAVE( REMOVE_REFERENCE ) );
