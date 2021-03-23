@@ -4538,7 +4538,16 @@ typedef gsl_CONFIG_INDEX_TYPE stride;
 typedef gsl_CONFIG_INDEX_TYPE diff;
 
 # if gsl_HAVE( ALIAS_TEMPLATE )
+#  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 141 )  // VS 2015 and earlier have trouble with `using` for alias templates
+  template< class T
+#   if gsl_HAVE( TYPE_TRAITS )
+          , typename = typename std::enable_if< std::is_pointer<T>::value >::type
+#   endif
+  >
+  using owner = T;
+#  else
 using ::gsl::owner;
+#  endif
 # endif
 
 using ::gsl::fail_fast;
