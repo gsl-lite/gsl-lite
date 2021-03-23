@@ -459,6 +459,15 @@ CASE( "not_null<>: Terminates swap of a moved-from value (shared_ptr)" )
     EXPECT_THROWS( swap( p2, p1 ) );
 }
 
+CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >( 12 );
+    not_null< shared_ptr< int > > p1( pi );
+    not_null< shared_ptr< int > > p2( std::move( p1 ) );
+
+    EXPECT_NO_THROW( p1 = std::move( p1 ) );
+}
+
 CASE( "not_null<>: Terminates self-swap of a moved-from value (shared_ptr)" )
 {
     shared_ptr< int > pi = make_shared< int >( 12 );
@@ -759,6 +768,15 @@ CASE( "not_null<>: Terminates swap of a moved-from value (unique_ptr)" )
 
     EXPECT_THROWS( swap( p1, p2 ) );
     EXPECT_THROWS( swap( p2, p1 ) );
+}
+
+CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (unique_ptr)" )
+{
+    unique_ptr< int > pi = make_unique< int >( 12 );
+    not_null< unique_ptr< int > > p1( std::move( pi ) );
+    not_null< unique_ptr< int > > p2( std::move( p1 ) );
+
+    EXPECT_NO_THROW( p1 = std::move( p1 ) );
 }
 
 CASE( "not_null<>: Terminates self-swap of a moved-from value (unique_ptr)" )

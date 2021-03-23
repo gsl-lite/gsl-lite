@@ -2475,7 +2475,7 @@ public:
     }
     gsl_constexpr14 not_null & operator=( not_null && other ) gsl_noexcept
     {
-        gsl_Expects( other.data_.ptr_ != gsl_nullptr );
+        gsl_Expects( other.data_.ptr_ != gsl_nullptr || &other == this );
         data_ = std::move( other.data_ );
         return *this;
     }
