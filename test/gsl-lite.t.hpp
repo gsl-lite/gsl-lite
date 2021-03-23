@@ -63,8 +63,16 @@
 # endif // !__has_cpp_attribute(maybe_unused) || !gsl_CPP17_OR_GREATER
 #endif
 
-// GSL-Lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>
+// gsl-lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>.
 #include <ostream>
+
+// Some test cases use stringstreams and other iostream functionality.
+#include <sstream>
+#include <iostream>
+
+// Additional general requirements.
+#include <cstring>
+
 
 namespace lest {
 

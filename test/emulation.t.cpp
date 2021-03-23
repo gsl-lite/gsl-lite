@@ -15,6 +15,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
 #include "gsl-lite.t.hpp"
 
 using namespace gsl;
@@ -27,6 +28,66 @@ template <int> struct False : std::false_type { };
 struct Incomplete;
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( VARIADIC_TEMPLATE )
 
+
+CASE( "equal()" )
+{
+    char const* arg1 = "foo";
+    char const* arg2 = "fou";
+    EXPECT(   std98::equal( arg1, arg1 + std::strlen( arg1 ), arg1 ) );
+    EXPECT( ! std98::equal( arg1, arg1 + std::strlen( arg1 ), arg2 ) );
+    EXPECT( ! std98::equal( arg2, arg2 + std::strlen( arg2 ), arg1 ) );
+
+    std::istringstream sstr1a1( "foo" ), sstr1a2( "foo" ), sstr1b( "foo" ), sstr1c( "foo" );
+    std::istringstream sstr2b( "fou" ), sstr2c( "fou" );
+    EXPECT(   std98::equal( std::istreambuf_iterator<char>( sstr1a1 ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1a2 ) ) );
+    EXPECT( ! std98::equal( std::istreambuf_iterator<char>( sstr1b ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr2b ) ) );
+    EXPECT( ! std98::equal( std::istreambuf_iterator<char>( sstr2c ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1c ) ) );
+}
+
+template < typename T, std::size_t N >
+std::size_t arraySize( T (&)[N] )
+{
+    return N;
+}
+
+CASE( "lexicographical_compare()" )
+{
+    std::pair<char const*, char const*> less[] = {
+        std::make_pair("", "foo"),
+        std::make_pair("fa", "foo"),
+        std::make_pair("foe", "foo"),
+        std::make_pair("fond", "foo")
+    };
+    for ( std::size_t i = 0, n = arraySize( less ); i != n; ++i )
+    {
+        EXPECT( std98::lexicographical_compare( less[i].first, less[i].first + std::strlen( less[i].first ), less[i].second, less[i].second + std::strlen( less[i].second ) ));
+
+        std::istringstream sstr1( less[i].first );
+        std::istringstream sstr2( less[i].second );
+        std::istreambuf_iterator<char> it1( sstr1 ), it1End;
+        std::istreambuf_iterator<char> it2( sstr2 ), it2End;
+        EXPECT( std98::lexicographical_compare( it1, it1End, it2, it2End ));
+    }
+
+    std::pair<char const*, char const*> notLess[] = {
+        std::make_pair("g", "foo"),
+        std::make_pair("fu", "foo"),
+        std::make_pair("foo", "foo"),
+        std::make_pair("fou", "foo"),
+        std::make_pair("fool", "foo"),
+        std::make_pair("foul", "foo")
+    };
+    for ( std::size_t i = 0, n = arraySize( less ); i != n; ++i )
+    {
+        EXPECT( ! std98::lexicographical_compare( notLess[i].first, notLess[i].first + std::strlen( notLess[i].first ), notLess[i].second, notLess[i].second + std::strlen( notLess[i].second ) ));
+
+        std::istringstream sstr1( notLess[i].first );
+        std::istringstream sstr2( notLess[i].second );
+        std::istreambuf_iterator<char> it1( sstr1 ), it1End;
+        std::istreambuf_iterator<char> it2( sstr2 ), it2End;
+        EXPECT( ! std98::lexicographical_compare( it1, it1End, it2, it2End ));
+    }
+}
 
 CASE( "conjunction<> and disjunction<>: Short-circuiting is handled correctly" )
 {
