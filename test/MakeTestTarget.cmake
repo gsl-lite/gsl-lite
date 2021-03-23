@@ -194,7 +194,7 @@ function( make_test_target target )
         message( SEND_ERROR "make_test_target(): no argument specified for DEFAULTS_VERSION" )
     endif()
     if( NOT SCOPE_CONTRACT_VIOLATION )
-        set( SCOPE_CONTRACT_VIOLATION "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
+        set( SCOPE_CONTRACT_VIOLATION "THROWS" )
     endif()
 
     message( STATUS "Make target: '${target}'" )
