@@ -37,9 +37,9 @@ CASE( "equal()" )
     EXPECT( ! std98::equal( arg1, arg1 + std::strlen( arg1 ), arg2 ) );
     EXPECT( ! std98::equal( arg2, arg2 + std::strlen( arg2 ), arg1 ) );
 
-    std::istringstream sstr1a( "foo" ), sstr1b( "foo" ), sstr1c( "foo" );
+    std::istringstream sstr1a1( "foo" ), sstr1a2( "foo" ), sstr1b( "foo" ), sstr1c( "foo" );
     std::istringstream sstr2b( "fou" ), sstr2c( "fou" );
-    EXPECT(   std98::equal( std::istreambuf_iterator<char>( sstr1a ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1a ) ) );
+    EXPECT(   std98::equal( std::istreambuf_iterator<char>( sstr1a1 ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1a2 ) ) );
     EXPECT( ! std98::equal( std::istreambuf_iterator<char>( sstr1b ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr2b ) ) );
     EXPECT( ! std98::equal( std::istreambuf_iterator<char>( sstr2c ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1c ) ) );
 }
