@@ -70,6 +70,10 @@
 #include <sstream>
 #include <iostream>
 
+// Additional general requirements.
+#include <cstring>
+
+
 namespace lest {
 
 // These functions cannot be found via ADL, so we have to define them before including lest.

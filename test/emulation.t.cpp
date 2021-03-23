@@ -52,7 +52,7 @@ std::size_t arraySize( T (&)[N] )
 
 CASE( "lexicographical_compare()" )
 {
-    std::pair<char const*, char const*> less[] {
+    std::pair<char const*, char const*> less[] = {
         std::make_pair("", "foo"),
         std::make_pair("fa", "foo"),
         std::make_pair("foe", "foo"),
@@ -69,7 +69,7 @@ CASE( "lexicographical_compare()" )
         EXPECT( std98::lexicographical_compare( it1, it1End, it2, it2End ));
     }
 
-    std::pair<char const*, char const*> notLess[] {
+    std::pair<char const*, char const*> notLess[] = {
         std::make_pair("g", "foo"),
         std::make_pair("fu", "foo"),
         std::make_pair("foo", "foo"),
