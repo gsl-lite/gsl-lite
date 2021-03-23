@@ -448,6 +448,14 @@ CASE( "not_null<>: Allows dereferencing (raw pointer)" )
     EXPECT( *p == i );
 }
 
+#if gsl_HAVE( MOVE_FORWARD )
+template< class T >
+void move_to( T& dest, T& src )
+{
+    dest = std::move( src );
+}
+#endif // gsl_HAVE( MOVE_FORWARD )
+
 #if gsl_HAVE( SHARED_PTR )
 CASE( "not_null<>: Terminates swap of a moved-from value (shared_ptr)" )
 {
@@ -465,7 +473,7 @@ CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (shared_
     not_null< shared_ptr< int > > p1( pi );
     not_null< shared_ptr< int > > p2( std::move( p1 ) );
 
-    EXPECT_NO_THROW( p1 = std::move( p1 ) );
+    EXPECT_NO_THROW( move_to(p1, p1 ) );  // use extra indirection to suppress compiler warning about explicit self-move
 }
 
 CASE( "not_null<>: Terminates self-swap of a moved-from value (shared_ptr)" )
@@ -776,7 +784,7 @@ CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (unique_
     not_null< unique_ptr< int > > p1( std::move( pi ) );
     not_null< unique_ptr< int > > p2( std::move( p1 ) );
 
-    EXPECT_NO_THROW( p1 = std::move( p1 ) );
+    EXPECT_NO_THROW( move_to(p1, p1 ) );  // use extra indirection to suppress compiler warning about explicit self-move
 }
 
 CASE( "not_null<>: Terminates self-swap of a moved-from value (unique_ptr)" )
