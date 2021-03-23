@@ -403,6 +403,14 @@
 # define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
+#if defined( __ARMCC_VERSION )
+# define gsl_COMPILER_ARMCC_VERSION       ( __ARMCC_VERSION / 10000 )
+# define gsl_COMPILER_ARMCC_VERSION_FULL  __ARMCC_VERSION
+#else
+# define gsl_COMPILER_ARMCC_VERSION       0
+# define gsl_COMPILER_ARMCC_VERSION_FULL  0
+#endif
+
 // Compiler non-strict aliasing:
 
 #if defined(__clang__) || defined(__GNUC__)
@@ -569,11 +577,20 @@
 
 // Presence of C++ library features:
 
-#define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
-#define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
-#define gsl_STDLIB_CPP14_OR_GREATER  gsl_CPP14_OR_GREATER
-#define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
-#define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
+#if gsl_BETWEEN( gsl_COMPILER_ARMCC_VERSION, 1, 600 )
+// Some versions of the ARM compiler apparently ship without a C++11 standard library despite having some C++11 support.
+# define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
+# define gsl_STDLIB_CPP11_OR_GREATER  0
+# define gsl_STDLIB_CPP14_OR_GREATER  0
+# define gsl_STDLIB_CPP17_OR_GREATER  0
+# define gsl_STDLIB_CPP20_OR_GREATER  0
+#else
+# define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
+# define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
+# define gsl_STDLIB_CPP14_OR_GREATER  gsl_CPP14_OR_GREATER
+# define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
+# define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
+#endif
 
 #define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
 #define gsl_STDLIB_CPP11_110  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1700)
