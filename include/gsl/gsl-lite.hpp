@@ -1486,7 +1486,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 #  define  gsl_CONTRACT_CHECK_( str, x )  assert( ( x ) && str )
 #elif   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str " at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( "GSL: " str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
 #endif
