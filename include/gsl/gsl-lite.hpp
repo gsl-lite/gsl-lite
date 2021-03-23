@@ -1622,10 +1622,10 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  if __has_builtin(__builtin_trap)
 #   define gsl_TRAP_()  __builtin_trap()
 #  else
-#   error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: don't know how to generate a trap instruction for this compiler. Use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead.
+#   error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
 #  endif
 # else
-#  error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: don't know how to generate a trap instruction for this compiler. Use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead.
+#  error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
 # endif
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 
