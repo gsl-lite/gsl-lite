@@ -521,6 +521,7 @@
 #define gsl_HAVE_NOEXCEPT                  gsl_CPP11_140
 #define gsl_HAVE_NORETURN                  ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 480 ) )
 #define gsl_HAVE_EXPRESSION_SFINAE         gsl_CPP11_140
+#define gsl_HAVE_OVERRIDE_FINAL            gsl_CPP11_110
 
 #define gsl_HAVE_AUTO_()                   gsl_HAVE_AUTO
 #define gsl_HAVE_RVALUE_REFERENCE_()       gsl_HAVE_RVALUE_REFERENCE
@@ -536,6 +537,7 @@
 #define gsl_HAVE_NOEXCEPT_()               gsl_HAVE_NOEXCEPT
 #define gsl_HAVE_NORETURN_()               gsl_HAVE_NORETURN
 #define gsl_HAVE_EXPRESSION_SFINAE_()      gsl_HAVE_EXPRESSION_SFINAE
+#define gsl_HAVE_OVERRIDE_FINAL_()         gsl_HAVE_OVERRIDE_FINAL
 
 // Presence of C++14 language features:
 
@@ -1891,7 +1893,16 @@ narrow_cast( U u ) gsl_noexcept
 
 #endif // gsl_STDLIB_CPP11_120
 
-struct narrowing_error : public std::exception {};
+struct narrowing_error : public std::exception
+{
+    char const * what() const gsl_noexcept
+#if gsl_HAVE( OVERRIDE_FINAL )
+    override
+#endif
+    {
+        return "narrowing_error";
+    }
+};
 
 #if gsl_HAVE( TYPE_TRAITS )
 
