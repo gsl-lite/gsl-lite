@@ -35,9 +35,11 @@ void test_not_null_for_null()
 {
     int i = 0;
     gsl::not_null<int*> const pi(&i);
-    std::ignore = pi == nullptr; // expect C26431 (not generated for gsl-lite)
+    std::ignore = pi;
+    //std::ignore = pi == nullptr; // expect C26431 (does not compile for gsl-lite)
     gsl_lite::not_null<int*> const pi2(&i);
-    std::ignore = pi2 == nullptr; // expect C26431 (not generated for gsl-lite)
+    std::ignore = pi2;
+    //std::ignore = pi2 == nullptr; // expect C26431 (does not compile for gsl-lite)
 }
 
 int dereference(int const* pi) noexcept // expect C26429

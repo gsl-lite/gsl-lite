@@ -2653,6 +2653,21 @@ not_null<T> operator+( std::ptrdiff_t, not_null<T> const & ) gsl_is_delete;
 
 // not_null comparisons
 
+#if gsl_HAVE( NULLPTR ) && gsl_HAVE( IS_DELETE )
+template< class T >
+gsl_constexpr bool
+operator==( not_null<T> const &, std::nullptr_t ) = delete;
+template< class T >
+gsl_constexpr bool
+operator==( std::nullptr_t , not_null<T> const & ) = delete;
+template< class T >
+gsl_constexpr bool
+operator!=( not_null<T> const &, std::nullptr_t ) = delete;
+template< class T >
+gsl_constexpr bool
+operator!=( std::nullptr_t , not_null<T> const & ) = delete;
+#endif // gsl_HAVE( NULLPTR ) && gsl_HAVE( IS_DELETE )
+
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
 operator==( not_null<T> const & l, not_null<U> const & r )
