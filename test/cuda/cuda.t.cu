@@ -28,7 +28,6 @@ __global__ void preconditionAssertionKernel( int i, int j )
     gsl_EnsuresAudit( i < j );
     gsl_Assert( i >= 0 );
     gsl_AssertAudit( i < j );
-    gsl_FailFast( );
 }
 
 CASE( "CUDA: Precondition/postcondition checks and assertions can be used in kernel code" )
