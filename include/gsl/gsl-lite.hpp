@@ -19,7 +19,6 @@
 #define GSL_GSL_LITE_HPP_INCLUDED
 
 #include <exception> // for exception, terminate(), uncaught_exceptions()
-#include <iterator>  // for data(), size(), reverse_iterator<>, iterator_traits<>
 #include <limits>
 #include <memory>    // for addressof(), unique_ptr<>, shared_ptr<>
 #include <iosfwd>    // for basic_ostream<>
@@ -901,7 +900,11 @@
 #endif // ! gsl_CPP11_OR_GREATER
 
 #if gsl_HAVE( ARRAY )
-# include <array>
+# include <array> // indirectly includes reverse_iterator<>
+#endif
+
+#if ! gsl_HAVE( ARRAY )
+# include <iterator> // for reverse_iterator<>
 #endif
 
 #if !gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || !gsl_HAVE( AUTO )
@@ -1185,12 +1188,7 @@ using void_t = typename make_void< Ts... >::type;
 
 #endif // gsl_CPP11_120
 
-#if gsl_HAVE( STD_DATA )
-
-using std::data;
-using std::size;
-
-#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
 template< class T, size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr auto
@@ -1234,7 +1232,7 @@ data( std::initializer_list<E> il ) gsl_noexcept -> E const *
     return il.begin();
 }
 
-#endif // span_HAVE( DATA )
+#endif // gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
 } // namespace std17
 
@@ -2964,7 +2962,7 @@ public:
     typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
 
     typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
-    typedef typename std::iterator_traits< iterator >::difference_type difference_type;
+    typedef std::ptrdiff_t difference_type;
 
     // 26.7.3.2 Constructors, copy, and assignment [span.cons]
 
