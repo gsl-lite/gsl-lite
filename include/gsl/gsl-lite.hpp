@@ -1032,10 +1032,8 @@
 # include <cassert>
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
-# if gsl_COMPILER_MSVC_VERSION
-#  include <intrin.h>
-# endif
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 110 ) // __fastfail() supported by VS 2012 and later
+# include <intrin.h>
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
@@ -1614,8 +1612,8 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 #  define  gsl_TRAP_()  __trap()
-# elif gsl_COMPILER_MSVC_VERSION
-#  define  gsl_TRAP_()  __fastfail( 0 )  // legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes"
+# elif gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 110 ) // __fastfail() supported by VS 2012 and later
+#  define  gsl_TRAP_()  __fastfail( 0 ) /* legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes" */
 # elif gsl_COMPILER_GNUC_VERSION
 #  define  gsl_TRAP_()  __builtin_trap()
 # elif defined(__has_builtin)
