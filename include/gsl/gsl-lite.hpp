@@ -1032,7 +1032,7 @@
 # include <cassert>
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 110 ) // __fastfail() supported by VS 2012 and later
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
 # include <intrin.h>
 #endif
 
@@ -1099,8 +1099,9 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 // - C26446: gdl::b.4  : prefer to use gsl::at() instead of unchecked subscript operator
 // - C26490: gsl::t.1  : don't use reinterpret_cast
 // - C26487: gsl::l.4  : don't return a pointer '(<some number>'s result)' that may be invalid
+// - C26457: es.48     : (void) should not be used to ignore return values, use 'std::ignore =' instead
 
-gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473 26481 26482 26446 26490 26487 )
+gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473 26481 26482 26446 26490 26487 26457 )
 
 namespace gsl {
 
@@ -1612,7 +1613,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 #  define  gsl_TRAP_()  __trap()
-# elif gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 110 ) // __fastfail() supported by VS 2012 and later
+# elif gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
 #  define  gsl_TRAP_()  __fastfail( 0 ) /* legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes" */
 # elif gsl_COMPILER_GNUC_VERSION
 #  define  gsl_TRAP_()  __builtin_trap()

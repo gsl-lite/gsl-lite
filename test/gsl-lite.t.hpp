@@ -35,6 +35,18 @@
 # include "gsl/gsl-lite.hpp"
 #endif
 
+
+// gsl-lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>.
+#include <ostream>
+
+// Some test cases use stringstreams and other iostream functionality.
+#include <sstream>
+#include <iostream>
+
+// Additional general requirements.
+#include <cstring>
+
+
 // Limit C++ Core Guidelines checking to GSL Lite:
 
 #ifdef gsl_TESTING_CPPCORECHECK_
@@ -66,16 +78,6 @@
 #  pragma warning( disable : 4100 ) // unreferenced formal parameter
 # endif // !__has_cpp_attribute(maybe_unused) || !gsl_CPP17_OR_GREATER
 #endif
-
-// gsl-lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>.
-#include <ostream>
-
-// Some test cases use stringstreams and other iostream functionality.
-#include <sstream>
-#include <iostream>
-
-// Additional general requirements.
-#include <cstring>
 
 
 namespace lest {
