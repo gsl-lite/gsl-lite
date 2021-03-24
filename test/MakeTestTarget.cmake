@@ -174,7 +174,7 @@ endfunction()
 
 function( make_test_target target )
 
-    set( optionArgs CUDA NO_EXCEPTIONS )
+    set( optionArgs CUDA NO_EXCEPTIONS COMPILE_ONLY NO_PCH )
     set( oneValueArgs STD DEFAULTS_VERSION )
     set( multiValueArgs SOURCES EXTRA_OPTIONS )
     cmake_parse_arguments( PARSE_ARGV 1 "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" )
@@ -260,12 +260,13 @@ function( make_test_target target )
     target_compile_definitions( ${target} PRIVATE ${localDefinitions} )
     target_link_libraries( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
 
-    if( NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
+    if( NOT SCOPE_NO_PCH
+            AND NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
         target_precompile_headers( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
     endif()
 
-    if( NOT SCOPE_NO_EXCEPTIONS )
+    if( NOT SCOPE_NO_EXCEPTIONS AND NOT SCOPE_COMPILE_ONLY )
         # We only add tests for targets with exceptions enabled. lest has been modified to permit compilation without exceptions
         # so we can test compiling gsl-lite without exceptions, but the no-exception tests will not run correctly because lest
         # relies on exceptions for running tests and therefore cannot function correctly without.

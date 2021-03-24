@@ -39,6 +39,7 @@ jobs:
       cxxCompilerVersions: [VS2017, VS2019]
       cmakeGenerator: 'MSBuild' # required for CppCoreCheck
       platforms: [x86, x64]
+      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
 
     - os: Windows
       cxxCompiler: Clang

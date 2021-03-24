@@ -56,17 +56,17 @@ endfunction()
 # Add test targets for version-0 and version-1 defaults:
 
 set( SOURCES
-    gsl-lite.t.cpp
-    assert.t.cpp
-    at.t.cpp
-    byte.t.cpp
-    emulation.t.cpp
-    issue.t.cpp
-    not_null.t.cpp
-    owner.t.cpp
-    span.t.cpp
-    string_span.t.cpp
-    util.t.cpp
+    "gsl-lite.t.cpp"
+    "assert.t.cpp"
+    "at.t.cpp"
+    "byte.t.cpp"
+    "emulation.t.cpp"
+    "issue.t.cpp"
+    "not_null.t.cpp"
+    "owner.t.cpp"
+    "span.t.cpp"
+    "string_span.t.cpp"
+    "util.t.cpp"
 )
 make_test_targets( "${PROGRAM}-v0" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v0 )
 make_test_targets( "${PROGRAM}-v1" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 )
@@ -80,8 +80,8 @@ make_test_targets( "${PROGRAM}-v1-no-exc" 99 SOURCES ${SOURCES} DEFAULTS_VERSION
 # Add test targets for special configurations:
 
 set( SPECIAL_SOURCES
-    gsl-lite.t.cpp
-    not_null.t.cpp
+    "gsl-lite.t.cpp"
+    "not_null.t.cpp"
 )
 set( SPECIAL_OPTIONS
     "-Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1"
@@ -89,5 +89,10 @@ set( SPECIAL_OPTIONS
 )
 make_test_targets( "${PROGRAM}-v1-special" 11 SOURCES ${SPECIAL_SOURCES} EXTRA_OPTIONS ${SPECIAL_OPTIONS} DEFAULTS_VERSION v1 )
 
+
+if( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS AND MSVC AND CMAKE_GENERATOR MATCHES "Visual Studio" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.2 )
+    make_test_target( "${PROGRAM}-v1-cpplatest-CppCoreCheck" STD latest SOURCES "core_check.t.cpp" DEFAULTS_VERSION v1 COMPILE_ONLY NO_PCH )
+    enable_msvs_guideline_checker( "${PROGRAM}-v1-cpplatest-CppCoreCheck" )
+endif()
 
 # end of file

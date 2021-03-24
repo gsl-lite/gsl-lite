@@ -32,6 +32,7 @@ message( STATUS "Project '${PROJECT_NAME}', package '${package_name}' version: '
 option( GSL_LITE_OPT_BUILD_TESTS             "Build and perform gsl-lite tests" OFF )
 option( GSL_LITE_OPT_BUILD_CUDA_TESTS        "Build and perform gsl-lite CUDA tests" OFF )
 option( GSL_LITE_OPT_BUILD_EXAMPLES          "Build gsl-lite examples" OFF )
+option( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS "Build and perform gsl-lite static analysis demos" OFF )
 option( CMAKE_EXPORT_PACKAGE_REGISTRY        "Export build directory to CMake user package registry" OFF )
 option( GSL_LITE_OPT_INSTALL_COMPAT_HEADER   "Install MS-GSL compatibility header <gsl/gsl>" OFF )
 option( GSL_LITE_OPT_INSTALL_LEGACY_HEADERS  "Install legacy headers <gsl.h>, <gsl.hpp>, <gsl/gsl-lite.h>" OFF )
