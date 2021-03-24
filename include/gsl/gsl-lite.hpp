@@ -1895,7 +1895,10 @@ narrow_cast( U u ) gsl_noexcept
 
 struct narrowing_error : public std::exception
 {
-    char const * what() const gsl_noexcept
+    char const * what() const
+#if gsl_HAVE( NOEXCEPT )
+    noexcept
+#endif
 #if gsl_HAVE( OVERRIDE_FINAL )
     override
 #endif
