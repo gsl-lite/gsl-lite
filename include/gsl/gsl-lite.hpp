@@ -1898,6 +1898,8 @@ struct narrowing_error : public std::exception
     char const * what() const
 #if gsl_HAVE( NOEXCEPT )
     noexcept
+#else
+    throw()
 #endif
 #if gsl_HAVE( OVERRIDE_FINAL )
     override
