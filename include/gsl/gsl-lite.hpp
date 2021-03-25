@@ -860,9 +860,11 @@
 // Method enabling (C++98, VC120 (VS2013) cannot use __VA_ARGS__)
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
-# define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
+# define gsl_TRAILING_RETURN_TYPE_(T)  auto
+# define gsl_DECLTYPE_(EXPR)           -> decltype( EXPR )
 #else
-# define gsl_DECLTYPE_(T, EXPR) T
+# define gsl_TRAILING_RETURN_TYPE_(T)  T
+# define gsl_DECLTYPE_(EXPR)
 #endif
 
 // NOTE: When using SFINAE in gsl-lite, please note that overloads of function templates must always use SFINAE with non-type default arguments
@@ -1338,12 +1340,12 @@ struct is_span : is_span_oracle< typename std::remove_cv<Q>::type >{};
 template< class Q >
 struct is_std_array_oracle : std::false_type{};
 
-#if gsl_HAVE( ARRAY )
+# if gsl_HAVE( ARRAY )
 
 template< class T, std::size_t Extent >
 struct is_std_array_oracle< std::array<T, Extent> > : std::true_type{};
 
-#endif
+# endif
 
 template< class Q >
 struct is_std_array : is_std_array_oracle< typename std::remove_cv<Q>::type >{};
@@ -2673,115 +2675,133 @@ not_null<T> operator+( std::ptrdiff_t, not_null<T> const & ) gsl_is_delete;
 // not_null comparisons
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, not_null<U> const & r )
+gsl_DECLTYPE_( l.operator->() == r.operator->() )
 {
     return l.operator->() == r.operator->();
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, U const & r )
+gsl_DECLTYPE_(l.operator->() == r )
 {
     return l.operator->() == r;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( T const & l, not_null<U> const & r )
+gsl_DECLTYPE_( l == r.operator->() )
 {
     return l == r.operator->();
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
+gsl_DECLTYPE_( l.operator->() < r.operator->() )
 {
     return l.operator->() < r.operator->();
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, U const & r )
+gsl_DECLTYPE_( l.operator->() < r )
 {
     return l.operator->() < r;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( T const & l, not_null<U> const & r )
+gsl_DECLTYPE_( l < r.operator->() )
 {
     return l < r.operator->();
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, not_null<U> const & r )
+gsl_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, U const & r )
+gsl_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( T const & l, not_null<U> const & r )
+gsl_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, not_null<U> const & r )
+gsl_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, U const & r )
+gsl_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( T const & l, not_null<U> const & r )
+gsl_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, not_null<U> const & r )
+gsl_DECLTYPE_( r < l )
 {
     return r < l;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, U const & r )
+gsl_DECLTYPE_( r < l )
 {
     return r < l;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( T const & l, not_null<U> const & r )
+gsl_DECLTYPE_( r < l )
 {
     return r < l;
 }
 
 template< class T, class U >
-gsl_NODISCARD  gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+gsl_NODISCARD  gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, not_null<U> const & r )
+gsl_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, U const & r )
+gsl_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( T const & l, not_null<U> const & r )
+gsl_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
@@ -4654,6 +4674,7 @@ gsl_RESTORE_MSVC_WARNINGS()
 // #undef internal macros
 #undef gsl_STATIC_ASSERT_
 #undef gsl_ENABLE_IF_
+#undef gsl_TRAILING_RETURN_TYPE_
 #undef gsl_DECLTYPE_
 
 #endif // GSL_GSL_LITE_HPP_INCLUDED
