@@ -223,7 +223,7 @@ function( make_test_target target )
         endif()
         if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
             list( APPEND localOptions "-Wno-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
-        elif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" )
+        elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" )
             list( APPEND localOptions "-Wnoc++11-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
         endif()
     endif()
