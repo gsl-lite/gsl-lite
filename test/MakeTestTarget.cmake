@@ -226,7 +226,7 @@ function( make_test_target target )
             if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8 )
                 list( APPEND localOptions "-Wno-error=type-limits" ) # irrelevant warning about `unsigned value < 0` comparison
             endif()
-        elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.0 )
+        elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" )
             list( APPEND localOptions "-Wno-c++11-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
         endif()
     endif()
