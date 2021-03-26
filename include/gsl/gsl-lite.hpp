@@ -704,9 +704,11 @@
 #endif
 
 #if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
-# define gsl_noexcept /*noexcept*/
+# define gsl_noexcept           /*noexcept*/
+# define gsl_noexcept_iff(expr) /*noexcept(noexcept(expr))*/
 #else
-# define gsl_noexcept noexcept
+# define gsl_noexcept           noexcept
+# define gsl_noexcept_iff(expr) noexcept(noexcept(expr))
 #endif
 
 #if gsl_HAVE( NULLPTR )
@@ -4529,7 +4531,52 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 
 #if gsl_HAVE( HASH )
 
+//
+// std::hash specializations for GSL types
+//
+
+namespace gsl {
+
+namespace detail {
+
+//
+// Helper struct for std::hash specializations
+//
+
+template<bool Condition>
+struct conditionally_enabled_hash
+{
+
+};
+
+// disabled as described in [unord.hash]
+template<>
+struct conditionally_enabled_hash< false >
+{
+gsl_is_delete_access:
+    conditionally_enabled_hash() gsl_is_delete;
+    conditionally_enabled_hash( conditionally_enabled_hash const & ) gsl_is_delete;
+    conditionally_enabled_hash( conditionally_enabled_hash && ) gsl_is_delete;
+    conditionally_enabled_hash & operator=( conditionally_enabled_hash const & ) gsl_is_delete;
+    conditionally_enabled_hash & operator=( conditionally_enabled_hash && ) gsl_is_delete;
+};
+
+} // namespace detail
+
+} // namespace gsl
+
 namespace std {
+
+template<typename T>
+struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash< is_default_constructible< hash< T > >::value >
+{
+public:
+    gsl_NODISCARD gsl_constexpr std::size_t
+    operator()( const ::gsl::not_null< T >& v ) const gsl_noexcept_iff( hash<T>()( declval<T>() ) )
+    {
+        return hash<T>()( ::gsl::as_nullable( v ) );
+    }
+};
 
 template<>
 struct hash< ::gsl::byte >

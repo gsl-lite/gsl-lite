@@ -1481,4 +1481,31 @@ CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers ev
 #endif
 }
 
+#if gsl_HAVE( HASH )
+
+CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
+{
+    int i = 42;
+    gsl::not_null< const int* > raw_pointer = gsl::make_not_null( &i );
+    EXPECT( std::hash< gsl::not_null< const int* > >()(raw_pointer) == std::hash< const int* >()( gsl::as_nullable( raw_pointer ) ) );
+    gsl::not_null< std::unique_ptr< int > > unique_pointer = gsl::make_not_null( std::make_unique< int >(43) );
+    EXPECT( std::hash< gsl::not_null< std::unique_ptr< int > > >()(unique_pointer) == std::hash< std::unique_ptr< int > >()( gsl::as_nullable( unique_pointer) ) );
+    gsl::not_null< std::shared_ptr< int > > shared_pointer = gsl::make_not_null( std::make_shared< int >(43) );
+    EXPECT( std::hash< gsl::not_null< std::shared_ptr< int > > >()(shared_pointer) == std::hash< std::shared_ptr< int > >()( gsl::as_nullable( shared_pointer) ) );
+}
+
+CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers" )
+{
+    EXPECT(( std::is_default_constructible< std::hash< gsl::not_null< int* > > >::value ));
+    EXPECT(( std::is_default_constructible< std::hash< gsl::not_null< std::unique_ptr< int > > > >::value ));
+    EXPECT(( std::is_default_constructible< std::hash< gsl::not_null< std::shared_ptr< int > > > >::value ));
+#if gsl_CPP11_140
+    // doesn't even compile in VS 2013, but at least the error message is somewhat descriptive:
+    //     error C2338: The C++ Standard doesn't provide a hash for this type.
+    EXPECT_NOT(( std::is_default_constructible< std::hash< gsl::not_null< NormalPtr< int > > > >::value ));
+#endif
+}
+
+#endif // gsl_HAVE( HASH )
+
 // end of file
