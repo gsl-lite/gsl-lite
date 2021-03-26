@@ -382,7 +382,7 @@
 // AppleClang 10.0.1  __apple_build_version__ == 10010046  gsl_COMPILER_APPLECLANG_VERSION == 1001  (Xcode 10.2, 10.2.1, 10.3)       (LLVM  7.0.0)
 // AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3, 11.3.1) (LLVM  8.0.0)
 // AppleClang 11.0.3  __apple_build_version__ == 11030032  gsl_COMPILER_APPLECLANG_VERSION == 1103  (Xcode 11.4, 11.4.1, 11.5, 11.6) (LLVM  9.0.0)
-// AppleClang 12.0.0  __apple_build_version__ == 12000032  gsl_COMPILER_APPLECLANG_VERSION == 1200  (Xcode 12.0–12.4)                (LLVM 10.0.0)
+// AppleClang 12.0.0  __apple_build_version__ == 12000032  gsl_COMPILER_APPLECLANG_VERSION == 1200  (Xcode 12.0â€“12.4)                (LLVM 10.0.0)
 // AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 10.0.0)
 
 #if defined( __apple_build_version__ )
@@ -721,9 +721,11 @@
 #endif
 
 #if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
-# define gsl_noexcept /*noexcept*/
+# define gsl_noexcept            /*noexcept*/
+# define gsl_noexcept_if( expr ) /*noexcept( expr )*/
 #else
-# define gsl_noexcept noexcept
+# define gsl_noexcept            noexcept
+# define gsl_noexcept_if( expr ) noexcept( expr )
 #endif
 
 #if gsl_HAVE( NULLPTR )
@@ -4566,7 +4568,52 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 
 #if gsl_HAVE( HASH )
 
+//
+// std::hash specializations for GSL types
+//
+
+namespace gsl {
+
+namespace detail {
+
+//
+// Helper struct for std::hash specializations
+//
+
+template<bool Condition>
+struct conditionally_enabled_hash
+{
+
+};
+
+// disabled as described in [unord.hash]
+template<>
+struct conditionally_enabled_hash< false >
+{
+gsl_is_delete_access:
+    conditionally_enabled_hash() gsl_is_delete;
+    conditionally_enabled_hash( conditionally_enabled_hash const & ) gsl_is_delete;
+    conditionally_enabled_hash( conditionally_enabled_hash && ) gsl_is_delete;
+    conditionally_enabled_hash & operator=( conditionally_enabled_hash const & ) gsl_is_delete;
+    conditionally_enabled_hash & operator=( conditionally_enabled_hash && ) gsl_is_delete;
+};
+
+} // namespace detail
+
+} // namespace gsl
+
 namespace std {
+
+template<typename T>
+struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash< is_default_constructible< hash< T > >::value >
+{
+public:
+    gsl_NODISCARD gsl_constexpr std::size_t
+    operator()( const ::gsl::not_null< T >& v ) const gsl_noexcept_if(gsl_noexcept( hash<T>()(declval<T>() ) ) )
+    {
+        return hash<T>()( ::gsl::as_nullable( v ) );
+    }
+};
 
 template<>
 struct hash< ::gsl::byte >

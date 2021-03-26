@@ -1481,4 +1481,30 @@ CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers ev
 #endif
 }
 
+#if gsl_HAVE( HASH )
+
+CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
+{
+    int i = 42;
+    not_null< const int* > raw_pointer = make_not_null( &i );
+    EXPECT( std::hash< not_null< const int* > >()(raw_pointer) == std::hash< const int* >()( as_nullable( raw_pointer ) ) );
+    not_null< std::unique_ptr< int > > unique_pointer = make_not_null( make_unique< int >(43) );
+    EXPECT( std::hash< not_null< std::unique_ptr< int > > >()(unique_pointer) == std::hash< std::unique_ptr< int > >()( as_nullable( unique_pointer) ) );
+    not_null< std::shared_ptr< int > > shared_pointer = make_not_null( make_shared< int >(43) );
+    EXPECT( std::hash< not_null< std::shared_ptr< int > > >()(shared_pointer) == std::hash< std::shared_ptr< int > >()( as_nullable( shared_pointer) ) );
+}
+
+CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers" )
+{
+    EXPECT(( std::is_default_constructible< std::hash< not_null< int* > > >::value ));
+    EXPECT(( std::is_default_constructible< std::hash< not_null< std::unique_ptr< int > > > >::value ));
+    EXPECT(( std::is_default_constructible< std::hash< not_null< std::shared_ptr< int > > > >::value ));
+#if gsl_STDLIB_CPP14_OR_GREATER && ! gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 141)
+    // std::hash< NormalPtr< int > > isn't guaranteed to exist at all in C++11
+    EXPECT_NOT(( std::is_default_constructible< std::hash< not_null< NormalPtr< int > > > >::value ));
+#endif
+}
+
+#endif // gsl_HAVE( HASH )
+
 // end of file
