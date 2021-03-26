@@ -402,6 +402,14 @@
 # define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
+#if defined( __ARMCC_VERSION )
+# define gsl_COMPILER_ARMCC_VERSION       ( __ARMCC_VERSION / 10000 )
+# define gsl_COMPILER_ARMCC_VERSION_FULL  __ARMCC_VERSION
+#else
+# define gsl_COMPILER_ARMCC_VERSION       0
+# define gsl_COMPILER_ARMCC_VERSION_FULL  0
+#endif
+
 // Compiler non-strict aliasing:
 
 #if defined(__clang__) || defined(__GNUC__)
@@ -570,11 +578,20 @@
 
 // Presence of C++ library features:
 
-#define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
-#define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
-#define gsl_STDLIB_CPP14_OR_GREATER  gsl_CPP14_OR_GREATER
-#define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
-#define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
+#if gsl_BETWEEN( gsl_COMPILER_ARMCC_VERSION, 1, 600 )
+// Some versions of the ARM compiler apparently ship without a C++11 standard library despite having some C++11 support.
+# define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
+# define gsl_STDLIB_CPP11_OR_GREATER  0
+# define gsl_STDLIB_CPP14_OR_GREATER  0
+# define gsl_STDLIB_CPP17_OR_GREATER  0
+# define gsl_STDLIB_CPP20_OR_GREATER  0
+#else
+# define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
+# define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
+# define gsl_STDLIB_CPP14_OR_GREATER  gsl_CPP14_OR_GREATER
+# define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
+# define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
+#endif
 
 #define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
 #define gsl_STDLIB_CPP11_110  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1700)
@@ -844,9 +861,11 @@
 // Method enabling (C++98, VC120 (VS2013) cannot use __VA_ARGS__)
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
-# define gsl_DECLTYPE_(T, EXPR) decltype( EXPR )
+# define gsl_TRAILING_RETURN_TYPE_(T)  auto
+# define gsl_RETURN_DECLTYPE_(EXPR)    -> decltype( EXPR )
 #else
-# define gsl_DECLTYPE_(T, EXPR) T
+# define gsl_TRAILING_RETURN_TYPE_(T)  T
+# define gsl_RETURN_DECLTYPE_(EXPR)
 #endif
 
 // NOTE: When using SFINAE in gsl-lite, please note that overloads of function templates must always use SFINAE with non-type default arguments
@@ -1321,12 +1340,12 @@ struct is_span : is_span_oracle< typename std::remove_cv<Q>::type >{};
 template< class Q >
 struct is_std_array_oracle : std::false_type{};
 
-#if gsl_HAVE( ARRAY )
+# if gsl_HAVE( ARRAY )
 
 template< class T, std::size_t Extent >
 struct is_std_array_oracle< std::array<T, Extent> > : std::true_type{};
 
-#endif
+# endif
 
 template< class Q >
 struct is_std_array : is_std_array_oracle< typename std::remove_cv<Q>::type >{};
@@ -1651,7 +1670,7 @@ public:
     }
 
 gsl_is_delete_access:
-    final_action( final_action const  & ) gsl_is_delete;
+    final_action( final_action const & ) gsl_is_delete;
     final_action & operator=( final_action const & ) gsl_is_delete;
     final_action & operator=( final_action && ) gsl_is_delete;
 
@@ -2139,8 +2158,8 @@ struct not_null_data< T, false >
     }
 
 gsl_is_delete_access:
-    not_null_data( not_null_data const & other ) gsl_is_delete;
-    not_null_data & operator=( not_null_data const & other ) gsl_is_delete;
+    not_null_data( not_null_data const & ) gsl_is_delete;
+    not_null_data & operator=( not_null_data const & ) gsl_is_delete;
 };
 #endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
@@ -2496,8 +2515,8 @@ public:
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_constexpr14 not_null( not_null const & other ) = default;
-    gsl_constexpr14 not_null & operator=( not_null const & other ) = default;
+    gsl_constexpr14 not_null( not_null const & ) = default;
+    gsl_constexpr14 not_null & operator=( not_null const & ) = default;
 #endif
 
     gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
@@ -2685,115 +2704,133 @@ operator!=( std::nullptr_t , not_null<T> const & ) = delete;
 #endif // gsl_HAVE( NULLPTR ) && gsl_HAVE( IS_DELETE )
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( l.operator->() == r.operator->() )
 {
     return l.operator->() == r.operator->();
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, U const & r )
+gsl_RETURN_DECLTYPE_(l.operator->() == r )
 {
     return l.operator->() == r;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() == std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( T const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( l == r.operator->() )
 {
     return l == r.operator->();
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( l.operator->() < r.operator->() )
 {
     return l.operator->() < r.operator->();
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, U const & r )
+gsl_RETURN_DECLTYPE_( l.operator->() < r )
 {
     return l.operator->() < r;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<T const>() < std::declval<U const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( T const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( l < r.operator->() )
 {
     return l < r.operator->();
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, U const & r )
+gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() == std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( T const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, U const & r )
+gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<U const>() < std::declval<T const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( T const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( r < l )
 {
     return r < l;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, U const & r )
+gsl_RETURN_DECLTYPE_( r < l )
 {
     return r < l;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, std::declval<U const>() < std::declval<T const>() )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( T const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( r < l )
 {
     return r < l;
 }
 
 template< class T, class U >
-gsl_NODISCARD  gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+gsl_NODISCARD  gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, U const & r )
+gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_DECLTYPE_( bool, !( std::declval<T const>() < std::declval<U const>() ) )
+gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( T const & l, not_null<U> const & r )
+gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
@@ -3883,13 +3920,13 @@ public:
 
 #if gsl_HAVE( IS_DEFAULT )
 # if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
-    gsl_constexpr basic_string_span( basic_string_span const & rhs ) = default;
+    gsl_constexpr basic_string_span( basic_string_span const & ) = default;
 
-    gsl_constexpr basic_string_span( basic_string_span && rhs ) = default;
+    gsl_constexpr basic_string_span( basic_string_span && ) = default;
 # else
-    gsl_constexpr basic_string_span( basic_string_span const & rhs ) gsl_noexcept = default;
+    gsl_constexpr basic_string_span( basic_string_span const & ) gsl_noexcept = default;
 
-    gsl_constexpr basic_string_span( basic_string_span && rhs ) gsl_noexcept = default;
+    gsl_constexpr basic_string_span( basic_string_span && ) gsl_noexcept = default;
 # endif
 #endif
 
@@ -3924,9 +3961,9 @@ public:
     // assignment:
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_constexpr14 basic_string_span & operator=( basic_string_span const & rhs ) gsl_noexcept = default;
+    gsl_constexpr14 basic_string_span & operator=( basic_string_span const & ) gsl_noexcept = default;
 
-    gsl_constexpr14 basic_string_span & operator=( basic_string_span && rhs ) gsl_noexcept = default;
+    gsl_constexpr14 basic_string_span & operator=( basic_string_span && ) gsl_noexcept = default;
 #endif
 
     // sub span:
@@ -4475,10 +4512,10 @@ public:
     }
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_constexpr basic_zstring_span( basic_zstring_span const & other ) = default;
-    gsl_constexpr basic_zstring_span( basic_zstring_span &&      other ) = default;
-    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & other ) = default;
-    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      other ) = default;
+    gsl_constexpr basic_zstring_span( basic_zstring_span const & ) = default;
+    gsl_constexpr basic_zstring_span( basic_zstring_span &&      ) = default;
+    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & ) = default;
+    gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      ) = default;
 #else
     gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
     gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other ) { span_ = other.span_; return *this; }
@@ -4674,7 +4711,8 @@ gsl_RESTORE_MSVC_WARNINGS()
 // #undef internal macros
 #undef gsl_STATIC_ASSERT_
 #undef gsl_ENABLE_IF_
-#undef gsl_DECLTYPE_
+#undef gsl_TRAILING_RETURN_TYPE_
+#undef gsl_RETURN_DECLTYPE_
 
 #endif // GSL_GSL_LITE_HPP_INCLUDED
 

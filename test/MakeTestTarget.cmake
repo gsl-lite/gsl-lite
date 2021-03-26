@@ -177,7 +177,7 @@ function( make_test_target target )
     set( optionArgs CUDA NO_EXCEPTIONS COMPILE_ONLY NO_PCH )
     set( oneValueArgs STD DEFAULTS_VERSION )
     set( multiValueArgs SOURCES EXTRA_OPTIONS )
-    cmake_parse_arguments( PARSE_ARGV 1 "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" )
+    cmake_parse_arguments( "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     if( SCOPE_UNPARSED_ARGUMENTS )
         list( JOIN SCOPE_UNPARSED_ARGUMENTS "\", \"" SCOPE_UNPARSED_ARGUMENTS_STR )
         list( JOIN "${oneValueArgs};${multiValueArgs}" "\", \"" POSSIBLE_ARGUMENTS_STR )
@@ -223,6 +223,11 @@ function( make_test_target target )
         endif()
         if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
             list( APPEND localOptions "-Wno-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
+            if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8 )
+                list( APPEND localOptions "-Wno-type-limits" ) # irrelevant warning about `unsigned value < 0` comparison
+            endif()
+        elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" )
+            list( APPEND localOptions "-Wno-c++11-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
         endif()
     endif()
 
