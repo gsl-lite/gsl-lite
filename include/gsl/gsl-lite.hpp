@@ -704,11 +704,11 @@
 #endif
 
 #if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
-# define gsl_noexcept           /*noexcept*/
-# define gsl_noexcept_iff(expr) /*noexcept(noexcept(expr))*/
+# define gsl_noexcept          /*noexcept*/
+# define gsl_noexcept_if(expr) /*noexcept(expr)*/
 #else
 # define gsl_noexcept           noexcept
-# define gsl_noexcept_iff(expr) noexcept(noexcept(expr))
+# define gsl_noexcept_if(expr) noexcept(noexcept(expr))
 #endif
 
 #if gsl_HAVE( NULLPTR )
@@ -4572,7 +4572,7 @@ struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enable
 {
 public:
     gsl_NODISCARD gsl_constexpr std::size_t
-    operator()( const ::gsl::not_null< T >& v ) const gsl_noexcept_iff( hash<T>()( declval<T>() ) )
+    operator()( const ::gsl::not_null< T >& v ) const gsl_noexcept_if(gsl_noexcept( hash<T>()(declval<T>() ) ) )
     {
         return hash<T>()( ::gsl::as_nullable( v ) );
     }
