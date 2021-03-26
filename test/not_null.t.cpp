@@ -1499,9 +1499,8 @@ CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled f
     EXPECT(( std::is_default_constructible< std::hash< not_null< int* > > >::value ));
     EXPECT(( std::is_default_constructible< std::hash< not_null< std::unique_ptr< int > > > >::value ));
     EXPECT(( std::is_default_constructible< std::hash< not_null< std::shared_ptr< int > > > >::value ));
-#if gsl_CPP11_140
-    // doesn't even compile in VS 2013, but at least the error message is somewhat descriptive:
-    //     error C2338: The C++ Standard doesn't provide a hash for this type.
+#if gsl_STDLIB_CPP14_OR_GREATER && ! gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 141)
+    // std::hash< NormalPtr< int > > isn't guaranteed to exist at all in C++11
     EXPECT_NOT(( std::is_default_constructible< std::hash< not_null< NormalPtr< int > > > >::value ));
 #endif
 }
