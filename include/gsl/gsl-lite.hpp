@@ -704,11 +704,11 @@
 #endif
 
 #if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
-# define gsl_noexcept          /*noexcept*/
-# define gsl_noexcept_if(expr) /*noexcept(expr)*/
+# define gsl_noexcept            /*noexcept*/
+# define gsl_noexcept_if( expr ) /*noexcept( expr )*/
 #else
-# define gsl_noexcept           noexcept
-# define gsl_noexcept_if(expr) noexcept(noexcept(expr))
+# define gsl_noexcept            noexcept
+# define gsl_noexcept_if( expr ) noexcept( expr )
 #endif
 
 #if gsl_HAVE( NULLPTR )
