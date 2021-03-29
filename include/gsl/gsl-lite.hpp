@@ -675,33 +675,33 @@
 #endif
 
 #if gsl_HAVE( CONSTEXPR_11 )
-# define gsl_constexpr constexpr
+# define gsl_constexpr  constexpr
 #else
-# define gsl_constexpr /*constexpr*/
+# define gsl_constexpr  /*constexpr*/
 #endif
 
 #if gsl_HAVE( CONSTEXPR_14 )
-# define gsl_constexpr14 constexpr
+# define gsl_constexpr14  constexpr
 #else
-# define gsl_constexpr14 /*constexpr*/
+# define gsl_constexpr14  /*constexpr*/
 #endif
 
 #if gsl_HAVE( CONSTEXPR_17 )
-# define gsl_constexpr17 constexpr
+# define gsl_constexpr17  constexpr
 #else
-# define gsl_constexpr17 /*constexpr*/
+# define gsl_constexpr17  /*constexpr*/
 #endif
 
 #if gsl_HAVE( CONSTEXPR_20 )
-# define gsl_constexpr20 constexpr
+# define gsl_constexpr20  constexpr
 #else
-# define gsl_constexpr20 /*constexpr*/
+# define gsl_constexpr20  /*constexpr*/
 #endif
 
 #if gsl_HAVE( EXPLICIT )
-# define gsl_explicit explicit
+# define gsl_explicit  explicit
 #else
-# define gsl_explicit /*explicit*/
+# define gsl_explicit  /*explicit*/
 #endif
 
 #if gsl_FEATURE( IMPLICIT_MACRO )
@@ -709,23 +709,28 @@
 #endif
 
 #if gsl_HAVE( IS_DELETE )
-# define gsl_is_delete = delete
+# define gsl_is_delete  = delete
 #else
 # define gsl_is_delete
 #endif
 
 #if gsl_HAVE( IS_DELETE )
-# define gsl_is_delete_access public
+# define gsl_is_delete_access  public
 #else
-# define gsl_is_delete_access private
+# define gsl_is_delete_access  private
 #endif
 
-#if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
-# define gsl_noexcept            /*noexcept*/
-# define gsl_noexcept_if( expr ) /*noexcept( expr )*/
+#if gsl_HAVE( NOEXCEPT )
+# define gsl_noexcept             noexcept
+# define gsl_noexcept_if( expr )  noexcept( expr )
 #else
-# define gsl_noexcept            noexcept
-# define gsl_noexcept_if( expr ) noexcept( expr )
+# define gsl_noexcept             /*noexcept*/
+# define gsl_noexcept_if( expr )  /*noexcept( expr )*/
+#endif
+#if defined( gsl_TESTING_ )
+# define gsl_noexcept_not_testing
+#else
+# define gsl_noexcept_not_testing  gsl_noexcept
 #endif
 
 #if gsl_HAVE( NULLPTR )
@@ -735,15 +740,15 @@
 #endif
 
 #if gsl_HAVE( NODISCARD )
-# define gsl_NODISCARD [[nodiscard]]
+# define gsl_NODISCARD  [[nodiscard]]
 #else
 # define gsl_NODISCARD
 #endif
 
 #if gsl_HAVE( NORETURN )
-# define gsl_NORETURN [[noreturn]]
+# define gsl_NORETURN  [[noreturn]]
 #elif defined(_MSC_VER)
-# define gsl_NORETURN __declspec(noreturn)
+# define gsl_NORETURN  __declspec(noreturn)
 #else
 # define gsl_NORETURN
 #endif
@@ -2514,12 +2519,14 @@ public:
 
 #if gsl_HAVE( MOVE_FORWARD )
     // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
-    gsl_constexpr14 not_null( not_null && other ) gsl_noexcept
+    gsl_constexpr14 not_null( not_null && other )
+    gsl_noexcept_not_testing  // we want to be nothrow-movable despite the precondition check
     : data_( std::move( other.data_ ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-    gsl_constexpr14 not_null & operator=( not_null && other ) gsl_noexcept
+    gsl_constexpr14 not_null & operator=( not_null && other )
+    gsl_noexcept_not_testing // we want to be nothrow-movable despite the precondition check
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr || &other == this );
         data_ = std::move( other.data_ );
@@ -2532,7 +2539,8 @@ public:
     gsl_constexpr14 not_null & operator=( not_null const & ) = default;
 #endif
 
-    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
+    gsl_noexcept_not_testing // we want to be nothrow-swappable despite the precondition check
     {
         gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
         using std::swap;
@@ -2817,7 +2825,7 @@ struct as_nullable_helper< CVReference, not_null<T *> >
 {
     typedef T * nullable_type;
 
-    static nullable_type call( not_null<nullable_type> p ) noexcept
+    static nullable_type call( not_null<nullable_type> p ) gsl_noexcept
     {
         return p.data_.ptr_;
     }
