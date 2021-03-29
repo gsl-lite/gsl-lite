@@ -4607,24 +4607,24 @@ gsl_is_delete_access:
 namespace std {
 
 template< class T >
-struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash< is_default_constructible< hash< T > >::value >
+struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
 {
 public:
     gsl_NODISCARD gsl_constexpr std::size_t
-    operator()( ::gsl::not_null< T > const & v ) const
+    operator()( ::gsl::not_null<T> const & v ) const
     // hash function is not `noexcept` because `as_nullable()` has preconditions
     {
         return hash<T>()( ::gsl::as_nullable( v ) );
     }
 };
 template< class T >
-struct hash< ::gsl::not_null< T * > >
+struct hash< ::gsl::not_null< T* > >
 {
 public:
     gsl_NODISCARD gsl_constexpr std::size_t
     operator()( ::gsl::not_null< T * > const & v ) const gsl_noexcept
     {
-        return hash<T>()( ::gsl::as_nullable( v ) );
+        return hash<T *>()( ::gsl::as_nullable( v ) );
     }
 };
 
