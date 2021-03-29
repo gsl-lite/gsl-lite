@@ -2247,7 +2247,7 @@ private:
     template< class U >
     friend class not_null;
 
-    template< class T >
+    template< class U >
     friend struct detail::not_null_accessor;
 
 public:
@@ -2577,7 +2577,7 @@ private:
     template< class U >
     friend class not_null;
 
-    template< class T >
+    template< class U >
     friend struct detail::not_null_accessor;
 
 public:
