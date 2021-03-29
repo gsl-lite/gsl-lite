@@ -644,8 +644,17 @@ CASE( "as_nullable: Converts to underlying pointer (shared_ptr)" )
     shared_ptr< int > pi = make_shared< int >();
     not_null< shared_ptr< int > > p( pi );
 
-    take_shared_by_val<int>( as_nullable(p) );
-    take_shared_by_ref<int>( as_nullable(p) );
+    take_shared_by_val<int>( as_nullable( p ) );
+    take_shared_by_ref<int>( as_nullable( p ) );
+}
+
+CASE( "as_nullable: Terminates for moved-from pointer (shared_ptr)" )
+{
+    shared_ptr< int > pi = make_shared< int >();
+    not_null< shared_ptr< int > > p( pi );
+    not_null< shared_ptr< int > > p2( std::move( p ) );
+
+    EXPECT_THROWS( as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -989,8 +998,17 @@ CASE( "as_nullable: Converts to underlying pointer (unique_ptr)" )
     unique_ptr< int > pi = make_unique< int >();
     not_null< unique_ptr< int > > p( std::move(pi) );
 
-    take_unique_by_val<int>( as_nullable( std::move(p) ) );
     take_unique_by_ref<int>( as_nullable( p ) );
+    take_unique_by_val<int>( as_nullable( std::move( p ) ) );
+}
+
+CASE( "as_nullable: Terminates for moved-from pointer (unique_ptr)" )
+{
+    shared_ptr< int > pi = make_unique< int >();
+    not_null< shared_ptr< int > > p( std::move( pi ) );
+    not_null< shared_ptr< int > > p2( std::move( p ) );
+
+    EXPECT_THROWS( as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_ptr)" )
@@ -1499,10 +1517,10 @@ CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled f
     EXPECT(( std::is_default_constructible< std::hash< not_null< int* > > >::value ));
     EXPECT(( std::is_default_constructible< std::hash< not_null< std::unique_ptr< int > > > >::value ));
     EXPECT(( std::is_default_constructible< std::hash< not_null< std::shared_ptr< int > > > >::value ));
-#if gsl_STDLIB_CPP14_OR_GREATER && ! gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 141)
+# if gsl_STDLIB_CPP14_OR_GREATER && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 141 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 900 )
     // std::hash< NormalPtr< int > > isn't guaranteed to exist at all in C++11
-    EXPECT_NOT(( std::is_default_constructible< std::hash< not_null< NormalPtr< int > > > >::value ));
-#endif
+    EXPECT_NOT( ( std::is_default_constructible< std::hash< not_null< NormalPtr< int > > > >::value ) );
+# endif
 }
 
 #endif // gsl_HAVE( HASH )

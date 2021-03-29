@@ -2606,7 +2606,7 @@ struct as_nullable_helper
 #if gsl_HAVE( MOVE_FORWARD )
     static nullable_type call( nullable_type && p )
     {
-        return std::move(p);
+        return std::move( p );
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 };
@@ -2619,13 +2619,15 @@ struct as_nullable_helper< CVReference, not_null<T> >
 
     static nullable_type const & call( not_null<nullable_type> const & p )
     {
+        gsl_Expects( p.data_.ptr_ != gsl_nullptr );
         return p.data_.ptr_;
     }
 
 #if gsl_HAVE( MOVE_FORWARD )
     static nullable_type call( not_null<nullable_type> && p )
     {
-        return std::move(p.data_.ptr_);
+        gsl_Expects( p.data_.ptr_ != gsl_nullptr );
+        return std::move( p.data_.ptr_ );
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 };
@@ -2636,16 +2638,16 @@ namespace no_adl {
 template< class T >
 auto
 as_nullable( T && p )
--> decltype( detail::as_nullable_helper<T>::call(std::forward<T>(p)) )
+-> decltype( detail::as_nullable_helper<T>::call( std::forward<T>( p ) ) )
 {
-    return detail::as_nullable_helper<T>::call(std::forward<T>(p));
+    return detail::as_nullable_helper<T>::call( std::forward<T>( p ) );
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
 typename detail::as_nullable_helper<T>::nullable_type const &
 as_nullable( T const & p )
 {
-    return detail::as_nullable_helper<T>::call(p);
+    return detail::as_nullable_helper<T>::call( p );
 }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
@@ -4604,14 +4606,25 @@ gsl_is_delete_access:
 
 namespace std {
 
-template<typename T>
-struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash< is_default_constructible< hash< T > >::value >
+template< class T >
+struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
 {
 public:
     gsl_NODISCARD gsl_constexpr std::size_t
-    operator()( const ::gsl::not_null< T >& v ) const gsl_noexcept_if(gsl_noexcept( hash<T>()(declval<T>() ) ) )
+    operator()( ::gsl::not_null<T> const & v ) const
+    // hash function is not `noexcept` because `as_nullable()` has preconditions
     {
         return hash<T>()( ::gsl::as_nullable( v ) );
+    }
+};
+template< class T >
+struct hash< ::gsl::not_null< T* > >
+{
+public:
+    gsl_NODISCARD gsl_constexpr std::size_t
+    operator()( ::gsl::not_null< T * > const & v ) const gsl_noexcept
+    {
+        return hash<T *>()( ::gsl::as_nullable( v ) );
     }
 };
 

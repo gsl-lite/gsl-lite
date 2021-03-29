@@ -563,7 +563,7 @@ Define this macro to 1 to make `not_null<>`'s constructor explicit. **Default is
 Define this macro to 1 to have `not_null<>` support typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks. This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. **Default is 0.**
 
 #### `gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=0`
-Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro may not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. **Default is 0 for `T`.**
+Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor. This macro must not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. **Default is 0 for `T`.**
 
 #### `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=1`
 Define this macro to 0 to omit the ability to compare spans. C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear. **Default is 1.**
