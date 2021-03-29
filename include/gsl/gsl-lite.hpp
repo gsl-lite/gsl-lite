@@ -2814,7 +2814,7 @@ template< class T >
 gsl_NODISCARD T as_nullable( not_null<T> && p )
 {
     T result = detail::not_null_accessor<T>::get( std::move( p ) );
-    gsl_Expects( result != nullptr );
+    gsl_Expects( result != gsl_nullptr );
     return result;
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
@@ -2828,7 +2828,7 @@ template< class T >
 gsl_NODISCARD T const & as_nullable( not_null<T> const & p )
 {
     T const & result = detail::not_null_accessor<T>::get( p );
-    gsl_Expects( result != nullptr );
+    gsl_Expects( result != gsl_nullptr );
     return result;
 }
 template< class T >
