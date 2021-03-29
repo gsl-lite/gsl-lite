@@ -675,33 +675,33 @@
 #endif
 
 #if gsl_HAVE( CONSTEXPR_11 )
-# define gsl_constexpr constexpr
+# define gsl_constexpr  constexpr
 #else
-# define gsl_constexpr /*constexpr*/
+# define gsl_constexpr  /*constexpr*/
 #endif
 
 #if gsl_HAVE( CONSTEXPR_14 )
-# define gsl_constexpr14 constexpr
+# define gsl_constexpr14  constexpr
 #else
-# define gsl_constexpr14 /*constexpr*/
+# define gsl_constexpr14  /*constexpr*/
 #endif
 
 #if gsl_HAVE( CONSTEXPR_17 )
-# define gsl_constexpr17 constexpr
+# define gsl_constexpr17  constexpr
 #else
-# define gsl_constexpr17 /*constexpr*/
+# define gsl_constexpr17  /*constexpr*/
 #endif
 
 #if gsl_HAVE( CONSTEXPR_20 )
-# define gsl_constexpr20 constexpr
+# define gsl_constexpr20  constexpr
 #else
-# define gsl_constexpr20 /*constexpr*/
+# define gsl_constexpr20  /*constexpr*/
 #endif
 
 #if gsl_HAVE( EXPLICIT )
-# define gsl_explicit explicit
+# define gsl_explicit  explicit
 #else
-# define gsl_explicit /*explicit*/
+# define gsl_explicit  /*explicit*/
 #endif
 
 #if gsl_FEATURE( IMPLICIT_MACRO )
@@ -709,23 +709,28 @@
 #endif
 
 #if gsl_HAVE( IS_DELETE )
-# define gsl_is_delete = delete
+# define gsl_is_delete  = delete
 #else
 # define gsl_is_delete
 #endif
 
 #if gsl_HAVE( IS_DELETE )
-# define gsl_is_delete_access public
+# define gsl_is_delete_access  public
 #else
-# define gsl_is_delete_access private
+# define gsl_is_delete_access  private
 #endif
 
-#if !gsl_HAVE( NOEXCEPT ) || defined( gsl_TESTING_ )
-# define gsl_noexcept            /*noexcept*/
-# define gsl_noexcept_if( expr ) /*noexcept( expr )*/
+#if gsl_HAVE( NOEXCEPT )
+# define gsl_noexcept             noexcept
+# define gsl_noexcept_if( expr )  noexcept( expr )
 #else
-# define gsl_noexcept            noexcept
-# define gsl_noexcept_if( expr ) noexcept( expr )
+# define gsl_noexcept             throw()
+# define gsl_noexcept_if( expr )  /*noexcept( expr )*/
+#endif
+#if defined( gsl_TESTING_ )
+# define gsl_noexcept_not_testing
+#else
+# define gsl_noexcept_not_testing  gsl_noexcept
 #endif
 
 #if gsl_HAVE( NULLPTR )
@@ -735,15 +740,15 @@
 #endif
 
 #if gsl_HAVE( NODISCARD )
-# define gsl_NODISCARD [[nodiscard]]
+# define gsl_NODISCARD  [[nodiscard]]
 #else
 # define gsl_NODISCARD
 #endif
 
 #if gsl_HAVE( NORETURN )
-# define gsl_NORETURN [[noreturn]]
+# define gsl_NORETURN  [[noreturn]]
 #elif defined(_MSC_VER)
-# define gsl_NORETURN __declspec(noreturn)
+# define gsl_NORETURN  __declspec(noreturn)
 #else
 # define gsl_NORETURN
 #endif
@@ -1916,12 +1921,7 @@ narrow_cast( U u ) gsl_noexcept
 
 struct narrowing_error : public std::exception
 {
-    char const * what() const
-#if gsl_HAVE( NOEXCEPT )
-    noexcept
-#else
-    throw()
-#endif
+    char const * what() const gsl_noexcept
 #if gsl_HAVE( OVERRIDE_FINAL )
     override
 #endif
@@ -2203,7 +2203,18 @@ struct not_null_data< T, true >
         return *this;
     }
 };
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+template< class T >
+struct not_null_data< T *, true >
+{
+    T * ptr_;
 
+    gsl_constexpr14 not_null_data( T * _ptr ) gsl_noexcept
+    : ptr_( _ptr )
+    {
+    }
+};
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 template< class T >
 struct is_copyable
 #if gsl_HAVE( TYPE_TRAITS )
@@ -2221,8 +2232,8 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 };
 #endif
 
-template< class CVReference, class T = typename std20::remove_cvref<CVReference>::type >
-struct as_nullable_helper;
+template< class T >
+struct not_null_accessor;
 
 } // namespace detail
 
@@ -2236,8 +2247,8 @@ private:
     template< class U >
     friend class not_null;
 
-    template< class CVReference, class U >
-    friend struct detail::as_nullable_helper;
+    template< class U >
+    friend struct detail::not_null_accessor;
 
 public:
     typedef typename detail::element_type_helper<T>::type element_type;
@@ -2289,7 +2300,7 @@ public:
         , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 not_null( U other )
-    : data_( T( std::move( other ) ) )
+    : data_( std::move( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
@@ -2503,12 +2514,14 @@ public:
 
 #if gsl_HAVE( MOVE_FORWARD )
     // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
-    gsl_constexpr14 not_null( not_null && other ) gsl_noexcept
+    gsl_constexpr14 not_null( not_null && other )
+    gsl_noexcept_not_testing  // we want to be nothrow-movable despite the precondition check
     : data_( std::move( other.data_ ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-    gsl_constexpr14 not_null & operator=( not_null && other ) gsl_noexcept
+    gsl_constexpr14 not_null & operator=( not_null && other )
+    gsl_noexcept_not_testing // we want to be nothrow-movable despite the precondition check
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr || &other == this );
         data_ = std::move( other.data_ );
@@ -2521,7 +2534,8 @@ public:
     gsl_constexpr14 not_null & operator=( not_null const & ) = default;
 #endif
 
-    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
+    gsl_noexcept_not_testing // we want to be nothrow-swappable despite the precondition check
     {
         gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
         using std::swap;
@@ -2552,6 +2566,175 @@ gsl_is_delete_access:
     not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
     void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
 };
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+template< class T >
+class not_null< T * >
+{
+private:
+    detail::not_null_data<T *, true> data_;
+
+    // need to access `not_null<U>::data_`
+    template< class U >
+    friend class not_null;
+
+    template< class U >
+    friend struct detail::not_null_accessor;
+
+public:
+    typedef T element_type;
+
+    gsl_constexpr14
+#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    explicit
+#endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    not_null( T * other )
+    : data_( other )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+
+#if gsl_HAVE( MOVE_FORWARD )
+    // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
+    // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T*, U>::value && !std::is_convertible<U, T*>::value ), int >::type = 0
+    >
+    gsl_constexpr14 explicit not_null( not_null<U> other )
+    : data_( static_cast<T*>( std::move( other.data_.ptr_ ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T*>::value ), int >::type = 0
+    >
+    gsl_constexpr14 not_null( not_null<U> other )
+    : data_( std::move( other.data_.ptr_ ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+# else // a.k.a. ! ( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
+    template< class U >
+    gsl_constexpr14 not_null( not_null<U> other )
+    : data_( std::move( other.data_.ptr_ ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+    template< class U >
+    gsl_constexpr14 not_null<T*>& operator=( not_null<U> other )
+    {
+        gsl_Expects( other.data_.ptr_ != gsl_nullptr );
+        data_.ptr_ = std::move( other.data_.ptr_ );
+        return *this;
+    }
+# endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
+    template< class U >
+    gsl_constexpr14 not_null( not_null<U> const& other )
+    : data_( other.data_.ptr_ )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+    template< class U >
+    gsl_constexpr14 not_null<T*>& operator=( not_null<U> const & other )
+    {
+        gsl_Expects( other.data_.ptr_ != gsl_nullptr );
+        data_.ptr_ = other.data_.ptr_;
+        return *this;
+    }
+#endif // gsl_HAVE( MOVE_FORWARD )
+
+#if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+    gsl_NODISCARD gsl_constexpr14 T*
+    get() const
+    {
+        return data_.ptr_;
+    }
+#endif
+
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+    // explicit conversion operator
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T*>::value && !std::is_convertible<T*, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_constexpr14 explicit
+    operator U() const
+    {
+        return U( data_.ptr_ );
+    }
+
+    // implicit conversion operator
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T*>::value && std::is_convertible<T*, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_constexpr14
+    operator U() const
+    {
+        return data_.ptr_;
+    }
+#else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
+    template< class U >
+    gsl_NODISCARD gsl_constexpr14
+    operator U() const
+    {
+        return data_.ptr_;
+    }
+#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+
+    gsl_NODISCARD gsl_constexpr14 T*
+    operator->() const
+    {
+        return data_.ptr_;
+    }
+
+    gsl_NODISCARD gsl_constexpr14 element_type &
+    operator*() const
+    {
+        return *data_.ptr_;
+    }
+
+#if gsl_HAVE( IS_DEFAULT )
+    gsl_constexpr14 not_null( not_null const & ) = default;
+    gsl_constexpr14 not_null & operator=( not_null const & ) = default;
+#endif
+
+    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    {
+        using std::swap;
+        swap( lhs.data_.ptr_, rhs.data_.ptr_ );
+    }
+
+gsl_is_delete_access:
+    not_null() gsl_is_delete;
+    // prevent compilation when initialized with a nullptr or literal 0:
+#if gsl_HAVE( NULLPTR )
+    not_null(             std::nullptr_t ) gsl_is_delete;
+    not_null & operator=( std::nullptr_t ) gsl_is_delete;
+#else
+    not_null(             int ) gsl_is_delete;
+    not_null & operator=( int ) gsl_is_delete;
+#endif
+
+    // unwanted operators...pointers only point to single objects!
+    not_null & operator++() gsl_is_delete;
+    not_null & operator--() gsl_is_delete;
+    not_null   operator++( int ) gsl_is_delete;
+    not_null   operator--( int ) gsl_is_delete;
+    not_null & operator+ ( size_t ) gsl_is_delete;
+    not_null & operator+=( size_t ) gsl_is_delete;
+    not_null & operator- ( size_t ) gsl_is_delete;
+    not_null & operator-=( size_t ) gsl_is_delete;
+    not_null & operator+=( std::ptrdiff_t ) gsl_is_delete;
+    not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
+    void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
+};
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 #if gsl_HAVE( DEDUCTION_GUIDES )
 template< class U >
 not_null( U ) -> not_null<U>;
@@ -2592,64 +2775,67 @@ make_not_null( not_null<U> const & u )
 
 namespace detail {
 
-// Generic case handling anything that is not a not_null
-template< class CVReference, class T/* = typename std20::remove_cvref<CVReference>::type*/ >
+template< class T >
 struct as_nullable_helper
 {
-    typedef T nullable_type;
-
-    static nullable_type const & call( nullable_type const & p )
-    {
-        return p;
-    }
-
-#if gsl_HAVE( MOVE_FORWARD )
-    static nullable_type call( nullable_type && p )
-    {
-        return std::move( p );
-    }
-#endif // gsl_HAVE( MOVE_FORWARD )
+    typedef T type;
+};
+template< class T >
+struct as_nullable_helper< not_null<T> >
+{
 };
 
-// Specific case handling not_null
-template< class CVReference, class T >
-struct as_nullable_helper< CVReference, not_null<T> >
+template< class T >
+struct not_null_accessor
 {
-    typedef T nullable_type;
-
-    static nullable_type const & call( not_null<nullable_type> const & p )
-    {
-        gsl_Expects( p.data_.ptr_ != gsl_nullptr );
-        return p.data_.ptr_;
-    }
-
 #if gsl_HAVE( MOVE_FORWARD )
-    static nullable_type call( not_null<nullable_type> && p )
+    static T get( not_null<T>&& p ) gsl_noexcept
     {
-        gsl_Expects( p.data_.ptr_ != gsl_nullptr );
         return std::move( p.data_.ptr_ );
     }
-#endif // gsl_HAVE( MOVE_FORWARD )
+#endif
+    static T const & get( not_null<T> const & p ) gsl_noexcept
+    {
+        return p.data_.ptr_;
+    }
 };
 
 namespace no_adl {
 
 #if gsl_HAVE( MOVE_FORWARD )
 template< class T >
-auto
-as_nullable( T && p )
--> decltype( detail::as_nullable_helper<T>::call( std::forward<T>( p ) ) )
+gsl_NODISCARD auto as_nullable( T && p )
+gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
+-> typename detail::as_nullable_helper<typename std20::remove_cvref<T>::type>::type
 {
-    return detail::as_nullable_helper<T>::call( std::forward<T>( p ) );
+    return std::move( p );
+}
+template< class T >
+gsl_NODISCARD T as_nullable( not_null<T> && p )
+{
+    T result = detail::not_null_accessor<T>::get( std::move( p ) );
+    gsl_Expects( result != gsl_nullptr );
+    return result;
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
-typename detail::as_nullable_helper<T>::nullable_type const &
-as_nullable( T const & p )
+gsl_NODISCARD T const & as_nullable( T const & p ) gsl_noexcept
 {
-    return detail::as_nullable_helper<T>::call( p );
+    return p;
 }
 #endif // gsl_HAVE( MOVE_FORWARD )
+template< class T >
+gsl_NODISCARD T const & as_nullable( not_null<T> const & p )
+{
+    T const & result = detail::not_null_accessor<T>::get( p );
+    gsl_Expects( result != gsl_nullptr );
+    return result;
+}
+template< class T >
+gsl_NODISCARD T* as_nullable( not_null<T*> p ) gsl_noexcept
+{
+    return detail::not_null_accessor<T*>::get( p );
+}
 
 } // namespace no_adl
 } // namespace detail

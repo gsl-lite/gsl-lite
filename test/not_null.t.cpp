@@ -346,6 +346,9 @@ CASE( "as_nullable: Converts to underlying pointer (raw pointer)" )
     not_null< int* > p( &i );
 
     take_raw<int>( as_nullable( p ) );
+#if gsl_HAVE( MOVE_FORWARD )
+    take_raw<int>( as_nullable( std::move( p ) ) );
+#endif
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
@@ -654,7 +657,7 @@ CASE( "as_nullable: Terminates for moved-from pointer (shared_ptr)" )
     not_null< shared_ptr< int > > p( pi );
     not_null< shared_ptr< int > > p2( std::move( p ) );
 
-    EXPECT_THROWS( as_nullable( p ) );
+    EXPECT_THROWS( (void) as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
@@ -1008,7 +1011,7 @@ CASE( "as_nullable: Terminates for moved-from pointer (unique_ptr)" )
     not_null< shared_ptr< int > > p( std::move( pi ) );
     not_null< shared_ptr< int > > p2( std::move( p ) );
 
-    EXPECT_THROWS( as_nullable( p ) );
+    EXPECT_THROWS( (void) as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_ptr)" )
