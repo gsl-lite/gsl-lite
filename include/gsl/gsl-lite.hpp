@@ -2778,7 +2778,7 @@ namespace detail {
 template< class T >
 struct as_nullable_helper
 {
-    T type;
+    typedef T type;
 };
 template< class T >
 struct as_nullable_helper< not_null<T> >
