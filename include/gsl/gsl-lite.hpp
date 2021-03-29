@@ -2788,10 +2788,12 @@ struct as_nullable_helper< not_null<T> >
 template< class T >
 struct not_null_accessor
 {
+#if gsl_HAVE( MOVE_FORWARD )
     static T get( not_null<T>&& p ) gsl_noexcept
     {
         return std::move( p.data_.ptr_ );
     }
+#endif
     static T const & get( not_null<T> const & p ) gsl_noexcept
     {
         return p.data_.ptr_;
