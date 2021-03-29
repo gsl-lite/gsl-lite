@@ -2649,7 +2649,7 @@ public:
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_NODISCARD gsl_constexpr14 T
+    gsl_NODISCARD gsl_constexpr14 T*
     get() const
     {
         return data_.ptr_;
