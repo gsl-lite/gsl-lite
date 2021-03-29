@@ -724,7 +724,7 @@
 # define gsl_noexcept             noexcept
 # define gsl_noexcept_if( expr )  noexcept( expr )
 #else
-# define gsl_noexcept             /*noexcept*/
+# define gsl_noexcept             throw()
 # define gsl_noexcept_if( expr )  /*noexcept( expr )*/
 #endif
 #if defined( gsl_TESTING_ )
@@ -1921,12 +1921,7 @@ narrow_cast( U u ) gsl_noexcept
 
 struct narrowing_error : public std::exception
 {
-    char const * what() const
-#if gsl_HAVE( NOEXCEPT )
-    noexcept
-#else
-    throw()
-#endif
+    char const * what() const gsl_noexcept
 #if gsl_HAVE( OVERRIDE_FINAL )
     override
 #endif
@@ -2237,8 +2232,8 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 };
 #endif
 
-template< class CVReference, class T = typename std20::remove_cvref<CVReference>::type >
-struct as_nullable_helper;
+template< class T >
+struct not_null_accessor;
 
 } // namespace detail
 
@@ -2252,8 +2247,8 @@ private:
     template< class U >
     friend class not_null;
 
-    template< class CVReference, class U >
-    friend struct detail::as_nullable_helper;
+    template< class T >
+    friend struct detail::not_null_accessor;
 
 public:
     typedef typename detail::element_type_helper<T>::type element_type;
@@ -2582,8 +2577,8 @@ private:
     template< class U >
     friend class not_null;
 
-    template< class CVReference, class U >
-    friend struct detail::as_nullable_helper;
+    template< class T >
+    friend struct detail::not_null_accessor;
 
 public:
     typedef T element_type;
@@ -2645,7 +2640,7 @@ public:
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
     template< class U >
-    gsl_constexpr14 not_null<T>& operator=( not_null<U> const & other )
+    gsl_constexpr14 not_null<T*>& operator=( not_null<U> const & other )
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr );
         data_.ptr_ = other.data_.ptr_;
@@ -2780,76 +2775,65 @@ make_not_null( not_null<U> const & u )
 
 namespace detail {
 
-// Generic case handling anything that is not a not_null
-template< class CVReference, class T/* = typename std20::remove_cvref<CVReference>::type*/ >
+template< class T >
 struct as_nullable_helper
 {
-    typedef T nullable_type;
-
-    static nullable_type const & call( nullable_type const & p )
-    {
-        return p;
-    }
-
-#if gsl_HAVE( MOVE_FORWARD )
-    static nullable_type call( nullable_type && p )
-    {
-        return std::move( p );
-    }
-#endif // gsl_HAVE( MOVE_FORWARD )
+    T type;
+};
+template< class T >
+struct as_nullable_helper< not_null<T> >
+{
 };
 
-// Specific case handling not_null
-template< class CVReference, class T >
-struct as_nullable_helper< CVReference, not_null<T> >
+template< class T >
+struct not_null_accessor
 {
-    typedef T nullable_type;
-
-    static nullable_type const & call( not_null<nullable_type> const & p )
+    static T get( not_null<T>&& p ) gsl_noexcept
     {
-        gsl_Expects( p.data_.ptr_ != gsl_nullptr );
-        return p.data_.ptr_;
-    }
-
-#if gsl_HAVE( MOVE_FORWARD )
-    static nullable_type call( not_null<nullable_type> && p )
-    {
-        gsl_Expects( p.data_.ptr_ != gsl_nullptr );
         return std::move( p.data_.ptr_ );
     }
-#endif // gsl_HAVE( MOVE_FORWARD )
-};
-#if gsl_CONFIG_DEFAULTS_VERSION >= 1
-template< class CVReference, class T >
-struct as_nullable_helper< CVReference, not_null<T *> >
-{
-    typedef T * nullable_type;
-
-    static nullable_type call( not_null<nullable_type> p ) gsl_noexcept
+    static T const & get( not_null<T> const & p ) gsl_noexcept
     {
         return p.data_.ptr_;
     }
 };
-#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 
 namespace no_adl {
 
 #if gsl_HAVE( MOVE_FORWARD )
 template< class T >
-auto
-as_nullable( T && p )
--> decltype( detail::as_nullable_helper<T>::call( std::forward<T>( p ) ) )
+gsl_NODISCARD auto as_nullable( T && p )
+gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
+-> typename detail::as_nullable_helper<typename std20::remove_cvref<T>::type>::type
 {
-    return detail::as_nullable_helper<T>::call( std::forward<T>( p ) );
+    return std::move( p );
+}
+template< class T >
+gsl_NODISCARD T as_nullable( not_null<T> && p )
+{
+    T result = detail::not_null_accessor<T>::get( std::move( p ) );
+    gsl_Expects( result != nullptr );
+    return result;
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
-typename detail::as_nullable_helper<T>::nullable_type const &
-as_nullable( T const & p )
+gsl_NODISCARD T const & as_nullable( T const & p ) gsl_noexcept
 {
-    return detail::as_nullable_helper<T>::call( p );
+    return p;
 }
 #endif // gsl_HAVE( MOVE_FORWARD )
+template< class T >
+gsl_NODISCARD T const & as_nullable( not_null<T> const & p )
+{
+    T const & result = detail::not_null_accessor<T>::get( p );
+    gsl_Expects( result != nullptr );
+    return result;
+}
+template< class T >
+gsl_NODISCARD T* as_nullable( not_null<T*> p ) gsl_noexcept
+{
+    return detail::not_null_accessor<T*>::get( p );
+}
 
 } // namespace no_adl
 } // namespace detail

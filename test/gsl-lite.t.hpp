@@ -12,6 +12,10 @@
 // Compiler warning suppression for ancient versions of Visual Studio:
 
 #if defined( _MSC_VER )
+# if _MSC_VER < 1910
+#  pragma warning( disable : 4577 ) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
+#  pragma warning( disable : 4702 ) // unreachable code
+# endif
 # if _MSC_VER < 1900
 #  pragma warning( disable : 4127 ) // conditional expression is constant
 # endif

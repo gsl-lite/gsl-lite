@@ -346,6 +346,7 @@ CASE( "as_nullable: Converts to underlying pointer (raw pointer)" )
     not_null< int* > p( &i );
 
     take_raw<int>( as_nullable( p ) );
+    take_raw<int>( as_nullable( std::move( p ) ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (raw pointer)" )
