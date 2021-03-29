@@ -2203,7 +2203,18 @@ struct not_null_data< T, true >
         return *this;
     }
 };
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+template< class T >
+struct not_null_data< T *, true >
+{
+    T * ptr_;
 
+    gsl_constexpr14 not_null_data( T * _ptr ) gsl_noexcept
+    : ptr_( _ptr )
+    {
+    }
+};
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 template< class T >
 struct is_copyable
 #if gsl_HAVE( TYPE_TRAITS )
@@ -2289,7 +2300,7 @@ public:
         , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
     gsl_constexpr14 not_null( U other )
-    : data_( T( std::move( other ) ) )
+    : data_( std::move( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
@@ -2552,6 +2563,175 @@ gsl_is_delete_access:
     not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
     void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
 };
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+template< class T >
+class not_null< T * >
+{
+private:
+    detail::not_null_data<T *, true> data_;
+
+    // need to access `not_null<U>::data_`
+    template< class U >
+    friend class not_null;
+
+    template< class CVReference, class U >
+    friend struct detail::as_nullable_helper;
+
+public:
+    typedef T element_type;
+
+    gsl_constexpr14
+#if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    explicit
+#endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    not_null( T * other )
+    : data_( other )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+
+#if gsl_HAVE( MOVE_FORWARD )
+    // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
+    // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T*, U>::value && !std::is_convertible<U, T*>::value ), int >::type = 0
+    >
+    gsl_constexpr14 explicit not_null( not_null<U> other )
+    : data_( static_cast<T*>( std::move( other.data_.ptr_ ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_convertible<U, T*>::value ), int >::type = 0
+    >
+    gsl_constexpr14 not_null( not_null<U> other )
+    : data_( std::move( other.data_.ptr_ ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+# else // a.k.a. ! ( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
+    template< class U >
+    gsl_constexpr14 not_null( not_null<U> other )
+    : data_( std::move( other.data_.ptr_ ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+    template< class U >
+    gsl_constexpr14 not_null<T*>& operator=( not_null<U> other )
+    {
+        gsl_Expects( other.data_.ptr_ != gsl_nullptr );
+        data_.ptr_ = std::move( other.data_.ptr_ );
+        return *this;
+    }
+# endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+#else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
+    template< class U >
+    gsl_constexpr14 not_null( not_null<U> const& other )
+    : data_( other.data_.ptr_ )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+    template< class U >
+    gsl_constexpr14 not_null<T>& operator=( not_null<U> const & other )
+    {
+        gsl_Expects( other.data_.ptr_ != gsl_nullptr );
+        data_.ptr_ = other.data_.ptr_;
+        return *this;
+    }
+#endif // gsl_HAVE( MOVE_FORWARD )
+
+#if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+    gsl_NODISCARD gsl_constexpr14 T
+    get() const
+    {
+        return data_.ptr_;
+    }
+#endif
+
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+    // explicit conversion operator
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T*>::value && !std::is_convertible<T*, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_constexpr14 explicit
+    operator U() const
+    {
+        return U( data_.ptr_ );
+    }
+
+    // implicit conversion operator
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<U, T*>::value && std::is_convertible<T*, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+    >
+    gsl_NODISCARD gsl_constexpr14
+    operator U() const
+    {
+        return data_.ptr_;
+    }
+#else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
+    template< class U >
+    gsl_NODISCARD gsl_constexpr14
+    operator U() const
+    {
+        return data_.ptr_;
+    }
+#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+
+    gsl_NODISCARD gsl_constexpr14 T*
+    operator->() const
+    {
+        return data_.ptr_;
+    }
+
+    gsl_NODISCARD gsl_constexpr14 element_type &
+    operator*() const
+    {
+        return *data_.ptr_;
+    }
+
+#if gsl_HAVE( IS_DEFAULT )
+    gsl_constexpr14 not_null( not_null const & ) = default;
+    gsl_constexpr14 not_null & operator=( not_null const & ) = default;
+#endif
+
+    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    {
+        using std::swap;
+        swap( lhs.data_.ptr_, rhs.data_.ptr_ );
+    }
+
+gsl_is_delete_access:
+    not_null() gsl_is_delete;
+    // prevent compilation when initialized with a nullptr or literal 0:
+#if gsl_HAVE( NULLPTR )
+    not_null(             std::nullptr_t ) gsl_is_delete;
+    not_null & operator=( std::nullptr_t ) gsl_is_delete;
+#else
+    not_null(             int ) gsl_is_delete;
+    not_null & operator=( int ) gsl_is_delete;
+#endif
+
+    // unwanted operators...pointers only point to single objects!
+    not_null & operator++() gsl_is_delete;
+    not_null & operator--() gsl_is_delete;
+    not_null   operator++( int ) gsl_is_delete;
+    not_null   operator--( int ) gsl_is_delete;
+    not_null & operator+ ( size_t ) gsl_is_delete;
+    not_null & operator+=( size_t ) gsl_is_delete;
+    not_null & operator- ( size_t ) gsl_is_delete;
+    not_null & operator-=( size_t ) gsl_is_delete;
+    not_null & operator+=( std::ptrdiff_t ) gsl_is_delete;
+    not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
+    void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
+};
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 #if gsl_HAVE( DEDUCTION_GUIDES )
 template< class U >
 not_null( U ) -> not_null<U>;
@@ -2631,6 +2811,18 @@ struct as_nullable_helper< CVReference, not_null<T> >
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 };
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+template< class CVReference, class T >
+struct as_nullable_helper< CVReference, not_null<T *> >
+{
+    typedef T * nullable_type;
+
+    static nullable_type call( not_null<nullable_type> p ) noexcept
+    {
+        return p.data_.ptr_;
+    }
+};
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 
 namespace no_adl {
 
