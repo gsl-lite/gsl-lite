@@ -381,11 +381,11 @@
 #endif
 #if 0 == defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 // select default
-//# if gsl_CONFIG_DEFAULTS_VERSION >= 1
-//#  define gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS  // This is still controversial because it's non-conforming.
-//# else
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  define gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS
+# else
 #  define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
-//# endif
+# endif
 #endif
 #if 0 == defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
 // select default
