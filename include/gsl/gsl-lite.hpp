@@ -1647,7 +1647,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) )
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), __trap() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
 # else
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # endif
@@ -1655,13 +1655,9 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 #  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), __trap() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), gsl_TRAP_() )
 #endif
-# if gsl_COMPILER_MSVC_VERSION
-#  define  gsl_FAILFAST_()                ( __trap(), ::gsl::detail::fail_fast_terminate() )
-# else
-#  define  gsl_FAILFAST_()                ( __trap() )
-# endif
+# define  gsl_FAILFAST_()                 ( gsl_TRAP_() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # if ! defined( NDEBUG )
@@ -1671,7 +1667,11 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # endif
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() )
-# define   gsl_FAILFAST_()                ( gsl_TRAP_() )
+# if gsl_COMPILER_MSVC_VERSION
+#  define  gsl_FAILFAST_()                ( gsl_TRAP_(), ::gsl::detail::fail_fast_terminate() )
+# else
+#  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
+# endif
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 # define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
