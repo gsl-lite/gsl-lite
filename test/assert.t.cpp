@@ -136,34 +136,32 @@ CASE( "gsl_AssertAudit(): Terminates on a false expression in AUDIT mode" )
 #endif
 }
 
-int testAssume( int i, std::vector<int> const& v )
+int myAt( int i, std::vector<int> const& v )
 {
     // The arguments to `__assume( x )` (MSVC) and `__builtin_assume( x )` (Clang) are never evaluated, so they cannot incur side-effects. We would like to implement
-    // `gsl_ASSUME()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
+    // `gsl_ASSUME_()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
     // `__attribute__ ((pure))` or `__attribute__ ((const))` is considered a potential side-effect (e.g. the call to `v.size()` below). In many cases Clang is capable
     // of inlining the expression and find it free of side-effects, cf. https://gcc.godbolt.org/z/ZcKfbp, but the warning is produced anyway.
     //
-    // To avoid littering user code with warnings, we instead define `gsl_ASSUME()` in terms of `__builtin_unreachable()`. The following `gsl_ASSUME()` statement
+    // To avoid littering user code with warnings, we instead define `gsl_ASSUME_()` in terms of `__builtin_unreachable()`. The following `gsl_ASSUME_()` statement
     // should thus compile without any warnings.
 
-    gsl_ASSUME( i >= 0 && static_cast<std::size_t>(i) < v.size() );
+    gsl_Expects( i >= 0 && static_cast<std::size_t>(i) < v.size() );
     return v.at( static_cast<std::size_t>(i) );
 }
 
-CASE( "gsl_ASSUME(): Compiles" )
+CASE( "gsl_Expects(): No warnings produced for function calls in precondition checks" )
 {
     std::vector<int> v;
     v.push_back( 42 );
-    testAssume( 0, v );
+    EXPECT_NO_THROW( myAt( 0, v ) );
+    EXPECT_THROWS( myAt( 1, v ) );
 }
 
 CASE( "gsl_Expects(): Supports explicit conversions to bool" )
 {
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     gsl_Expects( ConvertibleToBool() );
-
-    // `gsl_CONFIG_CONTRACT_CHECKING_OFF` should be compatible with explicit conversions to bool.
-    gsl_ELIDE_CONTRACT_( ConvertibleToBool() );
 
     if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }

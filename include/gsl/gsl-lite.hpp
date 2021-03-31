@@ -487,6 +487,12 @@
 # define gsl_COMPILER_GNUC_VERSION  0
 #endif
 
+#if defined( __NVCC__ )
+# define gsl_COMPILER_NVCC_VERSION  ( __CUDACC_VER_MAJOR__ * 10 + __CUDACC_VER_MINOR__ )
+#else
+# define gsl_COMPILER_NVCC_VERSION  0
+#endif
+
 #if defined( __ARMCC_VERSION )
 # define gsl_COMPILER_ARMCC_VERSION       ( __ARMCC_VERSION / 10000 )
 # define gsl_COMPILER_ARMCC_VERSION_FULL  __ARMCC_VERSION
@@ -983,8 +989,7 @@
 #define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR       ( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD )
 #define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR_()    gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR
 
-// Note: !defined(__NVCC__) doesn't work with nvcc here:
-#define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR     ( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR && (__NVCC__== 0) )
+#define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR     ( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR && gsl_COMPILER_NVCC_VERSION == 0 )
 #define gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR_()  gsl_HAVE_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 
 // GSL API (e.g. for CUDA platform):
@@ -1070,7 +1075,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 
 // MSVC warning suppression macros:
 
-#if gsl_COMPILER_MSVC_VERSION >= 140 && !defined(__NVCC__)
+#if gsl_COMPILER_MSVC_VERSION >= 140 && ! ( defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ) )
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
@@ -1582,32 +1587,43 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 //
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_ELIDE_CONTRACT_( x )  static_assert( ::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool" )
+# define gsl_ELIDE_( x )  static_assert( ::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool" )
 #else
-# define gsl_ELIDE_CONTRACT_( x )
+# define gsl_ELIDE_( x )
 #endif
-#define gsl_NO_OP_()               ( static_cast<void>( 0 ) )
+#define gsl_NO_OP_()      ( static_cast<void>( 0 ) )
 
-#if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define  gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* there is no assume intrinsic in CUDA device code */
-# define  gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* there is no assume intrinsic in CUDA device code */
-#elif gsl_COMPILER_MSVC_VERSION
-# define  gsl_ASSUME( x )           __assume( x )
-# define  gsl_ASSUME_UNREACHABLE()  __assume( 0 )
-#elif gsl_COMPILER_GNUC_VERSION
-#  define gsl_ASSUME( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
-# define  gsl_ASSUME_UNREACHABLE()  __builtin_unreachable()
-#elif defined(__has_builtin)
-# if __has_builtin(__builtin_unreachable)
-#  define gsl_ASSUME( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
-#  define gsl_ASSUME_UNREACHABLE()  __builtin_unreachable()
+#if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+# if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
+#  if gsl_COMPILER_NVCC_VERSION >= 112
+#   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+#   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
+#  else
+#   define gsl_ASSUME_( x )           gsl_ELIDE_( x ) /* there is no assume intrinsic in CUDA device code */
+#   define gsl_ASSUME_UNREACHABLE_()  gsl_NO_OP_() /* there is no assume intrinsic in CUDA device code */
+#  endif
+# elif gsl_COMPILER_MSVC_VERSION >= 140
+#  define  gsl_ASSUME_( x )           __assume( x )
+#  define  gsl_ASSUME_UNREACHABLE_()  __assume( 0 )
+# elif gsl_COMPILER_GNUC_VERSION
+#   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+#  define  gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
+# elif defined(__has_builtin)
+#  if __has_builtin(__builtin_unreachable)
+#   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
+#   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
+#  else
+#   error  gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints for this compiler; use gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE instead
+#  endif
 # else
-#  define gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
-#  define gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* unknown compiler; cannot rely on assume intrinsic */
+#  error   gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints for this compiler; use gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE instead
 # endif
-#else
-# define  gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* unknown compiler; cannot rely on assume intrinsic */
-# define  gsl_ASSUME_UNREACHABLE()  gsl_NO_OP_() /* unknown compiler; cannot rely on assume intrinsic */
+#endif // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+
+#if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
+# define gsl_CONTRACT_UNENFORCED_( x )  gsl_ASSUME_( x )
+#else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
+# define gsl_CONTRACT_UNENFORCED_( x )  gsl_ELIDE_( x )
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
@@ -1621,10 +1637,10 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  if __has_builtin(__builtin_trap)
 #   define gsl_TRAP_()  __builtin_trap()
 #  else
-#   error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
+#   error  gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
 #  endif
 # else
-#  error gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
+#  error   gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
 # endif
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 
@@ -1641,7 +1657,11 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # else
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), __trap() )
 #endif
-# define   gsl_FAILFAST_()                ( __trap() )
+# if gsl_COMPILER_MSVC_VERSION
+#  define  gsl_FAILFAST_()                ( __trap(), ::gsl::detail::fail_fast_terminate() )
+# else
+#  define  gsl_FAILFAST_()                ( __trap() )
+# endif
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # if ! defined( NDEBUG )
@@ -1661,48 +1681,36 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-#  define gsl_Expects( x )       gsl_ASSUME( x )
-# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
-#  define gsl_Expects( x )       gsl_ELIDE_CONTRACT_( x )
-# endif
+# define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #else
 # define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "GSL: Precondition failure", x )
 #endif
 #define   Expects( x )           gsl_Expects( x )
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsAudit( x )  gsl_ELIDE_CONTRACT_( x )
+# define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #else
 # define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (audit)", x )
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-#  define gsl_Ensures( x )       gsl_ASSUME( x )
-# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
-#  define gsl_Ensures( x )       gsl_ELIDE_CONTRACT_( x )
-# endif
+# define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #else
 # define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "GSL: Postcondition failure", x )
 #endif
 #define   Ensures( x )           gsl_Ensures( x )
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresAudit( x )  gsl_ELIDE_CONTRACT_( x )
+# define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #else
 # define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (audit)", x )
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-#  define gsl_Assert( x )       gsl_ASSUME( x )
-# else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
-#  define gsl_Assert( x )       gsl_ELIDE_CONTRACT_( x )
-# endif
+#  define gsl_Assert( x )       gsl_CONTRACT_UNENFORCED_( x )
 #else
 # define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "GSL: Assertion failure", x )
 #endif
 #if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAudit( x )  gsl_ELIDE_CONTRACT_( x )
+# define  gsl_AssertAudit( x )  gsl_ELIDE_( x )
 #else
 # define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (audit)", x )
 #endif
@@ -2096,7 +2104,7 @@ namespace detail {
     template< class T, class U >
     struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
 
-# if defined( __NVCC__ )
+# if gsl_COMPILER_NVCC_VERSION
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
     gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
@@ -2118,7 +2126,7 @@ namespace detail {
     {
         return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
     }
-# endif // defined( __NVCC__ )
+# endif // gsl_COMPILER_NVCC_VERSION
 
 } // namespace detail
 
@@ -2151,7 +2159,7 @@ narrow( U u )
     }
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if defined( __NVCC__ )
+# if gsl_COMPILER_NVCC_VERSION
     if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
@@ -2182,7 +2190,7 @@ narrow_failfast( U u )
     gsl_Expects( static_cast<U>( t ) == u );
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if defined( __NVCC__ )
+# if gsl_COMPILER_NVCC_VERSION
     gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )

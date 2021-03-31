@@ -108,15 +108,18 @@ make_test_targets( "${PROGRAM}-v1-unenforced" 3
     COMPILE_ONLY
 )
 
-make_test_targets( "${PROGRAM}-v1-assume" 3
-    SOURCES
-        gsl-lite.t.cpp
-        assert.t.cpp
-    DEFAULTS_VERSION v1
-    CONTRACT_CHECKING OFF
-    UNENFORCED_CONTRACTS ASSUME
-    COMPILE_ONLY
-)
+if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0 ) # VS 2015 and later
+        OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
+    make_test_targets( "${PROGRAM}-v1-assume" 3
+        SOURCES
+            gsl-lite.t.cpp
+            assert.t.cpp
+        DEFAULTS_VERSION v1
+        CONTRACT_CHECKING OFF
+        UNENFORCED_CONTRACTS ASSUME
+        COMPILE_ONLY
+    )
+endif()
 
 make_test_targets( "${PROGRAM}-v1-terminates" 3
     SOURCES
@@ -145,7 +148,7 @@ make_test_targets( "${PROGRAM}-v1-calls-handler" 3
     COMPILE_ONLY
 )
 
-if( (MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VS 2012 and later
+if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VS 2012 and later
         OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
     make_test_targets( "${PROGRAM}-v1-traps" 3
         SOURCES
