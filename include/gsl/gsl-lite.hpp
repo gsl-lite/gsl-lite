@@ -1075,7 +1075,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 
 // MSVC warning suppression macros:
 
-#if gsl_COMPILER_MSVC_VERSION >= 140 && ! ( defined( __CUDACC__ ) && defined( __CUDA_ARCH__ ) )
+#if gsl_COMPILER_MSVC_VERSION >= 140 && ! gsl_COMPILER_NVCC_VERSION
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))

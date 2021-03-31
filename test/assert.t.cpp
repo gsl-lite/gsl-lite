@@ -29,7 +29,11 @@ bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; }
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
 
-enum Color { red, green, blue };
+enum Color
+#if gsl_CPP11_OR_GREATER
+: int
+#endif
+{ red, green, blue };
 
 std::string colorToString( Color color )
 {
@@ -91,7 +95,9 @@ CASE( "gsl_FailFast(): Suppresses compiler warning about missing return value" )
 CASE( "gsl_FailFast(): Terminates" )
 {
     EXPECT_THROWS( failFast() );
+#if gsl_CPP11_OR_GREATER
     EXPECT_THROWS( colorToString( Color( 42 ) ) );
+#endif
 }
 
 CASE( "gsl_ExpectsAudit(): Allows a true expression" )
