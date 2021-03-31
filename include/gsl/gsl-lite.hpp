@@ -4682,9 +4682,7 @@ ensure_z( Container & cont )
 //
 
 template <typename T>
-class
-gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated due to design issues, cf. https://github.com/gsl-lite/gsl-lite/issues/282")
-basic_zstring_span
+class basic_zstring_span
 {
 public:
     typedef T element_type;
