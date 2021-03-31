@@ -29,6 +29,19 @@ bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; }
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
 
+enum Color { red, green, blue };
+
+std::string colorToString( Color color )
+{
+    switch (color)
+    {
+    case red: return "red";
+    case green: return "green";
+    case blue: return "blue";
+    }
+    gsl_FailFast();  // this should keep the compiler from issuing a warning about not returning a value
+}
+
 struct ConvertibleToBool
 {
 #if gsl_CPP11_OR_GREATER
@@ -70,9 +83,15 @@ CASE( "gsl_Assert(): Terminates on a false expression" )
     EXPECT_THROWS( assert_( false ) );
 }
 
+CASE( "gsl_FailFast(): Suppresses compiler warning about missing return value" )
+{
+    EXPECT( colorToString(red) == "red" );
+}
+
 CASE( "gsl_FailFast(): Terminates" )
 {
     EXPECT_THROWS( failFast() );
+    EXPECT_THROWS( colorToString( Color( 42 ) ) );
 }
 
 CASE( "gsl_ExpectsAudit(): Allows a true expression" )
@@ -131,7 +150,14 @@ int testAssume( int i, std::vector<int> const& v )
     return v.at( static_cast<std::size_t>(i) );
 }
 
-void testConvertibleToBool()
+CASE( "gsl_ASSUME(): Compiles" )
+{
+    std::vector<int> v;
+    v.push_back( 42 );
+    testAssume( 0, v );
+}
+
+CASE( "gsl_Expects(): Supports explicit conversions to bool" )
 {
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     gsl_Expects( ConvertibleToBool() );
@@ -141,5 +167,6 @@ void testConvertibleToBool()
 
     if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }
+
 
 // end of file

@@ -217,6 +217,10 @@ function( make_test_target target )
 
     if( MSVC )
         list( APPEND localOptions "/WX" "/W4" )
+        list( APPEND localOptions "/w44062" ) # enable C4062: enumerator 'identifier' in a switch of enum 'enumeration' is not handled
+        list( APPEND localOptions "/w44242" ) # enable C4242: 'identifier': conversion from 'type1' to 'type2', possible loss of data
+        list( APPEND localOptions "/w44254" ) # enable C4254: 'operator': conversion from 'type1' to 'type2', possible loss of data
+        list( APPEND localOptions "/w44265" ) # enable C4265: 'class': class has virtual functions, but destructor is not virtual
         list( APPEND localDefinitions "_SCL_SECURE_NO_WARNINGS" )
         if( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VC++ 2010 and earlier
             list( APPEND localOptions "/wd4275" ) # suppress C4275: non dll-interface class 'stdext::exception' used as base for dll-interface class 'std::bad_cast'
