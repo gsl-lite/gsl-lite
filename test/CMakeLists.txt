@@ -98,6 +98,26 @@ make_test_targets( "${PROGRAM}-v1-special" 11
     DEFAULTS_VERSION v1
 )
 
+make_test_targets( "${PROGRAM}-v1-unenforced" 3
+    SOURCES
+        gsl-lite.t.cpp
+        assert.t.cpp
+    DEFAULTS_VERSION v1
+    CONTRACT_CHECKING OFF
+    UNENFORCED_CONTRACTS ELIDE
+    COMPILE_ONLY
+)
+
+make_test_targets( "${PROGRAM}-v1-assume" 3
+    SOURCES
+        gsl-lite.t.cpp
+        assert.t.cpp
+    DEFAULTS_VERSION v1
+    CONTRACT_CHECKING OFF
+    UNENFORCED_CONTRACTS ASSUME
+    COMPILE_ONLY
+)
+
 make_test_targets( "${PROGRAM}-v1-terminates" 3
     SOURCES
         gsl-lite.t.cpp
