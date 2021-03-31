@@ -837,17 +837,13 @@
 #endif
 
 #if gsl_HAVE( NORETURN )
-# define gsl_NORETURN          [[noreturn]]
-# define gsl_NORETURN_POSTFIX
+# define gsl_NORETURN  [[noreturn]]
 #elif defined(_MSC_VER)
-# define gsl_NORETURN          __declspec(noreturn)
-# define gsl_NORETURN_POSTFIX
+# define gsl_NORETURN  __declspec(noreturn)
 #elif gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_ARMCC_VERSION
-# define gsl_NORETURN
-# define gsl_NORETURN_POSTFIX  __attribute__ ((noreturn))
+# define gsl_NORETURN  __attribute__((noreturn))
 #else
 # define gsl_NORETURN
-# define gsl_NORETURN_POSTFIX
 #endif
 
 #if gsl_HAVE( DEPRECATED ) && ! defined( gsl_TESTING_ )
@@ -1734,12 +1730,12 @@ namespace detail {
 
 
 #if gsl_HAVE( EXCEPTIONS )
-gsl_NORETURN inline void fail_fast_throw( char const * message ) gsl_NORETURN_POSTFIX
+gsl_NORETURN inline void fail_fast_throw( char const * message )
 {
     throw fail_fast( message );
 }
 #endif // gsl_HAVE( EXCEPTIONS )
-gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept gsl_NORETURN_POSTFIX
+gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept
 {
     std::terminate();
 }
