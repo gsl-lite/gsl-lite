@@ -837,11 +837,17 @@
 #endif
 
 #if gsl_HAVE( NORETURN )
-# define gsl_NORETURN  [[noreturn]]
+# define gsl_NORETURN          [[noreturn]]
+# define gsl_NORETURN_POSTFIX
 #elif defined(_MSC_VER)
-# define gsl_NORETURN  __declspec(noreturn)
+# define gsl_NORETURN          __declspec(noreturn)
+# define gsl_NORETURN_POSTFIX
+#elif gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_ARMCC_VERSION
+# define gsl_NORETURN
+# define gsl_NORETURN_POSTFIX  __attribute__ ((noreturn))
 #else
 # define gsl_NORETURN
+# define gsl_NORETURN_POSTFIX
 #endif
 
 #if gsl_HAVE( DEPRECATED ) && ! defined( gsl_TESTING_ )
@@ -1655,9 +1661,9 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 # if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 #  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), gsl_TRAP_() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), __trap() )
 #endif
-# define  gsl_FAILFAST_()                 ( gsl_TRAP_() )
+# define  gsl_FAILFAST_()                 ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # if ! defined( NDEBUG )
@@ -1728,12 +1734,12 @@ namespace detail {
 
 
 #if gsl_HAVE( EXCEPTIONS )
-gsl_NORETURN inline void fail_fast_throw( char const * message )
+gsl_NORETURN inline void fail_fast_throw( char const * message ) gsl_NORETURN_POSTFIX
 {
     throw fail_fast( message );
 }
 #endif // gsl_HAVE( EXCEPTIONS )
-gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept
+gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept gsl_NORETURN_POSTFIX
 {
     std::terminate();
 }
