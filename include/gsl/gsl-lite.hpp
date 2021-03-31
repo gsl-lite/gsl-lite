@@ -1597,7 +1597,7 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 
 #if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-#  if gsl_COMPILER_NVCC_VERSION >= 112
+#  if gsl_COMPILER_NVCC_VERSION >= 113
 #   define gsl_ASSUME_( x )           ( ( x ) ? static_cast<void>(0) : __builtin_unreachable() )
 #   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
 #  else
