@@ -36,20 +36,21 @@ set( CUDA_SOURCES
 set( SOURCES
     "../gsl-lite.t.cpp"
     "../assert.t.cpp"
-    "../at.t.cpp"
-    "../byte.t.cpp"
-    "../emulation.t.cpp"
-    "../issue.t.cpp"
-    "../not_null.t.cpp"
-    "../owner.t.cpp"
-    "../span.t.cpp"
-    "../string_span.t.cpp"
-    "../util.t.cpp"
 )
 set_property( SOURCE ${SOURCES} PROPERTY LANGUAGE CUDA ) # compile .cpp files with the CUDA compiler
 
 make_cuda_test_targets( "${PROGRAM}" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} )
 make_cuda_test_targets( "${PROGRAM}-expt" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} EXTRA_OPTIONS "--expt-relaxed-constexpr" )
+
+if( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA|Clang" )
+    make_cuda_test_targets( "${PROGRAM}-assume" 14
+        SOURCES ${SOURCES} ${CUDA_SOURCES}
+        DEFAULTS_VERSION v1
+        CONTRACT_CHECKING OFF
+        UNENFORCED_CONTRACTS ASSUME
+        COMPILE_ONLY
+    )
+endif()
 
 
 # end of file

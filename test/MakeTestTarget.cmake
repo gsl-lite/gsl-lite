@@ -17,7 +17,6 @@ set( _makeTestTarget )
 
 set( GSL_CONFIG
     "gsl_TESTING_"
-    "gsl_CONFIG_CONTRACT_CHECKING_AUDIT"
 )
 
 set( CUDA_OPTIONS )
@@ -175,7 +174,7 @@ endfunction()
 function( make_test_target target )
 
     set( optionArgs CUDA NO_EXCEPTIONS COMPILE_ONLY NO_PCH )
-    set( oneValueArgs STD DEFAULTS_VERSION )
+    set( oneValueArgs STD DEFAULTS_VERSION CONTRACT_VIOLATION CONTRACT_CHECKING UNENFORCED_CONTRACTS )
     set( multiValueArgs SOURCES EXTRA_OPTIONS )
     cmake_parse_arguments( "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     if( SCOPE_UNPARSED_ARGUMENTS )
@@ -187,11 +186,20 @@ function( make_test_target target )
         list( JOIN SCOPE_KEYWORDS_MISSING_VALUES "\", \"" SCOPE_KEYWORDS_MISSING_VALUES_STR )
         message( SEND_ERROR "make_test_target(): argument keyword(s) \"${SCOPE_KEYWORDS_MISSING_VALUES_STR}\" missing values" )
     endif()
-    if( NOT SCOPE_SOURCES )
+    if( NOT DEFINED SCOPE_SOURCES )
         message( SEND_ERROR "make_test_target(): no argument specified for SCOPE_SOURCES" )
     endif()
-    if( NOT SCOPE_DEFAULTS_VERSION )
+    if( NOT DEFINED SCOPE_DEFAULTS_VERSION )
         message( SEND_ERROR "make_test_target(): no argument specified for DEFAULTS_VERSION" )
+    endif()
+    if( NOT DEFINED SCOPE_CONTRACT_VIOLATION )
+        set( SCOPE_CONTRACT_VIOLATION "THROWS" )
+    endif()
+    if( NOT DEFINED SCOPE_CONTRACT_CHECKING )
+        set( SCOPE_CONTRACT_CHECKING "ON" )
+    endif()
+    if( NOT DEFINED SCOPE_UNENFORCED_CONTRACTS )
+        set( SCOPE_UNENFORCED_CONTRACTS "ELIDE" )
     endif()
 
     message( STATUS "Make target: '${target}'" )
@@ -199,10 +207,20 @@ function( make_test_target target )
     add_executable( ${target} ${SCOPE_SOURCES} )
 
     set( localOptions ${OPTIONS} )
-    set( localDefinitions ${GSL_CONFIG} )
+    set( localDefinitions ${GSL_CONFIG} "gsl_CONFIG_CONTRACT_VIOLATION_${SCOPE_CONTRACT_VIOLATION}" "gsl_CONFIG_UNENFORCED_CONTRACTS_${SCOPE_UNENFORCED_CONTRACTS}" )
+
+    if( SCOPE_CONTRACT_CHECKING )
+        list( APPEND localDefinitions "gsl_CONFIG_CONTRACT_CHECKING_AUDIT" )
+    else()
+        list( APPEND localDefinitions "gsl_CONFIG_CONTRACT_CHECKING_OFF" )
+    endif()
 
     if( MSVC )
         list( APPEND localOptions "/WX" "/W4" )
+        list( APPEND localOptions "/w44062" ) # enable C4062: enumerator 'identifier' in a switch of enum 'enumeration' is not handled
+        list( APPEND localOptions "/w44242" ) # enable C4242: 'identifier': conversion from 'type1' to 'type2', possible loss of data
+        list( APPEND localOptions "/w44254" ) # enable C4254: 'operator': conversion from 'type1' to 'type2', possible loss of data
+        list( APPEND localOptions "/w44265" ) # enable C4265: 'class': class has virtual functions, but destructor is not virtual
         list( APPEND localDefinitions "_SCL_SECURE_NO_WARNINGS" )
         if( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VC++ 2010 and earlier
             list( APPEND localOptions "/wd4275" ) # suppress C4275: non dll-interface class 'stdext::exception' used as base for dll-interface class 'std::bad_cast'
@@ -239,7 +257,6 @@ function( make_test_target target )
             list( APPEND localOptions "-fno-exceptions" )
         endif()
     else()
-        list( APPEND localDefinitions "gsl_CONFIG_CONTRACT_VIOLATION_THROWS" )
         if( MSVC )
             list( APPEND localOptions "/EHsc" )
         endif()
@@ -271,7 +288,7 @@ function( make_test_target target )
         target_precompile_headers( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
     endif()
 
-    if( NOT SCOPE_NO_EXCEPTIONS AND NOT SCOPE_COMPILE_ONLY )
+    if( NOT SCOPE_COMPILE_ONLY )
         # We only add tests for targets with exceptions enabled. lest has been modified to permit compilation without exceptions
         # so we can test compiling gsl-lite without exceptions, but the no-exception tests will not run correctly because lest
         # relies on exceptions for running tests and therefore cannot function correctly without.

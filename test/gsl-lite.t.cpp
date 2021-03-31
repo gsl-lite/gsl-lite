@@ -269,6 +269,17 @@ int main( int argc, char * argv[] )
     return lest::run( specification(), argc, argv );
 }
 
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+namespace gsl {
+
+gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line )
+{
+    std::cerr << message << ": " << expression << " at " << file << ":" << line << "\n";
+}
+
+} // namespace gsl
+#endif
+
 #if 0
 g++            -I../include/gsl -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -o gsl-lite.t.exe gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp && gsl-lite.t.exe --pass
 g++ -std=c++98 -I../include/gsl -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -o gsl-lite.t.exe gsl-lite.t.cpp assert.t.cpp at.t.cpp byte.t.cpp issue.t.cpp not_null.t.cpp owner.t.cpp span.t.cpp string_span.t.cpp util.t.cpp && gsl-lite.t.exe --pass

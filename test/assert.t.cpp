@@ -23,8 +23,28 @@ namespace {
 
 bool expects( bool x ) { gsl_Expects( x ); return x; } 
 bool ensures( bool x ) { gsl_Ensures( x ); return x; }
+bool assert_( bool x ) { gsl_Assert( x ); return x; }
+void failFast() { gsl_FailFast(); }
 bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; } 
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
+bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
+
+enum Color
+#if gsl_CPP11_OR_GREATER
+: int
+#endif
+{ red, green, blue };
+
+std::string colorToString( Color color )
+{
+    switch (color)
+    {
+    case red: return "red";
+    case green: return "green";
+    case blue: return "blue";
+    }
+    gsl_FailFast();  // this should keep the compiler from issuing a warning about not returning a value
+}
 
 struct ConvertibleToBool
 {
@@ -47,6 +67,11 @@ CASE( "gsl_Ensures(): Allows a true expression" )
     EXPECT_NO_THROW( ensures( true  ) );
 }
 
+CASE( "gsl_Assert(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assert_( true  ) );
+}
+
 CASE( "gsl_Expects(): Terminates on a false expression" )
 {
     EXPECT_THROWS( expects( false ) );
@@ -57,6 +82,24 @@ CASE( "gsl_Ensures(): Terminates on a false expression" )
     EXPECT_THROWS( ensures( false ) );
 }
 
+CASE( "gsl_Assert(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( assert_( false ) );
+}
+
+CASE( "gsl_FailFast(): Suppresses compiler warning about missing return value" )
+{
+    EXPECT( colorToString(red) == "red" );
+}
+
+CASE( "gsl_FailFast(): Terminates" )
+{
+    EXPECT_THROWS( failFast() );
+#if gsl_CPP11_OR_GREATER
+    EXPECT_THROWS( colorToString( Color( 42 ) ) );
+#endif
+}
+
 CASE( "gsl_ExpectsAudit(): Allows a true expression" )
 {
     EXPECT_NO_THROW( expectsAudit( true  ) );
@@ -65,6 +108,11 @@ CASE( "gsl_ExpectsAudit(): Allows a true expression" )
 CASE( "gsl_EnsuresAudit(): Allows a true expression" )
 {
     EXPECT_NO_THROW( ensuresAudit( true  ) );
+}
+
+CASE( "gsl_AssertAudit(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assertAudit( true  ) );
 }
 
 CASE( "gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode" )
@@ -85,29 +133,44 @@ CASE( "gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode" )
 #endif
 }
 
-int testAssume( int i, std::vector<int> const& v )
+CASE( "gsl_AssertAudit(): Terminates on a false expression in AUDIT mode" )
+{
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( assertAudit( false ) );
+#else
+    EXPECT_NO_THROW( assertAudit( false ) );
+#endif
+}
+
+int myAt( int i, std::vector<int> const& v )
 {
     // The arguments to `__assume( x )` (MSVC) and `__builtin_assume( x )` (Clang) are never evaluated, so they cannot incur side-effects. We would like to implement
-    // `gsl_ASSUME()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
+    // `gsl_ASSUME_()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
     // `__attribute__ ((pure))` or `__attribute__ ((const))` is considered a potential side-effect (e.g. the call to `v.size()` below). In many cases Clang is capable
     // of inlining the expression and find it free of side-effects, cf. https://gcc.godbolt.org/z/ZcKfbp, but the warning is produced anyway.
     //
-    // To avoid littering user code with warnings, we instead define `gsl_ASSUME()` in terms of `__builtin_unreachable()`. The following `gsl_ASSUME()` statement
+    // To avoid littering user code with warnings, we instead define `gsl_ASSUME_()` in terms of `__builtin_unreachable()`. The following `gsl_ASSUME_()` statement
     // should thus compile without any warnings.
 
-    gsl_ASSUME( i >= 0 && static_cast<std::size_t>(i) < v.size() );
+    gsl_Expects( i >= 0 && static_cast<std::size_t>(i) < v.size() );
     return v.at( static_cast<std::size_t>(i) );
 }
 
-void testConvertibleToBool()
+CASE( "gsl_Expects(): No warnings produced for function calls in precondition checks" )
+{
+    std::vector<int> v;
+    v.push_back( 42 );
+    EXPECT_NO_THROW( myAt( 0, v ) );
+    EXPECT_THROWS( myAt( 1, v ) );
+}
+
+CASE( "gsl_Expects(): Supports explicit conversions to bool" )
 {
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     gsl_Expects( ConvertibleToBool() );
 
-    // `gsl_CONFIG_CONTRACT_CHECKING_OFF` should be compatible with explicit conversions to bool.
-    gsl_ELIDE_CONTRACT_( ConvertibleToBool() );
-
     if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }
+
 
 // end of file

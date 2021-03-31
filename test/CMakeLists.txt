@@ -74,23 +74,91 @@ make_test_targets( "${PROGRAM}-v1" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 )
 
 # Add test targets for no-exception build:
 
-make_test_targets( "${PROGRAM}-v1-no-exc" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 NO_EXCEPTIONS )
+make_test_targets(
+    "${PROGRAM}-v1-no-exc" 99
+    SOURCES ${SOURCES}
+    DEFAULTS_VERSION v1
+    CONTRACT_VIOLATION TERMINATES
+    NO_EXCEPTIONS
+    COMPILE_ONLY
+)
 
 
 # Add test targets for special configurations:
 
-set( SPECIAL_SOURCES
-    "gsl-lite.t.cpp"
-    "not_null.t.cpp"
+make_test_targets( "${PROGRAM}-v1-special" 11
+    SOURCES
+        gsl-lite.t.cpp
+        not_null.t.cpp
+    EXTRA_OPTIONS
+        "-Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1"
+        "-Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t"
+        "-Dgsl_CONFIG_TRANSPARENT_NOT_NULL=0"
+        "-DNOT_NULL_GET_BY_CONST_REF=1"
+    DEFAULTS_VERSION v1
 )
-set( SPECIAL_OPTIONS
-    "-Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1"
-    "-Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t"
-    "-Dgsl_CONFIG_TRANSPARENT_NOT_NULL=0"
-    "-DNOT_NULL_GET_BY_CONST_REF=1"
-)
-make_test_targets( "${PROGRAM}-v1-special" 11 SOURCES ${SPECIAL_SOURCES} EXTRA_OPTIONS ${SPECIAL_OPTIONS} DEFAULTS_VERSION v1 )
 
+make_test_targets( "${PROGRAM}-v1-unenforced" 3
+    SOURCES
+        gsl-lite.t.cpp
+        assert.t.cpp
+    DEFAULTS_VERSION v1
+    CONTRACT_CHECKING OFF
+    UNENFORCED_CONTRACTS ELIDE
+    COMPILE_ONLY
+)
+
+if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0 ) # VS 2015 and later
+        OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
+    make_test_targets( "${PROGRAM}-v1-assume" 3
+        SOURCES
+            gsl-lite.t.cpp
+            assert.t.cpp
+        DEFAULTS_VERSION v1
+        CONTRACT_CHECKING OFF
+        UNENFORCED_CONTRACTS ASSUME
+        COMPILE_ONLY
+    )
+endif()
+
+make_test_targets( "${PROGRAM}-v1-terminates" 3
+    SOURCES
+        gsl-lite.t.cpp
+        assert.t.cpp
+    DEFAULTS_VERSION v1
+    CONTRACT_VIOLATION TERMINATES
+    COMPILE_ONLY
+)
+
+make_test_targets( "${PROGRAM}-v1-asserts" 3
+    SOURCES
+        gsl-lite.t.cpp
+        assert.t.cpp
+    DEFAULTS_VERSION v1
+    CONTRACT_VIOLATION ASSERTS
+    COMPILE_ONLY
+)
+
+make_test_targets( "${PROGRAM}-v1-calls-handler" 3
+    SOURCES
+        gsl-lite.t.cpp
+        assert.t.cpp
+    DEFAULTS_VERSION v1
+    CONTRACT_VIOLATION CALLS_HANDLER
+    COMPILE_ONLY
+)
+
+if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VS 2012 and later
+        OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
+    make_test_targets( "${PROGRAM}-v1-traps" 3
+        SOURCES
+            gsl-lite.t.cpp
+            assert.t.cpp
+        DEFAULTS_VERSION v1
+        CONTRACT_VIOLATION TRAPS
+        COMPILE_ONLY
+    )
+endif()
 
 if( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS AND MSVC AND CMAKE_GENERATOR MATCHES "Visual Studio" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.2 )
     make_test_target( "${PROGRAM}-v1-cpplatest-CppCoreCheck" STD latest SOURCES "core_check.t.cpp" DEFAULTS_VERSION v1 COMPILE_ONLY NO_PCH )

@@ -24,11 +24,26 @@ __global__ void preconditionAssertionKernel( int i, int j )
 {
     gsl_Expects( i >= 0 );
     gsl_ExpectsAudit( i < j );
+    gsl_Ensures( i >= 0 );
+    gsl_EnsuresAudit( i < j );
+    gsl_Assert( i >= 0 );
+    gsl_AssertAudit( i < j );
 }
 
-CASE( "CUDA: Precondition and postcondition assertions can be used in kernel code" )
+CASE( "CUDA: Precondition/postcondition checks and assertions can be used in kernel code" )
 {
     preconditionAssertionKernel<<<1, 1>>>( 0, 1 );
+    // TODO: check for failure
+}
+
+__global__ void failFastKernel()
+{
+    gsl_FailFast();
+}
+
+CASE( "CUDA: gsl_FailFast() can be used in kernel code" )
+{
+    failFastKernel<<<1, 1>>>();
     // TODO: check for failure
 }
 
