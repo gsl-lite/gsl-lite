@@ -1,6 +1,49 @@
 Changes in gsl-lite
 ===================
 
+version 0.38.0 2021-03-31
+
+Additions:
+- Add macros `gsl_Assert()`, `gsl_AssertAudit()` to express checks which are neither pre- nor postconditions (#294)
+- Add fail-fast operation `gsl_FailFast()` which is guaranteed to terminate normal execution in some way
+  (exception, `std::terminate()`, or trap instruction) (#294)
+- Add configuration option `gsl_CONFIG_CONTRACT_VIOLATION_TRAPS` which makes `gsl_Expects()`/`gsl_Ensures()`/`gsl_Assert()` (and
+  the `Audit` variants if audit mode is enabled) and `gsl_FailFast()` execute a trap instruction in case of a contract violation
+- Add configuration option `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` which implements `gsl_Expects()`/`gsl_Ensures()`/`gsl_Assert()`
+  (and the `Audit` variants if audit mode is enabled) in terms of the `assert()` macro from the standard library. This has the
+  benefits that both legacy assertions and contract checks can be globally suppressed with a single macro (`NDEBUG`), and that
+  `assert()` prints an informative error message which contains the contract check expression.
+- Add `as_nullable()` function (#251, thanks to @petamas)
+- Add compiler detection macro for NVCC (#294)
+- Add compiler detection macro and tentative support (no CI) for ARMCC (#293; thanks to @woodsking2)
+- Add conditional `std::hash<>` specialization for `not_null<>` (#297; thanks to @mbs-c)
+- Track language and library versions separately; new macros `gsl_STDLIB_CPPxx_OR_GREATER` indicate availability of the standard library
+- Add feature detection macros `gsl_HAVE( HASH )`, `gsl_HAVE( MOVE_FORWARD )`, `gsl_HAVE( OVERRIDE_FINAL )`
+- Add `size_type` to `span<>` and `basic_string_span<>`
+- Add Continuous Integration testing for NVCC 11.0-11.2 (CUDA14, CUDA17), Clang 10-11, GCC 10, Apple Clang 12.0.0
+- Add Continuous Integration testing for Clang with libstdc++
+- Add Valgrind "memcheck" run to Continuous Integration
+- Add testing for more configuration scenarios, e.g. building with exceptions disabled and using different ways of precondition
+  violation handling
+
+Changes:
+- Remove dependency on standard library headers <algorithm> and <iterator> (#290, #295; thanks to @mpusz)
+- Use of `gsl_HAVE()`, `gsl_CONFIG()`, `gsl_FEATURE()` with unknown arguments now causes compilation errors (#272)
+- `narrow<>()` now issues a `static_assert()` that refers to `narrow_failfast<>()` if exceptions are unavailable (#269)
+- With version-1 defaults, `not_null<>` now has a specialization for raw pointers which avoids unnecessary contract checks (#300)
+- The contract expression is now part of the exception message in `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` mode
+- `narrowing_error` now produces a less unhelpful exception message ("narrowing_error")
+- `gsl_noexcept` now falls back to `throw()` if `noexcept` is unavailable
+- Most symbols are now accessible through both `namespace gsl` and `namespace gsl_lite` to ease migration
+- `not_null_ic<>` is now also visible in `namespace gsl_lite` (#280; thanks to @woodsking2)
+- `nullptr_t` comparison operators for `not_null<>` are now explicitly deleted
+- More uses of `gsl_NODISCARD` throughout the library
+- For NVCC ≥11.3, make use of new `__builtin_unreachable()` intrinsic in `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` mode
+
+Fixes:
+- Many bugfixes (#249, #250, #255, #256, #262, #263, #268, #270, #271, #286, #287, #292; thanks to @fodinabor, @KazDragon,
+  @martinmoene, @Maximus5, @Pesa, @petamas, @travnick)
+
 version 0.37.0 2020-05-13
 
 Additions:

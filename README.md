@@ -3,7 +3,7 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://github.com/microsoft/vcpkg/tree/master/ports/gsl-lite) <br> [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://bintray.com/conan/conan-center/gsl-lite%3A_/_latestVersion) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/p9YnfiUTOYEQx0QL)   |
+| [![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://badge.fury.io/gh/gsl-lite%2Fgsl-lite.svg)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://vcpkg.info/port/gsl-lite) <br> [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://conan.io/center/gsl-lite) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/PloGDgU3dtDO2qVV)   |
 
 
 *gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl).
@@ -91,7 +91,7 @@ The recommended way to consume *gsl-lite* in your CMake project is to use `find_
 ```CMake
 cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
-find_package( gsl-lite 0.37 REQUIRED )
+find_package( gsl-lite 0.38 REQUIRED )
     
 project( my-program LANGUAGES CXX )
     
@@ -155,7 +155,7 @@ For the [Conan package manager](https://www.conan.io/), follow these steps:
 2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
 
         [requires]
-        gsl-lite/0.37@center/stable
+        gsl-lite/0.38@center/stable
 
 3. Run conan's install command:
 
@@ -361,7 +361,7 @@ Example:
 
 ```cmake
 # my-statistics-lib/CMakeLists.txt
-find_package( gsl-lite 0.37 REQUIRED )
+find_package( gsl-lite 0.38 REQUIRED )
 
 add_library( my-statistics-lib STATIC mean.cpp )
 target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )
@@ -693,7 +693,7 @@ The following features are deprecated since the indicated version. See macro [`g
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
 0.37.0  |   6   | `as_writeable_bytes()`, call indexing for spans, and `span::at()` |
-&nbsp;  |&nbsp; | `as_writable_bytes()`, subscript indexing is used |
+&nbsp;  |&nbsp; | Use `as_writable_bytes()`, subscript indexing |
 0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
 &nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
 0.31.0  |   5   | `span( std::nullptr_t, index_type )` |
@@ -734,6 +734,7 @@ Clang                | Windows         | x64       | version shipped with VS 201
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2017, 2019](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9](https://travis-ci.com/gsl-lite/gsl-lite/), [9.1, 10, 10.0.1, 11, 11.0.3, 12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 11.0 and newer    | [11.0, 11.1, 11.2](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+ARMCC                |                 | ARM       | 5 and newer       | |
 
 
 Building the tests
@@ -825,6 +826,7 @@ gsl_Assert(): Allows a true expression
 gsl_Expects(): Terminates on a false expression
 gsl_Ensures(): Terminates on a false expression
 gsl_Assert(): Terminates on a false expression
+gsl_FailFast(): Suppresses compiler warning about missing return value
 gsl_FailFast(): Terminates
 gsl_ExpectsAudit(): Allows a true expression
 gsl_EnsuresAudit(): Allows a true expression
@@ -832,6 +834,8 @@ gsl_AssertAudit(): Allows a true expression
 gsl_ExpectsAudit(): Terminates on a false expression in AUDIT mode
 gsl_EnsuresAudit(): Terminates on a false expression in AUDIT mode
 gsl_AssertAudit(): Terminates on a false expression in AUDIT mode
+gsl_Expects(): No warnings produced for function calls in precondition checks
+gsl_Expects(): Supports explicit conversions to bool
 at(): Terminates access to non-existing C-array elements
 at(): Terminates access to non-existing std::array elements (C++11)
 at(): Terminates access to non-existing std::vector elements
@@ -919,6 +923,7 @@ not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) 
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)
 not_null<>: Converts to underlying pointer (shared_ptr)
 as_nullable: Converts to underlying pointer (shared_ptr)
+as_nullable: Terminates for moved-from pointer (shared_ptr)
 not_null<>: Allows to construct from a non-null related pointer (shared_ptr)
 not_null<>: Allows to construct a const pointer from a non-null related pointer (shared_ptr)
 not_null<>: Allows to construct from a not_null related pointer type (shared_ptr)
@@ -951,6 +956,7 @@ not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) 
 not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)
 not_null<>: Converts to underlying pointer (unique_ptr)
 as_nullable: Converts to underlying pointer (unique_ptr)
+as_nullable: Terminates for moved-from pointer (unique_ptr)
 not_null<>: Allows to construct from a non-null related pointer (unique_ptr)
 not_null<>: Allows to construct a const pointer from a non-null related pointer (unique_ptr)
 not_null<>: Allows to construct from a not_null related pointer type (unique_ptr)
@@ -993,6 +999,8 @@ not_null<>: Able to deduce element_type of normal user-defined smart pointers
 not_null<>: Able to correctly deduce element_type of user-defined smart pointers even if typedef and result of dereferencing differs
 not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef
 not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef, and element_type differs from T
+not_null<>: Hashes match the hashes of the wrapped pointer
+not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers
 owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
@@ -1176,9 +1184,11 @@ string_span: Allows to obtain the number of elements via size()
 string_span: Allows to obtain the number of bytes via length_bytes()
 string_span: Allows to obtain the number of bytes via size_bytes()
 string_span: Allows to view the elements as read-only bytes
+zstring_span: Terminates construction of a zstring_span from an empty span
 zstring_span: Allows to construct a zstring_span from a zero-terminated empty string (via span)
 zstring_span: Allows to construct a zstring_span from a zero-terminated non-empty string (via span)
 zstring_span: Terminates construction of a zstring_span from a non-zero-terminated string (via span)
+zstring_span: Terminates construction of a wzstring_span from an empty span
 zstring_span: Allows to construct a wzstring_span from a zero-terminated empty string (via span)
 zstring_span: Allows to construct a wzstring_span from a zero-terminated non-empty string (via span)
 zstring_span: Terminates construction of a wzstring_span from a non-zero-terminated string (via span)

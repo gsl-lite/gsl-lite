@@ -29,7 +29,7 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  37
+#define  gsl_lite_MINOR  38
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
@@ -1548,6 +1548,15 @@ struct is_compatible_container : decltype( is_compatible_container_f< C, E >( 0 
 // Integer type for indices (e.g. in a loop).
 typedef gsl_CONFIG_INDEX_TYPE index;
 
+// Integer type for dimensions.
+typedef gsl_CONFIG_INDEX_TYPE dim;
+
+// Integer type for array strides.
+typedef gsl_CONFIG_INDEX_TYPE stride;
+
+// Integer type for pointer, iterator, or index differences.
+typedef gsl_CONFIG_INDEX_TYPE diff;
+
 //
 // GSL.owner: ownership pointers
 //
@@ -2332,6 +2341,8 @@ gsl_is_delete_access:
     not_null_data( not_null_data const & ) gsl_is_delete;
     not_null_data & operator=( not_null_data const & ) gsl_is_delete;
 };
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+# endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 #endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
 struct not_null_data< T, true >
@@ -2423,7 +2434,7 @@ public:
     typedef typename detail::element_type_helper<T>::type element_type;
 
 #if gsl_HAVE( TYPE_TRAITS )
-    static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
+    static_assert( std::is_assignable<typename std::remove_const<typename std::remove_reference<T>::type>::type&, std::nullptr_t>::value, "T cannot be assigned nullptr." );
 #endif
 
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
@@ -4168,6 +4179,7 @@ public:
     typedef T element_type;
     typedef span<T> span_type;
 
+    typedef typename span_type::size_type size_type;
     typedef typename span_type::index_type index_type;
     typedef typename span_type::difference_type difference_type;
 
@@ -4986,9 +4998,9 @@ struct hash< ::gsl::not_null< T* > >
 {
 public:
     gsl_NODISCARD gsl_constexpr std::size_t
-    operator()( ::gsl::not_null< T * > const & v ) const gsl_noexcept
+    operator()( ::gsl::not_null< T* > const & v ) const gsl_noexcept
     {
-        return hash<T *>()( ::gsl::as_nullable( v ) );
+        return hash<T*>()( ::gsl::as_nullable( v ) );
     }
 };
 
@@ -5016,12 +5028,13 @@ public:
 // Going forward, we want to support coexistence of gsl-lite with M-GSL, so we want to encourage using the `gsl_lite`
 // namespace when consuming gsl-lite. Typical use in library code would be:
 //
-//     #include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
+//     #include <gsl-lite/gsl-lite.hpp>  // instead of <gsl/gsl-lite.hpp>
 //
 //     namespace foo {
 //         namespace gsl = ::gsl_lite; // convenience alias
-//         double mean(gsl::span<double const> elements) {
-//             gsl_Expects(!elements.empty()); // instead of Expects()
+//         double mean( gsl::span<double const> elements )
+//         {
+//             gsl_Expects( ! elements.empty() );  // instead of Expects()
 //             ...
 //         }
 //     } // namespace foo
@@ -5042,6 +5055,8 @@ using namespace std14;
 using namespace std17;
 using namespace std20;
 
+using namespace ::gsl::detail::no_adl;
+
 # if gsl_HAVE( SHARED_PTR )
 using std::unique_ptr;
 using std::shared_ptr;
@@ -5049,15 +5064,9 @@ using std::make_shared;
 # endif
 
 using ::gsl::index;
-
-// Integer type for dimensions.
-typedef gsl_CONFIG_INDEX_TYPE dim;
-
-// Integer type for array strides.
-typedef gsl_CONFIG_INDEX_TYPE stride;
-
-// Integer type for pointer, iterator, or index differences.
-typedef gsl_CONFIG_INDEX_TYPE diff;
+using ::gsl::dim;
+using ::gsl::stride;
+using ::gsl::diff;
 
 # if gsl_HAVE( ALIAS_TEMPLATE )
 #  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 141 )  // VS 2015 and earlier have trouble with `using` for alias templates
@@ -5085,7 +5094,6 @@ using ::gsl::narrowing_error;
 using ::gsl::narrow;
 using ::gsl::narrow_failfast;
 
-
 using ::gsl::at;
 
 using ::gsl::not_null;
@@ -5093,6 +5101,11 @@ using ::gsl::not_null_ic;
 using ::gsl::make_not_null;
 
 using ::gsl::byte;
+
+using ::gsl::to_byte;
+using ::gsl::to_integer;
+using ::gsl::to_uchar;
+using ::gsl::to_string;
 
 using ::gsl::with_container_t;
 using ::gsl::with_container;
@@ -5125,6 +5138,8 @@ using ::gsl::cwzstring;
 using ::gsl::wzstring_span;
 using ::gsl::cwzstring_span;
 # endif // gsl_HAVE( WCHAR )
+
+using ::gsl::ensure_z;
 
 } // namespace gsl_lite
 
