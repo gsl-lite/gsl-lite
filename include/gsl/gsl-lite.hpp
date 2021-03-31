@@ -4160,7 +4160,7 @@ public:
 
     /*gsl_api*/ // currently disabled due to an apparent NVCC bug
     gsl_NODISCARD gsl_constexpr14 basic_string_span
-        first( index_type count ) const
+    first( index_type count ) const
     {
         return span_.first( count );
     }
@@ -4698,7 +4698,7 @@ public:
         : span_( s )
     {
         // expects a zero-terminated span
-        gsl_Expects( s[s.size() - 1] == '\0');
+        gsl_Expects( s.back() == '\0' );
     }
 
 #if gsl_HAVE( IS_DEFAULT )
@@ -4714,13 +4714,13 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr bool
     empty() const gsl_noexcept
     {
-        return span_.size() == 0;
+        return false;
     }
 
     gsl_NODISCARD gsl_api gsl_constexpr string_span_type
     as_string_span() const gsl_noexcept
     {
-        return string_span_type( span_.data(), span_.size() > 1 ? span_.size() - 1 : 0 );
+        return string_span_type( span_.data(), span_.size() - 1 );
     }
 
     /*gsl_api*/ // currently disabled due to an apparent NVCC bug
