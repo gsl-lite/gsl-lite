@@ -1582,11 +1582,11 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 //
 
 #if gsl_HAVE( TYPE_TRAITS )
-# define gsl_ELIDE_CONTRACT_( x )  static_assert(::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool")
+# define gsl_ELIDE_CONTRACT_( x )  static_assert( ::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool" )
 #else
 # define gsl_ELIDE_CONTRACT_( x )
 #endif
-#define gsl_NO_OP_()               ((void) 0)
+#define gsl_NO_OP_()               ( static_cast<void>( 0 ) )
 
 #if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
 # define  gsl_ASSUME( x )           gsl_ELIDE_CONTRACT_( x ) /* there is no assume intrinsic in CUDA device code */
@@ -1636,12 +1636,16 @@ typedef gsl_CONFIG_INDEX_TYPE index;
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # endif
 #elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
+# if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+#  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
+# else
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), __trap() )
+#endif
 # define   gsl_FAILFAST_()                ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # if ! defined( NDEBUG )
-#  define  gsl_FAILFAST_()                assert( "GSL: failure" && false )
+#  define  gsl_FAILFAST_()                ( assert( ! "GSL: failure" ), ::gsl::detail::fail_fast_terminate() )
 # else
 #  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 # endif
