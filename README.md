@@ -3,7 +3,7 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://img.shields.io/github/v/release/gsl-lite/gsl-lite?sort=semver)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://vcpkg.info/port/gsl-lite) <br> [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://conan.io/center/gsl-lite) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/PloGDgU3dtDO2qVV)   |
+| [![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://img.shields.io/github/v/release/gsl-lite/gsl-lite?sort=semver)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://vcpkg.info/port/gsl-lite) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/PloGDgU3dtDO2qVV)   |
 
 
 *gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl).
@@ -56,11 +56,6 @@ int main()
 }
 ```
 
-### Compile and run
-
-```
-prompt> g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
-```
 
 In a nutshell
 -------------
@@ -95,11 +90,11 @@ find_package( gsl-lite 0.38 REQUIRED )
     
 project( my-program LANGUAGES CXX )
     
-add_executable(        my-program main.cpp )
-target_link_libraries( my-program PRIVATE gsl::gsl-lite )
+add_executable( my-program main.cpp )
+target_link_libraries( my-program PRIVATE gsl::gsl-lite-v1 )
 ```
 
-There are various ways to make the `gsl-lite` package available to your project:
+There are different ways to make the `gsl-lite` package available to your project:
 
 <details>
 <summary>Using Vcpkg</summary>
@@ -142,153 +137,24 @@ There are various ways to make the `gsl-lite` package available to your project:
     See [example/cmake-pkg/Readme.md](example/cmake-pkg/Readme.md) for a complete example.
 </p></details>
 
-<details>
-<summary>Using Conan</summary>
-<p>
-
-For the [Conan package manager](https://www.conan.io/), follow these steps:
-
-1. Add Conan Center to the conan remotes:
-
-        conan remote add center https://api.bintray.com/conan/conan/conan-center
-
-2. Add a reference to *gsl-lite* to the *requires* section of your project's `conanfile.txt` file:
-
-        [requires]
-        gsl-lite/0.38@center/stable
-
-3. Run conan's install command:
-
-        conan install gsl-lite
-
-Now *gsl-lite* can be consumed as a Conan package. (TODO: elaborate!)
-</p></details>
-
-<details>
-<summary>Using Conda</summary>
-<p>
-
-1. For the [conda package manager](https://conda.io), first use **one of these options** to install `gsl-lite` from the [`conda-forge`](https://conda-forge.org/) channel:
-
- * Install it in the current environment:
-
-        conda install -c conda-forge gsl-lite
-
- * Install it in a different environment (named `env_name` in this example):
-
-        conda install -n env_name -c conda-forge gsl-lite
-
- * Create a new environment containing *gsl-lite* (and possibly other packages, appended at the end of the command):
-
-        conda create -n env_name -c conda-forge gsl-lite cmake
-
- * Add it to an already existing [`environment.yml`](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) file, and update the environment using:
-
-        conda env update
-
-2. Then activate the environment using `conda activate env_name` (if not already activated) and proceed using the instructions from step 2 of ["As CMake package"](#as-cmake-package). Note that it's also useful to have the `cmake` package in the same environment, and explicitly passing `-DCMAKE_INSTALL_PREFIX` is not necessary.
-</p></details>
 
 ### Other options
 
-<details>
-<summary>As external Git project</summary>
-<p>
+*gsl-lite* is a header-only library; if you do not want to use the CMake package, or if you use a different build system, all
+you need to do is to add the "include" subdirectory of the *gsl-lite* source directory to your include path:
 
-TODO: this section needs updating
+        git clone git@github.com:gsl-lite/gsl-lite.git <gsl-lite-source-dir>
+        g++ -std=c++03 -I<gsl-lite-source-dir>/include main.cpp
 
-Another approach is to automatically fetch the entire *gsl-lite* repository from GitHub and configure it as an external project.
+*gsl-lite* is also a single-header library; if you want to avoid external dependencies, it suffices to copy the header file
+["include/gsl/gsl-lite.hpp"](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp) to a
+subdirectory of your project:
 
-```CMake
-cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
-
-project( use-gsl-lite LANGUAGES CXX )
-
-# Set default ExternalProject root directory and add gsl-lite:
-
-set( GSL_LITE_URL https://github.com/gsl-lite/gsl-lite.git )
-
-include( ExternalProject )
-find_package( Git REQUIRED )
-
-set_directory_properties( PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/3rd_party )
-
-ExternalProject_Add(
-    gsl-extern
-    GIT_REPOSITORY ${GSL_LITE_URL}
-    TIMEOUT 10
-    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
-   )
-
-# Provide #include access to gsl-lite as <gsl/gsl-lite.hpp>: 
-
-ExternalProject_Get_Property( gsl-extern SOURCE_DIR )
-set( GSL_LITE_INCLUDE_DIR ${SOURCE_DIR}/include CACHE INTERNAL "Include folder for gsl-lite" )
-
-add_library( gsl INTERFACE )
-target_include_directories( gsl INTERFACE ${GSL_LITE_INCLUDE_DIR} )
-
-# Build program from src:
-
-add_subdirectory( src ) 
-```
-
-In folder src:
-```CMake
-cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
-
-project( program-using-gsl-lite LANGUAGES CXX )
-
-# Make program executable:
-
-add_executable( program main.cpp )
-target_link_libraries( program PRIVATE gsl::gsl-lite )
-```
-
-This setup brings in more than you need, but also makes it easy to update *gsl-lite* to the latest version.  See [example/cmake-extern](example/cmake-extern) for a complete example.
-
-</p></details>
-
-<details>
-<summary>As copied header</summary>
-<p>
-
-Put a copy of [`gsl-lite.hpp`](include/gsl/gsl-lite.hpp) located in folder [include/gsl](include/gsl) directly into the project source tree or somewhere reachable from your project, for example in *project-root*/include/gsl. A minimal CMake setup using this header might look as follows.
-
-In project root folder:
-
-```CMake
-cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
-
-project( use-gsl-lite LANGUAGES CXX )
-
-# Provide #include access to gsl-lite as 'gsl/gsl-lite.hpp': 
-
-add_library( gsl-lite INTERFACE )
-target_include_directories( gsl-lite INTERFACE include )  # adapt as necessary
-
-# Build program from src:
-
-add_subdirectory( src ) 
-```
-
-In folder src:
-
-```CMake
-cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
-
-project( program-using-gsl-lite LANGUAGES CXX )
-
-# Make program executable:
-
-add_executable( program main.cpp )
-target_link_libraries( program PRIVATE gsl-lite )
-```
-</p></details>
+        git clone git@github.com:gsl-lite/gsl-lite.git <gsl-lite-source-dir>
+        mkdir -p external/include/gsl
+        cp <gsl-lite-source-dir>/include/gsl/gsl-lite.hpp external/include/gsl/
+        
+        g++ -std=c++03 -Iexternal/include main.cpp
 
 
 Version semantics
