@@ -1663,10 +1663,10 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # endif
 #elif defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
-# if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+# if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) || ! defined( NDEBUG )
 #  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( assert( str && ( x ) ), __trap() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : __trap() )
 #endif
 # define  gsl_FAILFAST_()                 ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
