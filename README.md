@@ -45,7 +45,7 @@ struct Widget
 
     void work() { non_owned_ptr_ = use( owned_ptr_ ); }
     
-    gsl::owner<int *> owned_ptr_; // if alias template support
+    gsl::owner<int *> owned_ptr_;  // if alias template support
     int * non_owned_ptr_;
 };
 
@@ -236,7 +236,7 @@ target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )
 ```c++
 // my-statistics-lib/include/my-statistics-lib/mean.hpp
 
-#include <gsl-lite/gsl-lite.hpp> // instead of <gsl/gsl-lite.hpp>
+#include <gsl-lite/gsl-lite.hpp>  // instead of <gsl/gsl-lite.hpp>
 
 namespace my_statistics_lib {
 
@@ -244,7 +244,7 @@ namespace my_statistics_lib {
 
     double mean( gsl::span<double const> elements )
     {
-        gsl_Expects( !elements.empty() ); // instead of Expects()
+        gsl_Expects( !elements.empty() );  // instead of Expects()
         ...
     }
 

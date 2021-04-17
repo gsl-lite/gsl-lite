@@ -22,6 +22,8 @@
 #ifndef GSL_GSL_H_INCLUDED
 #define GSL_GSL_H_INCLUDED
 
+#pragma message ("gsl/gsl is deprecated since version 0.39.0, use gsl/gsl-lite.hpp instead.")
+
 #include "gsl-lite.hpp"
 
 #endif // GSL_GSL_H_INCLUDED
