@@ -30,7 +30,7 @@
 
 #define  gsl_lite_MAJOR  0
 #define  gsl_lite_MINOR  38
-#define  gsl_lite_PATCH  0
+#define  gsl_lite_PATCH  1
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -606,6 +606,7 @@
 
 // Presence of C++11 language features:
 
+#define gsl_HAVE_C99_PREPROCESSOR          gsl_CPP11_140
 #define gsl_HAVE_AUTO                      gsl_CPP11_100
 #define gsl_HAVE_RVALUE_REFERENCE          gsl_CPP11_100
 #define gsl_HAVE_FUNCTION_REF_QUALIFIER    ( gsl_CPP11_140 && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 481 ) )
@@ -622,6 +623,7 @@
 #define gsl_HAVE_EXPRESSION_SFINAE         gsl_CPP11_140
 #define gsl_HAVE_OVERRIDE_FINAL            gsl_CPP11_110
 
+#define gsl_HAVE_C99_PREPROCESSOR_()       gsl_HAVE_C99_PREPROCESSOR
 #define gsl_HAVE_AUTO_()                   gsl_HAVE_AUTO
 #define gsl_HAVE_RVALUE_REFERENCE_()       gsl_HAVE_RVALUE_REFERENCE
 #define gsl_HAVE_FUNCTION_REF_QUALIFIER_()  gsl_HAVE_FUNCTION_REF_QUALIFIER
@@ -852,6 +854,14 @@
 #else
 # define gsl_DEPRECATED
 # define gsl_DEPRECATED_MSG( msg )
+#endif
+
+#if gsl_HAVE( C99_PREPROCESSOR )
+# if gsl_CPP20_OR_GREATER
+#  define gsl_CONSTRAINT(...)  __VA_ARGS__
+# else
+#  define gsl_CONSTRAINT(...)  typename
+# endif
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
@@ -5031,7 +5041,7 @@ public:
 //     #include <gsl-lite/gsl-lite.hpp>  // instead of <gsl/gsl-lite.hpp>
 //
 //     namespace foo {
-//         namespace gsl = ::gsl_lite; // convenience alias
+//         namespace gsl = ::gsl_lite;  // convenience alias
 //         double mean( gsl::span<double const> elements )
 //         {
 //             gsl_Expects( ! elements.empty() );  // instead of Expects()
