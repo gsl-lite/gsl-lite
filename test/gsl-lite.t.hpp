@@ -69,6 +69,9 @@
 #elif defined( __GNUC__ )
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"
+# if gsl_COMPILER_GNUC_VERSION >= 1030
+#  pragma GCC  diagnostic ignored "-Warray-bounds" // work around GCC bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100137
+# endif
 #elif defined( _MSC_VER )
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 #  pragma warning( disable : 4702 ) // unreachable code
