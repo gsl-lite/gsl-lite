@@ -30,7 +30,16 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2019]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_0, 11_1, 11_2]
+      cudaCompilerVersions: [10_2]
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [VS2019]
+      cudaCompiler: NVCC
+      cudaCompilerVersions: [11_2]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -44,6 +53,7 @@ jobs:
     - os: Windows
       cxxCompiler: Clang
       cxxCompilerVersions: [VS2019]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
 
     # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
@@ -60,6 +70,7 @@ jobs:
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [10]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
@@ -106,15 +117,38 @@ jobs:
     - os: Linux
       cxxCompiler: Clang
       cxxCompilerVersions: [11]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      platforms: [x64]
+      tag: 'memcheck'
+      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
+      postSetupSteps:
+      - bash: |
+          sudo apt install valgrind
+        displayName: 'Install Valgrind'
+
+    - os: Linux
+      cxxCompiler: Clang
+      cxxCompilerVersions: [11]
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [9]
+      cxxCompilerVersions: [6]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_0, 11_1, 11_2]
+      cudaCompilerVersions: [10_2]
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [9]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      cudaCompiler: NVCC
+      cudaCompilerVersions: [11_2]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -125,5 +159,11 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3, 12]
+      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3]
+      platforms: [x64]
+
+    - os: MacOS
+      cxxCompiler: AppleClang
+      cxxCompilerVersions: [12]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
