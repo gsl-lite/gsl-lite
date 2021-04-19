@@ -27,6 +27,7 @@
 # pragma warning( disable : 4345 ) // behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
 #endif
 
+
 // Select GSL Lite for VC6 if compiling with VC6:
 
 #if defined(_MSC_VER) && _MSC_VER < 1300
@@ -69,9 +70,6 @@
 #elif defined( __GNUC__ )
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"
-# if gsl_COMPILER_GNUC_VERSION >= 1000
-#  pragma GCC  diagnostic ignored "-Warray-bounds" // work around GCC bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100137
-# endif
 #elif defined( _MSC_VER )
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 #  pragma warning( disable : 4702 ) // unreachable code

@@ -244,6 +244,9 @@ function( make_test_target target )
             if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8 )
                 list( APPEND localOptions "-Wno-type-limits" ) # irrelevant warning about `unsigned value < 0` comparison
             endif()
+            if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0 )
+                list( APPEND localOptions "-Wno-error=array-bounds" ) # work around compiler bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100137
+            endif()
         elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" )
             list( APPEND localOptions "-Wno-c++11-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
         endif()
