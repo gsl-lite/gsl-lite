@@ -399,13 +399,13 @@ gsl_constexpr14 int use_span_with_array( int const (&array)[3], span<int const> 
     gsl_Assert( ! sp.empty() );
 
     int array2[3] = { 0, 0, 0 };
-    auto sp2 = span<int>( array2 );
+    span<int> sp2 = span<int>( array2 );
+    sp = sp2;
 #if gsl_CPP17_OR_GREATER
     array2[0] = 1;
     gsl_Assert( sp2[0] == 1 );
 #endif
-    auto sp3 = sp2;
-    sp3[1] = 2;
+    sp2[1] = 2;
     gsl_Assert( array2[1] == 2 );
     return 0;
 }
