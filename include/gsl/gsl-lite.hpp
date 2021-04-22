@@ -2255,7 +2255,7 @@ at( T(&arr)[N], size_t pos )
 }
 
 template< class Container >
-gsl_NODISCARD inline gsl_constexpr14 typename Container::value_type &
+gsl_NODISCARD gsl_api inline gsl_constexpr14 typename Container::value_type &
 at( Container & cont, size_t pos )
 {
     gsl_Expects( pos < cont.size() );
@@ -2263,7 +2263,7 @@ at( Container & cont, size_t pos )
 }
 
 template< class Container >
-gsl_NODISCARD inline gsl_constexpr14 typename Container::value_type const &
+gsl_NODISCARD gsl_api inline gsl_constexpr14 typename Container::value_type const &
 at( Container const & cont, size_t pos )
 {
     gsl_Expects( pos < cont.size() );
@@ -2273,7 +2273,7 @@ at( Container const & cont, size_t pos )
 #if gsl_HAVE( INITIALIZER_LIST )
 
 template< class T >
-gsl_NODISCARD inline const gsl_constexpr14 T
+gsl_NODISCARD gsl_api inline const gsl_constexpr14 T
 at( std::initializer_list<T> cont, size_t pos )
 {
     gsl_Expects( pos < cont.size() );
@@ -2347,16 +2347,16 @@ struct not_null_data< T, false >
 {
     T ptr_;
 
-    gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
     : ptr_( std::move( _ptr ) )
     {
     }
 
-    gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
     : ptr_( std::move( other.ptr_ ) )
     {
     }
-    gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
     {
         ptr_ = std::move( other.ptr_ );
         return *this;
@@ -2374,34 +2374,34 @@ struct not_null_data< T, true >
 {
     T ptr_;
 
-    gsl_constexpr14 not_null_data( T const & _ptr ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( T const & _ptr ) gsl_noexcept
     : ptr_( _ptr )
     {
     }
 
 #if gsl_HAVE( MOVE_FORWARD )
-    gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( T && _ptr ) gsl_noexcept
     : ptr_( std::move( _ptr ) )
     {
     }
 
-    gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( not_null_data && other ) gsl_noexcept
     : ptr_( std::move( other.ptr_ ) )
     {
     }
-    gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data && other ) gsl_noexcept
     {
         ptr_ = std::move( other.ptr_ );
         return *this;
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
-    gsl_constexpr14 not_null_data( not_null_data const & other )
+    gsl_api gsl_constexpr14 not_null_data( not_null_data const & other )
     : ptr_( other.ptr_ )
     {
         gsl_Expects( ptr_ != gsl_nullptr );
     }
-    gsl_constexpr14 not_null_data & operator=( not_null_data const & other )
+    gsl_api gsl_constexpr14 not_null_data & operator=( not_null_data const & other )
     {
         gsl_Expects( other.ptr_ != gsl_nullptr );
         ptr_ = other.ptr_;
@@ -2414,7 +2414,7 @@ struct not_null_data< T *, true >
 {
     T * ptr_;
 
-    gsl_constexpr14 not_null_data( T * _ptr ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( T * _ptr ) gsl_noexcept
     : ptr_( _ptr )
     {
     }
@@ -2472,14 +2472,14 @@ public:
         , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
 #  endif
     >
-    gsl_constexpr14 explicit not_null( U other )
+    gsl_api gsl_constexpr14 explicit not_null( U other )
     : data_( T( std::move( other ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_constexpr14 explicit not_null( U const& other )
+    gsl_api gsl_constexpr14 explicit not_null( U const& other )
     : data_( T( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2494,7 +2494,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
-    gsl_constexpr14 explicit not_null( U other )
+    gsl_api gsl_constexpr14 explicit not_null( U other )
     : data_( T( std::move( other ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2504,7 +2504,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
-    gsl_constexpr14 not_null( U other )
+    gsl_api gsl_constexpr14 not_null( U other )
     : data_( std::move( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2512,7 +2512,7 @@ public:
 #  else // a.k.a. !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
-    gsl_constexpr14 not_null( U other )
+    gsl_api gsl_constexpr14 not_null( U other )
     : data_( T( std::move( other ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2520,7 +2520,7 @@ public:
 #  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_constexpr14 not_null( U const& other )
+    gsl_api gsl_constexpr14 not_null( U const& other )
     : data_( T( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2537,7 +2537,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
-    gsl_constexpr14 explicit not_null( not_null<U> other )
+    gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2547,7 +2547,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
     >
-    gsl_constexpr14 not_null( not_null<U> other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2555,13 +2555,13 @@ public:
 # else // a.k.a. ! ( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
-    gsl_constexpr14 not_null( not_null<U> other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( std::move( other.data_.ptr_ ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
     template< class U >
-    gsl_constexpr14 not_null<T>& operator=( not_null<U> other )
+    gsl_api gsl_constexpr14 not_null<T>& operator=( not_null<U> other )
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr );
         data_.ptr_ = std::move( other.data_.ptr_ );
@@ -2570,13 +2570,13 @@ public:
 # endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 #else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_constexpr14 not_null( not_null<U> const& other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> const& other )
     : data_( T( other.data_.ptr_ ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
     template< class U >
-    gsl_constexpr14 not_null<T>& operator=( not_null<U> const & other )
+    gsl_api gsl_constexpr14 not_null<T>& operator=( not_null<U> const & other )
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr );
         data_.ptr_ = other.data_.ptr_;
@@ -2585,7 +2585,7 @@ public:
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_NODISCARD gsl_constexpr14 element_type *
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
     get() const
     {
         element_type * result = data_.ptr_.get();
@@ -2594,7 +2594,7 @@ public:
     }
 #else
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-    gsl_NODISCARD gsl_constexpr14 T const &
+    gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
     {
         T const & result = data_.ptr_;
@@ -2602,7 +2602,7 @@ public:
         return result;
     }
 # else
-    gsl_NODISCARD gsl_constexpr14 T
+    gsl_NODISCARD gsl_api gsl_constexpr14 T
     get() const
     {
         T result = data_.ptr_;
@@ -2648,7 +2648,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
-    gsl_NODISCARD gsl_constexpr14 explicit
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() const
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     &
@@ -2663,7 +2663,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
-    gsl_NODISCARD gsl_constexpr14 explicit
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() &&
     {
         U result( std::move( data_.ptr_ ) );
@@ -2677,7 +2677,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
-    gsl_NODISCARD gsl_constexpr14
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     &
@@ -2692,7 +2692,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
-    gsl_NODISCARD gsl_constexpr14
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() &&
     {
         U result( std::move( data_.ptr_ ) );
@@ -2702,7 +2702,7 @@ public:
 # endif
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
     template< class U >
-    gsl_NODISCARD gsl_constexpr14
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
     {
         U result( data_.ptr_ );
@@ -2711,7 +2711,7 @@ public:
     }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
-    gsl_NODISCARD gsl_constexpr14 T const &
+    gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     operator->() const
     {
         T const & result( data_.ptr_ );
@@ -2719,7 +2719,7 @@ public:
         return result;
     }
 
-    gsl_NODISCARD gsl_constexpr14 element_type &
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
     operator*() const
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2728,13 +2728,13 @@ public:
 
 #if gsl_HAVE( MOVE_FORWARD )
     // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
-    gsl_constexpr14 not_null( not_null && other )
+    gsl_api gsl_constexpr14 not_null( not_null && other )
     gsl_noexcept_not_testing  // we want to be nothrow-movable despite the precondition check
     : data_( std::move( other.data_ ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
-    gsl_constexpr14 not_null & operator=( not_null && other )
+    gsl_api gsl_constexpr14 not_null & operator=( not_null && other )
     gsl_noexcept_not_testing // we want to be nothrow-movable despite the precondition check
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr || &other == this );
@@ -2748,7 +2748,7 @@ public:
     gsl_constexpr14 not_null & operator=( not_null const & ) = default;
 #endif
 
-    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
+    gsl_api gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
     gsl_noexcept_not_testing // we want to be nothrow-swappable despite the precondition check
     {
         gsl_Expects( lhs.data_.ptr_ != gsl_nullptr && rhs.data_.ptr_ != gsl_nullptr );
@@ -2797,7 +2797,7 @@ private:
 public:
     typedef T element_type;
 
-    gsl_constexpr14
+    gsl_api gsl_constexpr14
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
     explicit
 #endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
@@ -2815,7 +2815,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T*, U>::value && !std::is_convertible<U, T*>::value ), int >::type = 0
     >
-    gsl_constexpr14 explicit not_null( not_null<U> other )
+    gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
     : data_( static_cast<T*>( std::move( other.data_.ptr_ ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2825,7 +2825,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_convertible<U, T*>::value ), int >::type = 0
     >
-    gsl_constexpr14 not_null( not_null<U> other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( std::move( other.data_.ptr_ ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2833,13 +2833,13 @@ public:
 # else // a.k.a. ! ( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     // If type_traits are not available, then we can't distinguish `is_convertible<>` and `is_constructible<>`, so we unconditionally permit implicit construction.
     template< class U >
-    gsl_constexpr14 not_null( not_null<U> other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( std::move( other.data_.ptr_ ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
     template< class U >
-    gsl_constexpr14 not_null<T*>& operator=( not_null<U> other )
+    gsl_api gsl_constexpr14 not_null<T*>& operator=( not_null<U> other )
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr );
         data_.ptr_ = std::move( other.data_.ptr_ );
@@ -2848,13 +2848,13 @@ public:
 # endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 #else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_constexpr14 not_null( not_null<U> const& other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> const& other )
     : data_( other.data_.ptr_ )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
     template< class U >
-    gsl_constexpr14 not_null<T*>& operator=( not_null<U> const & other )
+    gsl_api gsl_constexpr14 not_null<T*>& operator=( not_null<U> const & other )
     {
         gsl_Expects( other.data_.ptr_ != gsl_nullptr );
         data_.ptr_ = other.data_.ptr_;
@@ -2863,7 +2863,7 @@ public:
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_NODISCARD gsl_constexpr14 T*
+    gsl_NODISCARD gsl_api gsl_constexpr14 T*
     get() const
     {
         return data_.ptr_;
@@ -2876,7 +2876,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<U, T*>::value && !std::is_convertible<T*, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
-    gsl_NODISCARD gsl_constexpr14 explicit
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() const
     {
         return U( data_.ptr_ );
@@ -2887,27 +2887,27 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<U, T*>::value && std::is_convertible<T*, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
     >
-    gsl_NODISCARD gsl_constexpr14
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
     {
         return data_.ptr_;
     }
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
     template< class U >
-    gsl_NODISCARD gsl_constexpr14
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
     {
         return data_.ptr_;
     }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
-    gsl_NODISCARD gsl_constexpr14 T*
+    gsl_NODISCARD gsl_api gsl_constexpr14 T*
     operator->() const
     {
         return data_.ptr_;
     }
 
-    gsl_NODISCARD gsl_constexpr14 element_type &
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
     operator*() const
     {
         return *data_.ptr_;
@@ -2918,7 +2918,7 @@ public:
     gsl_constexpr14 not_null & operator=( not_null const & ) = default;
 #endif
 
-    gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
+    gsl_api gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs ) gsl_noexcept
     {
         using std::swap;
         swap( lhs.data_.ptr_, rhs.data_.ptr_ );
@@ -2961,26 +2961,26 @@ void make_not_null( std::nullptr_t ) gsl_is_delete;
 #endif // gsl_HAVE( NULLPTR )
 #if gsl_HAVE( MOVE_FORWARD )
 template< class U >
-gsl_NODISCARD gsl_constexpr14 not_null<U>
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
 make_not_null( U u )
 {
     return not_null<U>( std::move( u ) );
 }
 template< class U >
-gsl_NODISCARD gsl_constexpr14 not_null<U>
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
 make_not_null( not_null<U> u )
 {
     return std::move( u );
 }
 #else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
 template< class U >
-gsl_NODISCARD not_null<U>
+gsl_NODISCARD gsl_api not_null<U>
 make_not_null( U const & u )
 {
     return not_null<U>( u );
 }
 template< class U >
-gsl_NODISCARD not_null<U>
+gsl_NODISCARD gsl_api not_null<U>
 make_not_null( not_null<U> const & u )
 {
     return u;
@@ -3003,12 +3003,12 @@ template< class T >
 struct not_null_accessor
 {
 #if gsl_HAVE( MOVE_FORWARD )
-    static T get( not_null<T>&& p ) gsl_noexcept
+    static gsl_api T get( not_null<T>&& p ) gsl_noexcept
     {
         return std::move( p.data_.ptr_ );
     }
 #endif
-    static T const & get( not_null<T> const & p ) gsl_noexcept
+    static gsl_api T const & get( not_null<T> const & p ) gsl_noexcept
     {
         return p.data_.ptr_;
     }
@@ -3018,14 +3018,14 @@ namespace no_adl {
 
 #if gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD auto as_nullable( T && p )
+gsl_NODISCARD gsl_api gsl_constexpr auto as_nullable( T && p )
 gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
 -> typename detail::as_nullable_helper<typename std20::remove_cvref<T>::type>::type
 {
     return std::move( p );
 }
 template< class T >
-gsl_NODISCARD T as_nullable( not_null<T> && p )
+gsl_NODISCARD gsl_api gsl_constexpr14 T as_nullable( not_null<T> && p )
 {
     T result = detail::not_null_accessor<T>::get( std::move( p ) );
     gsl_Expects( result != gsl_nullptr );
@@ -3033,20 +3033,20 @@ gsl_NODISCARD T as_nullable( not_null<T> && p )
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD T const & as_nullable( T const & p ) gsl_noexcept
+gsl_NODISCARD gsl_api gsl_constexpr T const & as_nullable( T const & p ) gsl_noexcept
 {
     return p;
 }
 #endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD T const & as_nullable( not_null<T> const & p )
+gsl_NODISCARD gsl_api gsl_constexpr14 T const & as_nullable( not_null<T> const & p )
 {
     T const & result = detail::not_null_accessor<T>::get( p );
     gsl_Expects( result != gsl_nullptr );
     return result;
 }
 template< class T >
-gsl_NODISCARD T* as_nullable( not_null<T*> p ) gsl_noexcept
+gsl_NODISCARD gsl_api gsl_constexpr T* as_nullable( not_null<T*> p ) gsl_noexcept
 {
     return detail::not_null_accessor<T*>::get( p );
 }
@@ -3065,7 +3065,7 @@ public:
     template< class U
         gsl_ENABLE_IF_(( std::is_constructible<T, U>::value ))
     >
-    gsl_constexpr14
+    gsl_api gsl_constexpr14
 #if gsl_HAVE( MOVE_FORWARD )
     not_null_ic( U && u )
     : not_null<T>( std::forward<U>( u ) )
@@ -3108,21 +3108,21 @@ operator!=( std::nullptr_t , not_null<T> const & ) = delete;
 #endif // gsl_HAVE( NULLPTR ) && gsl_HAVE( IS_DELETE )
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l.operator->() == r.operator->() )
 {
     return l.operator->() == r.operator->();
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_(l.operator->() == r )
 {
     return l.operator->() == r;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l == r.operator->() )
 {
@@ -3130,21 +3130,21 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l.operator->() < r.operator->() )
 {
     return l.operator->() < r.operator->();
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( l.operator->() < r )
 {
     return l.operator->() < r;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( l < r.operator->() )
 {
@@ -3152,21 +3152,21 @@ gsl_RETURN_DECLTYPE_( l < r.operator->() )
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
@@ -3174,21 +3174,21 @@ gsl_RETURN_DECLTYPE_( !( l == r ) )
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
     return !( r < l );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<=( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( r < l ) )
 {
@@ -3196,21 +3196,21 @@ gsl_RETURN_DECLTYPE_( !( r < l ) )
 }
 
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( r < l )
 {
     return r < l;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( r < l )
 {
     return r < l;
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( r < l )
 {
@@ -3218,21 +3218,21 @@ gsl_RETURN_DECLTYPE_( r < l )
 }
 
 template< class T, class U >
-gsl_NODISCARD  gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( not_null<T> const & l, U const & r )
 gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
     return !( l < r );
 }
 template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
+gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator>=( T const & l, not_null<U> const & r )
 gsl_RETURN_DECLTYPE_( !( l < r ) )
 {
@@ -3504,7 +3504,7 @@ public:
 
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
     template< class U, size_t N >
-    gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
+    gsl_api gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
         : first_( gsl_ADDRESSOF( arr[0] ) )
         , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
     {}
@@ -3512,7 +3512,7 @@ public:
     template< size_t N
         gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
     >
-    gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
+    gsl_api gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
         : first_( gsl_ADDRESSOF( arr[0] ) )
         , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
     {}
@@ -3522,13 +3522,13 @@ public:
 #if ! gsl_DEPRECATE_TO_LEVEL( 5 )
 
     template< class U, size_t N >
-    gsl_constexpr span( std::array< U, N > & arr )
+    gsl_api gsl_constexpr span( std::array< U, N > & arr )
         : first_( arr.data() )
         , last_ ( arr.data() + N )
     {}
 
     template< class U, size_t N >
-    gsl_constexpr span( std::array< U, N > const & arr )
+    gsl_api gsl_constexpr span( std::array< U, N > const & arr )
         : first_( arr.data() )
         , last_ ( arr.data() + N )
     {}
@@ -3558,7 +3558,7 @@ public:
     template< class Container
         gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
     >
-    gsl_constexpr span( Container & cont ) gsl_noexcept
+    gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
         , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
@@ -3569,7 +3569,7 @@ public:
             && detail::is_compatible_container< Container, element_type >::value
         ))
     >
-    gsl_constexpr span( Container const & cont ) gsl_noexcept
+    gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
         : first_( std17::data( cont ) )
         , last_ ( std17::data( cont ) + std17::size( cont ) )
     {}
