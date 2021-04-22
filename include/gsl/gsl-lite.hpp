@@ -2,7 +2,8 @@
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
-// Copyright (c) 2015-2018 Martin Moene
+// Copyright (c) 2015-2019 Martin Moene
+// Copyright (c) 2019-2021 Moritz Beutel
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
 //
 // This code is licensed under the MIT License (MIT).
@@ -381,11 +382,7 @@
 #endif
 #if 0 == defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) + defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 // select default
-//# if gsl_CONFIG_DEFAULTS_VERSION >= 1
-//#  define gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS  // This is still controversial because it's non-conforming.
-//# else
-#  define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
-//# endif
+# define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 #if 0 == defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME ) + defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
 // select default
@@ -3416,6 +3413,7 @@ namespace detail {
 template< class T >
 gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
 {
+        // Be sure to run the check before doing pointer arithmetics, which would be UB for `nullptr` and non-0 integers.
     gsl_Expects( size == 0 || data != gsl_nullptr );
     return data + size;
 }
@@ -4528,7 +4526,7 @@ public:
     }
 
 private:
-    gsl_api static gsl_constexpr14 span_type remove_z( pointer const & sz, std::size_t max )
+    gsl_api static gsl_constexpr14 span_type remove_z( pointer sz, std::size_t max )
     {
         return span_type( sz, detail::string_length( sz, max ) );
     }

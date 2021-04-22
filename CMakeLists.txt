@@ -1,4 +1,5 @@
-# Copyright 2015-2018 by Martin Moene
+# Copyright 2015-2019 by Martin Moene
+# Copyright 2019-2021 by Moritz Beutel
 #
 # https://github.com/gsl-lite/gsl-lite
 #

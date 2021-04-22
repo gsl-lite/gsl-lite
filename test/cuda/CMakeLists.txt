@@ -1,4 +1,5 @@
 # Copyright 2015-2018 by Martin Moene
+# Copyright 2019-2021 by Moritz Beutel
 #
 # gsl-lite is based on GSL: Guidelines Support Library,
 # https://github.com/microsoft/gsl
