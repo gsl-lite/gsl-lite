@@ -1,6 +1,25 @@
 Changes in gsl-lite
 ===================
 
+version 0.38.1 2021-04-22
+
+Additions:
+- Add feature detection macro `gsl_HAVE( C99_PREPROCESSOR )`
+- Add `gsl_CONSTRAINT()` which can be used to impose concept requirements on template type parameters in a backward-compatible manner:
+  `template< gsl_CONSTRAINT(Concept) T >` expands to `template< Concept T >` for C++20 and to `template< typename T >` otherwise
+- Add C++20 polyfill `std20::endian()` (#305)
+- Restore Continuous Integration testing for NVCC 10.2
+- Add basic CUDA runtime tests to test suite (#307)
+
+Changes:
+- Continuous Integration now also tests "RelWithDebInfo" configuration for select compilers and platforms
+
+Fixes:
+- Fix regression in precondition/postcondition/assertion checks for CUDA (cf. #302, thanks to @Spielix)
+- Add workaround for GCC bug to test suite (cf. #303, thanks to @sanjayankur31)
+- Fix endianness issues in test suite (cf. #304, thanks to @sanjayankur31)
+- Improve `constexpr` support for `span<>`; add `constexpr` tests (#306)
+
 version 0.38.0 2021-03-31
 
 Additions:

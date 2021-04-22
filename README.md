@@ -898,6 +898,7 @@ span<>: Allows to construct from a C-array with size via decay to pointer (poten
 span<>: Allows to construct from a const C-array with size via decay to pointer (potentially dangerous)
 span<>: Allows to construct from a std::initializer_list<> (C++11)
 span<>: Allows to construct from a std::array<> (C++11)
+span<>: Allows constexpr use (C++14)
 span<>: Allows to construct from a std::array<> with const data (C++11) [deprecated-5]
 span<>: Allows to construct from a container (std::vector<>)
 span<>: Allows to construct from a temporary container (potentially dangerous)
@@ -1091,6 +1092,11 @@ narrow<>(): Terminates when narrowing with sign loss
 narrow_failfast<>(): Allows narrowing without value loss
 narrow_failfast<>(): Terminates when narrowing with value loss
 narrow_failfast<>(): Terminates when narrowing with sign loss
+CUDA: Precondition/postcondition checks and assertions can be used in kernel code
+CUDA: span<> can be passed to kernel code
+CUDA: span<> can be used in kernel code
+CUDA: not_null<> can be passed to and used in kernel code
+CUDA: gsl_FailFast() can be used in kernel code
 ```
 </p>
 </details>
