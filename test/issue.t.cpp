@@ -57,6 +57,11 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
 #endif
 }
 
+#if gsl_COMPILER_MSVC_VERSION
+# pragma warning( push )
+# pragma warning( disable : 4127 ) // conditional expression is constant
+#endif
+
 CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [issue #34](GSL issue #313, PR #390)" )
 {
 #if gsl_HAVE( ENUM_CLASS )
@@ -80,6 +85,10 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [i
     }
 #endif // gsl_HAVE( ENUM_CLASS )
 }
+
+#if gsl_COMPILER_MSVC_VERSION
+# pragma warning( pop )
+#endif
 
 CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
 {
