@@ -3036,7 +3036,7 @@ gsl_NODISCARD gsl_api gsl_constexpr14 T as_nullable( not_null<T> && p )
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD gsl_api gsl_constexr T const & as_nullable( T const & p ) gsl_noexcept
+gsl_NODISCARD gsl_api gsl_constexpr T const & as_nullable( T const & p ) gsl_noexcept
 {
     return p;
 }
