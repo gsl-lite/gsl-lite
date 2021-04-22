@@ -80,8 +80,8 @@ jobs:
       cxxCompilerVersions: [VS2019]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp20'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
 
     - os: Windows
       cxxCompiler: MSVC
@@ -97,8 +97,8 @@ jobs:
       cxxCompilerVersions: [12]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp20'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
 
     # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
     #- os: Linux
