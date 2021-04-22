@@ -387,6 +387,45 @@ CASE( "span<>: Allows to construct from a std::array<> (C++11)" )
 #endif
 }
 
+gsl_constexpr14 int use_span_with_array( int const (&array)[3], span<int const> sp )
+{
+    gsl_Assert( sp.size() == 3 );
+    gsl_Assert( sp.front() == 0 );
+    gsl_Assert( sp[1] == array[1] );
+    gsl_Assert( sp.back() == 2 );
+    gsl_Assert( sp.first( 0 ).size() == 0 );
+    gsl_Assert( sp.last( 1 ).size() == 1 );
+    gsl_Assert( sp.subspan( 1, 2 ).size() == 2 );
+    gsl_Assert( ! sp.empty() );
+
+    int array2[3] = { 0, 0, 0 };
+    span<int> sp2 = span<int>( array2 );
+    sp = sp2;
+#if gsl_CPP17_OR_GREATER
+    array2[0] = 1;
+    gsl_Assert( sp2[0] == 1 );
+#endif
+    sp2[1] = 2;
+    gsl_Assert( array2[1] == 2 );
+    return 0;
+}
+
+CASE("span<>: Allows constexpr use (C++14)")
+{
+#if gsl_HAVE( CONSTEXPR_14 ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 700 )
+    constexpr int array[3] = { 0, 1, 2 };
+# if gsl_FEATURE_TO_STD( MAKE_SPAN )
+    constexpr int r1 = use_span_with_array( array, make_span( array ) );
+    constexpr int r2 = use_span_with_array( array, make_span( array, array + 3 ) );
+    constexpr int r3 = use_span_with_array( array, make_span( array, 3 ) );
+# endif
+    constexpr int r4 = use_span_with_array( array, span<int const>( array ) );
+    constexpr int r5 = use_span_with_array( array, span<int const>( array, array + 3 ) );
+    constexpr int r6 = use_span_with_array( array, span<int const>( array, 3 ) );
+    EXPECT( (r1 | r2 | r3 | r4 | r5 | r6) == 0 );
+#endif
+}
+
 CASE( "span<>: Allows to construct from a std::array<> with const data (C++11) " "[deprecated-5]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 5 )

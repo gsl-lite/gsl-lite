@@ -3411,6 +3411,17 @@ const  gsl_constexpr   with_container_t with_container; // TODO: this can lead t
 
 #endif
 
+namespace detail {
+
+template< class T >
+gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
+{
+    gsl_Expects( size == 0 || data != gsl_nullptr );
+    return data + size;
+}
+
+} // namespace detail
+
 //
 // span<> - A 1D view of contiguous T's, replace (*,len).
 //
@@ -3470,10 +3481,9 @@ public:
 #endif // deprecate
 
     gsl_api gsl_constexpr14 span( pointer data_in, index_type size_in )
+        : first_( data_in )
+        , last_( detail::endptr( data_in, size_in ) )
     {
-        gsl_Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
-        first_ = data_in;
-        last_ = data_in + size_in;
     }
 
     gsl_api gsl_constexpr14 span( pointer first_in, pointer last_in )
@@ -3487,10 +3497,9 @@ public:
 
     template< class U >
     gsl_api gsl_constexpr14 span( U * data_in, index_type size_in )
+        : first_( data_in )
+        , last_( detail::endptr( data_in, size_in ) )
     {
-        gsl_Expects( size_in == 0 || ( size_in > 0 && data_in != gsl_nullptr ) );
-        first_ = data_in;
-        last_ = data_in + size_in;
     }
 
 #endif // deprecate
