@@ -24,31 +24,44 @@ jobs:
 
     targets:
 
-    # VS 2010, 2012, 2013, and 2015 are tested with AppVeyor
+    # put a set of representative (and slow) jobs first
 
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [10_2]
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [11_2]
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [10]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
+      tag: 'memcheck'
+      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
+      postSetupSteps:
+      - bash: |
+          sudo apt install valgrind
+        displayName: 'Install Valgrind'
+
+    - os: Linux
+      cxxCompiler: GCC
+      cxxCompilerVersions: [9]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      cudaCompiler: NVCC
+      cudaCompilerVersions: [11_2]
+      platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2017]
-      cmakeGenerator: 'MSBuild' # required for CppCoreCheck
-      platforms: [x86, x64]
-      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
+    - os: Linux
+      cxxCompiler: Clang
+      cxxCompilerVersions: [11]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      platforms: [x64]
+      tag: 'memcheck'
+      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
+      postSetupSteps:
+      - bash: |
+          sudo apt install valgrind
+        displayName: 'Install Valgrind'
 
     - os: Windows
       cxxCompiler: MSVC
@@ -64,6 +77,21 @@ jobs:
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
 
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [VS2019]
+      cudaCompiler: NVCC
+      cudaCompilerVersions: [11_2]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: MacOS
+      cxxCompiler: AppleClang
+      cxxCompilerVersions: [12]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      platforms: [x64]
+
     # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
     #- os: Linux
     #  cxxCompiler: GCC
@@ -74,20 +102,6 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [6, 7, 8, 9]
       platforms: [x64]
-
-    - os: Linux
-      cxxCompiler: GCC
-      cxxCompilerVersions: [10]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x64]
-      tag: 'memcheck'
-      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
-      postSetupSteps:
-      - bash: |
-          sudo apt install valgrind
-        displayName: 'Install Valgrind'
 
     - os: Linux
       cxxCompiler: GCC
@@ -125,20 +139,6 @@ jobs:
     - os: Linux
       cxxCompiler: Clang
       cxxCompilerVersions: [11]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x64]
-      tag: 'memcheck'
-      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
-      postSetupSteps:
-      - bash: |
-          sudo apt install valgrind
-        displayName: 'Install Valgrind'
-
-    - os: Linux
-      cxxCompiler: Clang
-      cxxCompilerVersions: [11]
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
@@ -151,14 +151,22 @@ jobs:
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
-    - os: Linux
-      cxxCompiler: GCC
-      cxxCompilerVersions: [9]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    # VS 2010, 2012, 2013, and 2015 are tested with AppVeyor
+
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [VS2019]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_2]
+      cudaCompilerVersions: [10_2]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: Windows
+      cxxCompiler: MSVC
+      cxxCompilerVersions: [VS2017]
+      cmakeGenerator: 'MSBuild' # required for CppCoreCheck
+      platforms: [x86, x64]
+      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
 
     - os: MacOS
       cxxCompiler: GCC
@@ -168,10 +176,4 @@ jobs:
     - os: MacOS
       cxxCompiler: AppleClang
       cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3]
-      platforms: [x64]
-
-    - os: MacOS
-      cxxCompiler: AppleClang
-      cxxCompilerVersions: [12]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
