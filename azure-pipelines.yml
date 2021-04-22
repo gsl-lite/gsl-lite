@@ -34,7 +34,8 @@ jobs:
       tag: 'memcheck'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
       postSetupSteps:
       - bash: |
           sudo apt install valgrind
@@ -57,7 +58,8 @@ jobs:
       tag: 'memcheck'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
       postSetupSteps:
       - bash: |
           sudo apt install valgrind
@@ -70,12 +72,16 @@ jobs:
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
       cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
 
     - os: Windows
       cxxCompiler: Clang
       cxxCompilerVersions: [VS2019]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp20'
 
     - os: Windows
       cxxCompiler: MSVC
@@ -91,6 +97,8 @@ jobs:
       cxxCompilerVersions: [12]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp20'
 
     # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
     #- os: Linux
@@ -100,7 +108,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [6, 7, 8, 9]
+      cxxCompilerVersions: [6, 7, 8, 9, 10]
       platforms: [x64]
 
     - os: Linux
@@ -111,8 +119,8 @@ jobs:
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v0-cpp17|gsl-lite-v1-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
 
     # Clang 3.5, 3.6, 3.7, 3.8, and 3.9 are tested with Travis
     #- os: Linux
@@ -122,7 +130,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [4, 5, 6, 7, 8, 9, 10]
+      cxxCompilerVersions: [4, 5, 6, 7, 8, 9, 10, 11]
       platforms: [x64]
 
     - os: Linux
@@ -133,8 +141,8 @@ jobs:
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v0-cpp17|gsl-lite-v1-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
 
     - os: Linux
       cxxCompiler: Clang
@@ -163,10 +171,8 @@ jobs:
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2017]
-      cmakeGenerator: 'MSBuild' # required for CppCoreCheck
+      cxxCompilerVersions: [VS2017, VS2019]
       platforms: [x86, x64]
-      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
 
     - os: MacOS
       cxxCompiler: GCC
@@ -175,5 +181,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3]
+      cxxCompilerVersions: [9_1, 10, 10_0_1, 11, 11_0_3, 12]
       platforms: [x64]
