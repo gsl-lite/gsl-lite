@@ -402,7 +402,7 @@ gsl_constexpr14 int use_span_with_array( int const (&array)[3], span<int const> 
     auto sp2 = span<int>( array2 );
 #if gsl_CPP17_OR_GREATER
     array2[0] = 1;
-    gsl_Assert( sp[0] == 1 );
+    gsl_Assert( sp2[0] == 1 );
 #endif
     auto sp3 = sp2;
     sp3[1] = 2;
