@@ -412,7 +412,7 @@ gsl_constexpr14 int use_span_with_array( int const (&array)[3], span<int const> 
 
 CASE("span<>: Allows constexpr use (C++14)")
 {
-#if gsl_HAVE( CONSTEXPR_14 )
+#if gsl_HAVE( CONSTEXPR_14 ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 1, 700 )
     constexpr int array[3] = { 0, 1, 2 };
 # if gsl_FEATURE_TO_STD( MAKE_SPAN )
     constexpr int r1 = use_span_with_array( array, make_span( array ) );

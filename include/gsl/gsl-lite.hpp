@@ -3396,7 +3396,7 @@ const  gsl_constexpr   with_container_t with_container; // TODO: this can lead t
 namespace detail {
 
 template< class T >
-gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
+gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
 {
     gsl_Expects( size == 0 || data != gsl_nullptr );
     return data + size;
