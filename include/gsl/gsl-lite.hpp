@@ -942,11 +942,7 @@
     //
     // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
     //
-    //     enum class Vegetables {
-    //         tomato   = 0b001,
-    //         onion    = 0b010,
-    //         eggplant = 0b100
-    //     };
+    //     enum class Vegetables { tomato = 0b001, onion = 0b010, eggplant = 0b100 };
     //     gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
     //
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
@@ -954,11 +950,7 @@
     //
     // Defines relational operators `<`, `>`, `<=`, `>=` for the given enum type.
     //
-    //     enum class OperatorPrecedence {
-    //         additive = 0,
-    //         multiplicative = 1,
-    //         power = 2
-    //     };
+    //     enum class OperatorPrecedence { additive = 0, multiplicative = 1, power = 2 };
     //     gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
     //
 #define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
@@ -1037,7 +1029,7 @@
 # include <iterator> // for reverse_iterator<>
 #endif
 
-#if !gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || !gsl_HAVE( AUTO )
+#if ! gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || ! gsl_HAVE( AUTO )
 # include <vector>
 #endif
 
@@ -1051,6 +1043,10 @@
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
 # include <intrin.h>
+#endif
+
+#if gsl_HAVE( ENUM_CLASS ) && gsl_COMPILER_ARMCC_VERSION
+# include <endian.h>
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
@@ -1389,6 +1385,28 @@ struct identity
         return std::forward<T>( arg );
     }
 };
+
+# if gsl_HAVE( ENUM_CLASS )
+enum class endian
+{
+#  if defined( _WIN32 )
+    little = 0,
+    big    = 1,
+    native = little
+#  elif gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+    little = __ORDER_LITTLE_ENDIAN__,
+    big    = __ORDER_BIG_ENDIAN__,
+    native = __BYTE_ORDER__
+#  elif gsl_COMPILER_ARMCC_VERSION
+    // from <endian.h> header file
+    little = __LITTLE_ENDIAN,
+    big    = __BIG_ENDIAN,
+    native = __BYTE_ORDER
+#  else
+// Do not define any endianness constants for unknown compilers.
+#  endif
+};
+# endif // gsl_HAVE( ENUM_CLASS )
 
 #endif // gsl_CPP11_100
 

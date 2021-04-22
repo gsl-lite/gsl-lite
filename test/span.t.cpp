@@ -1684,25 +1684,62 @@ CASE( "byte_span() (gsl_FEATURE_BYTE_SPAN=1)" )
     EXPECT( !!"(avoid warning)" );  // suppress: unused parameter 'lest_env' [-Wunused-parameter]
 }
 
+# if gsl_COMPILER_MSVC_VERSION
+#  pragma warning( push )
+#  pragma warning( disable : 4127 ) // conditional expression is constant
+# endif
+
 CASE( "byte_span(): Allows to build a span of gsl::byte from a single object" )
 {
+# if gsl_HAVE( ENUM_CLASS )
     int x = (std::numeric_limits<int>::max)();
 
     span<gsl::byte> spn = byte_span( x );
 
     EXPECT( spn.size() == index_type( sizeof x ) );
-    EXPECT( spn[0]     == to_byte( 0xff ) );
+    if ( sizeof x > 1 )
+    {
+        if ( std20::endian::native == std20::endian::little )
+        {
+            EXPECT( spn[0]            == to_byte( 0xff ) );
+            EXPECT( spn[sizeof x - 1] == to_byte( 0x7f ) );
+        }
+        else if ( std20::endian::native == std20::endian::big )
+        {
+            EXPECT( spn[sizeof x - 1] == to_byte( 0xff ) );
+            EXPECT( spn[0]            == to_byte( 0x7f ) );
+        }
+    }
+# endif // gsl_HAVE( ENUM_CLASS )
 }
 
 CASE( "byte_span(): Allows to build a span of const gsl::byte from a single const object" )
 {
+# if gsl_HAVE( ENUM_CLASS )
     const int x = (std::numeric_limits<int>::max)();
 
     span<const gsl::byte> spn = byte_span( x );
 
     EXPECT( spn.size() == index_type( sizeof x ) );
-    EXPECT( spn[0]     == to_byte( 0xff ) );
+    if ( sizeof x > 1 )
+    {
+        if ( std20::endian::native == std20::endian::little )
+        {
+            EXPECT( spn[0]            == to_byte( 0xff ) );
+            EXPECT( spn[sizeof x - 1] == to_byte( 0x7f ) );
+        }
+        else if ( std20::endian::native == std20::endian::big )
+        {
+            EXPECT( spn[sizeof x - 1] == to_byte( 0xff ) );
+            EXPECT( spn[0]            == to_byte( 0x7f ) );
+        }
+    }
+# endif // gsl_HAVE( ENUM_CLASS )
 }
+
+# if gsl_COMPILER_MSVC_VERSION
+#  pragma warning( pop )
+# endif
 
 #endif // span_PROVIDE( BYTE_SPAN )
 
