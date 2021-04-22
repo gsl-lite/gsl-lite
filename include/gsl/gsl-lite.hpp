@@ -1856,6 +1856,8 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
 
 #if gsl_STDLIB_CPP11_110
 
+gsl_DISABLE_MSVC_WARNINGS( 4702 ) // unreachable code
+
 template< class F >
 class final_action
 {
@@ -1996,6 +1998,8 @@ on_error( F && action ) gsl_noexcept
 }
 
 # endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+
+gsl_RESTORE_MSVC_WARNINGS()
 
 #else // ! gsl_STDLIB_CPP11_110
 
