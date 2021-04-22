@@ -59,6 +59,7 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
 
 CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [issue #34](GSL issue #313, PR #390)" )
 {
+#if gsl_HAVE( ENUM_CLASS )
     struct F {
         static int f( int & i, gsl::byte & r )
         {
@@ -68,8 +69,16 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [i
         }
     };
 
-   int i;
-   EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte&>( i ) ) );
+    int i = 0;
+    if ( std20::endian::native == std20::endian::little )
+    {
+        EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte*>( &i )[0] ) );
+    }
+    else if ( std20::endian::native == std20::endian::big )
+    {
+        EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte*>( &i )[sizeof i - 1] ) );
+    }
+#endif // gsl_HAVE( ENUM_CLASS )
 }
 
 CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
