@@ -478,7 +478,7 @@
 # define gsl_COMPILER_CLANG_VERSION       0
 #endif
 
-#if defined( __GNUC__ ) && ! defined( __clang__ )
+#if defined( __GNUC__ ) && ! defined( __clang__ ) && ! defined( __NVCOMPILER )
 # define gsl_COMPILER_GNUC_VERSION  gsl_COMPILER_VERSION( __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ )
 #else
 # define gsl_COMPILER_GNUC_VERSION  0
@@ -488,6 +488,13 @@
 # define gsl_COMPILER_NVCC_VERSION  ( __CUDACC_VER_MAJOR__ * 10 + __CUDACC_VER_MINOR__ )
 #else
 # define gsl_COMPILER_NVCC_VERSION  0
+#endif
+
+// NVHPC 21.2  gsl_COMPILER_NVHPC_VERSION == 2120
+#if defined( __NVCOMPILER )
+# define gsl_COMPILER_NVHPC_VERSION  gsl_COMPILER_VERSION( __NVCOMPILER_MAJOR__, __NVCOMPILER_MINOR__, __NVCOMPILER_PATCHLEVEL__ )
+#else
+# define gsl_COMPILER_NVHPC_VERSION  0
 #endif
 
 #if defined( __ARMCC_VERSION )
@@ -1386,7 +1393,7 @@ struct identity
 # if gsl_HAVE( ENUM_CLASS )
 enum class endian
 {
-#  if defined( _WIN32 )
+#  if defined( _WIN32 ) || gsl_COMPILER_NVHPC_VERSION
     little = 0,
     big    = 1,
     native = little
