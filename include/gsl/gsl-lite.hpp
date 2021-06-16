@@ -1049,7 +1049,7 @@
 # include <intrin.h>
 #endif
 
-#if gsl_HAVE( ENUM_CLASS ) && gsl_COMPILER_ARMCC_VERSION
+#if gsl_HAVE( ENUM_CLASS ) && ( gsl_COMPILER_ARMCC_VERSION || gsl_COMPILER_NVHPC_VERSION )
 # include <endian.h>
 #endif
 
@@ -1393,7 +1393,7 @@ struct identity
 # if gsl_HAVE( ENUM_CLASS )
 enum class endian
 {
-#  if defined( _WIN32 ) || gsl_COMPILER_NVHPC_VERSION
+#  if defined( _WIN32 )
     little = 0,
     big    = 1,
     native = little
@@ -1401,7 +1401,7 @@ enum class endian
     little = __ORDER_LITTLE_ENDIAN__,
     big    = __ORDER_BIG_ENDIAN__,
     native = __BYTE_ORDER__
-#  elif gsl_COMPILER_ARMCC_VERSION
+#  elif gsl_COMPILER_ARMCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     // from <endian.h> header file
     little = __LITTLE_ENDIAN,
     big    = __BIG_ENDIAN,
