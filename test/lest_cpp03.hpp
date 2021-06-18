@@ -355,7 +355,7 @@ namespace lest
 
 #define lest_CASE( specification, proposition ) \
     static void lest_FUNCTION( lest::env & ); \
-    namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
+    static lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); \
     static void lest_FUNCTION( lest_MAYBE_UNUSED( lest::env & lest_env ) )
 
 #define lest_ADD_TEST( specification, test ) \

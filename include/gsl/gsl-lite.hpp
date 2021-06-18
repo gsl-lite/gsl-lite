@@ -557,8 +557,8 @@
 #   define gsl_HAVE_EXCEPTIONS  0
 #  endif
 # endif
-#elif gsl_COMPILER_GNUC_VERSION
-# if gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
+#elif defined( __GNUC__ )
+# if __GNUC__ < 5
 #  ifdef __EXCEPTIONS
 #   define gsl_HAVE_EXCEPTIONS  1
 #  else
@@ -570,7 +570,7 @@
 #  else
 #   define gsl_HAVE_EXCEPTIONS  0
 #  endif // __cpp_exceptions
-# endif // gsl_BETWEEN(gsl_COMPILER_GNUC_VERSION, 1, 500)
+# endif // __GNUC__ < 5
 #elif gsl_COMPILER_MSVC_VERSION
 # ifdef _CPPUNWIND
 #  define gsl_HAVE_EXCEPTIONS  1
@@ -846,7 +846,7 @@
 # define gsl_NORETURN  [[noreturn]]
 #elif defined(_MSC_VER)
 # define gsl_NORETURN  __declspec(noreturn)
-#elif gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_ARMCC_VERSION
+#elif defined( __GNUC__ ) || gsl_COMPILER_ARMCC_VERSION
 # define gsl_NORETURN  __attribute__((noreturn))
 #else
 # define gsl_NORETURN
@@ -1049,7 +1049,7 @@
 # include <intrin.h>
 #endif
 
-#if gsl_HAVE( ENUM_CLASS ) && ( gsl_COMPILER_ARMCC_VERSION || gsl_COMPILER_NVHPC_VERSION )
+#if gsl_HAVE( ENUM_CLASS ) && ( gsl_COMPILER_ARMCC_VERSION || gsl_COMPILER_NVHPC_VERSION ) && !defined( _WIN32 )
 # include <endian.h>
 #endif
 
@@ -2151,7 +2151,7 @@ namespace detail {
     template< class T, class U >
     struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
 
-# if gsl_COMPILER_NVCC_VERSION
+# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
     gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
@@ -2206,7 +2206,7 @@ narrow( U u )
     }
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_NVCC_VERSION
+# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
@@ -2237,7 +2237,7 @@ narrow_failfast( U u )
     gsl_Expects( static_cast<U>( t ) == u );
 
 #if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_NVCC_VERSION
+# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )

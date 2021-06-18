@@ -69,10 +69,6 @@
 # pragma clang diagnostic ignored "-Wunused-member-function"
 # pragma clang diagnostic warning "-Wunknown-warning-option" // we want to see warnings about unknown warning options
 # pragma clang diagnostic warning "-Wunknown-pragmas" // we want to see warnings about unknown pragmas
-#elif defined( __NVCOMPILER )
-# pragma diag_suppress 177 // Suppress: variable "..." was declared but never referenced
-# pragma diag_suppress 186 // Suppress: pointless comparison of unsigned integer with zero
-# pragma diag_suppress 941 // Suppress:  missing return statement at end of non-void function "..."
 #elif defined( __GNUC__ )
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"
