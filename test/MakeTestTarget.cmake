@@ -81,7 +81,8 @@ if( MSVC )
         endif()
     endif()
 
-elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
+# Older CMake versions identify NVHPC compilers as PGI.
+elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang|PGI|NVHPC" )
 
     set( HAS_STD_FLAGS  TRUE )
     set( HAS_CPP98_FLAG TRUE )
@@ -133,8 +134,14 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0.0 )
             set( HAS_CPP20_FLAG TRUE )
         endif()
+    # Older CMake versions identify NVHPC compilers as PGI.
+    elseif( CMAKE_CXX_COMPILER_ID MATCHES "PGI|NVHPC" )
+        message( STATUS "Matched: NVHPC/PGI ${CMAKE_CXX_COMPILER_VERSION}" )
+        set( HAS_CPP11_FLAG TRUE )
+        set( HAS_CPP14_FLAG TRUE )
+        set( HAS_CPP17_FLAG TRUE )
+        set( HAS_CPP20_FLAG TRUE )
     endif()
-
 elseif( CMAKE_CXX_COMPILER_ID MATCHES "Intel" )
     message( STATUS "Matched: Intel ${CMAKE_CXX_COMPILER_VERSION}" )
 else()

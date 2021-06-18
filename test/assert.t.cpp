@@ -36,7 +36,7 @@ enum Color
 #endif
 { red, green, blue };
 
-#if gsl_COMPILER_NVHPC_VERSION
+#if gsl_COMPILER_NVHPC_VERSION && !gsl_CPP11_OR_GREATER
 # pragma diag_suppress 941 // Suppress:  missing return statement at end of non-void function "..."
 #endif
 std::string colorToString( Color color )
@@ -49,7 +49,7 @@ std::string colorToString( Color color )
     }
     gsl_FailFast();  // this should keep the compiler from issuing a warning about not returning a value
 }
-#if gsl_COMPILER_NVHPC_VERSION
+#if gsl_COMPILER_NVHPC_VERSION && !gsl_CPP11_OR_GREATER
 # pragma diag_default 941
 #endif
 

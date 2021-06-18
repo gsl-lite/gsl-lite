@@ -1069,7 +1069,7 @@
 # if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 #  if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
 namespace gsl { namespace detail { extern "C" char * __cdecl _getptd(); } }
-#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 #   if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
 #    include  <cxxabi.h>
 #   elif ! defined( BOOST_CORE_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED_ )  // libc++: prototype from Boost?
@@ -1687,6 +1687,15 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 # endif
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 
+#if gsl_COMPILER_NVHPC_VERSION
+// Suppress "controlling expression is constant" warning when using gsl_Expects,
+// gsl_Ensures, gsl_Assert, gsl_FailFast and so on.
+# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT _Pragma("diag_suppress 236")
+# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT _Pragma("diag_default 236")
+#else
+# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
+# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
+#endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) )
 # if defined( __CUDACC__ ) && defined( __CUDA_ARCH__ )
@@ -1702,9 +1711,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #endif
 # define  gsl_FAILFAST_()                 ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-# define   gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
 # if ! defined( NDEBUG )
-#  define  gsl_FAILFAST_()                ( assert( ! "GSL: failure" ), ::gsl::detail::fail_fast_terminate() )
+#  define  gsl_FAILFAST_()                (gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT, ::gsl::detail::fail_fast_terminate() )
 # else
 #  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 # endif
@@ -1716,10 +1725,10 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
 # endif
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
 # define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-# define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() )
+# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
 # define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 #endif
 
@@ -1847,7 +1856,7 @@ inline unsigned char uncaught_exceptions() gsl_noexcept
     return static_cast<unsigned char>( *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) ) );
 }
 
-#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 inline unsigned char uncaught_exceptions() gsl_noexcept
 {
@@ -2215,7 +2224,16 @@ narrow( U u )
 #else
     // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+# if gsl_COMPILER_NVHPC_VERSION
+    // Suppress: pointless comparison of unsigned integer with zero.
+#  pragma diag_suppress 186
+# endif
     if ( ( t < 0 ) != ( u < 0 ) )
+# if gsl_COMPILER_NVHPC_VERSION
+    // Restore: pointless comparison of unsigned integer with zero.
+#  pragma diag_default 186
+# endif
+
 #endif
     {
 #if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
@@ -2246,7 +2264,15 @@ narrow_failfast( U u )
 #else
     // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+# if gsl_COMPILER_NVHPC_VERSION
+    // Suppress: pointless comparison of unsigned integer with zero.
+#  pragma diag_suppress 186
+# endif
     gsl_Expects( ( t < 0 ) == ( u < 0 ) );
+# if gsl_COMPILER_NVHPC_VERSION
+    // Restore: pointless comparison of unsigned integer with zero.
+#  pragma diag_default 186
+# endif
 #endif
 
     return t;
