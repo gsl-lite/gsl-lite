@@ -118,6 +118,14 @@
 # define lest_RESTORE_WARNINGS         /*empty*/
 #endif
 
+#if defined(__NVCOMPILER)
+# define lest_SUPPRESS_CONTROLLING_EXPRESSION_IS_CONSTANT _Pragma("diag_suppress 236")
+# define lest_RESTORE_CONTROLLING_EXPRESSION_IS_CONSTANT _Pragma("diag_default 236")
+#else
+# define lest_SUPPRESS_CONTROLLING_EXPRESSION_IS_CONSTANT
+# define lest_RESTORE_CONTROLLING_EXPRESSION_IS_CONSTANT
+#endif
+
 // Stringify:
 
 #define lest_STRINGIFY(  x )  lest_STRINGIFY_( x )
@@ -355,7 +363,7 @@ namespace lest
 
 #define lest_CASE( specification, proposition ) \
     static void lest_FUNCTION( lest::env & ); \
-    namespace { lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); } \
+    static lest::add_test lest_REGISTRAR( specification, lest::test( proposition, lest_FUNCTION ) ); \
     static void lest_FUNCTION( lest_MAYBE_UNUSED( lest::env & lest_env ) )
 
 #define lest_ADD_TEST( specification, test ) \
@@ -377,10 +385,12 @@ namespace lest
     do { \
         lest_TRY \
         { \
+            lest_SUPPRESS_CONTROLLING_EXPRESSION_IS_CONSTANT \
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
                 lest_THROW( lest::failure( lest_LOCATION, #expr, score.decomposition ) ); \
             else if ( lest_env.pass() ) \
                 lest::report( lest_env.os, lest::passing( lest_LOCATION, #expr, score.decomposition, lest_env.zen() ), lest_env.context() ); \
+            lest_RESTORE_CONTROLLING_EXPRESSION_IS_CONSTANT \
         } \
         lest_CATCH_ALL \
         { \
@@ -392,6 +402,7 @@ namespace lest
     do { \
         lest_TRY \
         { \
+            lest_SUPPRESS_CONTROLLING_EXPRESSION_IS_CONSTANT \
             if ( lest::result score = lest_DECOMPOSE( expr ) ) \
             { \
                 if ( lest_env.pass() ) \
@@ -399,6 +410,7 @@ namespace lest
             } \
             else \
                 lest_THROW( lest::failure( lest_LOCATION, lest::not_expr( #expr ), lest::not_expr( score.decomposition ) ) ); \
+            lest_RESTORE_CONTROLLING_EXPRESSION_IS_CONSTANT \
         } \
         lest_CATCH_ALL \
         { \
