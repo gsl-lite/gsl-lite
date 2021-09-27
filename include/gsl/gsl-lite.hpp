@@ -2625,26 +2625,23 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
     get() const
     {
-        element_type * result = data_.ptr_.get();
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_.get();
     }
 #else
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
     {
-        T const & result = data_.ptr_;
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
     }
 # else
     gsl_NODISCARD gsl_api gsl_constexpr14 T
     get() const
     {
-        T result = data_.ptr_;
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
     }
 # endif
 #endif
@@ -2691,9 +2688,8 @@ public:
     &
 # endif
     {
-        U result( data_.ptr_ );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return U( data_.ptr_ );
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
@@ -2703,9 +2699,8 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() &&
     {
-        U result( std::move( data_.ptr_ ) );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return U( std::move( data_.ptr_ ) );
     }
 # endif
 
@@ -2720,9 +2715,8 @@ public:
     &
 # endif
     {
-        U result( data_.ptr_ );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
@@ -2732,9 +2726,8 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() &&
     {
-        U result( std::move( data_.ptr_ ) );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return std::move( data_.ptr_ );
     }
 # endif
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
@@ -2742,24 +2735,22 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
     {
-        U result( data_.ptr_ );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return U( data_.ptr_ );
     }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
 
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     operator->() const
     {
-        T const & result( data_.ptr_ );
-        gsl_Ensures( result != gsl_nullptr );
-        return result;
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
+        return data_.ptr_;
     }
 
     gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
     operator*() const
     {
-        gsl_Expects( data_.ptr_ != gsl_nullptr );
+        gsl_Assert( data_.ptr_ != gsl_nullptr );
         return *data_.ptr_;
     }
 

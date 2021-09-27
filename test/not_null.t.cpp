@@ -59,6 +59,13 @@ template< class T >
 void take_shared_by_ref( std::shared_ptr<T> const & )
 {
 }
+template< class T >
+struct ExplicitFromShared
+{
+    explicit ExplicitFromShared( std::shared_ptr<T> const & )
+    {
+    }
+};
 #endif
 
 } // anonymous namespace
@@ -1178,6 +1185,36 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a not_null
 #endif
 
     EXPECT( &*q == raw );
+}
+
+CASE( "not_null<>: Allows to convert to weak_ptr<T> from a not_null<shared_ptr<T>>" )
+{
+    shared_ptr< int > pi = std::make_shared< int >(12);
+    int* raw(pi.get());
+    not_null< shared_ptr< int > > p( std::move(pi) );
+
+#if gsl_CPP11_OR_GREATER
+    std::weak_ptr< int > q = p;
+    std::vector< std::weak_ptr< int > > v;
+    v.emplace_back( p );
+#else
+    std::weak_ptr< int > q(p); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
+
+    EXPECT_NOT( q.expired() );
+    EXPECT( q.lock().get() == raw );
+}
+
+CASE( "not_null<>: Allows to convert from a not_null<shared_ptr<T>> to a user-defined type with explicit conversion constructor" )
+{
+    shared_ptr< int > pi = std::make_shared< int >(12);
+    not_null< shared_ptr< int > > p( std::move(pi) );
+
+#if gsl_CPP11_OR_GREATER
+    ExplicitFromShared< int > q(p);
+#else
+    ExplicitFromShared< int > q(p); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
+#endif
 }
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a not_null<unique_ptr<T>>" )
