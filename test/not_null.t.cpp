@@ -1205,17 +1205,19 @@ CASE( "not_null<>: Allows to convert to weak_ptr<T> from a not_null<shared_ptr<T
     EXPECT( q.lock().get() == raw );
 }
 
+// C++14 has ambiguity issues with constructors and conversion operators that were fixed in C++17,
+// cf. https://github.com/gsl-lite/gsl-lite/issues/275#issuecomment-678640600.
+// Also, Clang ≤ 5 may pretend to support C++17 but it still suffers from the conversion ambiguity.
+#if gsl_CPP17_OR_GREATER && ! ( gsl_BETWEEN(gsl_COMPILER_CLANG_VERSION, 1, 600) || gsl_BETWEEN(gsl_COMPILER_APPLECLANG_VERSION, 1, 1000) )
 CASE( "not_null<>: Allows to convert from a not_null<shared_ptr<T>> to a user-defined type with explicit conversion constructor" )
 {
     shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< int > > p( std::move(pi) );
 
-#if gsl_CPP11_OR_GREATER
     ExplicitFromShared< int > q(p);
-#else
-    ExplicitFromShared< int > q(p); // in C++98, we cannot differentiate between implicit and explicit cases, so conversion is always explicit
-#endif
+    (void) q;
 }
+#endif // gsl_CPP17_OR_GREATER
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a not_null<unique_ptr<T>>" )
 {
