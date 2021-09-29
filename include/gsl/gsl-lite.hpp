@@ -1272,6 +1272,9 @@ template< class T, class... Args >
 gsl_NODISCARD std::unique_ptr<T>
 make_unique( Args &&... args )
 {
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "make_unique<T[]>() is not part of C++14" );
+#  endif
     return std::unique_ptr<T>( new T( std::forward<Args>( args )... ) );
 }
 
@@ -3278,6 +3281,10 @@ template< class T, class... Args >
 gsl_NODISCARD not_null<std::unique_ptr<T>>
 make_unique( Args &&... args )
 {
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "gsl::make_unique<T>() returns `gsl::not_null<std::unique_ptr<T>>`, which is not "
+        "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
+#  endif
     return not_null<std::unique_ptr<T>>( new T( std::forward<Args>( args )... ) );
 }
 # endif // gsl_HAVE( UNIQUE_PTR )
@@ -3286,6 +3293,10 @@ template< class T, class... Args >
 gsl_NODISCARD not_null<std::shared_ptr<T>>
 make_shared( Args &&... args )
 {
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "gsl::make_shared<T>() returns `gsl::not_null<std::shared_ptr<T>>`, which is not "
+        "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
+#  endif
     return not_null<std::shared_ptr<T>>( std::make_shared<T>( std::forward<Args>( args )... ) );
 }
 # endif // gsl_HAVE( SHARED_PTR )
