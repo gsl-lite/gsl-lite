@@ -34,15 +34,15 @@ CASE( "equal()" )
 {
     char const* arg1 = "foo";
     char const* arg2 = "fou";
-    EXPECT(   std98::equal( arg1, arg1 + std::strlen( arg1 ), arg1 ) );
-    EXPECT( ! std98::equal( arg1, arg1 + std::strlen( arg1 ), arg2 ) );
-    EXPECT( ! std98::equal( arg2, arg2 + std::strlen( arg2 ), arg1 ) );
+    EXPECT(   detail::equal( arg1, arg1 + std::strlen( arg1 ), arg1 ) );
+    EXPECT( ! detail::equal( arg1, arg1 + std::strlen( arg1 ), arg2 ) );
+    EXPECT( ! detail::equal( arg2, arg2 + std::strlen( arg2 ), arg1 ) );
 
     std::istringstream sstr1a1( "foo" ), sstr1a2( "foo" ), sstr1b( "foo" ), sstr1c( "foo" );
     std::istringstream sstr2b( "fou" ), sstr2c( "fou" );
-    EXPECT(   std98::equal( std::istreambuf_iterator<char>( sstr1a1 ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1a2 ) ) );
-    EXPECT( ! std98::equal( std::istreambuf_iterator<char>( sstr1b ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr2b ) ) );
-    EXPECT( ! std98::equal( std::istreambuf_iterator<char>( sstr2c ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1c ) ) );
+    EXPECT(   detail::equal( std::istreambuf_iterator<char>( sstr1a1 ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1a2 ) ) );
+    EXPECT( ! detail::equal( std::istreambuf_iterator<char>( sstr1b ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr2b ) ) );
+    EXPECT( ! detail::equal( std::istreambuf_iterator<char>( sstr2c ), std::istreambuf_iterator<char>(), std::istreambuf_iterator<char>( sstr1c ) ) );
 }
 
 template < typename T, std::size_t N >
@@ -61,13 +61,13 @@ CASE( "lexicographical_compare()" )
     };
     for ( std::size_t i = 0, n = arraySize( less ); i != n; ++i )
     {
-        EXPECT( std98::lexicographical_compare( less[i].first, less[i].first + std::strlen( less[i].first ), less[i].second, less[i].second + std::strlen( less[i].second ) ));
+        EXPECT( detail::lexicographical_compare( less[i].first, less[i].first + std::strlen( less[i].first ), less[i].second, less[i].second + std::strlen( less[i].second ) ));
 
         std::istringstream sstr1( less[i].first );
         std::istringstream sstr2( less[i].second );
         std::istreambuf_iterator<char> it1( sstr1 ), it1End;
         std::istreambuf_iterator<char> it2( sstr2 ), it2End;
-        EXPECT( std98::lexicographical_compare( it1, it1End, it2, it2End ));
+        EXPECT( detail::lexicographical_compare( it1, it1End, it2, it2End ));
     }
 
     std::pair<char const*, char const*> notLess[] = {
@@ -80,13 +80,13 @@ CASE( "lexicographical_compare()" )
     };
     for ( std::size_t i = 0, n = arraySize( less ); i != n; ++i )
     {
-        EXPECT( ! std98::lexicographical_compare( notLess[i].first, notLess[i].first + std::strlen( notLess[i].first ), notLess[i].second, notLess[i].second + std::strlen( notLess[i].second ) ));
+        EXPECT( ! detail::lexicographical_compare( notLess[i].first, notLess[i].first + std::strlen( notLess[i].first ), notLess[i].second, notLess[i].second + std::strlen( notLess[i].second ) ));
 
         std::istringstream sstr1( notLess[i].first );
         std::istringstream sstr2( notLess[i].second );
         std::istreambuf_iterator<char> it1( sstr1 ), it1End;
         std::istreambuf_iterator<char> it2( sstr2 ), it2End;
-        EXPECT( ! std98::lexicographical_compare( it1, it1End, it2, it2End ));
+        EXPECT( ! detail::lexicographical_compare( it1, it1End, it2, it2End ));
     }
 }
 

@@ -1129,7 +1129,7 @@ class span;
 
 // C++98 emulation:
 
-namespace std98 {
+namespace detail {
 
 // We implement `equal()` and `lexicographical_compare()` here to avoid having to pull in the <algorithm> header.
 template< class InputIt1, class InputIt2 >
@@ -1154,7 +1154,7 @@ bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, 
     return first1 == last1 && first2 != last2;
 }
 
-} // namespace std98
+} // namespace detail
 
 // C++11 emulation:
 
@@ -3949,14 +3949,14 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator==( span<T> const & l, span<U> const & r )
 {
     return  l.size()  == r.size()
-        && (l.begin() == r.begin() || std98::equal( l.begin(), l.end(), r.begin() ) );
+        && (l.begin() == r.begin() || detail::equal( l.begin(), l.end(), r.begin() ) );
 }
 
 template< class T, class U >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const & r )
 {
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 # else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
@@ -3966,14 +3966,14 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator==( span<T> const & l, span<T> const & r )
 {
     return  l.size()  == r.size()
-        && (l.begin() == r.begin() || std98::equal( l.begin(), l.end(), r.begin() ) );
+        && (l.begin() == r.begin() || detail::equal( l.begin(), l.end(), r.begin() ) );
 }
 
 template< class T >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T> const & l, span<T> const & r )
 {
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 # endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
@@ -4591,7 +4591,7 @@ operator==( basic_string_span<T> const & l, U const & u ) gsl_noexcept
     const basic_string_span< typename std11::add_const<T>::type > r( u );
 
     return l.size() == r.size()
-        && std98::equal( l.begin(), l.end(), r.begin() );
+        && detail::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T, class U >
@@ -4601,7 +4601,7 @@ operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
 {
     const basic_string_span< typename std11::add_const<T>::type > r( u );
 
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 #if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
@@ -4616,7 +4616,7 @@ operator==( U const & u, basic_string_span<T> const & r ) gsl_noexcept
     const basic_string_span< typename std11::add_const<T>::type > l( u );
 
     return l.size() == r.size()
-        && std98::equal( l.begin(), l.end(), r.begin() );
+        && detail::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T, class U
@@ -4628,7 +4628,7 @@ operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 {
     const basic_string_span< typename std11::add_const<T>::type > l( u );
 
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 #endif
 
@@ -4640,7 +4640,7 @@ gsl_NODISCARD inline gsl_constexpr14 bool
 operator==( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
     return l.size() == r.size()
-        && std98::equal( l.begin(), l.end(), r.begin() );
+        && detail::equal( l.begin(), l.end(), r.begin() );
 }
 
 template< class T >
@@ -4648,7 +4648,7 @@ gsl_SUPPRESS_MSGSL_WARNING(stl.1)
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_noexcept
 {
-    return std98::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
+    return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 #endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
