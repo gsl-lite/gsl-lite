@@ -1288,6 +1288,25 @@ CASE( "not_null<>: Allows assignment to a not_null<shared_ptr<const T>> from a r
     EXPECT( &*q == raw );
 }
 
+# if gsl_HAVE( VARIADIC_TEMPLATE )
+CASE( "not_null<>: make_unique<T>() returns not_null<unique_ptr<T>>" )
+{
+    not_null< unique_ptr< int > > p = make_unique< int >();
+    unique_ptr< int > q = std::move( p );
+    (void) q;
+
+    EXPECT( q.get() != nullptr );
+}
+CASE( "not_null<>: make_shared<T>() returns not_null<shared_ptr<T>>" )
+{
+    not_null< shared_ptr< int > > p = make_shared< int >();
+    shared_ptr< int > q = std::move( p );
+    (void) q;
+
+    EXPECT( q.get() != nullptr );
+}
+# endif // gsl_HAVE( VARIADIC_TEMPLATE )
+
 #endif // gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( SHARED_PTR )
 
 CASE( "not_null<>: Allows assignment from a non-null bare recast pointer" )
