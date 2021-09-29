@@ -1273,6 +1273,9 @@ template< class T, class... Args >
 gsl_NODISCARD std::unique_ptr<T>
 make_unique( Args &&... args )
 {
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "make_unique<T[]>() is not part of C++14" );
+#  endif
     return std::unique_ptr<T>( new T( std::forward<Args>( args )... ) );
 }
 
@@ -1596,10 +1599,6 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #if gsl_HAVE( SHARED_PTR )
   using std::unique_ptr;
   using std::shared_ptr;
-  using std::make_shared;
-# if gsl_HAVE( MAKE_UNIQUE ) || gsl_HAVE( VARIADIC_TEMPLATE )
-  using std14::make_unique;
-# endif
 #endif
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
@@ -3275,6 +3274,34 @@ std::basic_ostream< CharType, Traits > & operator<<( std::basic_ostream< CharTyp
 {
     return os << p.operator->();
 }
+
+
+#if gsl_HAVE( VARIADIC_TEMPLATE )
+# if gsl_HAVE( UNIQUE_PTR )
+template< class T, class... Args >
+gsl_NODISCARD not_null<std::unique_ptr<T>>
+make_unique( Args &&... args )
+{
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "gsl::make_unique<T>() returns `gsl::not_null<std::unique_ptr<T>>`, which is not "
+        "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
+#  endif
+    return not_null<std::unique_ptr<T>>( new T( std::forward<Args>( args )... ) );
+}
+# endif // gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( SHARED_PTR )
+template< class T, class... Args >
+gsl_NODISCARD not_null<std::shared_ptr<T>>
+make_shared( Args &&... args )
+{
+#  if gsl_HAVE( TYPE_TRAITS )
+    static_assert( !std::is_array<T>::value, "gsl::make_shared<T>() returns `gsl::not_null<std::shared_ptr<T>>`, which is not "
+        "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
+#  endif
+    return not_null<std::shared_ptr<T>>( std::make_shared<T>( std::forward<Args>( args )... ) );
+}
+# endif // gsl_HAVE( SHARED_PTR )
+#endif // gsl_HAVE( VARIADIC_TEMPLATE )
 
 
 //
@@ -5115,16 +5142,19 @@ namespace std17 = ::gsl::std17;
 namespace std20 = ::gsl::std20;
 
 using namespace std11;
-using namespace std14;
+//using namespace std14;  // contains only make_unique<>(), which is superseded by `gsl::make_unique<>()`
 using namespace std17;
 using namespace std20;
 
 using namespace ::gsl::detail::no_adl;
 
-# if gsl_HAVE( SHARED_PTR )
+# if gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( SHARED_PTR )
 using std::unique_ptr;
 using std::shared_ptr;
-using std::make_shared;
+#  if gsl_HAVE( VARIADIC_TEMPLATE )
+using ::gsl::make_unique;
+using ::gsl::make_shared;
+#  endif
 # endif
 
 using ::gsl::index;

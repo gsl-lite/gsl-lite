@@ -838,11 +838,15 @@ not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a non-null 
 not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related non-null unique_ptr<U>
 not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a related non-null unique_ptr<U>
 not_null<>: Allows to construct a not_null<shared_ptr<T>> from a not_null<unique_ptr<T>>
+not_null<>: Allows to convert to weak_ptr<T> from a not_null<shared_ptr<T>>
+not_null<>: Allows to convert from a not_null<shared_ptr<T>> to a user-defined type with explicit conversion constructor
 not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a not_null<unique_ptr<T>>
 not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related not_null<unique_ptr<U>>
 not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a related not_null<unique_ptr<U>>
 not_null<>: Allows assignment to a not_null<shared_ptr<T>> from a related not_null<unique_ptr<U>>
 not_null<>: Allows assignment to a not_null<shared_ptr<const T>> from a related not_null<unique_ptr<U>>
+not_null<>: make_unique<T>() returns not_null<unique_ptr<T>>
+not_null<>: make_shared<T>() returns not_null<shared_ptr<T>>
 not_null<>: Allows assignment from a non-null bare recast pointer
 not_null<>: Allows implicit conversion to underlying type
 not_null<>: Allows to construct from a non-null user-defined ref-counted type

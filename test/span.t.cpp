@@ -553,7 +553,7 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( SHARED_PTR )
-    shared_ptr<int> ptr = gsl::make_shared<int>( 4 );
+    shared_ptr<int> ptr = std::make_shared<int>( 4 );
 
     span<int> s( ptr );
 
@@ -596,7 +596,7 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
 #if  gsl_HAVE( MAKE_UNIQUE )
-    gsl::unique_ptr<size_t[]> arr = make_unique<size_t[]>( 4 );
+    gsl::unique_ptr<size_t[]> arr = std::make_unique<size_t[]>( 4 );
 #else
     gsl::unique_ptr<size_t[]> arr = unique_ptr<size_t[]>( new size_t[4] );
 #endif
@@ -1644,7 +1644,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( SHARED_PTR )
-    auto ptr = gsl::make_shared<int>( 4 );
+    auto ptr = std::make_shared<int>( 4 );
 
     auto s = make_span( ptr );
 
@@ -1664,7 +1664,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
 #if  gsl_HAVE( MAKE_UNIQUE )
-    auto ptr = gsl::make_unique<int>( 4 );
+    auto ptr = std::make_unique<int>( 4 );
 #else
     auto ptr = gsl::unique_ptr<int>( new int(4) );
 #endif

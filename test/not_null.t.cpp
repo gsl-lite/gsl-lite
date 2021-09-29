@@ -470,7 +470,7 @@ void move_to( T& dest, T& src )
 #if gsl_HAVE( SHARED_PTR )
 CASE( "not_null<>: Terminates swap of a moved-from value (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >( 12 );
+    shared_ptr< int > pi = std::make_shared< int >( 12 );
     not_null< shared_ptr< int > > p1( pi );
     not_null< shared_ptr< int > > p2( std::move( p1 ) );
 
@@ -480,7 +480,7 @@ CASE( "not_null<>: Terminates swap of a moved-from value (shared_ptr)" )
 
 CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >( 12 );
+    shared_ptr< int > pi = std::make_shared< int >( 12 );
     not_null< shared_ptr< int > > p1( pi );
     not_null< shared_ptr< int > > p2( std::move( p1 ) );
 
@@ -489,7 +489,7 @@ CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (shared_
 
 CASE( "not_null<>: Terminates self-swap of a moved-from value (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >( 12 );
+    shared_ptr< int > pi = std::make_shared< int >( 12 );
     not_null< shared_ptr< int > > p1( pi );
     not_null< shared_ptr< int > > p2( std::move( p1 ) );
 
@@ -512,7 +512,7 @@ CASE( "not_null<>: Terminates construction from related pointer types for null p
 
 CASE( "not_null<>: Terminates assignment from a null pointer value (shared_ptr)" )
 {
-    not_null< shared_ptr< int > > p( make_shared< int >(12) );
+    not_null< shared_ptr< int > > p( std::make_shared< int >(12) );
     shared_ptr< int > z = gsl_nullptr;
 
     EXPECT_THROWS( p = not_null< shared_ptr< int > >( z ) );
@@ -521,14 +521,14 @@ CASE( "not_null<>: Terminates assignment from a null pointer value (shared_ptr)"
 CASE( "not_null<>: Terminates assignment from related pointer types for null pointer value (shared_ptr)" )
 {
     shared_ptr< MyDerived >  z = gsl_nullptr;
-    not_null< shared_ptr< MyBase > > p( make_shared< MyDerived >() );
+    not_null< shared_ptr< MyBase > > p( std::make_shared< MyDerived >() );
 
     EXPECT_THROWS( p = not_null< shared_ptr< MyDerived > >( z ) );
 }
 
 CASE( "not_null<>: Terminates propagation of a moved-from value (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< int > > p( std::move( pi ) );
     not_null< shared_ptr< int > > q( std::move( p ) );
 
@@ -540,7 +540,7 @@ CASE( "not_null<>: Terminates propagation of a moved-from value (shared_ptr)" )
 
 CASE( "not_null<>: Allows self-swap (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >( 12 );
+    shared_ptr< int > pi = std::make_shared< int >( 12 );
     not_null< shared_ptr< int > > p( pi );
 
     EXPECT_NO_THROW( swap( p, p ) );
@@ -549,8 +549,8 @@ CASE( "not_null<>: Allows self-swap (shared_ptr)" )
 
 CASE( "not_null<>: Allows swap (shared_ptr)" )
 {
-    shared_ptr< int > pi1 = make_shared< int >( 12 );
-    shared_ptr< int > pi2 = make_shared< int >( 34 );
+    shared_ptr< int > pi1 = std::make_shared< int >( 12 );
+    shared_ptr< int > pi2 = std::make_shared< int >( 34 );
     not_null< shared_ptr< int > > p1( pi1 );
     not_null< shared_ptr< int > > p2( pi2 );
 
@@ -561,7 +561,7 @@ CASE( "not_null<>: Allows swap (shared_ptr)" )
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
     EXPECT( p == pi );
@@ -575,7 +575,7 @@ CASE( "not_null<>: Allows to construct from a non-null raw pointer with explicit
 
 CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
@@ -590,7 +590,7 @@ CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (shared_
 CASE( "not_null<>: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     int* raw(pi.get());
 
     not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
@@ -603,7 +603,7 @@ CASE( "not_null<>: Allows to move from a not_null pointer to an underlying point
 
 CASE( "as_nullable: Allows to move from a not_null pointer to an underlying pointer (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     int* raw(pi.get());
 
     not_null< shared_ptr< int > > p ( std::move(pi) ); // There...
@@ -615,7 +615,7 @@ CASE( "as_nullable: Allows to move from a not_null pointer to an underlying poin
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with make_not_null()" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
 
     not_null< shared_ptr< int > > p = make_not_null( pi );
 
@@ -625,7 +625,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (shared_ptr) with deduction guide" )
 {
 #if gsl_HAVE( DEDUCTION_GUIDES )
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
 
     not_null p( pi );
 
@@ -635,7 +635,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (share
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< const int > > p( pi );
 
     EXPECT( p == pi );
@@ -643,7 +643,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
 
 CASE( "not_null<>: Converts to underlying pointer (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >();
+    shared_ptr< int > pi = std::make_shared< int >();
     not_null< shared_ptr< int > > p( pi );
 
     take_shared_by_val<int>( p );
@@ -652,7 +652,7 @@ CASE( "not_null<>: Converts to underlying pointer (shared_ptr)" )
 
 CASE( "as_nullable: Converts to underlying pointer (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >();
+    shared_ptr< int > pi = std::make_shared< int >();
     not_null< shared_ptr< int > > p( pi );
 
     take_shared_by_val<int>( as_nullable( p ) );
@@ -661,7 +661,7 @@ CASE( "as_nullable: Converts to underlying pointer (shared_ptr)" )
 
 CASE( "as_nullable: Terminates for moved-from pointer (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >();
+    shared_ptr< int > pi = std::make_shared< int >();
     not_null< shared_ptr< int > > p( pi );
     not_null< shared_ptr< int > > p2( std::move( p ) );
 
@@ -670,7 +670,7 @@ CASE( "as_nullable: Terminates for moved-from pointer (shared_ptr)" )
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyBase > > p( pderived );
 
     EXPECT( p == pderived );
@@ -678,7 +678,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer (shared_p
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null related pointer (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< const MyBase > > p( pderived );
 
     EXPECT( p == pderived );
@@ -686,7 +686,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null related p
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
 #if gsl_CPP11_OR_GREATER
@@ -700,7 +700,7 @@ CASE( "not_null<>: Allows to construct from a not_null related pointer type (sha
 
 CASE( "not_null<>: Allows to construct a const pointer from a not_null related pointer type (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
 #if gsl_CPP11_OR_GREATER
@@ -714,7 +714,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
 
 CASE( "not_null<>: Converts to a related pointer (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
     take_shared_by_val<MyBase>( p );
@@ -723,7 +723,7 @@ CASE( "not_null<>: Converts to a related pointer (shared_ptr)" )
 
 CASE( "as_nullable: Converts to a related pointer (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
 
     take_shared_by_val<MyBase>( as_nullable(p) );
@@ -732,7 +732,7 @@ CASE( "as_nullable: Converts to a related pointer (shared_ptr)" )
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived > > p( pderived );
     not_null< shared_ptr< MyBase >    > q( p );
 
@@ -743,7 +743,7 @@ CASE( "not_null<>: Allows assignment from a not_null related pointer type (share
 
 CASE( "not_null<>: Allows assignment to a const pointer from a not_null related pointer type (shared_ptr)" )
 {
-    shared_ptr< MyDerived > pderived = make_shared< MyDerived >();
+    shared_ptr< MyDerived > pderived = std::make_shared< MyDerived >();
     not_null< shared_ptr< MyDerived    > > p( pderived );
     not_null< shared_ptr< const MyBase > > q( p );
 
@@ -756,7 +756,7 @@ CASE( "not_null<>: Allows indirect member access (shared_ptr)" )
 {
     using namespace nonlocal;
     S s = { 'a', 7 };
-    not_null< shared_ptr< S > > p( make_shared< S >(s) );
+    not_null< shared_ptr< S > > p( std::make_shared< S >(s) );
 
     EXPECT( p->c == 'a' );
     EXPECT( p->i ==  7  );
@@ -764,7 +764,7 @@ CASE( "not_null<>: Allows indirect member access (shared_ptr)" )
 
 CASE( "not_null<>: Allows dereferencing (shared_ptr)" )
 {
-    shared_ptr< int > pi = make_shared< int >(12);
+    shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
     EXPECT( *p == *pi );
@@ -774,23 +774,21 @@ CASE( "not_null<>: Allows dereferencing (shared_ptr)" )
 
 #if gsl_HAVE( UNIQUE_PTR )
 
-# if ! gsl_HAVE( MAKE_UNIQUE ) && ! gsl_HAVE( VARIADIC_TEMPLATE )
 template<typename T>
-unique_ptr<T> make_unique()
+unique_ptr<T> my_make_unique()
 {
     return unique_ptr<T>(new T());
 }
 
 template<typename T, typename Arg>
-unique_ptr<T> make_unique(Arg&& arg)
+unique_ptr<T> my_make_unique(Arg&& arg)
 {
     return unique_ptr<T>(new T(std::forward<Arg>(arg)));
 }
-# endif
 
 CASE( "not_null<>: Terminates swap of a moved-from value (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >( 12 );
+    unique_ptr< int > pi = my_make_unique< int >( 12 );
     not_null< unique_ptr< int > > p1( std::move( pi ) );
     not_null< unique_ptr< int > > p2( std::move( p1 ) );
 
@@ -800,7 +798,7 @@ CASE( "not_null<>: Terminates swap of a moved-from value (unique_ptr)" )
 
 CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >( 12 );
+    unique_ptr< int > pi = my_make_unique< int >( 12 );
     not_null< unique_ptr< int > > p1( std::move( pi ) );
     not_null< unique_ptr< int > > p2( std::move( p1 ) );
 
@@ -809,7 +807,7 @@ CASE( "not_null<>: Tolerates self-move-assignment of a moved-from value (unique_
 
 CASE( "not_null<>: Terminates self-swap of a moved-from value (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >( 12 );
+    unique_ptr< int > pi = my_make_unique< int >( 12 );
     not_null< unique_ptr< int > > p1( std::move( pi ) );
     not_null< unique_ptr< int > > p2( std::move( p1 ) );
 
@@ -832,7 +830,7 @@ CASE( "not_null<>: Terminates construction from related pointer types for null p
 
 CASE( "not_null<>: Terminates assignment from a null pointer value (unique_ptr)" )
 {
-    not_null< unique_ptr< int > > p( make_unique< int >(12) );
+    not_null< unique_ptr< int > > p( my_make_unique< int >(12) );
     unique_ptr< int > z = gsl_nullptr;
 
     EXPECT_THROWS( p = not_null< unique_ptr< int > >( std::move(z) ) );
@@ -841,14 +839,14 @@ CASE( "not_null<>: Terminates assignment from a null pointer value (unique_ptr)"
 CASE( "not_null<>: Terminates assignment from related pointer types for null pointer value (unique_ptr)" )
 {
     unique_ptr< MyDerived >  z = gsl_nullptr;
-    not_null< unique_ptr< MyBase > > p( make_unique< MyDerived >() );
+    not_null< unique_ptr< MyBase > > p( my_make_unique< MyDerived >() );
 
     EXPECT_THROWS( p = not_null< unique_ptr< MyDerived > >( std::move(z) ) );
 }
 
 CASE( "not_null<>: Terminates propagation of a moved-from value (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     not_null< unique_ptr< int > > p( std::move( pi ) );
     not_null< unique_ptr< int > > q( std::move( p ) );
 
@@ -858,7 +856,7 @@ CASE( "not_null<>: Terminates propagation of a moved-from value (unique_ptr)" )
 
 CASE( "not_null<>: Allows self-swap (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >( 12 );
+    unique_ptr< int > pi = my_make_unique< int >( 12 );
     int* raw( pi.get() );
     not_null< unique_ptr< int > > p( std::move( pi ) );
 
@@ -868,8 +866,8 @@ CASE( "not_null<>: Allows self-swap (unique_ptr)" )
 
 CASE( "not_null<>: Allows swap (unique_ptr)" )
 {
-    unique_ptr< int > pi1 = make_unique< int >( 12 );
-    unique_ptr< int > pi2 = make_unique< int >( 34 );
+    unique_ptr< int > pi1 = my_make_unique< int >( 12 );
+    unique_ptr< int > pi2 = my_make_unique< int >( 34 );
     int* raw1( pi1.get() );
     int* raw2( pi2.get() );
     not_null< unique_ptr< int > > p1( std::move( pi1 ) );
@@ -882,7 +880,7 @@ CASE( "not_null<>: Allows swap (unique_ptr)" )
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
@@ -898,7 +896,7 @@ CASE( "not_null<>: Allows to construct from a non-null raw pointer with explicit
 CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (unique_ptr)" )
 {
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL ) || gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
@@ -915,7 +913,7 @@ CASE( "not_null<>: Returns underlying pointer or raw pointer with get() (unique_
 CASE( "not_null<>: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
 
     not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
@@ -928,7 +926,7 @@ CASE( "not_null<>: Allows to move from a not_null pointer to an underlying point
 
 CASE( "as_nullable: Allows to move from a not_null pointer to an underlying pointer (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
 
     not_null< unique_ptr< int > > p ( std::move(pi) ); // There...
@@ -941,7 +939,7 @@ CASE( "as_nullable: Allows to move from a not_null pointer to an underlying poin
 CASE( "not_null<>: Allows to move to a related pointer from a not_null pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p ( std::move(pderived) );
     unique_ptr< MyBase > pbase = std::move(p);
@@ -953,7 +951,7 @@ CASE( "not_null<>: Allows to move to a related pointer from a not_null pointer (
 
 CASE( "as_nullable: Allows to move to a related pointer from a not_null pointer (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p ( std::move(pderived) );
     unique_ptr< MyBase > pbase = as_nullable( std::move(p) );
@@ -964,7 +962,7 @@ CASE( "as_nullable: Allows to move to a related pointer from a not_null pointer 
 
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with make_not_null()" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
 
     not_null< unique_ptr< int > > p = make_not_null( std::move(pi) );
@@ -975,7 +973,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
 CASE( "not_null<>: Allows to construct from a non-null underlying pointer (unique_ptr) with deduction guide" )
 {
 #if gsl_HAVE( DEDUCTION_GUIDES )
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
 
     not_null p( std::move(pi) );
@@ -986,7 +984,7 @@ CASE( "not_null<>: Allows to construct from a non-null underlying pointer (uniqu
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null underlying pointer (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< const int > > p( std::move(pi) );
 
@@ -996,7 +994,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null underlyin
 CASE( "not_null<>: Converts to underlying pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-    unique_ptr< int > pi = make_unique< int >();
+    unique_ptr< int > pi = my_make_unique< int >();
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     take_unique_by_val<int>( std::move(p) );
@@ -1006,7 +1004,7 @@ CASE( "not_null<>: Converts to underlying pointer (unique_ptr)" )
 
 CASE( "as_nullable: Converts to underlying pointer (unique_ptr)" )
 {
-    unique_ptr< int > pi = make_unique< int >();
+    unique_ptr< int > pi = my_make_unique< int >();
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     take_unique_by_ref<int>( as_nullable( p ) );
@@ -1015,16 +1013,16 @@ CASE( "as_nullable: Converts to underlying pointer (unique_ptr)" )
 
 CASE( "as_nullable: Terminates for moved-from pointer (unique_ptr)" )
 {
-    shared_ptr< int > pi = make_unique< int >();
-    not_null< shared_ptr< int > > p( std::move( pi ) );
-    not_null< shared_ptr< int > > p2( std::move( p ) );
+    unique_ptr< int > pi = my_make_unique< int >();
+    not_null< unique_ptr< int > > p( std::move( pi ) );
+    not_null< unique_ptr< int > > p2( std::move( p ) );
 
     EXPECT_THROWS( (void) as_nullable( p ) );
 }
 
 CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyBase > > p( std::move(pderived) );
 
@@ -1033,7 +1031,7 @@ CASE( "not_null<>: Allows to construct from a non-null related pointer (unique_p
 
 CASE( "not_null<>: Allows to construct a const pointer from a non-null related pointer (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< const MyBase > > p( std::move(pderived) );
 
@@ -1042,7 +1040,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a non-null related p
 
 CASE( "not_null<>: Allows to construct from a not_null related pointer type (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
@@ -1057,7 +1055,7 @@ CASE( "not_null<>: Allows to construct from a not_null related pointer type (uni
 
 CASE( "not_null<>: Allows to construct a const pointer from a not_null related pointer type (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
@@ -1073,7 +1071,7 @@ CASE( "not_null<>: Allows to construct a const pointer from a not_null related p
 CASE( "not_null<>: Converts to a related pointer (unique_ptr)" )
 {
 #if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
     take_unique_by_val<MyBase>( std::move(p) );
@@ -1083,7 +1081,7 @@ CASE( "not_null<>: Converts to a related pointer (unique_ptr)" )
 
 CASE( "as_nullable: Converts to a related pointer (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
     take_unique_by_val<MyBase>( as_nullable( std::move(p) ) );
@@ -1091,10 +1089,10 @@ CASE( "as_nullable: Converts to a related pointer (unique_ptr)" )
 
 CASE( "not_null<>: Allows assignment from a not_null related pointer type (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
 	MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
-    not_null< unique_ptr< MyBase >    > q( make_unique< MyBase >() );
+    not_null< unique_ptr< MyBase >    > q( my_make_unique< MyBase >() );
 
     q = std::move(p);
 
@@ -1103,10 +1101,10 @@ CASE( "not_null<>: Allows assignment from a not_null related pointer type (uniqu
 
 CASE( "not_null<>: Allows assignment to a const pointer from a not_null related pointer type (unique_ptr)" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
 	MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived    > > p( std::move(pderived) );
-    not_null< unique_ptr< const MyBase > > q( make_unique< MyBase >() );
+    not_null< unique_ptr< const MyBase > > q( my_make_unique< MyBase >() );
 
     q = std::move(p);
 
@@ -1117,7 +1115,7 @@ CASE( "not_null<>: Allows indirect member access (unique_ptr)" )
 {
     using namespace nonlocal;
     S s = { 'a', 7 };
-    not_null< unique_ptr< S > > p( make_unique< S >(s) );
+    not_null< unique_ptr< S > > p( my_make_unique< S >(s) );
 
     EXPECT( p->c == 'a' );
     EXPECT( p->i ==  7  );
@@ -1126,7 +1124,7 @@ CASE( "not_null<>: Allows indirect member access (unique_ptr)" )
 CASE( "not_null<>: Allows dereferencing (unique_ptr)" )
 {
     int i = 12;
-    unique_ptr< int > pi = make_unique< int >(i);
+    unique_ptr< int > pi = my_make_unique< int >(i);
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     EXPECT( *p == i );
@@ -1138,7 +1136,7 @@ CASE( "not_null<>: Allows dereferencing (unique_ptr)" )
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a non-null unique_ptr<T>" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< shared_ptr< int > > p( std::move(pi) );
 
@@ -1147,7 +1145,7 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a non-null
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a non-null unique_ptr<T>" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< shared_ptr< const int > > p( std::move(pi) );
 
@@ -1156,7 +1154,7 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a no
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related non-null unique_ptr<U>" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< shared_ptr< MyBase > > p( std::move(pderived) );
 
@@ -1165,7 +1163,7 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related 
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a related non-null unique_ptr<U>" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< shared_ptr< const MyBase > > p( std::move(pderived) );
 
@@ -1174,7 +1172,7 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a re
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a not_null<unique_ptr<T>>" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
@@ -1221,7 +1219,7 @@ CASE( "not_null<>: Allows to convert from a not_null<shared_ptr<T>> to a user-de
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a not_null<unique_ptr<T>>" )
 {
-    unique_ptr< int > pi = make_unique< int >(12);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     int* raw(pi.get());
     not_null< unique_ptr< int > > p( std::move(pi) );
 
@@ -1236,7 +1234,7 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a no
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related not_null<unique_ptr<U>>" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
@@ -1251,7 +1249,7 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related 
 
 CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a related not_null<unique_ptr<U>>" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
     MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
 
@@ -1266,10 +1264,10 @@ CASE( "not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a re
 
 CASE( "not_null<>: Allows assignment to a not_null<shared_ptr<T>> from a related not_null<unique_ptr<U>>" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
 	MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived > > p( std::move(pderived) );
-    not_null< shared_ptr< MyBase >    > q( make_shared< MyBase >() );
+    not_null< shared_ptr< MyBase >    > q( std::make_shared< MyBase >() );
 
     q = std::move(p);
 
@@ -1278,15 +1276,37 @@ CASE( "not_null<>: Allows assignment to a not_null<shared_ptr<T>> from a related
 
 CASE( "not_null<>: Allows assignment to a not_null<shared_ptr<const T>> from a related not_null<unique_ptr<U>>" )
 {
-    unique_ptr< MyDerived > pderived = make_unique< MyDerived >();
+    unique_ptr< MyDerived > pderived = my_make_unique< MyDerived >();
 	MyDerived* raw(pderived.get());
     not_null< unique_ptr< MyDerived    > > p( std::move(pderived) );
-    not_null< shared_ptr< const MyBase > > q( make_shared< MyBase >() );
+    not_null< shared_ptr< const MyBase > > q( std::make_shared< MyBase >() );
 
     q = std::move(p);
 
     EXPECT( &*q == raw );
 }
+
+# if gsl_HAVE( VARIADIC_TEMPLATE )
+#  if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 120, 130 )  // VS 2013
+CASE( "not_null<>: make_unique<T>() returns not_null<unique_ptr<T>>" )
+{
+    not_null< unique_ptr< int > > p = make_unique< int >();
+    unique_ptr< int > q = std::move( p );
+    (void) q;
+
+    EXPECT( q.get() != nullptr );
+
+}
+#  endif // !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 120, 130 )
+CASE( "not_null<>: make_shared<T>() returns not_null<shared_ptr<T>>" )
+{
+    not_null< shared_ptr< int > > p = make_shared< int >();
+    shared_ptr< int > q = std::move( p );
+    (void) q;
+
+    EXPECT( q.get() != nullptr );
+}
+# endif // gsl_HAVE( VARIADIC_TEMPLATE )
 
 #endif // gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( SHARED_PTR )
 
@@ -1549,9 +1569,9 @@ CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
     int i = 42;
     not_null< const int* > raw_pointer = make_not_null( &i );
     EXPECT( std::hash< not_null< const int* > >()(raw_pointer) == std::hash< const int* >()( as_nullable( raw_pointer ) ) );
-    not_null< std::unique_ptr< int > > unique_pointer = make_not_null( make_unique< int >(43) );
+    not_null< std::unique_ptr< int > > unique_pointer = make_not_null( my_make_unique< int >(43) );
     EXPECT( std::hash< not_null< std::unique_ptr< int > > >()(unique_pointer) == std::hash< std::unique_ptr< int > >()( as_nullable( unique_pointer) ) );
-    not_null< std::shared_ptr< int > > shared_pointer = make_not_null( make_shared< int >(43) );
+    not_null< std::shared_ptr< int > > shared_pointer = make_not_null( std::make_shared< int >(43) );
     EXPECT( std::hash< not_null< std::shared_ptr< int > > >()(shared_pointer) == std::hash< std::shared_ptr< int > >()( as_nullable( shared_pointer) ) );
 }
 
