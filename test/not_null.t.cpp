@@ -1015,9 +1015,9 @@ CASE( "as_nullable: Converts to underlying pointer (unique_ptr)" )
 
 CASE( "as_nullable: Terminates for moved-from pointer (unique_ptr)" )
 {
-    shared_ptr< int > pi = make_unique< int >();
-    not_null< shared_ptr< int > > p( std::move( pi ) );
-    not_null< shared_ptr< int > > p2( std::move( p ) );
+    unique_ptr< int > pi = make_unique< int >();
+    not_null< unique_ptr< int > > p( std::move( pi ) );
+    not_null< unique_ptr< int > > p2( std::move( p ) );
 
     EXPECT_THROWS( (void) as_nullable( p ) );
 }
