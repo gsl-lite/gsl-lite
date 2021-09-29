@@ -1287,6 +1287,7 @@ CASE( "not_null<>: Allows assignment to a not_null<shared_ptr<const T>> from a r
 }
 
 # if gsl_HAVE( VARIADIC_TEMPLATE )
+#  if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 120, 130 )  // VS 2013
 CASE( "not_null<>: make_unique<T>() returns not_null<unique_ptr<T>>" )
 {
     not_null< unique_ptr< int > > p = make_unique< int >();
@@ -1294,7 +1295,9 @@ CASE( "not_null<>: make_unique<T>() returns not_null<unique_ptr<T>>" )
     (void) q;
 
     EXPECT( q.get() != nullptr );
+
 }
+#  endif // !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 120, 130 )
 CASE( "not_null<>: make_shared<T>() returns not_null<shared_ptr<T>>" )
 {
     not_null< shared_ptr< int > > p = make_shared< int >();
