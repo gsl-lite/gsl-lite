@@ -465,7 +465,8 @@
 // AppleClang 11.0.0  __apple_build_version__ == 11000033  gsl_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3, 11.3.1) (LLVM  8.0.0)
 // AppleClang 11.0.3  __apple_build_version__ == 11030032  gsl_COMPILER_APPLECLANG_VERSION == 1103  (Xcode 11.4, 11.4.1, 11.5, 11.6) (LLVM  9.0.0)
 // AppleClang 12.0.0  __apple_build_version__ == 12000032  gsl_COMPILER_APPLECLANG_VERSION == 1200  (Xcode 12.0–12.4)                (LLVM 10.0.0)
-// AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 10.0.0)
+// AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 11.1.0)
+// AppleClang 13.0.0  __apple_build_version__ == 13000029  gsl_COMPILER_APPLECLANG_VERSION == 1300  (Xcode 13.0)                     (LLVM 12.0.0)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
@@ -1690,11 +1691,11 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #if gsl_COMPILER_NVHPC_VERSION
 // Suppress "controlling expression is constant" warning when using gsl_Expects,
 // gsl_Ensures, gsl_Assert, gsl_FailFast and so on.
-# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT _Pragma("diag_suppress 236")
-# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT _Pragma("diag_default 236")
+# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ _Pragma("diag_suppress 236")
+# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ _Pragma("diag_default 236")
 #else
-# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
-# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
+# define gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
+# define gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
 #endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) )
@@ -1711,9 +1712,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #endif
 # define  gsl_FAILFAST_()                 ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
+# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
 # if ! defined( NDEBUG )
-#  define  gsl_FAILFAST_()                (gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT, ::gsl::detail::fail_fast_terminate() )
+#  define  gsl_FAILFAST_()                (gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_, ::gsl::detail::fail_fast_terminate() )
 # else
 #  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 # endif
@@ -1725,10 +1726,10 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
 # endif
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
+# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
 # define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 #else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT
+# define   gsl_CONTRACT_CHECK_( str, x )  gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_
 # define   gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
 #endif
 
@@ -2182,7 +2183,7 @@ namespace detail {
     {
         return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
     }
-# endif // gsl_COMPILER_NVCC_VERSION
+# endif // gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 } // namespace detail
 
