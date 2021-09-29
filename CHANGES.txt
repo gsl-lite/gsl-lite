@@ -1,6 +1,20 @@
 Changes in gsl-lite
 ===================
 
+version 0.39.0 2021-09-30
+
+Additions:
+- Add `gsl::make_unique<T>()` and `gsl::make_shared<T>()` which resemble the eponymous functions from `std` but return
+  `gsl::not_null<std::unique_ptr<T>>` and `gsl::not_null<std::shared_ptr<T>>` (#312)
+- Add basic support for NVHPC compiler (#308, thanks to @olupton)
+
+Changes:
+- Continuous Integration now also tests GCC 11, Clang 12, and AppleClang 12.0.5 and 13, and updates CUDA version to 11.4 (#314)
+- Remove C++98 polyfills `std98::equal()`, `std98::lexicographical_compare()` from public interface (#313)
+
+Fixes:
+- `gsl::not_null<std::shared_ptr<T>>` now correctly converts to `std::weak_ptr<T>` (#311, thanks to @stohrendorf)
+
 version 0.38.1 2021-04-22
 
 Additions:
