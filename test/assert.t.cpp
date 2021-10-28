@@ -22,11 +22,14 @@
 
 namespace {
 
-bool expects( bool x ) { gsl_Expects( x ); return x; } 
+bool expects( bool x ) { gsl_Expects( x ); return x; }
 bool ensures( bool x ) { gsl_Ensures( x ); return x; }
 bool assert_( bool x ) { gsl_Assert( x ); return x; }
 void failFast() { gsl_FailFast(); }
-bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; } 
+bool expectsDebug( bool x ) { gsl_ExpectsDebug( x ); return x; }
+bool ensuresDebug( bool x ) { gsl_EnsuresDebug( x ); return x; }
+bool assertDebug( bool x ) { gsl_AssertDebug( x ); return x; }
+bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; }
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
 
@@ -105,6 +108,48 @@ CASE( "gsl_FailFast(): Terminates" )
     EXPECT_THROWS( failFast() );
 #if gsl_CPP11_OR_GREATER
     EXPECT_THROWS( colorToString( Color( 42 ) ) );
+#endif
+}
+
+CASE( "gsl_ExpectsDebug(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( expectsDebug( true  ) );
+}
+
+CASE( "gsl_EnsuresDebug(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( ensuresDebug( true  ) );
+}
+
+CASE( "gsl_AssertDebug(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assertDebug( true  ) );
+}
+
+CASE( "gsl_ExpectsDebug(): Terminates on a false expression in debug build or AUDIT mode" )
+{
+#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( expectsDebug( false ) );
+#else
+    EXPECT_NO_THROW( expectsDebug( false ) );
+#endif
+}
+
+CASE( "gsl_EnsuresAudit(): Terminates on a false expression in debug build or AUDIT mode" )
+{
+#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( ensuresDebug( false ) );
+#else
+    EXPECT_NO_THROW( ensuresDebug( false ) );
+#endif
+}
+
+CASE( "gsl_AssertAudit(): Terminates on a false expression in debug build or AUDIT mode" )
+{
+#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( assertDebug( false ) );
+#else
+    EXPECT_NO_THROW( assertDebug( false ) );
 #endif
 }
 
