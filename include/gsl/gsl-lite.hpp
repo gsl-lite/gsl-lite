@@ -1708,9 +1708,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 # if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) || ! defined( NDEBUG )
 #  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : __trap() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() )
 #endif
-# define   gsl_FAILFAST_()                ( __trap() )
+# define  gsl_FAILFAST_()                 ( gsl_TRAP_() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # if ! defined( NDEBUG )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
@@ -1740,7 +1740,7 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 # define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "GSL: Precondition failure", x )
 #endif
 #define   Expects( x )           gsl_Expects( x )
-#if defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
+#if ( !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) && defined( NDEBUG ) ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
 #else
 # define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (debug)", x )
@@ -1757,7 +1757,7 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 # define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "GSL: Postcondition failure", x )
 #endif
 #define   Ensures( x )           gsl_Ensures( x )
-#if defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
+#if ( !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) && defined( NDEBUG ) ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
 #else
 # define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (debug)", x )
@@ -1773,7 +1773,7 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #else
 # define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "GSL: Assertion failure", x )
 #endif
-#if defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+#if ( !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) && defined( NDEBUG ) ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_AssertDebug( x )  gsl_ELIDE_( x )
 #else
 # define  gsl_AssertDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (debug)", x )
