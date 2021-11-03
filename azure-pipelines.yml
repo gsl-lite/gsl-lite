@@ -52,7 +52,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [11]
+      cxxCompilerVersions: [13]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
@@ -130,12 +130,12 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [4, 5, 6, 7, 8, 9, 10, 11, 12]
+      cxxCompilerVersions: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [12]
+      cxxCompilerVersions: [13]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
@@ -146,7 +146,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [12]
+      cxxCompilerVersions: [13]
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
