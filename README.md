@@ -166,7 +166,7 @@ Version semantics
 Development of *gsl-lite* happens in the `master` branch. Versioning semantics apply only to tagged releases: there is no stability guarantee between individual commits in the `master` branch, i.e. anything
 added since the last tagged release may be renamed, removed, have the semantics changed, etc. without further notice.
 
-A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/gsl-lite/gsl-lite/issues/156) while we're still in version 0.\*).
+A minor-version release will be compatible (in both ABI and API) with the previous minor-version release (with [rare exceptions](https://github.com/gsl-lite/gsl-lite/issues/156) while we are still in version 0.\*).
 Thus, once a change is released, it becomes part of the API.
 
 Some of the [configuration options](#configuration-options) affect the API and ABI of *gsl-lite*. Most configuration options exist because a change we wanted to make would have broken backward compatibility,
@@ -306,21 +306,43 @@ Define this to additionally define a `namespace gsl_lite` with most of the *gsl-
 
 There are several macros for expressing preconditions, postconditions, and invariants:
 
+- `gsl_FailFast()` to indicate unreachable code
 - `gsl_Expects( cond )` for simple preconditions
 - `gsl_Ensures( cond )` for simple postconditions
 - `gsl_Assert( cond )` for simple assertions
-- `gsl_FailFast()` to indicate unreachable code
+- `gsl_ExpectsDebug( cond )` for debug-mode preconditions
+- `gsl_EnsuresDebug( cond )` for debug-mode postconditions
+- `gsl_AssertDebug( cond )` for debug-mode assertions
 - `gsl_ExpectsAudit( cond )` for preconditions that are expensive or include potentially opaque function calls
 - `gsl_EnsuresAudit( cond )` for postconditions that are expensive or include potentially opaque function calls
 - `gsl_AssertAudit( cond )` for assertions that are expensive or include potentially opaque function calls
 
 The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
+The `gsl_Expects*()`, `gsl_Ensures*()`, `gsl_Assert*()` categories of checks can be disabled individually with the
+`gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, or `gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`
+configuration macros.
+
+The macros `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` are compiled to runtime checks unless contract checking is disabled
+with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
+
+The macros `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()` are compiled to runtime checks unless assertions
+are disabled by defining `NDEBUG`. They thus behave similar to the traditional
+[`assert()`](https://en.cppreference.com/w/cpp/error/assert) macro from the C standard library.
+
+The macros `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()` are discarded by default. In order to compile them
+to runtime checks, the `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` configuration macro must be defined.
+
 
 The following macros control whether contracts are checked at runtime:
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_AUDIT`**  
   Define this macro to have all contracts checked at runtime.
+
+- **`NDEBUG`**
+  This macro traditionally disables runtime checks for the [`assert()`](https://en.cppreference.com/w/c/error/assert) macro from
+  the C standard library. Additionally, contracts expressed with `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()`
+  are not evaluated or checked at runtime if `NDEBUG` is defined.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ON` (default)**  
   Define this macro to have contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and `gsl_FailFast()` checked at runtime, and contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. **This is the default.**
@@ -332,82 +354,102 @@ The following macros control whether contracts are checked at runtime:
 The following macros can be used to selectively disable checking for a particular kind of contract:
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`**  
-  Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Expects()` and `gsl_ExpectsAudit()`.
+  Define this macro to disable runtime checking of precondition contracts expressed with `gsl_Expects()`, `gsl_ExpectsDebug()`, and `gsl_ExpectsAudit()`.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`**  
-  Define this macro to disable runtime checking of postcondition contracts expressed with `gsl_Ensures()` and `gsl_EnsuresAudit()`.
+  Define this macro to disable runtime checking of postcondition contracts expressed with `gsl_Ensures()`, `gsl_EnsuresDebug()`, and `gsl_EnsuresAudit()`.
 
 - **`gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`**  
-  Define this macro to disable runtime checking of assertions expressed with `gsl_Assert()` and `gsl_AssertAudit()`.
+  Define this macro to disable runtime checking of assertions expressed with `gsl_Assert()`, `gsl_AssertDebug()`, and `gsl_AssertAudit()`.
 
 
 The following macros control the handling of runtime contract violations:
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` (default)**  
-  Define this macro to call `std::terminate()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. **This is the default.**
+  Define this macro to call `std::terminate()` on a contract violation. **This is the default.**  
+  Termination on contract violation is the behavior specified by the Core Guidelines for GSL contract checks.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS`**  
-  If this macro is defined, the `assert()` macro is used to check GSL contracts expressed with `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. (Note that `gsl_FailFast()` will call `std::terminate()` if `NDEBUG` is defined.)
+  If this macro is defined, and if the `assert()` macro is available for runtime checks (that is, if `NDEBUG` is not defined),
+  contract checking macros are implemented in terms of `assert()`. If `assert()` is unavailable (i.e. if `NDEBUG` was defined),
+  `std::abort()` is called directly if a contract is violated.  
+  This option may be preferable over `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` because `assert()` prints diagnostic information
+  (such as the current source file, a line number, and the function name), and because vendor-specific extensions of `assert()`
+  can be used (e.g. the Microsoft STL displays a dialog box which permits breaking into the debugger or continuing execution).  
+  Note that `gsl_FailFast()` will call `std::abort()` if `assert()` continues execution.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TRAPS`**  
-  Define this macro to execute a trap instruction on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`.
+  Define this macro to execute a trap instruction on a contract violation.  
+  Trap instructions may result in smaller codegen and can thus result in better-performing code. However, they usually lead to
+  catastrophic failure and may be difficult to diagnose for some platforms.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_THROWS`**  
-  Define this macro to throw a std::runtime_exception-derived exception `gsl::fail_fast` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`.
+  Define this macro to throw a `std::runtime_error`-derived exception `gsl::fail_fast` on contract violation.  
+  Handling contract violations with exceptions can be desired when executing in an interactive programming environment, or if
+  there are other reasons why process termination shall be avoided.  
+  This macro is also useful for writing unit tests that exercise contract checks.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
-  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` on a GSL contract violation in `gsl_Expects()`, `gsl_ExpectsAudit()`, `gsl_Ensures()`, `gsl_EnsuresAudit()`, `gsl_Assert()`, `gsl_AssertAudit()`, and `gsl_FailFast()`. The user must provide a definition of the following function:
-
+  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` on a contract violation.
+  The user must provide a definition of the following function:
   ```c++
   namespace gsl {
       gsl_api void fail_fast_assert_handler(
-          char const * const expression, char const * const message,
-          char const * const file, int line );
+          char const * expression, char const * message,
+          char const * file, int line );
   }
-  ```
-
-Note that `gsl_FailFast()` will call `std::terminate()` if `fail_fast_assert_handler()` returns.
+  ```  
+  Note that `gsl_FailFast()` will call `std::terminate()` if `fail_fast_assert_handler()` returns.
 
 
 The following macros control what happens with contract checks not enforced at runtime:
  
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)**  
-  Define this macro to disable all runtime checking and evaluation of unenforced contracts and invariants. (Note that `gsl_FailFast()` calls are never elided.) **This is the default.**
+  Define this macro to disable all runtime checking and evaluation of unenforced contracts and invariants. **This is the default.**  
+  Note that `gsl_FailFast()` calls are never elided.
 
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`**  
-  Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` always hold true, and to have contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` not checked and not evaluated at runtime. With this setting, contract violations lead to undefined behavior, which gives the compiler more opportunities for optimization but can be dangerous if the code is not prepared for it.
+  Define this macro to let the compiler assume that contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()`
+  that are not checked (due to definition of `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`,
+  `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, or `gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`) always hold true. This is expressed
+  with compiler-specific intrinsics such as `__assume()`.
+  Contracts expressed with `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, `gsl_AssertDebug()` , `gsl_ExpectsAudit()`,
+  `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` which are not checked (due to definition of `NDEBUG` or one of the aforementioned
+  macros) are discarded.  
+  Explicitly injecting the assumption that contracts hold true implies that violating contracts causes undefined behavior. This
+  may give the compiler more opportunities for optimization, but it is usually dangerous and can have devastating consequences
+  like all occurrences of undefined behavior.  
+  The use of compiler-specific "assume" intrinsics may lead to spurious runtime evaluation of contract expressions. Because
+  *gsl-lite* implements contract checks with macros (rather than as a language feature as proposed by the C++2a Contracts proposal),
+  it cannot reliably suppress runtime evaluation for all compilers. E.g., if the contract check fed to the "assume" intrinsic
+  comprises a function call which is opaque to the compiler, many compilers will generate the runtime function call. Therefore,
+  `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should be used only for conditions that can be proven side-effect-free by
+  the compiler, and `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, `gsl_AssertDebug()`, `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`,
+  and `gsl_AssertAudit()` for everything else. In practice, this implies that `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()`
+  should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects
+  with trivially inlineable comparison operators.  
 
-
-Note that the distinction between regular and audit-level contracts is subtly different from the C++2a Contracts proposals. Defining `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` instructs the compiler that the
-conditions expressed by GSL contracts can be assumed to hold true. This is meant to be an aid for the optimizer; runtime evaluation of the condition is not desired. However, because the GSL implements contract checks
-with macros rather than as a language feature, it cannot reliably suppress runtime evaluation of a condition for all compilers. If the contract comprises a function call which is opaque to the compiler, many compilers
-will generate the runtime function call.
-
-Therefore, `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should be used only for conditions that can be proven side-effect-free by the compiler, and `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` for everything else. In practice, this implies that `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects with trivially inlineable comparison operators.
-
-
-Example:
-
-```c++
-template< class RandomIt >
-auto median( RandomIt first, RandomIt last )
-{
-        // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
-        // compiler will inline the comparison operator and understand that the comparison is free
-        // of side-effects, and hence generate no code in gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME mode.
-    gsl_Expects( first != last );
-
-        // Verifying that a range of elements is sorted may be an expensive operation, and we
-        // cannot trust the compiler to understand that it is free of side-effects, so we use an
-        // audit-level contract check.
-    gsl_ExpectsAudit( std::is_sorted( first, last ) );
-
-    auto count = last - first;
-    return count % 2 != 0
-        ? first[ count / 2 ]
-        : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
-}
-```
+  Example:  
+  ```c++
+  template< class RandomIt >
+  auto median( RandomIt first, RandomIt last )
+  {
+          // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
+          // compiler will inline the comparison operator and understand that the comparison is free
+          // of side-effects, and hence generate no code in `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` mode.
+      gsl_Expects( first != last );
+  
+          // Verifying that a range of elements is sorted may be an expensive operation, and we
+          // cannot trust the compiler to understand that it is free of side-effects, so we use an
+          // audit-level contract check.
+      gsl_ExpectsAudit( std::is_sorted( first, last ) );
+  
+      auto count = last - first;
+      return count % 2 != 0
+          ? first[ count / 2 ]
+          : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
+  }
+  ```
 
 
 ### Microsoft GSL compatibility macros
@@ -517,6 +559,9 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `gsl_Ensures()`             | -       | -       | ✓         | Postcondition assertion |
 `gsl_Assert()`              | -       | -       | ✓         | Assertion |
 `gsl_FailFast()`            | -       | -       | ✓         | Fail-fast termination |
+`gsl_ExpectsDebug()`        | -       | -       | ✓         | Debug-mode precondition assertion |
+`gsl_EnsuresDebug()`        | -       | -       | ✓         | Debug-mode postcondition assertion |
+`gsl_AssertDebug()`         | -       | -       | ✓         | Debug-mode assertion |
 `gsl_ExpectsAudit()`        | -       | -       | ✓         | Audit-level precondition assertion |
 `gsl_EnsuresAudit()`        | -       | -       | ✓         | Audit-level postcondition assertion |
 `gsl_AssertAudit()`         | -       | -       | ✓         | Audit-level assertion |
@@ -594,8 +639,8 @@ GCC                  | Linux           | x64       | 4.7 and newer     | [4.7, 4
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
 GCC                  | MacOS           | x64       | 6 and newer       | [6, 7, 8, 9, 10](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [3.5, 3.6, 3.7, 3.8, 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4, 5, 6, 7, 8, 9, 10, 11, 12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang with libstdc++ | Linux           | x64       | 11 and newer      | [12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [3.5, 3.6, 3.7, 3.8, 3.9](https://travis-ci.com/gsl-lite/gsl-lite/), [4, 5, 6, 7, 8, 9, 10, 11, 12, 13](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang with libstdc++ | Linux           | x64       | 11 and newer      | [13](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS 2019 | [latest](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2017, 2019](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9](https://travis-ci.com/gsl-lite/gsl-lite/), [9.1, 10, 10.0.1, 11, 11.0.3, 12, 12.0.5, 13](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
@@ -694,6 +739,12 @@ gsl_Ensures(): Terminates on a false expression
 gsl_Assert(): Terminates on a false expression
 gsl_FailFast(): Suppresses compiler warning about missing return value
 gsl_FailFast(): Terminates
+gsl_ExpectsDebug(): Allows a true expression
+gsl_EnsuresDebug(): Allows a true expression
+gsl_AssertDebug(): Allows a true expression
+gsl_ExpectsDebug(): Terminates on a false expression in debug build
+gsl_EnsuresAudit(): Terminates on a false expression in debug build
+gsl_AssertAudit(): Terminates on a false expression in debug build
 gsl_ExpectsAudit(): Allows a true expression
 gsl_EnsuresAudit(): Allows a true expression
 gsl_AssertAudit(): Allows a true expression
@@ -1096,11 +1147,6 @@ narrow<>(): Terminates when narrowing with sign loss
 narrow_failfast<>(): Allows narrowing without value loss
 narrow_failfast<>(): Terminates when narrowing with value loss
 narrow_failfast<>(): Terminates when narrowing with sign loss
-CUDA: Precondition/postcondition checks and assertions can be used in kernel code
-CUDA: span<> can be passed to kernel code
-CUDA: span<> can be used in kernel code
-CUDA: not_null<> can be passed to and used in kernel code
-CUDA: gsl_FailFast() can be used in kernel code
 ```
 </p>
 </details>
