@@ -1708,9 +1708,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 # if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) || ! defined( NDEBUG )
 #  define  gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
 # else
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : gsl_TRAP_() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( ( x ) ? static_cast<void>(0) : __trap() )
 #endif
-# define  gsl_FAILFAST_()                 ( gsl_TRAP_() )
+# define   gsl_FAILFAST_()                ( __trap() )
 #elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # if ! defined( NDEBUG )
 # define   gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
