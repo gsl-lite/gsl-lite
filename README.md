@@ -1161,6 +1161,11 @@ narrow<>(): Terminates when narrowing with sign loss
 narrow_failfast<>(): Allows narrowing without value loss
 narrow_failfast<>(): Terminates when narrowing with value loss
 narrow_failfast<>(): Terminates when narrowing with sign loss
+CUDA: Precondition/postcondition checks and assertions can be used in kernel code
+CUDA: span<> can be passed to kernel code
+CUDA: span<> can be used in kernel code
+CUDA: not_null<> can be passed to and used in kernel code
+CUDA: gsl_FailFast() can be used in kernel code
 ```
 </p>
 </details>
