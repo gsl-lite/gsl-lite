@@ -126,27 +126,27 @@ CASE( "gsl_AssertDebug(): Allows a true expression" )
     EXPECT_NO_THROW( assertDebug( true  ) );
 }
 
-CASE( "gsl_ExpectsDebug(): Terminates on a false expression in debug build or AUDIT mode" )
+CASE( "gsl_ExpectsDebug(): Terminates on a false expression in debug build" )
 {
-#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+#if !defined( NDEBUG )
     EXPECT_THROWS( expectsDebug( false ) );
 #else
     EXPECT_NO_THROW( expectsDebug( false ) );
 #endif
 }
 
-CASE( "gsl_EnsuresAudit(): Terminates on a false expression in debug build or AUDIT mode" )
+CASE( "gsl_EnsuresAudit(): Terminates on a false expression in debug build" )
 {
-#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+#if !defined( NDEBUG )
     EXPECT_THROWS( ensuresDebug( false ) );
 #else
     EXPECT_NO_THROW( ensuresDebug( false ) );
 #endif
 }
 
-CASE( "gsl_AssertAudit(): Terminates on a false expression in debug build or AUDIT mode" )
+CASE( "gsl_AssertAudit(): Terminates on a false expression in debug build" )
 {
-#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+#if !defined( NDEBUG )
     EXPECT_THROWS( assertDebug( false ) );
 #else
     EXPECT_NO_THROW( assertDebug( false ) );
