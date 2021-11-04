@@ -43,7 +43,7 @@ set_property( SOURCE ${SOURCES} PROPERTY LANGUAGE CUDA ) # compile .cpp files wi
 make_cuda_test_targets( "${PROGRAM}" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} )
 make_cuda_test_targets( "${PROGRAM}-expt" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} EXTRA_OPTIONS "--expt-relaxed-constexpr" )
 
-if( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA|Clang" )
+if( CMAKE_CUDA_COMPILER_ID MATCHES "Clang" OR ( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA" AND CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER 11.3 ) )
     make_cuda_test_targets( "${PROGRAM}-assume" 14
         SOURCES ${SOURCES} ${CUDA_SOURCES}
         DEFAULTS_VERSION v1
