@@ -3218,16 +3218,31 @@ gsl_NODISCARD gsl_api gsl_constexpr T const & as_nullable( T const & p ) gsl_noe
 }
 #endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD gsl_api gsl_constexpr14 T const & as_nullable( not_null<T> const & p )
+gsl_NODISCARD gsl_api gsl_constexpr14 T const &
+as_nullable( not_null<T> const & p )
 {
     T const & result = detail::not_null_accessor<T>::get( p );
     gsl_Expects( result != gsl_nullptr );
     return result;
 }
 template< class T >
-gsl_NODISCARD gsl_api gsl_constexpr T* as_nullable( not_null<T*> p ) gsl_noexcept
+gsl_NODISCARD gsl_api gsl_constexpr T*
+as_nullable( not_null<T*> p ) gsl_noexcept
 {
     return detail::not_null_accessor<T*>::get( p );
+}
+
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr bool
+is_valid( not_null<T> const & p )
+{
+    return detail::not_null_accessor<T>::get( p ) != gsl_nullptr;
+}
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr bool
+is_valid( not_null<T*> const & )
+{
+    return true;
 }
 
 } // namespace no_adl

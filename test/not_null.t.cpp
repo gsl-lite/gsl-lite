@@ -459,6 +459,21 @@ CASE( "not_null<>: Allows dereferencing (raw pointer)" )
     EXPECT( *p == i );
 }
 
+CASE( "not_null<>: Allows to check whether object is valid (raw pointer)" )
+{
+    int i = 12;
+    not_null< int* > p( &i );
+
+    EXPECT( gsl::is_valid( p ) );
+
+#if gsl_HAVE( MOVE_FORWARD )
+    not_null< int* > q( std::move( p ) );
+
+    EXPECT( gsl::is_valid( p ) ); // for raw pointers, moving `not_null<>` just makes a copy
+    EXPECT( gsl::is_valid( q ) );
+#endif
+}
+
 #if gsl_HAVE( MOVE_FORWARD )
 template< class T >
 void move_to( T& dest, T& src )
@@ -768,6 +783,19 @@ CASE( "not_null<>: Allows dereferencing (shared_ptr)" )
     not_null< shared_ptr< int > > p( pi );
 
     EXPECT( *p == *pi );
+}
+
+CASE( "not_null<>: Allows to check whether object is valid (shared_ptr)" )
+{
+    shared_ptr< int > pi = std::make_shared< int >(12);
+    not_null< shared_ptr< int > > p( pi );
+
+    EXPECT( gsl::is_valid( p ) );
+
+    not_null< shared_ptr< int > > q( std::move( p ) );
+
+    EXPECT_NOT( gsl::is_valid( p ) );
+    EXPECT(     gsl::is_valid( q ) );
 }
 
 #endif // gsl_HAVE( SHARED_PTR )
@@ -1124,10 +1152,23 @@ CASE( "not_null<>: Allows indirect member access (unique_ptr)" )
 CASE( "not_null<>: Allows dereferencing (unique_ptr)" )
 {
     int i = 12;
-    unique_ptr< int > pi = my_make_unique< int >(i);
+    unique_ptr< int > pi = my_make_unique< int >(12);
     not_null< unique_ptr< int > > p( std::move(pi) );
 
     EXPECT( *p == i );
+}
+
+CASE( "not_null<>: Allows to check whether object is valid (unique_ptr)" )
+{
+    unique_ptr< int > pi = my_make_unique< int >( 12 );
+    not_null< unique_ptr< int > > p( std::move(pi) );
+
+    EXPECT( gsl::is_valid( p ) );
+
+    not_null< unique_ptr< int > > q( std::move( p ) );
+
+    EXPECT_NOT( gsl::is_valid( p ) );
+    EXPECT(     gsl::is_valid( q ) );
 }
 
 #endif // gsl_HAVE( UNIQUE_PTR )

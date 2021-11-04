@@ -973,6 +973,7 @@ not_null<>: Allows to compare less than another not_null of the same type
 not_null<>: Allows to compare less than or equal to another not_null of the same type
 not_null<>: Allows to compare greater than another not_null of the same type
 not_null<>: Allows to compare greater than or equal to another not_null of the same type
+not_null<>: Allows to check whether object is valid
 not_null<>: Allows to compare equal to a raw pointer of the same type
 not_null<>: Allows to compare unequal to a raw pointer of the same type
 not_null<>: Allows to compare less than a raw pointer of the same type
