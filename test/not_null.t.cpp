@@ -1412,6 +1412,14 @@ CASE( "not_null<>: Allows to compare greater than or equal to another not_null o
 
 // raw pointer
 
+CASE( "not_null<>: Allows to check whether object is valid" )
+{
+    NotNull _;
+
+    EXPECT(gsl::is_valid(_.p1()));
+    EXPECT(gsl::is_valid(_.p2()));
+}
+
 CASE( "not_null<>: Allows to compare equal to a raw pointer of the same type" )
 {
     NotNull _;
