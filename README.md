@@ -320,33 +320,7 @@ There are several macros for expressing preconditions, postconditions, and invar
 
 The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
-- **`gsl_FailFast()`** is useful in places which should not be reachable during program execution. For example:
-  ```c++
-  enum class Color : int { red, green, blue };
-  std::string colorToString( Color color )
-  {
-      switch (color)
-      {
-      case Color::red:   return "red";
-      case Color::green: return "green";
-      case Color::blue:  return "blue";
-      }
-      gsl_FailFast();
-  }
-  ```
-  The C++ language permits casting any representable integer value to an enum. Therefore, `colorToString(Color(0xFF00FF))`
-  is legal C++, but not something supported by this `colorToString()` implementation. `gsl_FailFast()` is used to ensure that
-  passing unsupported values to `colorToString()` will be detected at runtime.  
-    
-  `gsl_FailFast()` is guaranteed to interrupt the current path of execution; it behaves as if annotated by the
-  [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute. A C++11 compiler will therefore not
-  emit a warning about a missing return statement in `colorToString()`.  
-  
-  (Note that the `switch` statement above deliberately elides the `default:` clause. Because the switch statement is wrapped in a
-  dedicated function, we can use `return` instead of `break` to conclude the `case` clauses, and hence the default handler can
-  simply go after the `switch` statement. The benefit of avoiding the `default:` clause is that most compilers will understand that
-  the `switch` statement is supposed to handle all defined enumeration values and thus issue a warning if the programmer adds a new
-  enumeration value (say, `Color::yellow`) but forgets to amend the `switch` statement.)
+The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of configuration macros:
 
 - The macros **`gsl_Expects()`**, **`gsl_Ensures()`**, and **`gsl_Assert()`** are compiled to runtime checks unless contract
   checking is disabled with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
@@ -363,6 +337,34 @@ The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Exp
 - The **`gsl_Expects*()`**, **`gsl_Ensures*()`**, **`gsl_Assert*()`** categories of checks can be disabled individually with the
   `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, or `gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`
   configuration macros.
+
+- **`gsl_FailFast()`** is similar to `gsl_Assert( false )` but is guaranteed to interrupt the current path of execution even
+  if contract checking is disabled with configuration macros. It is useful in places which should not be reachable during program
+  execution. For example:
+  ```c++
+  enum class Color : int { red, green, blue };
+  std::string colorToString( Color color )
+  {
+      switch (color)
+      {
+      case Color::red:   return "red";
+      case Color::green: return "green";
+      case Color::blue:  return "blue";
+      }
+      gsl_FailFast();
+  }
+  ```
+  The C++ language permits casting any representable integer value to an enum. Therefore, `colorToString(Color(0xFF00FF))`
+  is legal C++, but not actually supported by this `colorToString()` implementation. `gsl_FailFast()` is employed here to ensure
+  that passing unsupported values to `colorToString()` will be detected at runtime.  
+    
+  `gsl_FailFast()` behaves as if annotated by the [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn)
+  attribute. A C++11 compiler will therefore not emit a warning about a missing return statement in `colorToString()`.
+  <!--(Unrelated note: the `switch` statement above deliberately elides the `default:` clause. Because the switch statement is wrapped
+  in a dedicated function, we can use `return` instead of `break` to conclude the `case` clauses, and hence the default handler
+  can simply go after the `switch` statement. The benefit of avoiding the `default:` clause is that most compilers will understand
+  that the `switch` statement is supposed to handle all defined enumeration values and thus issue a warning if the programmer adds
+  a new enumeration value (say, `Color::yellow`) but forgets to amend the `switch` statement.)-->
 
 
 The following macros control whether contracts are checked at runtime:
@@ -485,7 +487,7 @@ The following macros control what happens with contract checks not enforced at r
   comprises a function call which is opaque to the compiler, many compilers will generate the runtime function call. Therefore,
   `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should be used only for conditions that can be proven side-effect-free by
   the compiler, and `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, `gsl_AssertDebug()`, `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`,
-  and `gsl_AssertAudit()` for everything else. In practice, this implies that `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()`
+  and `gsl_AssertAudit()` for everything else. In practice, this means that `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()`
   should only be used for simple comparisons of scalar values, for simple inlineable getters, and for comparisons of class objects
   with trivially inlineable comparison operators.  
 
