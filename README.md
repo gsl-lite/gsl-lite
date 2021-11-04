@@ -806,9 +806,9 @@ gsl_FailFast(): Terminates
 gsl_ExpectsDebug(): Allows a true expression
 gsl_EnsuresDebug(): Allows a true expression
 gsl_AssertDebug(): Allows a true expression
-gsl_ExpectsDebug(): Terminates on a false expression in debug build
-gsl_EnsuresAudit(): Terminates on a false expression in debug build
-gsl_AssertAudit(): Terminates on a false expression in debug build
+gsl_ExpectsDebug(): Terminates on a false expression in debug build or AUDIT mode
+gsl_EnsuresAudit(): Terminates on a false expression in debug build or AUDIT mode
+gsl_AssertAudit(): Terminates on a false expression in debug build or AUDIT mode
 gsl_ExpectsAudit(): Allows a true expression
 gsl_EnsuresAudit(): Allows a true expression
 gsl_AssertAudit(): Allows a true expression
