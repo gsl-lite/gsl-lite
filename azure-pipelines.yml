@@ -54,6 +54,15 @@ jobs:
       cxxCompiler: Clang
       cxxCompilerVersions: [13]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      cudaCompiler: Clang
+      cudaCompilerVersions: [13]
+      platforms: [x64]
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+
+    - os: Linux
+      cxxCompiler: Clang
+      cxxCompilerVersions: [13]
+      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
