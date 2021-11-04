@@ -1836,57 +1836,79 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 # endif
 #endif // gsl_DEVICE_CODE
 
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
-#else
+#if ( !gsl_DEVICE_CODE && defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) ) || ( gsl_DEVICE_CODE && defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF ) )
+# define  gsl_CHECK_CONTRACTS_        0
+# define  gsl_CHECK_DEBUG_CONTRACTS_  0
+# define  gsl_CHECK_AUDIT_CONTRACTS_  0
+#elif ( !gsl_DEVICE_CODE && defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) ) || ( gsl_DEVICE_CODE && defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT ) )
+# define  gsl_CHECK_CONTRACTS_        1
+# define  gsl_CHECK_DEBUG_CONTRACTS_  1
+# define  gsl_CHECK_AUDIT_CONTRACTS_  1
+#else // gsl_CONFIG_[DEVICE_]CONTRACT_CHECKING_ON [default]
+# define  gsl_CHECK_CONTRACTS_        1
+# if !defined( NDEBUG )
+#  define gsl_CHECK_DEBUG_CONTRACTS_  1
+# else // defined( NDEBUG )
+#  define gsl_CHECK_DEBUG_CONTRACTS_  0
+# endif
+# define  gsl_CHECK_AUDIT_CONTRACTS_  0
+#endif
+
+#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "GSL: Precondition failure", x )
+#else
+# define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #define   Expects( x )           gsl_Expects( x )
-#if defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
-#else
+#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (debug)", x )
-#endif
-#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #else
+# define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
+#endif
+#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (audit)", x )
+#else
+# define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
-#else
+#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "GSL: Postcondition failure", x )
+#else
+# define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #define   Ensures( x )           gsl_Ensures( x )
-#if defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
-#else
+#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (debug)", x )
-#endif
-#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #else
+# define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
+#endif
+#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (audit)", x )
+#else
+# define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-#  define gsl_Assert( x )       gsl_CONTRACT_UNENFORCED_( x )
-#else
+#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "GSL: Assertion failure", x )
-#endif
-#if defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertDebug( x )  gsl_ELIDE_( x )
 #else
+# define  gsl_Assert( x )       gsl_CONTRACT_UNENFORCED_( x )
+#endif
+#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_AssertDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (debug)", x )
-#endif
-#if !defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT ) || defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAudit( x )  gsl_ELIDE_( x )
 #else
+# define  gsl_AssertDebug( x )  gsl_ELIDE_( x )
+#endif
+#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (audit)", x )
+#else
+# define  gsl_AssertAudit( x )  gsl_ELIDE_( x )
 #endif
 
 #define   gsl_FailFast()        gsl_FAILFAST_()
+
+#undef gsl_CHECK_CONTRACTS_
+#undef gsl_CHECK_DEBUG_CONTRACTS_
+#undef gsl_CHECK_AUDIT_CONTRACTS_
 
 
 struct fail_fast : public std::logic_error
