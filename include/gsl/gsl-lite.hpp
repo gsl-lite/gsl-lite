@@ -1136,7 +1136,7 @@
 # include <initializer_list>
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) || gsl_DEVICE_CODE
 # include <cassert>
 #endif
 
@@ -1778,6 +1778,12 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #if gsl_DEVICE_CODE
 # if gsl_COMPILER_NVCC_VERSION
 #  define  gsl_TRAP_()  __trap()
+# elif defined(__has_builtin)
+#  if __has_builtin(__builtin_trap)
+#   define gsl_TRAP_()  __builtin_trap()
+#  else
+#   error  gsl-lite does not know how to generate a trap instruction for this device compiler
+#  endif
 # else
 #  error   gsl-lite does not know how to generate a trap instruction for this device compiler
 # endif
