@@ -302,7 +302,8 @@ Define this to additionally define a `namespace gsl_lite` with most of the *gsl-
 
 ### Contract checking configuration macros
 
-*gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
+*gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with
+some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
 
 There are several macros for expressing preconditions, postconditions, and invariants:
 
@@ -319,19 +320,49 @@ There are several macros for expressing preconditions, postconditions, and invar
 
 The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
-The `gsl_Expects*()`, `gsl_Ensures*()`, `gsl_Assert*()` categories of checks can be disabled individually with the
-`gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, or `gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`
-configuration macros.
+- **`gsl_FailFast()`** is useful in places which should not be reachable during program execution. For example:
+  ```c++
+  enum class Color : int { red, green, blue };
+  std::string colorToString( Color color )
+  {
+      switch (color)
+      {
+      case Color::red:   return "red";
+      case Color::green: return "green";
+      case Color::blue:  return "blue";
+      }
+      gsl_FailFast();
+  }
+  ```
+  The C++ language permits casting any representable integer value to an enum. Therefore, `colorToString(Color(0xFF00FF))`
+  is legal C++, but not something supported by this `colorToString()` implementation. `gsl_FailFast()` is used to ensure that
+  passing unsupported values to `colorToString()` will be detected at runtime.  
+    
+  `gsl_FailFast()` is guaranteed to interrupt the current path of execution; it behaves as if annotated by the
+  [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute. A C++11 compiler will therefore not
+  emit a warning about a missing return statement in `colorToString()`.  
+  
+  (Note that the `switch` statement above deliberately elides the `default:` clause. Because the switch statement is wrapped in a
+  dedicated function, we can use `return` instead of `break` to conclude the `case` clauses, and hence the default handler can
+  simply go after the `switch` statement. The benefit of avoiding the `default:` clause is that most compilers will understand that
+  the `switch` statement is supposed to handle all defined enumeration values and thus issue a warning if the programmer adds a new
+  enumeration value (say, `Color::yellow`) but forgets to amend the `switch` statement.)
 
-The macros `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` are compiled to runtime checks unless contract checking is disabled
-with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
+- The macros **`gsl_Expects()`**, **`gsl_Ensures()`**, and **`gsl_Assert()`** are compiled to runtime checks unless contract
+  checking is disabled with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
 
-The macros `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()` are compiled to runtime checks unless contract
-checking is disabled by defining `gsl_CONFIG_CONTRACT_CHECKING_OFF` or assertions are disabled by defining `NDEBUG`. They can be
-used in place of the [`assert()`](https://en.cppreference.com/w/cpp/error/assert) macro from the C standard library.
+- The macros **`gsl_ExpectsAudit()`**, **`gsl_EnsuresAudit()`**, and **`gsl_AssertAudit()`** are discarded by default. In order to
+  have them checked at runtime, the `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` configuration macro must be defined.
 
-The macros `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` are discarded by default. In order to have them
-checked at runtime, the `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` configuration macro must be defined.
+- The macros **`gsl_ExpectsDebug()`**, **`gsl_EnsuresDebug()`**, and **`gsl_AssertDebug()`** are compiled to runtime checks unless
+  contract checking is disabled by defining `gsl_CONFIG_CONTRACT_CHECKING_OFF` or assertions are disabled by defining `NDEBUG`.
+  They can be used in place of the [`assert()`](https://en.cppreference.com/w/cpp/error/assert) macro from the C standard library.
+  (Note that defining `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` also enables checking of the `gsl_*Debug()` macros regardless of
+  whether `NDEBUG` is defined.)
+
+- The **`gsl_Expects*()`**, **`gsl_Ensures*()`**, **`gsl_Assert*()`** categories of checks can be disabled individually with the
+  `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, or `gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`
+  configuration macros.
 
 
 The following macros control whether contracts are checked at runtime:
@@ -340,20 +371,26 @@ The following macros control whether contracts are checked at runtime:
   Define this macro to have contracts expressed with `gsl_ExpectsAudit()`, `gsl_EnsuresAudit()`, and `gsl_AssertAudit()` checked
   at runtime.
 
-- **`NDEBUG`**
-  This macro traditionally disables runtime checks for the [`assert()`](https://en.cppreference.com/w/c/error/assert) macro from
-  the C standard library. Additionally, contracts expressed with `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()`
-  are not evaluated or checked at runtime if `NDEBUG` is defined.
-
 - **`gsl_CONFIG_CONTRACT_CHECKING_ON` (default)**  
   Define this macro to have contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and `gsl_FailFast()`
   checked at runtime. **This is the default.**
  
+- **`NDEBUG`**
+  This macro traditionally disables runtime checks for the [`assert()`](https://en.cppreference.com/w/c/error/assert) macro from
+  the C standard library. Additionally, contracts expressed with `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()`
+  are not evaluated or checked at runtime if `NDEBUG` is defined and `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` is not.
+
 - **`gsl_CONFIG_CONTRACT_CHECKING_OFF`**  
   Define this macro to disable all runtime checking of contracts and invariants.  
     
   Note that `gsl_FailFast()` checks will trigger runtime failure even if runtime checking is disabled.
 
+- If desired, the macros **`gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT`**, **`gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON`**, and
+  **`gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF`** can be used to configure contract checking for CUDA device code separately. If
+  neither of these macros is defined, device code uses the same configuration as host code.  
+    
+  It may be reasonable to define `gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF` in Release builds because the performance impact of
+  runtime checks can be grave in device code, while it is often negligible in host code.
 
 The following macros can be used to selectively disable checking for a particular kind of contract:
 
@@ -412,6 +449,15 @@ The following macros control the handling of runtime contract violations:
     
   Note that `gsl_FailFast()` will call `std::terminate()` if `fail_fast_assert_handler()` returns.
 
+- If desired, the macros **`gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS`**, **`gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS`**, and
+  **`gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER`** can be used to configure contract violation handling for CUDA device
+  code separately. If neither of these macros is defined, device code uses the following defaults:
+  - `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` → `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS`
+  - `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` → `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS`
+  - `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` → `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS`
+  - `gsl_CONFIG_CONTRACT_VIOLATION_TRAPS` → `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS`
+  - `gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER` → `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER`
+
 
 The following macros control what happens with contract checks not enforced at runtime:
  
@@ -464,6 +510,10 @@ The following macros control what happens with contract checks not enforced at r
           : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
   }
   ```
+
+- If desired, the macros **`gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE`** and **`gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`** can be used
+  to configure handling of unenforced contract checks for CUDA device code separately. If neither of these macros is defined,
+  device code uses the same configuration as host code.  
 
 
 ### Microsoft GSL compatibility macros
