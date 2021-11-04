@@ -31,7 +31,7 @@
 #include <cstdlib>   // for abort()
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  39
+#define  gsl_lite_MINOR  40
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)

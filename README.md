@@ -3,7 +3,7 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://img.shields.io/github/v/release/gsl-lite/gsl-lite?sort=semver)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://vcpkg.info/port/gsl-lite) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/PloGDgU3dtDO2qVV)   |
+| [![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT) <br> [![Version](https://img.shields.io/github/v/release/gsl-lite/gsl-lite?sort=semver)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://img.shields.io/badge/on-Vcpkg-blue.svg)](https://vcpkg.info/port/gsl-lite) <br> [![single header](https://img.shields.io/badge/latest-single%20header%20file-blue.svg)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://img.shields.io/badge/on-godbolt-blue.svg)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/g7iVhtpktV8FJ4Ll)   |
 
 
 *gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl).
@@ -86,7 +86,7 @@ The recommended way to consume *gsl-lite* in your CMake project is to use `find_
 ```CMake
 cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
-find_package( gsl-lite 0.39 REQUIRED )
+find_package( gsl-lite 0.40 REQUIRED )
     
 project( my-program LANGUAGES CXX )
     
@@ -227,7 +227,7 @@ Example:
 
 ```cmake
 # my-statistics-lib/CMakeLists.txt
-find_package( gsl-lite 0.39 REQUIRED )
+find_package( gsl-lite 0.40 REQUIRED )
 
 add_library( my-statistics-lib STATIC mean.cpp )
 target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )

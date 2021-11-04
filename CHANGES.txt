@@ -1,6 +1,24 @@
 Changes in gsl-lite
 ===================
 
+version 0.40.0 2021-11-05
+
+Additions:
+- Add debug-mode contract checking macros `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, `gsl_AssertDebug()` which are sensitive
+  to the `NDEBUG` macro, and thus similar to `assert()` (#316)
+- Add dedicated contract check configuration macros for device code: `gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT`/`ON`/`OFF`,
+  `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS`/`TRAPS`/`CALLS_HANDLER`, and
+  `gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME`/`ELIDE` (#317)
+- Add `gsl::is_valid()` for explicitly detecting the moved-from state of a `gsl::not_null<>` object (#318)
+- Add device code detection macro `gsl_DEVICE_CODE` (evaluates to 1 when compiling CUDA device code, 0 when compiling host code)
+
+Changes:
+- Continuous Integration now also tests Clang 13 and updates CUDA version to 11.5
+- Improve documentation for contract checking macros and configuration macros
+
+Fixes:
+- Check for `gsl::` target rather than nonexistent `gsl-lite::` target in Config.cmake (#315, thanks to @Ram-Z)
+
 version 0.39.0 2021-09-30
 
 Additions:
