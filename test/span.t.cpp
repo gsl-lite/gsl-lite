@@ -401,6 +401,7 @@ gsl_constexpr14 int use_span_with_array( int const (&array)[3], span<int const> 
 
     int array2[3] = { 0, 0, 0 };
     span<int> sp2 = span<int>( array2 );
+    span<int const> spsave = sp;
     sp = sp2;
 #if gsl_CPP17_OR_GREATER
     array2[0] = 1;
@@ -408,6 +409,7 @@ gsl_constexpr14 int use_span_with_array( int const (&array)[3], span<int const> 
 #endif
     sp2[1] = 2;
     gsl_Assert( array2[1] == 2 );
+    sp = spsave;
     return 0;
 }
 
