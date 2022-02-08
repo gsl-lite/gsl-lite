@@ -72,6 +72,7 @@ add_library(
     ${package_nspace}::${package_name} ALIAS ${package_name} )
 target_include_directories(
     ${package_name}
+    SYSTEM
     INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
@@ -89,6 +90,7 @@ add_library(
     ${package_nspace}::${package_name}-v0 ALIAS ${package_name}-v0 )
 target_include_directories(
     ${package_name}-v0
+    SYSTEM
     INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
@@ -104,6 +106,7 @@ add_library(
     ${package_nspace}::${package_name}-v1 ALIAS ${package_name}-v1 )
 target_include_directories(
     ${package_name}-v1
+    SYSTEM
     INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" )
