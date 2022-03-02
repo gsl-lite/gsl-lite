@@ -1742,7 +1742,7 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #if gsl_DEVICE_CODE
 # if defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME )
 #  if gsl_COMPILER_NVCC_VERSION >= 113
-#   define gsl_ASSUME_( x )           ( __builtin_assume( bool(x) ) )
+#   define gsl_ASSUME_( x )           ( __builtin_assume( !!( x ) ) )
 #   define gsl_ASSUME_UNREACHABLE_()  __builtin_unreachable()
 #  else  // unknown device compiler
 #   error  gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME: gsl-lite does not know how to generate UB optimization hints in device code for this compiler; use gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE instead
