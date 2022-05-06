@@ -2660,8 +2660,8 @@ public:
         , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
 #  endif
     >
-    gsl_api gsl_constexpr14 explicit not_null( U && other )
-    : data_( T( std::forward<U>( other ) ) )
+    gsl_api gsl_constexpr14 explicit not_null( U other )
+    : data_( T( std::move( other ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
@@ -2682,8 +2682,8 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
     >
-    gsl_api gsl_constexpr14 explicit not_null( U && other )
-    : data_( T( std::forward<U>( other ) ) )
+    gsl_api gsl_constexpr14 explicit not_null( U other )
+    : data_( T( std::move( other ) ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
@@ -3261,8 +3261,8 @@ public:
     >
     gsl_api gsl_constexpr14
 #if gsl_HAVE( MOVE_FORWARD )
-    not_null_ic( U && u )
-    : not_null<T>( std::forward<U>( u ) )
+    not_null_ic( U u )
+    : not_null<T>( std::move( u ) )
 #else // ! gsl_HAVE( MOVE_FORWARD )
     not_null_ic( U const & u )
     : not_null<T>( u )
