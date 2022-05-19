@@ -3261,8 +3261,8 @@ public:
     >
     gsl_api gsl_constexpr14
 #if gsl_HAVE( MOVE_FORWARD )
-    not_null_ic( U && u )
-    : not_null<T>( std::forward<U>( u ) )
+    not_null_ic( U u )
+    : not_null<T>( std::move( u ) )
 #else // ! gsl_HAVE( MOVE_FORWARD )
     not_null_ic( U const & u )
     : not_null<T>( u )
