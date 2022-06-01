@@ -11,23 +11,11 @@ environment:
     matrix:
         # VS 2019 and newer are tested with Azure Pipelines
         #- generator: "Visual Studio 16 2019"
-        #  only:
-        #      - image: Visual Studio 2019
         - generator: "Visual Studio 15 2017"
-          only:
-              - image: "Visual Studio 2017"
         - generator: "Visual Studio 14 2015"
-          only:
-              - image: "Visual Studio 2017"
         - generator: "Visual Studio 12 2013"
-          only:
-              - image: "Visual Studio 2015"
         - generator: "Visual Studio 11 2012"
-          only:
-              - image: "Visual Studio 2015"
         - generator: "Visual Studio 10 2010"
-          only:
-              - image: "Visual Studio 2015"
 
 configuration:
     - Debug
@@ -39,6 +27,17 @@ platform:
 
 matrix:
     fast_finish: false
+    exclude:
+        - image:      Visual Studio 2017
+          generator: "Visual Studio 12 2013"
+        - image:      Visual Studio 2017
+          generator: "Visual Studio 11 2012"
+        - image:      Visual Studio 2017
+          generator: "Visual Studio 10 2010"
+        - image:      Visual Studio 2015
+          generator: "Visual Studio 15 2017"
+        - image:      Visual Studio 2015
+          generator: "Visual Studio 14 2015"
 
 before_build:
     - mkdir build && cd build
