@@ -38,6 +38,9 @@ jobs:
       postSetupSteps:
       - bash: |
           sudo apt install valgrind
+          # suppress AVX/AVX2 paths because there are apparent false positives in glibc's AVX2-optimized memcmp routines
+          # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
+          echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable"
         displayName: 'Install Valgrind'
 
     - os: Linux
@@ -72,6 +75,9 @@ jobs:
       postSetupSteps:
       - bash: |
           sudo apt install valgrind
+          # suppress AVX/AVX2 paths because there are apparent false positives in glibc's AVX2-optimized memcmp routines
+          # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
+          echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable"
         displayName: 'Install Valgrind'
 
     - os: Windows
