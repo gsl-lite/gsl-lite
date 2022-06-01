@@ -15,19 +15,19 @@ environment:
         #      - image: Visual Studio 2019
         - generator: "Visual Studio 15 2017"
           only:
-              - image: Visual Studio 2017
+              - image: "Visual Studio 2017"
         - generator: "Visual Studio 14 2015"
           only:
-              - image: Visual Studio 2017
+              - image: "Visual Studio 2017"
         - generator: "Visual Studio 12 2013"
           only:
-              - image: Visual Studio 2015
+              - image: "Visual Studio 2015"
         - generator: "Visual Studio 11 2012"
           only:
-              - image: Visual Studio 2015
+              - image: "Visual Studio 2015"
         - generator: "Visual Studio 10 2010"
           only:
-              - image: Visual Studio 2015
+              - image: "Visual Studio 2015"
 
 configuration:
     - Debug
