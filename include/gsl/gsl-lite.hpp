@@ -2340,7 +2340,7 @@ namespace detail {
 #endif
 
 template< class T, class U >
-gsl_NODISCARD
+gsl_NODISCARD gsl_constexpr14
 #if !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 gsl_api
 #endif
@@ -2398,7 +2398,7 @@ narrow( U u )
 }
 
 template< class T, class U >
-gsl_NODISCARD gsl_api inline T
+gsl_NODISCARD gsl_api gsl_constexpr14 inline T
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
