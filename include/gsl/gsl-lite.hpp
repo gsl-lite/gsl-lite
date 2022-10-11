@@ -517,6 +517,7 @@
 // MSVC++ 14.0  _MSC_VER == 1900  gsl_COMPILER_MSVC_VERSION == 140  (Visual Studio 2015)
 // MSVC++ 14.1  _MSC_VER >= 1910  gsl_COMPILER_MSVC_VERSION == 141  (Visual Studio 2017)
 // MSVC++ 14.2  _MSC_VER >= 1920  gsl_COMPILER_MSVC_VERSION == 142  (Visual Studio 2019)
+// MSVC++ 14.3  _MSC_VER >= 1930  gsl_COMPILER_MSVC_VERSION == 143  (Visual Studio 2022)
 
 #if defined( _MSC_VER ) && ! defined( __clang__ )
 # define gsl_COMPILER_MSVC_VER           (_MSC_VER )
@@ -551,7 +552,9 @@
 // AppleClang 11.0.3  __apple_build_version__ == 11030032  gsl_COMPILER_APPLECLANG_VERSION == 1103  (Xcode 11.4, 11.4.1, 11.5, 11.6) (LLVM  9.0.0)
 // AppleClang 12.0.0  __apple_build_version__ == 12000032  gsl_COMPILER_APPLECLANG_VERSION == 1200  (Xcode 12.0–12.4)                (LLVM 10.0.0)
 // AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 11.1.0)
-// AppleClang 13.0.0  __apple_build_version__ == 13000029  gsl_COMPILER_APPLECLANG_VERSION == 1300  (Xcode 13.0)                     (LLVM 12.0.0)
+// AppleClang 13.0.0  __apple_build_version__ == 13000029  gsl_COMPILER_APPLECLANG_VERSION == 1300  (Xcode 13.0–13.2.1)              (LLVM 12.0.0)
+// AppleClang 13.1.6  __apple_build_version__ == 13160021  gsl_COMPILER_APPLECLANG_VERSION == 1316  (Xcode 13.3–13.4.1)              (LLVM 13.0.0)
+// AppleClang 14.0.0  __apple_build_version__ == 14000029  gsl_COMPILER_APPLECLANG_VERSION == 1400  (Xcode 14.0)                     (LLVM 14.0.0)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
