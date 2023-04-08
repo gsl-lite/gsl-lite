@@ -48,10 +48,10 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [11]
+      cxxCompilerVersions: [12]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_7]
+      cudaCompilerVersions: [12_1]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -67,7 +67,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [14]
+      cxxCompilerVersions: [16]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
@@ -105,20 +105,20 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_7]
+      cudaCompilerVersions: [11_8]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [13_1_6]
+      cxxCompilerVersions: [14]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
 
-    # GCC 4.7, 4.8, 4.9, and 5 are tested with Travis
+    # GCC 4.7, 4.8, 4.9, 5, and 6 are tested with Travis
     #- os: Linux
     #  cxxCompiler: GCC
     #  cxxCompilerVersions: [5]
@@ -126,7 +126,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [6, 7, 8, 9, 10, 11, 12]
+      cxxCompilerVersions: [7, 8, 9, 10, 11, 12]
       platforms: [x64]
 
     - os: Linux
@@ -140,7 +140,7 @@ jobs:
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
 
-    # Clang 3.5, 3.6, 3.7, 3.8, and 3.9 are tested with Travis
+    # Clang 3.5, 3.6, 3.7, 3.8, and 3.9, 4, and 5 are tested with Travis
     #- os: Linux
     #  cxxCompiler: Clang
     #  cxxCompilerVersions: [4]
@@ -148,12 +148,12 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+      cxxCompilerVersions: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [14]
+      cxxCompilerVersions: [16]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
@@ -164,16 +164,16 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [14]
+      cxxCompilerVersions: [16]
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [6]
+      cxxCompilerVersions: [11]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [10_2]
+      cudaCompilerVersions: [11_7]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -183,7 +183,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2019]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [10_2]
+      cudaCompilerVersions: [11_8, 12_1]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -194,10 +194,10 @@ jobs:
 
     - os: MacOS
       cxxCompiler: GCC
-      cxxCompilerVersions: [6, 7, 8, 9, 10, 11, 12]
+      cxxCompilerVersions: [8, 9, 10, 11, 12]
       platforms: [x64]
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [10_0_1, 11, 11_0_3, 12, 12_0_5, 13, 13_1_6]
+      cxxCompilerVersions: [10_0_1, 11, 11_0_3, 12, 12_0_5, 13, 13_1_6, 14]
       platforms: [x64]
