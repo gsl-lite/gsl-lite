@@ -416,7 +416,7 @@
 
 // Presence of wide character support:
 
-#ifdef __DJGPP__
+#if defined(__DJGPP__) || (defined(_LIBCPP_VERSION) && defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS))
 # define gsl_HAVE_WCHAR 0
 #else
 # define gsl_HAVE_WCHAR 1
