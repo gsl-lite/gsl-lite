@@ -495,7 +495,8 @@
 #define gsl_CPP11_OR_GREATER  ( gsl_CPLUSPLUS >= 201103L )
 #define gsl_CPP14_OR_GREATER  ( gsl_CPLUSPLUS >= 201402L )
 #define gsl_CPP17_OR_GREATER  ( gsl_CPLUSPLUS >= 201703L )
-#define gsl_CPP20_OR_GREATER  ( gsl_CPLUSPLUS >= 202000L )
+#define gsl_CPP20_OR_GREATER  ( gsl_CPLUSPLUS >= 202002L )
+#define gsl_CPP23_OR_GREATER  ( gsl_CPLUSPLUS >= 202300L )  // tentative
 
 // C++ language version (represent 98 as 3):
 
@@ -771,6 +772,12 @@
 
 #define gsl_HAVE_CONSTEXPR_20_()           gsl_HAVE_CONSTEXPR_20
 
+// Presence of C++23 language features:
+
+#define gsl_HAVE_CONSTEXPR_23              gsl_CPP23_OR_GREATER
+
+#define gsl_HAVE_CONSTEXPR_23_()           gsl_HAVE_CONSTEXPR_23
+
 // Presence of C++ library features:
 
 #if gsl_BETWEEN( gsl_COMPILER_ARMCC_VERSION, 1, 600 )
@@ -780,12 +787,14 @@
 # define gsl_STDLIB_CPP14_OR_GREATER  0
 # define gsl_STDLIB_CPP17_OR_GREATER  0
 # define gsl_STDLIB_CPP20_OR_GREATER  0
+# define gsl_STDLIB_CPP23_OR_GREATER  0
 #else
 # define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
 # define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
 # define gsl_STDLIB_CPP14_OR_GREATER  gsl_CPP14_OR_GREATER
 # define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
 # define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
+# define gsl_STDLIB_CPP23_OR_GREATER  gsl_CPP23_OR_GREATER
 #endif
 
 #define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
@@ -891,6 +900,12 @@
 # define gsl_constexpr20  constexpr
 #else
 # define gsl_constexpr20  /*constexpr*/
+#endif
+
+#if gsl_HAVE( CONSTEXPR_23 )
+# define gsl_constexpr23  constexpr
+#else
+# define gsl_constexpr23  /*constexpr*/
 #endif
 
 #if gsl_HAVE( EXPLICIT )
@@ -1560,6 +1575,12 @@ template< class T > struct remove_cvref { typedef typename std11::remove_cv< typ
 #endif // gsl_HAVE( REMOVE_CVREF )
 
 } // namespace std20
+
+// C++23 emulation:
+
+namespace std23 {
+
+} // namespace std23
 
 namespace detail {
 
@@ -5309,11 +5330,13 @@ namespace std11 = ::gsl::std11;
 namespace std14 = ::gsl::std14;
 namespace std17 = ::gsl::std17;
 namespace std20 = ::gsl::std20;
+namespace std23 = ::gsl::std23;
 
 using namespace std11;
 //using namespace std14;  // contains only make_unique<>(), which is superseded by `gsl::make_unique<>()`
 using namespace std17;
 using namespace std20;
+using namespace std23;
 
 using namespace ::gsl::detail::no_adl;
 
