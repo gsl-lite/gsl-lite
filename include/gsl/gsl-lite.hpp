@@ -301,6 +301,15 @@
 #endif
 #define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_()  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 
+#if defined( gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
+#  pragma message ("invalid configuration value gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS=" gsl_STRINGIFY(gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS) ", must be 0 or 1")
+# endif
+#else
+# define gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS  1  // default
+#endif
+#define gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS_()  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS
+
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 #  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF) "; macro must be defined without value")
@@ -555,7 +564,8 @@
 // AppleClang 12.0.5  __apple_build_version__ == 12050022  gsl_COMPILER_APPLECLANG_VERSION == 1205  (Xcode 12.5)                     (LLVM 11.1.0)
 // AppleClang 13.0.0  __apple_build_version__ == 13000029  gsl_COMPILER_APPLECLANG_VERSION == 1300  (Xcode 13.0–13.2.1)              (LLVM 12.0.0)
 // AppleClang 13.1.6  __apple_build_version__ == 13160021  gsl_COMPILER_APPLECLANG_VERSION == 1316  (Xcode 13.3–13.4.1)              (LLVM 13.0.0)
-// AppleClang 14.0.0  __apple_build_version__ == 14000029  gsl_COMPILER_APPLECLANG_VERSION == 1400  (Xcode 14.0)                     (LLVM 14.0.0)
+// AppleClang 14.0.0  __apple_build_version__ == 14000029  gsl_COMPILER_APPLECLANG_VERSION == 1400  (Xcode 14.0–14.2)                (LLVM 14.0.0)
+// AppleClang 14.0.0  __apple_build_version__ == 14030022  gsl_COMPILER_APPLECLANG_VERSION == 1403  (Xcode 14.3)                     (LLVM 15.0.0)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
@@ -1747,7 +1757,7 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 // GSL.assert: assertions
 //
 
-#if gsl_HAVE( TYPE_TRAITS )
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_CONFIG( VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
 # define gsl_ELIDE_( x )  static_assert( ::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool" )
 #else
 # define gsl_ELIDE_( x )

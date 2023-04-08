@@ -470,6 +470,14 @@ of configuration, i.e. due to definition of `gsl_CONFIG_CONTRACT_CHECKING_OFF`, 
   Contract checks disabled by configuration will be discarded. **This is the default.**  
     
   Note that `gsl_FailFast()` calls are never discarded.
+  
+  Even for discarded contract checks, *gsl-lite* will by default still verify that the contract check forms a valid Boolean
+  expression by using the C++11 features `decltype()` and `static_assert()`. This may lead to problems if the contract check
+  expression cannot be used in an unevaluated context, for instance, when using a lambda expression in C++11/14/17.
+  
+  The compile-time verification of contract check expressions is controlled by the configuration macro
+  `gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS`, which defaults to *`1`*. To suppress the verification, define
+  `gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS=0`.
 
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`**  
   For contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` which are not checked as a result of
