@@ -1208,7 +1208,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 #endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 
-// MSVC warning suppression macros:
+// Warning suppression macros:
 
 #if gsl_COMPILER_MSVC_VERSION >= 140 && ! gsl_COMPILER_NVCC_VERSION
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
@@ -1222,6 +1222,18 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 # define gsl_DISABLE_MSVC_WARNINGS(codes)
 # define gsl_RESTORE_MSVC_WARNINGS()
 #endif
+
+// Warning suppressions:
+
+#if ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wweak-vtables"  // because of `fail_fast` and `narrowing_error`
+#endif // ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+
+#if gsl_COMPILER_GNUC_VERSION && ! gsl_COMPILER_NVCC_VERSION
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wuseless-cast"  // we use `static_cast<>()` in several places where it is possibly redundant depending on the configuration of the library
+#endif // gsl_COMPILER_GNUC_VERSION
 
 // Suppress the following MSVC GSL warnings:
 // - C26432: gsl::c.21 : if you define or delete any default operation in the type '...', define or delete them all
@@ -5442,6 +5454,12 @@ using ::gsl::ensure_z;
 #endif // gsl_FEATURE( GSL_LITE_NAMESPACE )
 
 gsl_RESTORE_MSVC_WARNINGS()
+#if ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+# pragma clang diagnostic pop
+#endif // ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+#if gsl_COMPILER_GNUC_VERSION && ! gsl_COMPILER_NVCC_VERSION
+# pragma GCC diagnostic pop
+#endif // gsl_COMPILER_GNUC_VERSION
 
 // #undef internal macros
 #undef gsl_STATIC_ASSERT_

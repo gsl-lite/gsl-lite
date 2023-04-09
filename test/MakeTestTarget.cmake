@@ -249,7 +249,10 @@ function( make_test_target target )
             list( APPEND localOptions "-pedantic" ) # NVCC and "-pedantic" don't mix (GCC complains that NVCC-generated GCC-specific code is GCC specific)
         endif()
         if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" )
-            list( APPEND localOptions "-Wno-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
+            list( APPEND localOptions
+                "-Wno-long-long"  # irrelevant strict-C++98 warning about non-standard type `long long`
+                "-Wuseless-cast"  # leads to warnings that need to be suppressed, cf. https://github.com/gsl-lite/gsl-lite/issues/325
+            )
             if( CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8 )
                 list( APPEND localOptions "-Wno-type-limits" ) # irrelevant warning about `unsigned value < 0` comparison
             endif()
@@ -257,7 +260,10 @@ function( make_test_target target )
                 list( APPEND localOptions "-Wno-error=array-bounds" ) # work around compiler bug: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100137
             endif()
         elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang" )
-            list( APPEND localOptions "-Wno-c++11-long-long" ) # irrelevant strict-C++98 warning about non-standard type `long long`
+            list( APPEND localOptions
+                "-Wno-c++11-long-long"  # irrelevant strict-C++98 warning about non-standard type `long long`
+                "-Wweak-vtables"  # leads to warnings that need to be suppressed, cf. https://github.com/gsl-lite/gsl-lite/issues/322
+            )
         endif()
     endif()
 
