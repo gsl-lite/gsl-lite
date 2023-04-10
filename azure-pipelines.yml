@@ -82,7 +82,6 @@ jobs:
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet.
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
 
