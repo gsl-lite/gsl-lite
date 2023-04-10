@@ -34,10 +34,6 @@ jobs:
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
-      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
       postSetupSteps:
       - bash: |
           sudo apt install valgrind
@@ -45,6 +41,11 @@ jobs:
           # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
           echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable"
         displayName: 'Install Valgrind'
+      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+      # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet.
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
 
     - os: Linux
       cxxCompiler: GCC
@@ -71,10 +72,6 @@ jobs:
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
-      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
       postSetupSteps:
       - bash: |
           sudo apt install valgrind
@@ -82,6 +79,12 @@ jobs:
           # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
           echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable"
         displayName: 'Install Valgrind'
+      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+      # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet.
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
 
     - os: Windows
       cxxCompiler: MSVC
