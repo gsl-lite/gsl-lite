@@ -305,7 +305,7 @@ function( make_test_target target )
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
         target_precompile_headers( ${target}
             PRIVATE
-                "gsl/gsl-lite.hpp"
+                <gsl/gsl-lite.hpp>
                 <ostream>
                 <sstream>
                 <iostream>
