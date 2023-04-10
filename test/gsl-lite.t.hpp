@@ -73,7 +73,6 @@
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"
 # pragma GCC   diagnostic ignored "-Wuseless-cast"
-# pragma message "message: GCC diagnostic ignored \"-Wuseless-cast\""
 #elif defined( _MSC_VER )
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 #  pragma warning( disable : 4702 ) // unreachable code
