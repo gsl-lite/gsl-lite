@@ -303,7 +303,14 @@ function( make_test_target target )
     if( NOT SCOPE_NO_PCH
             AND NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
-        target_precompile_headers( ${target} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/gsl-lite.t.hpp )
+        target_precompile_headers( ${target}
+            PRIVATE
+                <gsl/gsl-lite.hpp>
+                <ostream>
+                <sstream>
+                <iostream>
+                <cstring>
+        )
     endif()
 
     if( NOT SCOPE_COMPILE_ONLY )

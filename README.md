@@ -3,7 +3,7 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![Travis build status](https://travis-ci.com/gsl-lite/gsl-lite.svg?branch=master)](https://travis-ci.com/gsl-lite/gsl-lite) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.info/port/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/g7iVhtpktV8FJ4Ll)   |
+| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.info/port/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/JVtM2c) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/g7iVhtpktV8FJ4Ll)   |
 
 
 *gsl-lite* is an implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl).
@@ -416,7 +416,7 @@ The following macros control the handling of runtime contract violations:
 - **`gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS`**  
   If this macro is defined, and if the `assert()` macro is available for runtime checks (that is, if `NDEBUG` is not defined),
   contract checking macros are implemented in terms of `assert()`. If `assert()` is unavailable (i.e. if `NDEBUG` was defined),
-  `std::abort()` is called directly if a contract is violated.  
+  `std::abort()` is called directly when a contract is violated.  
     
   This option may be preferable over `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` because `assert()` prints diagnostic information
   (such as the current source file, a line number, and the function name), and because vendor-specific extensions of `assert()`
@@ -463,8 +463,8 @@ The following macros control the handling of runtime contract violations:
 
 The following macros control what happens with individual contract checks which are not enforced at runtime. Note that these
 macros do not disable runtime contract checking; they only configure what happens to contracts which are not checked as a result
-of configuration, i.e. due to definition of `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF`,
-  `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, or `gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF`.
+of configuration, e.g. for any contract check if `gsl_CONFIG_CONTRACT_CHECKING_OFF` is defined, or for audit-level and debug-level
+contract checks if `NDEBUG` is defined.
 
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)**  
   Contract checks disabled by configuration will be discarded. **This is the default.**  
@@ -712,15 +712,15 @@ The table below mentions the compiler versions and platforms *gsl-lite* is repor
 
 Compiler             | OS              | Platforms | Versions          | CI |
 --------------------:|:----------------|-----------|------------------:|----|
-GCC                  | Linux           | x64       | 4.7 and newer     | [4.7, 4.8, 4.9, 5, 6](https://travis-ci.com/gsl-lite/gsl-lite/), [7, 8, 9, 10, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | Linux           | x64       | 4.7 and newer     | [7, 8, 9, 10, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
 GCC                  | MacOS           | x64       | 6 and newer       | [10, 11, 12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [3.5, 3.6, 3.7, 3.8, 3.9, 4, 5](https://travis-ci.com/gsl-lite/gsl-lite/), [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang with libstdc++ | Linux           | x64       | 11 and newer      | [16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS 2019 | [latest](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [7.3, 8, 8.1, 9, 9.1, 10](https://travis-ci.com/gsl-lite/gsl-lite/), [10.0.1, 11, 11.0.3, 12, 12.0.5, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [11.0.3, 12, 12.0.5, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [11.8, 12.1](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 ARMCC                |                 | ARM       | 5 and newer       | |
 

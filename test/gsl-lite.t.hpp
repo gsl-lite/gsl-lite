@@ -69,6 +69,7 @@
 # pragma clang diagnostic ignored "-Wunused-member-function"
 # pragma clang diagnostic warning "-Wunknown-warning-option" // we want to see warnings about unknown warning options
 # pragma clang diagnostic warning "-Wunknown-pragmas" // we want to see warnings about unknown pragmas
+# pragma GCC   diagnostic ignored "-Wweak-vtables"
 #elif defined( __GNUC__ )
 # pragma GCC   diagnostic ignored "-Wunused-parameter"
 # pragma GCC   diagnostic ignored "-Wunused-function"

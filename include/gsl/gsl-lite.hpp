@@ -1225,12 +1225,12 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 
 // Warning suppressions:
 
-#if ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+#if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wweak-vtables"  // because of `fail_fast` and `narrowing_error`
-#endif // ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+#endif // gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 
-#if gsl_COMPILER_GNUC_VERSION && ! gsl_COMPILER_NVCC_VERSION
+#if gsl_COMPILER_GNUC_VERSION
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wuseless-cast"  // we use `static_cast<>()` in several places where it is possibly redundant depending on the configuration of the library
 #endif // gsl_COMPILER_GNUC_VERSION
@@ -5454,10 +5454,10 @@ using ::gsl::ensure_z;
 #endif // gsl_FEATURE( GSL_LITE_NAMESPACE )
 
 gsl_RESTORE_MSVC_WARNINGS()
-#if ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
+#if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
 # pragma clang diagnostic pop
-#endif // ( gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION ) && ! gsl_COMPILER_NVCC_VERSION
-#if gsl_COMPILER_GNUC_VERSION && ! gsl_COMPILER_NVCC_VERSION
+#endif // gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
+#if gsl_COMPILER_GNUC_VERSION
 # pragma GCC diagnostic pop
 #endif // gsl_COMPILER_GNUC_VERSION
 
