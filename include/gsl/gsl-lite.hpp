@@ -183,6 +183,15 @@
 #endif
 #define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
+//#if defined( gsl_FEATURE_STRING_SPAN )
+//# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
+//#  pragma message ("invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
+//# endif
+//#else
+//# define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+//#endif
+//#define gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
+
 #if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 #  pragma message ("invalid configuration value gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=" gsl_STRINGIFY(gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD) ", must be 0 or 1")
@@ -217,7 +226,7 @@
 
 #if ! defined( gsl_CONFIG_DEPRECATE_TO_LEVEL )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
-#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  6
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  8
 # else
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 # endif
@@ -4439,6 +4448,7 @@ byte_span( T const & t ) gsl_noexcept
 
 #endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
 
+//#if gsl_FEATURE( STRING_SPAN )
 //
 // basic_string_span:
 //
@@ -4476,6 +4486,9 @@ gsl_api inline gsl_constexpr14 std::size_t string_length( T * ptr, std::size_t m
 // basic_string_span<> - A view of contiguous characters, replace (*,len).
 //
 template< class T >
+#if ! gsl_DEPRECATE_TO_LEVEL( 7 )
+gsl_DEPRECATED_MSG("use span<> instead")
+#endif // ! gsl_DEPRECATE_TO_LEVEL( 7 )
 class basic_string_span
 {
 public:
@@ -4979,6 +4992,7 @@ as_bytes( basic_string_span<T> spn ) gsl_noexcept
 {
     return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
+//#endif // gsl_FEATURE( STRING_SPAN )
 
 //
 // String types:
@@ -4991,6 +5005,8 @@ typedef const char * czstring;
 typedef wchar_t * wzstring;
 typedef const wchar_t * cwzstring;
 #endif
+
+//#if gsl_FEATURE( STRING_SPAN )
 
 typedef basic_string_span< char > string_span;
 typedef basic_string_span< char const > cstring_span;
@@ -5112,6 +5128,7 @@ std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t,
 }
 
 #endif // gsl_HAVE( WCHAR )
+//#endif // gsl_FEATURE( STRING_SPAN )
 
 //
 // ensure_sentinel()
@@ -5170,11 +5187,15 @@ ensure_z( Container & cont )
 }
 # endif
 
+//#if gsl_FEATURE( STRING_SPAN )
 //
 // basic_zstring_span<> - A view of contiguous null-terminated characters, replace (*,len).
 //
 
 template <typename T>
+#if ! gsl_DEPRECATE_TO_LEVEL( 7 )
+gsl_DEPRECATED
+#endif // ! gsl_DEPRECATE_TO_LEVEL( 7 )
 class basic_zstring_span
 {
 public:
@@ -5244,6 +5265,7 @@ typedef basic_zstring_span< char const > czstring_span;
 typedef basic_zstring_span< wchar_t > wzstring_span;
 typedef basic_zstring_span< wchar_t const > cwzstring_span;
 #endif
+//#endif // gsl_FEATURE( STRING_SPAN )
 
 } // namespace gsl
 
@@ -5428,6 +5450,7 @@ using ::gsl::as_writable_bytes;
 using ::gsl::as_writeable_bytes;
 # endif
 
+//# if gsl_FEATURE( STRING_SPAN )
 using ::gsl::basic_string_span;
 using ::gsl::string_span;
 using ::gsl::cstring_span;
@@ -5435,6 +5458,7 @@ using ::gsl::cstring_span;
 using ::gsl::basic_zstring_span;
 using ::gsl::zstring_span;
 using ::gsl::czstring_span;
+//# endif // gsl_FEATURE( STRING_SPAN )
 
 using ::gsl::zstring;
 using ::gsl::czstring;
@@ -5443,8 +5467,10 @@ using ::gsl::czstring;
 using ::gsl::wzstring;
 using ::gsl::cwzstring;
 
+//#  if gsl_FEATURE( STRING_SPAN )
 using ::gsl::wzstring_span;
 using ::gsl::cwzstring_span;
+//#  endif // gsl_FEATURE( STRING_SPAN )
 # endif // gsl_HAVE( WCHAR )
 
 using ::gsl::ensure_z;
