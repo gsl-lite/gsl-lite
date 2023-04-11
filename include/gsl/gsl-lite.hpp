@@ -5191,8 +5191,10 @@ namespace detail {
 template< class T, class SizeType, const T Sentinel >
 gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::numeric_limits<SizeType>::max)() )
 {
+    typedef T * pointer;
+
     gsl_SUPPRESS_MSVC_WARNING( 26429, "f.23: symbol 'cur' is never tested for nullness, it can be marked as not_null" )
-    T * cur = seq;
+    pointer cur = seq;
 
     while ( static_cast<SizeType>( cur - seq ) < max && *cur != Sentinel )
         ++cur;
@@ -5201,7 +5203,6 @@ gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::nu
 
     return span<T>( seq, gsl::narrow_cast< typename span<T>::index_type >( cur - seq ) );
 }
-
 } // namespace detail
 
 //
@@ -5212,7 +5213,7 @@ gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::nu
 
 template< class T >
 gsl_NODISCARD inline gsl_constexpr14 span<T>
-ensure_z( T * sz, size_t max = (std::numeric_limits<size_t>::max)() )
+ensure_z( T * const & sz, size_t max = (std::numeric_limits<size_t>::max)() )
 {
     return detail::ensure_sentinel<T, size_t, 0>( sz, max );
 }
