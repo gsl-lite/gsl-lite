@@ -232,7 +232,10 @@ function( make_test_target target )
         list( APPEND localOptions "/w44265" ) # enable C4265: 'class': class has virtual functions, but destructor is not virtual
         list( APPEND localDefinitions "_SCL_SECURE_NO_WARNINGS" )
         if( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VC++ 2010 and earlier
-            list( APPEND localOptions "/wd4275" ) # suppress C4275: non dll-interface class 'stdext::exception' used as base for dll-interface class 'std::bad_cast'
+            list( APPEND localOptions "/wd4275" ) # disable C4275: non dll-interface class 'stdext::exception' used as base for dll-interface class 'std::bad_cast'
+        endif()
+        if ( CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12.0 ) # VC++ 2012 and earlier
+            list( APPEND localOptions "/w44265" ) # disable C4345: behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized [actually, value-initialized]
         endif()
     elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
         list( APPEND localOptions
