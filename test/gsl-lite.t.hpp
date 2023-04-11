@@ -13,22 +13,6 @@
 
 // Compiler warning suppression for ancient versions of Visual Studio:
 
-#if defined( _MSC_VER )
-# if _MSC_VER < 1910
-#  pragma warning( disable : 4577 ) // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
-#  pragma warning( disable : 4702 ) // unreachable code
-# endif
-# if _MSC_VER < 1900
-#  pragma warning( disable : 4127 ) // conditional expression is constant
-# endif
-# if _MSC_VER < 1800
-#  pragma warning( disable : 4345 ) // behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
-# endif
-#endif
-#if defined( _MSC_VER ) && _MSC_VER < 1800
-# pragma warning( disable : 4345 ) // behavior change: an object of POD type constructed with an initializer of the form () will be default-initialized
-#endif
-
 
 // Select GSL Lite for VC6 if compiling with VC6:
 

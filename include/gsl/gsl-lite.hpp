@@ -1254,6 +1254,12 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 // - C26457: es.48     : (void) should not be used to ignore return values, use 'std::ignore =' instead
 
 gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473 26481 26482 26446 26490 26487 26457 )
+#if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 110, 140 )  // VS 2012 and 2013
+# pragma warning(disable: 4127)  // conditional expression is constant
+#endif // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 110, 140 )
+#if gsl_COMPILER_MSVC_VERSION == 140  // VS 2015
+# pragma warning(disable: 4577)  // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
+#endif // gsl_COMPILER_MSVC_VERSION == 140
 
 namespace gsl {
 
