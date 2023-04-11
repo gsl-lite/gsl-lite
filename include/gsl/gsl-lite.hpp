@@ -4486,11 +4486,7 @@ gsl_api inline gsl_constexpr14 std::size_t string_length( T * ptr, std::size_t m
 // basic_string_span<> - A view of contiguous characters, replace (*,len).
 //
 template< class T >
-class
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
-basic_string_span
+class basic_string_span
 {
 public:
     typedef T element_type;
@@ -4525,19 +4521,31 @@ public:
 #ifdef __CUDACC_RELAXED_CONSTEXPR__
     gsl_api
 #endif // __CUDACC_RELAXED_CONSTEXPR__
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( pointer ptr )
     : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
     {}
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
     : span_( ptr, count )
     {}
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( pointer firstElem, pointer lastElem )
     : span_( firstElem, lastElem )
     {}
 
     template< std::size_t N >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( element_type (&arr)[N] )
     : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
     {}
@@ -4545,11 +4553,17 @@ public:
 #if gsl_HAVE( ARRAY )
 
     template< std::size_t N >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
     : span_( remove_z( arr ) )
     {}
 
     template< std::size_t N >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
     : span_( remove_z( arr ) )
     {}
@@ -4568,6 +4582,9 @@ public:
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
         ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container & cont )
     : span_( ( cont ) )
     {}
@@ -4582,6 +4599,9 @@ public:
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
         ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container const & cont )
     : span_( ( cont ) )
     {}
@@ -4589,11 +4609,17 @@ public:
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
     template< class Container >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container & cont )
     : span_( cont )
     {}
 
     template< class Container >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container const & cont )
     : span_( cont )
     {}
@@ -4601,6 +4627,9 @@ public:
 #else
 
     template< class U >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( span<U> const & rhs )
     : span_( rhs )
     {}
@@ -4610,6 +4639,9 @@ public:
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
     template< class Container >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( with_container_t, Container & cont )
     : span_( with_container, cont )
     {}
@@ -4630,6 +4662,9 @@ public:
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
@@ -4638,18 +4673,27 @@ public:
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
 #endif // gsl_STDLIB_CPP11_120
 
     template< class CharTraits, class Allocator >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span(
         std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > & str )
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
     {}
 
     template< class CharTraits, class Allocator >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span(
         std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > const & str )
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
@@ -5194,11 +5238,7 @@ ensure_z( Container & cont )
 //
 
 template <typename T>
-class
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
-basic_zstring_span
+class basic_zstring_span
 {
 public:
     typedef T element_type;
@@ -5210,6 +5250,9 @@ public:
     typedef element_type * czstring_type;
     typedef basic_string_span<element_type> string_span_type;
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr14 basic_zstring_span( span_type s )
         : span_( s )
     {
@@ -5233,13 +5276,19 @@ public:
         return false;
     }
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_NODISCARD gsl_api gsl_constexpr string_span_type
     as_string_span() const gsl_noexcept
     {
         return string_span_type( span_.data(), span_.size() - 1 );
     }
 
-    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+ #if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+   /*gsl_api*/ // currently disabled due to an apparent NVCC bug
     gsl_NODISCARD gsl_constexpr string_span_type
     ensure_z() const
     {
