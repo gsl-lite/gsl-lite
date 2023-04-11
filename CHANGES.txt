@@ -1,6 +1,27 @@
 Changes in gsl-lite
 ===================
 
+version 0.41.0 2023-04-12
+
+Additions:
+- Add tentative C++23 detection macro `gsl_CPP23_OR_GREATER`, `CONSTEXPR_23` language feature, and `gsl_constexpr23`
+  keyword macro (#329)
+- Add `gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS` config switch for suppressing the compile-time syntax
+  validation of contract check expressions (#330)
+
+Changes:
+- Deprecate `string_span` and `zstring_span` and prepare for removal (#335)
+- Continuous Integration now also tests GCC 12, Clang 14 thru 16, and NVCC 11.8 and 12.1
+- Remove Continuous Integration for GCC 6 and earlier, Clang 5 and earlier, Apple Clang 11.0.0 and earlier, and
+  CUDA 10.2 and earlier (#333, #334)
+
+Fixes:
+- Use NVCC's `__builtin_assume()` for `gsl_ASSUME_()` in device code (#324, thanks to @codecircuit)
+- Fix `not_null_ic<>` copy construction (#326, thanks to @runer112)
+- Respect libc++ configuration option to disable `wchar_t` (#331, thanks to @burnpanck)
+- Suppress "-Wweak-vtables" warning for Clang (#332, thanks to @mrahn)
+- Suppress "-Wuseless-cast" warning for GCC (#332, thanks to @wirew0rm)
+
 version 0.40.0 2021-11-05
 
 Additions:
