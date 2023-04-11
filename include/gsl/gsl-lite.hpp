@@ -183,6 +183,15 @@
 #endif
 #define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
+//#if defined( gsl_FEATURE_STRING_SPAN )
+//# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
+//#  pragma message ("invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
+//# endif
+//#else
+//# define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+//#endif
+//#define gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
+
 #if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 #  pragma message ("invalid configuration value gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=" gsl_STRINGIFY(gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD) ", must be 0 or 1")
@@ -217,7 +226,7 @@
 
 #if ! defined( gsl_CONFIG_DEPRECATE_TO_LEVEL )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
-#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  6
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  7
 # else
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 # endif
@@ -4445,6 +4454,7 @@ byte_span( T const & t ) gsl_noexcept
 
 #endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
 
+//#if gsl_FEATURE( STRING_SPAN )
 //
 // basic_string_span:
 //
@@ -4517,19 +4527,31 @@ public:
 #ifdef __CUDACC_RELAXED_CONSTEXPR__
     gsl_api
 #endif // __CUDACC_RELAXED_CONSTEXPR__
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( pointer ptr )
     : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
     {}
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
     : span_( ptr, count )
     {}
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( pointer firstElem, pointer lastElem )
     : span_( firstElem, lastElem )
     {}
 
     template< std::size_t N >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( element_type (&arr)[N] )
     : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
     {}
@@ -4537,11 +4559,17 @@ public:
 #if gsl_HAVE( ARRAY )
 
     template< std::size_t N >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
     : span_( remove_z( arr ) )
     {}
 
     template< std::size_t N >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
     : span_( remove_z( arr ) )
     {}
@@ -4560,6 +4588,9 @@ public:
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
         ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container & cont )
     : span_( ( cont ) )
     {}
@@ -4574,6 +4605,9 @@ public:
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
         ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container const & cont )
     : span_( ( cont ) )
     {}
@@ -4581,11 +4615,17 @@ public:
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
     template< class Container >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container & cont )
     : span_( cont )
     {}
 
     template< class Container >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container const & cont )
     : span_( cont )
     {}
@@ -4593,6 +4633,9 @@ public:
 #else
 
     template< class U >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( span<U> const & rhs )
     : span_( rhs )
     {}
@@ -4602,6 +4645,9 @@ public:
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
     template< class Container >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( with_container_t, Container & cont )
     : span_( with_container, cont )
     {}
@@ -4622,6 +4668,9 @@ public:
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
@@ -4630,18 +4679,27 @@ public:
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
 #endif // gsl_STDLIB_CPP11_120
 
     template< class CharTraits, class Allocator >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span(
         std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > & str )
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
     {}
 
     template< class CharTraits, class Allocator >
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span(
         std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > const & str )
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
@@ -4985,6 +5043,7 @@ as_bytes( basic_string_span<T> spn ) gsl_noexcept
 {
     return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
+//#endif // gsl_FEATURE( STRING_SPAN )
 
 //
 // String types:
@@ -4997,6 +5056,8 @@ typedef const char * czstring;
 typedef wchar_t * wzstring;
 typedef const wchar_t * cwzstring;
 #endif
+
+//#if gsl_FEATURE( STRING_SPAN )
 
 typedef basic_string_span< char > string_span;
 typedef basic_string_span< char const > cstring_span;
@@ -5118,6 +5179,7 @@ std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t,
 }
 
 #endif // gsl_HAVE( WCHAR )
+//#endif // gsl_FEATURE( STRING_SPAN )
 
 //
 // ensure_sentinel()
@@ -5176,6 +5238,7 @@ ensure_z( Container & cont )
 }
 # endif
 
+//#if gsl_FEATURE( STRING_SPAN )
 //
 // basic_zstring_span<> - A view of contiguous null-terminated characters, replace (*,len).
 //
@@ -5193,6 +5256,9 @@ public:
     typedef element_type * czstring_type;
     typedef basic_string_span<element_type> string_span_type;
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr14 basic_zstring_span( span_type s )
         : span_( s )
     {
@@ -5216,13 +5282,19 @@ public:
         return false;
     }
 
+#if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_NODISCARD gsl_api gsl_constexpr string_span_type
     as_string_span() const gsl_noexcept
     {
         return string_span_type( span_.data(), span_.size() - 1 );
     }
 
-    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
+ #if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
+#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+   /*gsl_api*/ // currently disabled due to an apparent NVCC bug
     gsl_NODISCARD gsl_constexpr string_span_type
     ensure_z() const
     {
@@ -5250,6 +5322,7 @@ typedef basic_zstring_span< char const > czstring_span;
 typedef basic_zstring_span< wchar_t > wzstring_span;
 typedef basic_zstring_span< wchar_t const > cwzstring_span;
 #endif
+//#endif // gsl_FEATURE( STRING_SPAN )
 
 } // namespace gsl
 
@@ -5434,6 +5507,7 @@ using ::gsl::as_writable_bytes;
 using ::gsl::as_writeable_bytes;
 # endif
 
+//# if gsl_FEATURE( STRING_SPAN )
 using ::gsl::basic_string_span;
 using ::gsl::string_span;
 using ::gsl::cstring_span;
@@ -5441,6 +5515,7 @@ using ::gsl::cstring_span;
 using ::gsl::basic_zstring_span;
 using ::gsl::zstring_span;
 using ::gsl::czstring_span;
+//# endif // gsl_FEATURE( STRING_SPAN )
 
 using ::gsl::zstring;
 using ::gsl::czstring;
@@ -5449,8 +5524,10 @@ using ::gsl::czstring;
 using ::gsl::wzstring;
 using ::gsl::cwzstring;
 
+//#  if gsl_FEATURE( STRING_SPAN )
 using ::gsl::wzstring_span;
 using ::gsl::cwzstring_span;
+//#  endif // gsl_FEATURE( STRING_SPAN )
 # endif // gsl_HAVE( WCHAR )
 
 using ::gsl::ensure_z;
