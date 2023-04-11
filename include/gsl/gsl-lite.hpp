@@ -514,7 +514,7 @@
 #define gsl_CPP14_OR_GREATER  ( gsl_CPLUSPLUS >= 201402L )
 #define gsl_CPP17_OR_GREATER  ( gsl_CPLUSPLUS >= 201703L )
 #define gsl_CPP20_OR_GREATER  ( gsl_CPLUSPLUS >= 202002L )
-#define gsl_CPP23_OR_GREATER  ( gsl_CPLUSPLUS >= 202300L )  // tentative
+#define gsl_CPP23_OR_GREATER  ( gsl_CPLUSPLUS >  202002L )  // tentative
 
 // C++ language version (represent 98 as 3):
 
