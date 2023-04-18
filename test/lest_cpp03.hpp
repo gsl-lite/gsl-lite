@@ -704,7 +704,7 @@ inline void inform( location where, text expr )
 
 // Expression decomposition:
 
-inline bool unprintable( char c ) { return 0 <= c && c < ' '; }
+inline bool unprintable( char c ) { return 0 <= static_cast<signed char>(c) && c < ' '; }
 
 inline std::string to_hex_string(char c)
 {
