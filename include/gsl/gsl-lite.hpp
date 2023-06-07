@@ -2107,8 +2107,9 @@ public:
 #if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
     final_action( final_action && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
-        , invoke_( std::exchange( other.invoke_, false ) )
+        , invoke_( other.invoke_ )
     {
+        other.invoke_ = false;
     }
 #endif // gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
 
@@ -2171,8 +2172,9 @@ public:
     final_action_return( final_action_return && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
-        , invoke_( std::exchange( other.invoke_, false ) )
+        , invoke_( other.invoke_ )
     {
+        other.invoke_ = false;
     }
 #endif // ! gsl_CPP17_OR_GREATER
 
@@ -2217,8 +2219,9 @@ public:
     final_action_error( final_action_error && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
-        , invoke_( std::exchange( other.invoke_, false ) )
+        , invoke_( other.invoke_ )
     {
+        other.invoke_ = false;
     }
 #endif // ! gsl_CPP17_OR_GREATER
 
