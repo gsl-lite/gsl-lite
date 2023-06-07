@@ -84,6 +84,7 @@ CASE( "finally: Allows to run function (pointer) on leaving scope" )
 #endif
 }
 
+#if gsl_CONFIG_DEFAULTS_VERSION < 1
 CASE( "finally: Allows to move final_action" )
 {
 #if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
@@ -151,6 +152,7 @@ CASE( "finally: Allows moving final_action to throw" "[.]")
 # endif
 #endif // gsl_HAVE( EXCEPTIONS )
 }
+#endif // gsl_CONFIG_DEFAULTS_VERSION < 1
 
 CASE( "on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {

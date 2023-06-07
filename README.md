@@ -183,7 +183,7 @@ Macro                                                                           
 ------------------------------------------------------------------------------------:|:---------------------------------------------------------|-------------------|-|
 [`gsl_FEATURE_OWNER_MACRO`](#gsl_feature_owner_macro1)                               | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
 [`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)                 | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
-[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 7                 | |
+[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 8                 | |
 [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
 [`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison1)           | 1                                                        | 0                 | C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear |
 [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
@@ -615,11 +615,6 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `byte_span()`               | -       | -       | ✓         | Create a span of bytes from a single object |
 `as_bytes()`                | -       | ✓      | ✓         | A span as bytes |
 `as_writable_bytes`         | -       | ✓      | ✓         | A span as writable bytes |
-`basic_string_span<>`       | -       | ✓      | ✓         | See also proposal [p0123](http://wg21.link/p0123) |
-`string_span`               | ✓      | ✓      | ✓         | `basic_string_span< char >` |
-`wstring_span`              | -       | ✓      | ✓         | `basic_string_span< wchar_t >` |
-`cstring_span`              | ✓      | ✓      | ✓         | `basic_string_span< const char >` |
-`cwstring_span`             | -       | ✓      | ✓         | `basic_string_span< const wchar_t >` |
 `zstring_span`              | -       | ✓      | ✓         | `basic_zstring_span< char >` |
 `wzstring_span`             | -       | ✓      | ✓         | `basic_zstring_span< wchar_t >` |
 `czstring_span`             | -       | ✓      | ✓         | `basic_zstring_span< const char >` |
@@ -649,15 +644,9 @@ Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
 `diff`                      | -      | -      | ✓        | type for index differences |
 `byte`                      | -       | ✓      | ✓         | byte type, see also proposal [p0298](http://wg21.link/p0298) |
 `final_action<>`            | ✓      | ✓      | ≥&nbsp;C++11    | Action at the end of a scope |
-`final_action`              | -       | -       | <&nbsp;C++11    | Currently only `void(*)()` |
 `finally()`                 | ✓      | ✓      | ≥&nbsp;C++11    | Make a `final_action<>` |
-`finally()`                 | -       | -       | <&nbsp;C++11    | Make a `final_action` |
-`final_action_return`       | -       | -       | <&nbsp;C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
 `on_return()`               | -       | -       | ≥&nbsp;C++11    | Make a `final_action_return<>, [experimental](#feature-selection-macros) |
-`on_return()`               | -       | -       | <&nbsp;C++11    | Make a `final_action_return, [experimental](#feature-selection-macros) |
-`final_action_error`        | -       | -       | <&nbsp;C++11    | Currently only `void(*)()`, [experimental](#feature-selection-macros) |
 `on_error()`                | -       | -       | ≥&nbsp;C++11    | Make a `final_action_error<>`, [experimental](#feature-selection-macros) |
-`on_error()`                | -       | -       | <&nbsp;C++11    | Make a `final_action_error`, [experimental](#feature-selection-macros) |
 `narrow_cast<>`             | ✓      | ✓      | ✓         | Searchable narrowing casts of values |
 `narrow<>()`                | ✓      | ✓      | ✓         | Checked narrowing cast |
 `narrow_failfast<>()`       | -       | -       | ✓         | Fail-fast narrowing cast |
@@ -680,6 +669,7 @@ The following features are deprecated since the indicated version. See macro [`g
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
+0.42.0  |   8   | `finally()`, `on_return()`, and `on_error()` for pre-C++11        |
 0.41.0  |   7   | `basic_string_span<>`, `basic_zstring_span<>` and related aliases |
 0.37.0  |   6   | `as_writeable_bytes()`, call indexing for spans, and `span::at()` |
 &nbsp;  |&nbsp; | Use `as_writable_bytes()`, subscript indexing |
@@ -1215,7 +1205,6 @@ operator<<: Allows printing a cwstring_span to an output stream
 finally: Allows to run lambda on leaving scope
 finally: Allows to run function (bind) on leaving scope
 finally: Allows to run function (pointer) on leaving scope
-finally: Allows to move final_action
 on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)
 on_error: Allows to perform action on leaving scope via an exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)
 narrow_cast<>: Allows narrowing without value loss
