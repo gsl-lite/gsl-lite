@@ -1603,6 +1603,40 @@ CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers ev
 #endif
 }
 
+CASE( "not_null<>: Can handle void*" )
+{
+    int i = 42;
+    void * vp = &i;
+
+        // Direct construction
+    gsl::not_null< void * > nvp( vp );
+    EXPECT( nvp == vp );
+
+        // Indirect construction
+    nvp = gsl::make_not_null( vp );
+    EXPECT( nvp == vp );
+
+        // Implicit conversion from `not_null<>` with typed pointer argument
+    gsl::not_null< int * > nip( &i );
+    EXPECT( nvp == nip );
+    gsl::not_null< void * > nvp2( nip );
+    EXPECT( nvp2 == nip );
+
+        // Implicit conversion from typed pointer
+    EXPECT( nvp == &i );
+    gsl::not_null< void * > nvp3( &i );
+    EXPECT( nvp3 == nip );
+
+        // Extract underlying value
+    void * vp2 = gsl::as_nullable( nvp );
+    EXPECT( vp2 == vp );
+
+        // Explicit conversion to typed pointer argument is not supported!
+    //gsl::not_null< int * > nip2 = static_cast< gsl::not_null< int * > >( nvp );
+    //gsl::not_null< int * > nip2 = gsl::not_null< int * >( nvp );
+    //int * ip = static_cast< int * >( nvp );
+}
+
 #if gsl_HAVE( HASH )
 
 CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
