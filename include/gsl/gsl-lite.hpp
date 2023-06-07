@@ -2589,6 +2589,18 @@ template< >
 struct non_void_ref< void >
 {
 };
+template< >
+struct non_void_ref< void const >
+{
+};
+template< >
+struct non_void_ref< void volatile >
+{
+};
+template< >
+struct non_void_ref< void const volatile >
+{
+};
 
 template< class T >
 struct is_not_null_or_bool_oracle : std11::false_type { };
@@ -2969,13 +2981,13 @@ public:
         return data_.ptr_;
     }
 
-#if gsl_CONFIG_DEFAULTS_VERSION == 0  // needed only if this class definition is instantiated for raw pointers
+#if gsl_CONFIG_DEFAULTS_VERSION == 0 && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )  // needed only if this class definition is instantiated for raw pointers
     template< class ElementType = element_type >
     gsl_NODISCARD gsl_api gsl_constexpr14
     typename detail::non_void_ref< ElementType >::type
-#else // gsl_CONFIG_DEFAULTS_VERSION != 0
+#else // ! ( gsl_CONFIG_DEFAULTS_VERSION == 0 && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) )
     gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
-#endif // gsl_CONFIG_DEFAULTS_VERSION == 0
+#endif // gsl_CONFIG_DEFAULTS_VERSION == 0 && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     operator*() const
     {
         gsl_Assert( data_.ptr_ != gsl_nullptr );
@@ -3163,9 +3175,13 @@ public:
         return data_.ptr_;
     }
 
+#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     template< class ElementType = element_type >
     gsl_NODISCARD gsl_api gsl_constexpr14
     typename detail::non_void_ref< ElementType >::type
+#else // ! gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
+#endif // gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     operator*() const
     {
         return *data_.ptr_;
