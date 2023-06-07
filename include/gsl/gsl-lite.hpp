@@ -2555,7 +2555,7 @@ namespace detail {
 template< class T, class E = void >
 struct element_type_helper
 {
-    // For types without a member element_type (this will handle raw pointers)
+    // For types without a member element_type (this could handle typed raw pointers but not `void*`)
     typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
 };
 
@@ -2572,13 +2572,13 @@ struct element_type_helper
 {
     typedef typename T::element_type type;
 };
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 
 template< class T >
 struct element_type_helper< T* >
 {
     typedef T type;
 };
-#endif // gsl_STDLIB_CPP11_OR_GREATER
 
 template< class T >
 struct is_not_null_or_bool_oracle : std11::false_type { };
@@ -3150,7 +3150,7 @@ public:
     template < typename ElementType = element_type >
     gsl_NODISCARD gsl_api gsl_constexpr14
 #if gsl_HAVE( TYPE_TRAITS )
-    typename std::enable_if< ! std::is_same< void, std::remove_cv_t< ElementType > >::value, typename std::add_lvalue_reference< element_type >::type >::type
+    typename std::enable_if< ! std::is_same< void, typename std::remove_cv< ElementType >::type >::value, typename std::add_lvalue_reference< element_type >::type >::type
 #else // ! gsl_HAVE( TYPE_TRAITS )
     element_type &
 #endif // gsl_HAVE( TYPE_TRAITS )
