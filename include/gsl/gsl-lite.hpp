@@ -1251,24 +1251,26 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 #endif // gsl_COMPILER_GNUC_VERSION
 
 // Suppress the following MSVC GSL warnings:
-// - C26432: gsl::c.21 : if you define or delete any default operation in the type '...', define or delete them all
-// - C26410: gsl::r.32 : the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
-// - C26415: gsl::r.30 : smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
-// - C26418: gsl::r.36 : shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
-// - C26472: gsl::t.1  : don't use a static_cast for arithmetic conversions;
-//                       use brace initialization, gsl::narrow_cast or gsl::narrow
-// - C26439: gsl::f.6  : special function 'function' can be declared 'noexcept'
-// - C26440: gsl::f.6  : function 'function' can be declared 'noexcept'
-// - C26455: gsl::f.6  : default constructor may not throw. Declare it 'noexcept'
-// - C26473: gsl::t.1  : don't cast between pointer types where the source type and the target type are the same
-// - C26481: gsl::b.1  : don't use pointer arithmetic. Use span instead
-// - C26482: gsl::b.2  : only index into arrays using constant expressions
-// - C26446: gdl::b.4  : prefer to use gsl::at() instead of unchecked subscript operator
-// - C26490: gsl::t.1  : don't use reinterpret_cast
-// - C26487: gsl::l.4  : don't return a pointer '(<some number>'s result)' that may be invalid
-// - C26457: es.48     : (void) should not be used to ignore return values, use 'std::ignore =' instead
+// - C26432: gsl::c.21  : if you define or delete any default operation in the type '...', define or delete them all
+// - C26410: gsl::r.32  : the parameter 'ptr' is a reference to const unique pointer, use const T* or const T& instead
+// - C26415: gsl::r.30  : smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
+// - C26418: gsl::r.36  : shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
+// - C26472: gsl::t.1   : don't use a static_cast for arithmetic conversions;
+//                        use brace initialization, gsl::narrow_cast or gsl::narrow
+// - C26439: gsl::f.6   : special function 'function' can be declared 'noexcept'
+// - C26440: gsl::f.6   : function 'function' can be declared 'noexcept'
+// - C26455: gsl::f.6   : default constructor may not throw. Declare it 'noexcept'
+// - C26473: gsl::t.1   : don't cast between pointer types where the source type and the target type are the same
+// - C26481: gsl::b.1   : don't use pointer arithmetic. Use span instead
+// - C26482: gsl::b.2   : only index into arrays using constant expressions
+// - C26446: gdl::b.4   : prefer to use gsl::at() instead of unchecked subscript operator
+// - C26490: gsl::t.1   : don't use reinterpret_cast
+// - C26487: gsl::l.4   : don't return a pointer '(<some number>'s result)' that may be invalid
+// - C26434: gsl::c.128 : function 'symbol_1' hides a non-virtual function 'symbol_2' (false positive for compiler-generated functions such as constructors)
+// - C26456: gsl::c.128 : operator 'symbol_1' hides a non-virtual operator 'symbol_2' (false positive for compiler-generated operators)
+// - C26457: es.48      : (void) should not be used to ignore return values, use 'std::ignore =' instead
 
-gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473 26481 26482 26446 26490 26487 26457 )
+gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473 26481 26482 26446 26490 26487 26434 26456 26457 )
 #if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 110, 140 )  // VS 2012 and 2013
 # pragma warning(disable: 4127)  // conditional expression is constant
 #endif // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 110, 140 )
@@ -1302,7 +1304,7 @@ template< class InputIt1, class InputIt2 >
 bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2 )
 {
     // Implementation borrowed from https://en.cppreference.com/w/cpp/algorithm/lexicographical_compare.
-    for ( ; first1 != last1 && first2 != last2; ++first1, (void) ++first2 )
+    for ( ; first1 != last1 && first2 != last2; ++first1, static_cast< void >( ++first2 ) )
     {
         if ( *first1 < *first2 ) return true;
         if ( *first2 < *first1 ) return false;
