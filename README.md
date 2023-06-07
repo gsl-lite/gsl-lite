@@ -898,6 +898,7 @@ not_null<>: Allows assignment from a not_null related pointer type (raw pointer)
 not_null<>: Allows assignment to a const pointer from a not_null related pointer type (raw pointer)
 not_null<>: Allows indirect member access (raw pointer)
 not_null<>: Allows dereferencing (raw pointer)
+not_null<>: Allows to check whether object is valid (raw pointer)
 not_null<>: Terminates swap of a moved-from value (shared_ptr)
 not_null<>: Tolerates self-move-assignment of a moved-from value (shared_ptr)
 not_null<>: Terminates self-swap of a moved-from value (shared_ptr)
@@ -929,6 +930,7 @@ not_null<>: Allows assignment from a not_null related pointer type (shared_ptr)
 not_null<>: Allows assignment to a const pointer from a not_null related pointer type (shared_ptr)
 not_null<>: Allows indirect member access (shared_ptr)
 not_null<>: Allows dereferencing (shared_ptr)
+not_null<>: Allows to check whether object is valid (shared_ptr)
 not_null<>: Terminates swap of a moved-from value (unique_ptr)
 not_null<>: Tolerates self-move-assignment of a moved-from value (unique_ptr)
 not_null<>: Terminates self-swap of a moved-from value (unique_ptr)
@@ -962,6 +964,7 @@ not_null<>: Allows assignment from a not_null related pointer type (unique_ptr)
 not_null<>: Allows assignment to a const pointer from a not_null related pointer type (unique_ptr)
 not_null<>: Allows indirect member access (unique_ptr)
 not_null<>: Allows dereferencing (unique_ptr)
+not_null<>: Allows to check whether object is valid (unique_ptr)
 not_null<>: Allows to construct a not_null<shared_ptr<T>> from a non-null unique_ptr<T>
 not_null<>: Allows to construct a not_null<shared_ptr<const T>> from a non-null unique_ptr<T>
 not_null<>: Allows to construct a not_null<shared_ptr<T>> from a related non-null unique_ptr<U>
@@ -985,7 +988,6 @@ not_null<>: Allows to compare less than another not_null of the same type
 not_null<>: Allows to compare less than or equal to another not_null of the same type
 not_null<>: Allows to compare greater than another not_null of the same type
 not_null<>: Allows to compare greater than or equal to another not_null of the same type
-not_null<>: Allows to check whether object is valid
 not_null<>: Allows to compare equal to a raw pointer of the same type
 not_null<>: Allows to compare unequal to a raw pointer of the same type
 not_null<>: Allows to compare less than a raw pointer of the same type
@@ -999,6 +1001,7 @@ not_null<>: Able to deduce element_type of normal user-defined smart pointers
 not_null<>: Able to correctly deduce element_type of user-defined smart pointers even if typedef and result of dereferencing differs
 not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef
 not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef, and element_type differs from T
+not_null<>: Can handle void*
 not_null<>: Hashes match the hashes of the wrapped pointer
 not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers
 owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
