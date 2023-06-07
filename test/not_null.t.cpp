@@ -1605,7 +1605,6 @@ CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers ev
 
 CASE( "not_null<>: Can handle void*" )
 {
-#if gsl_HAVE( TYPE_TRAITS )  // we do not support `void*` without type traits available
     int i = 42;
     void * vp = &i;
 
@@ -1636,7 +1635,6 @@ CASE( "not_null<>: Can handle void*" )
     //gsl::not_null< int * > nip2 = static_cast< gsl::not_null< int * > >( nvp );
     //gsl::not_null< int * > nip2 = gsl::not_null< int * >( nvp );
     //int * ip = static_cast< int * >( nvp );
-#endif // gsl_HAVE( TYPE_TRAITS )
 }
 
 #if gsl_HAVE( HASH )
