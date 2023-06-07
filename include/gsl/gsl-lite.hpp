@@ -3147,7 +3147,13 @@ public:
         return data_.ptr_;
     }
 
-    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
+    template < typename ElementType = element_type >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+#if gsl_HAVE( TYPE_TRAITS )
+    typename std::enable_if< ! std::is_same< void, std::remove_cv_t< ElementType > >::value, typename std::add_lvalue_reference< element_type >::type >::type
+#else // ! gsl_HAVE( TYPE_TRAITS )
+    element_type &
+#endif // gsl_HAVE( TYPE_TRAITS )
     operator*() const
     {
         return *data_.ptr_;
