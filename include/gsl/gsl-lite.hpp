@@ -2959,7 +2959,13 @@ public:
         return data_.ptr_;
     }
 
+#if gsl_CONFIG_DEFAULTS_VERSION == 0 && gsl_HAVE( TYPE_TRAITS )  // needed only if this class definition is instantiated for raw pointers
+    template < typename ElementType = element_type >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    typename std::enable_if< ! std::is_same< void, typename std::remove_cv< ElementType >::type >::value, typename std::add_lvalue_reference< element_type >::type >::type
+#else // ! ( gsl_CONFIG_DEFAULTS_VERSION == 0 && gsl_HAVE( TYPE_TRAITS ) )
     gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
+#endif // gsl_CONFIG_DEFAULTS_VERSION == 0 && gsl_HAVE( TYPE_TRAITS )
     operator*() const
     {
         gsl_Assert( data_.ptr_ != gsl_nullptr );
