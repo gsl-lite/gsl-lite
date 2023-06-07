@@ -1610,7 +1610,7 @@ CASE( "not_null<>: Can handle void*" )
     void * vp = &i;
 
         // Direct construction
-    auto nvp = gsl::not_null< void * >( vp );
+    gsl::not_null< void * > nvp( vp );
     EXPECT( nvp == vp );
 
         // Indirect construction
@@ -1618,14 +1618,14 @@ CASE( "not_null<>: Can handle void*" )
     EXPECT( nvp == vp );
 
         // Implicit conversion from `not_null<>` with typed pointer argument
-    auto nip = gsl::not_null< int * >( &i );
+    gsl::not_null< int * > nip( &i );
     EXPECT( nvp == nip );
-    auto nvp2 = gsl::not_null< void * >( nip );
+    gsl::not_null< void * > nvp2( nip );
     EXPECT( nvp2 == nip );
 
         // Implicit conversion from typed pointer
     EXPECT( nvp == &i );
-    auto nvp3 = gsl::not_null< void * >( &i );
+    gsl::not_null< void * > nvp3( &i );
     EXPECT( nvp3 == nip );
 
         // Extract underlying value
