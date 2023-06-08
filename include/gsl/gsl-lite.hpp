@@ -5393,8 +5393,7 @@ public:
     gsl_NODISCARD std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
     {
 #if gsl_CONFIG_DEFAULTS_VERSION >= 1
-        typedef typename std::underlying_type<::gsl::byte>::type byte_t;
-        return std::hash<byte_t>{ }( static_cast<byte_t>( v ) );
+        return std::hash<unsigned char>{ }( ::gsl::to_uchar( v ) );
 #else // gsl_CONFIG_DEFAULTS_VERSION < 1
             // Keep the old hashing algorithm if legacy defaults are used.
         return ::gsl::to_integer<std::size_t>( v );
