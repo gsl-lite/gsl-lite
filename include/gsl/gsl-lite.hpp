@@ -5352,7 +5352,7 @@ template< class T >
 struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
 {
 public:
-    gsl_NODISCARD gsl_constexpr std::size_t
+    gsl_NODISCARD std::size_t
     operator()( ::gsl::not_null<T> const & v ) const
     // hash function is not `noexcept` because `as_nullable()` has preconditions
     {
@@ -5363,7 +5363,7 @@ template< class T >
 struct hash< ::gsl::not_null< T* > >
 {
 public:
-    gsl_NODISCARD gsl_constexpr std::size_t
+    gsl_NODISCARD std::size_t
     operator()( ::gsl::not_null< T* > const & v ) const gsl_noexcept
     {
         return hash<T*>()( ::gsl::as_nullable( v ) );
@@ -5374,9 +5374,14 @@ template<>
 struct hash< ::gsl::byte >
 {
 public:
-    gsl_NODISCARD gsl_constexpr std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
+    gsl_NODISCARD std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
     {
+#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+        return std::hash<unsigned char>{ }( ::gsl::to_uchar( v ) );
+#else // gsl_CONFIG_DEFAULTS_VERSION < 1
+            // Keep the old hashing algorithm if legacy defaults are used.
         return ::gsl::to_integer<std::size_t>( v );
+#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
     }
 };
 
