@@ -2100,6 +2100,9 @@ class final_action
 public:
     explicit final_action( F action ) gsl_noexcept
         : action_( std::move( action ) )
+#if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+        , invoke_( true )
+#endif
     {
     }
 
@@ -2143,7 +2146,7 @@ protected:
 private:
     F action_;
 #if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
-    bool invoke_ = true;
+    bool invoke_;
 #endif
 };
 
@@ -2164,6 +2167,9 @@ public:
     explicit final_action_return( F action ) gsl_noexcept
         : action_( std::move( action ) )
         , exception_count_( std11::uncaught_exceptions() )
+#if ! gsl_CPP17_OR_GREATER
+        , invoke_( true )
+#endif
     {
     }
 
@@ -2201,7 +2207,7 @@ private:
     F action_;
     unsigned char exception_count_;
 #if ! gsl_CPP17_OR_GREATER
-    bool invoke_ = true;
+    bool invoke_;
 #endif
 };
 template< class F >
@@ -2211,6 +2217,9 @@ public:
     explicit final_action_error( F action ) gsl_noexcept
         : action_( std::move( action ) )
         , exception_count_( std11::uncaught_exceptions() )
+#if ! gsl_CPP17_OR_GREATER
+        , invoke_( true )
+#endif
     {
     }
 
@@ -2248,7 +2257,7 @@ private:
     F action_;
     unsigned char exception_count_;
 #if ! gsl_CPP17_OR_GREATER
-    bool invoke_ = true;
+    bool invoke_;
 #endif
 };
 #else // gsl_CONFIG_DEFAULTS_VERSION < 1
