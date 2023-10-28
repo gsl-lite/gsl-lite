@@ -2145,9 +2145,10 @@ protected:
 
 private:
     F action_;
-#if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
-    bool invoke_;
+#if gsl_CPP17_OR_GREATER
+    [[maybe_unused]]  // member is defined unconditionally so as not to have ABI depend on C++ language support
 #endif
+    bool invoke_;
 };
 
 template< class F >
@@ -2167,9 +2168,6 @@ public:
     explicit final_action_return( F action ) gsl_noexcept
         : action_( std::move( action ) )
         , exception_count_( std11::uncaught_exceptions() )
-#if ! gsl_CPP17_OR_GREATER
-        , invoke_( true )
-#endif
     {
     }
 
@@ -2178,9 +2176,8 @@ public:
     final_action_return( final_action_return && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
-        , invoke_( other.invoke_ )
     {
-        other.invoke_ = false;
+        other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
     }
 #endif // ! gsl_CPP17_OR_GREATER
 
@@ -2188,7 +2185,7 @@ public:
     ~final_action_return() gsl_noexcept
     {
 #if ! gsl_CPP17_OR_GREATER
-        if ( invoke_ )
+        if ( exception_count_ != 0xFF )  // abuse member as special "no-invoke" marker
 #endif
         {
             if ( std11::uncaught_exceptions() == exception_count_ )
@@ -2206,9 +2203,6 @@ gsl_is_delete_access:
 private:
     F action_;
     unsigned char exception_count_;
-#if ! gsl_CPP17_OR_GREATER
-    bool invoke_;
-#endif
 };
 template< class F >
 class final_action_error
@@ -2217,9 +2211,6 @@ public:
     explicit final_action_error( F action ) gsl_noexcept
         : action_( std::move( action ) )
         , exception_count_( std11::uncaught_exceptions() )
-#if ! gsl_CPP17_OR_GREATER
-        , invoke_( true )
-#endif
     {
     }
 
@@ -2228,9 +2219,8 @@ public:
     final_action_error( final_action_error && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
-        , invoke_( other.invoke_ )
     {
-        other.invoke_ = false;
+        other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
     }
 #endif // ! gsl_CPP17_OR_GREATER
 
@@ -2238,7 +2228,7 @@ public:
     ~final_action_error() gsl_noexcept
     {
 #if ! gsl_CPP17_OR_GREATER
-        if ( invoke_ )
+        if ( exception_count_ != 0xFF )  // abuse member as special "no-invoke" marker
 #endif
         {
             if ( std11::uncaught_exceptions() != exception_count_ )
@@ -2256,9 +2246,6 @@ gsl_is_delete_access:
 private:
     F action_;
     unsigned char exception_count_;
-#if ! gsl_CPP17_OR_GREATER
-    bool invoke_;
-#endif
 };
 #else // gsl_CONFIG_DEFAULTS_VERSION < 1
 template< class F >
