@@ -1387,12 +1387,15 @@ namespace {
 
 struct NotNull
 {
-    int    v1; int          v2;
+    int    vs[2];
     int * pv1; int const * pv2;
 
     NotNull()
-    :  v1(   7 ),  v2(  42 )
-    , pv1( &v1 ), pv2( &v2 ) {}
+    : pv1( &vs[ 0 ] ), pv2( &vs[ 1 ] )
+    {
+        vs[0] = 7;
+        vs[1] = 42;
+    }
 
     not_null< int       * > p1() const { return not_null< int       * >( pv1 ); }
     not_null< int const * > p2() const { return not_null< int const * >( pv2 ); }
