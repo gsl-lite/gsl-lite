@@ -2176,7 +2176,6 @@ public:
     final_action_return( final_action_return && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
-        , invoke_( other.invoke_ )
     {
         other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
     }
