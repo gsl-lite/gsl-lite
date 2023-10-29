@@ -783,6 +783,7 @@
 #define gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE_()  gsl_HAVE_ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE
 #define gsl_HAVE_DEDUCTION_GUIDES_()       gsl_HAVE_DEDUCTION_GUIDES
 #define gsl_HAVE_NODISCARD_()              gsl_HAVE_NODISCARD
+#define gsl_HAVE_MAYBE_UNUSED_()           gsl_CPP17_OR_GREATER
 #define gsl_HAVE_CONSTEXPR_17_()           gsl_HAVE_CONSTEXPR_17
 
 // Presence of C++20 language features:
@@ -982,6 +983,19 @@
 # define gsl_NORETURN  __attribute__((noreturn))
 #else
 # define gsl_NORETURN
+#endif
+
+#if gsl_HAVE( MAYBE_UNUSED )
+# define gsl_MAYBE_UNUSED           [[maybe_unused]]
+# if gsl_COMPILER_GNUC_VERSION
+// GCC currently ignores the [[maybe_unused]] attribute on data members and warns accordingly (cf. https://stackoverflow.com/a/65633590).
+# define gsl_MAYBE_UNUSED_MEMBER
+# else // ! gsl_COMPILER_GNUC_VERSION
+# define gsl_MAYBE_UNUSED_MEMBER    [[maybe_unused]]
+# endif // gsl_COMPILER_GNUC_VERSION
+#else
+# define gsl_MAYBE_UNUSED
+# define gsl_MAYBE_UNUSED_MEMBER
 #endif
 
 #if gsl_HAVE( DEPRECATED ) && ! defined( gsl_TESTING_ )
@@ -2145,10 +2159,7 @@ protected:
 
 private:
     F action_;
-#if gsl_CPP17_OR_GREATER
-    [[maybe_unused]]  // member is defined unconditionally so as not to have ABI depend on C++ language support
-#endif
-    bool invoke_;
+    gsl_MAYBE_UNUSED_MEMBER bool invoke_;  // member is defined unconditionally so as not to have ABI depend on C++ language support
 };
 
 template< class F >
