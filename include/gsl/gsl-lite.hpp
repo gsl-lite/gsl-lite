@@ -2836,8 +2836,7 @@ struct not_null_deref< Derived, T, true >
 template< class T > struct is_void : std11::false_type { };
 template< > struct is_void< void > : std11::true_type { };
 
-template< class T > struct is_void_ptr : std11::false_type { };
-template< class T > struct is_void_ptr< T* > : is_void< typename std11::remove_cv<T>::type > { };
+template< class T > struct is_void_ptr : is_void< typename detail::element_type_helper< T >::type > { };
 
 } // namespace detail
 
