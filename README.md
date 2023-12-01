@@ -992,6 +992,8 @@ not_null<>: Able to correctly deduce element_type of user-defined smart pointers
 not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef
 not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef, and element_type differs from T
 not_null<>: Can handle void*
+not_null<>: Can handle unique_ptr<void, DeleterT>
+not_null<>: Can handle shared_ptr<void>
 not_null<>: Hashes match the hashes of the wrapped pointer
 not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers
 owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)

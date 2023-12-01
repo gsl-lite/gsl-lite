@@ -1640,6 +1640,84 @@ CASE( "not_null<>: Can handle void*" )
     //int * ip = static_cast< int * >( nvp );
 }
 
+void int_const_deleter( void const * p )
+{
+    int const * pi = static_cast< int const * >( p );
+    delete pi;
+}
+
+CASE( "not_null<>: Can handle unique_ptr<void, DeleterT>" )
+{
+#if gsl_CPP11_OR_GREATER
+    std::unique_ptr< void, void ( * )( void const * ) > vp( new int( 42 ), int_const_deleter );
+    void * p = vp.get();
+
+        // Direct construction
+    gsl::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp( std::move( vp ) );
+    EXPECT( nvp.get() == p );
+    vp = std::move( nvp );
+
+        // Indirect construction
+    nvp = gsl::make_not_null( std::move( vp ) );
+    EXPECT( nvp.get() == p );
+
+        // Implicit conversion from `not_null<>` with typed pointer argument
+    std::unique_ptr< int, void ( * )( void const * ) > tp2( new int( 42 ), int_const_deleter );
+    int * pi2 = tp2.get();
+    gsl::not_null< std::unique_ptr< int, void ( * )( void const * ) > > ntp2( std::move( tp2 ) );
+    EXPECT( ntp2.get() == pi2 );
+    gsl::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp2( std::move( ntp2 ) );
+    EXPECT( nvp2.get() == pi2 );
+
+        // Implicit conversion from typed pointer
+    std::unique_ptr< int, void ( * )( void const * ) > tp3( new int( 42 ), int_const_deleter );
+    int * pi3 = tp3.get();
+    gsl::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp3( std::move( tp3 ) );
+    EXPECT( nvp3.get() == pi3 );
+
+        // Extract underlying value
+    std::unique_ptr< void, void ( * )( void const * ) > vp3 = gsl::as_nullable( std::move( nvp3 ) );
+    EXPECT( vp3.get() == pi3 );
+
+        // Explicit conversion to typed pointer argument is not supported!
+#endif
+}
+
+CASE( "not_null<>: Can handle shared_ptr<void>" )
+{
+#if gsl_CPP11_OR_GREATER
+    std::shared_ptr< void > vp = std::make_shared<int>( 42 );
+    void * p = vp.get();
+
+        // Direct construction
+    gsl::not_null< std::shared_ptr< void > > nvp( vp );
+    EXPECT( nvp.get() == p );
+    vp = std::move( nvp );
+
+        // Indirect construction
+    nvp = gsl::make_not_null( vp );
+    EXPECT( nvp.get() == p );
+
+        // Implicit conversion from `not_null<>` with typed pointer argument
+    std::shared_ptr< int > tp2 = std::make_shared<int>( 42 );
+    int * pi2 = tp2.get();
+    gsl::not_null< std::shared_ptr< int > > ntp2( tp2 );
+    EXPECT( ntp2.get() == pi2 );
+    gsl::not_null< std::shared_ptr< void > > nvp2( ntp2 );
+    EXPECT( nvp2.get() == pi2 );
+
+        // Implicit conversion from typed pointer
+    gsl::not_null< std::shared_ptr< void > > nvp2b( tp2 );
+    EXPECT( nvp2b.get() == pi2 );
+
+        // Extract underlying value
+    std::shared_ptr< void > vp2 = gsl::as_nullable( nvp2 );
+    EXPECT( vp2.get() == pi2 );
+
+        // Explicit conversion to typed pointer argument is not supported!
+#endif
+}
+
 #if gsl_HAVE( HASH )
 
 CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
