@@ -3366,6 +3366,14 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
     return l == r.operator->();
 }
 
+// The C++ Core Guidelines discourage the use of pointer arithmetic, and gsl-lite consequently refrains from defining operators
+// for pointer arithmetic or the subscript operator in `not_null<>`. However, comparison of `not_null<>` objects is supported;
+// although the standard does not mandate a certain ordering for objects with two exceptions (objects from the same array;
+// data members of the same class, as required for `offsetof()`), it does require that `operator<` establishes a total ordering
+// of pointers, as implied by https://eel.is/c++draft/expr.rel#5. Among other things, this guarantees that a list of pointers
+// can be sorted and searched, or that pointers can be used as a key in a relational container such as `std::map<>`.
+// Therefore, we also define relational comparison operators for `not_null<>`.
+
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
