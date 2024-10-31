@@ -2551,7 +2551,7 @@ narrow( U u )
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( static_cast<U>( t ) != u
-        || ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
+        || ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) ) )
 # endif
 #else
     // Don't assume T() works:
