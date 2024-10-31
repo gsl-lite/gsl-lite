@@ -576,7 +576,7 @@ Define this macro to 1 to add the unconstrained span constructor for containers 
 Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=0`
-Define this macro to 1 to have `narrow<>()` always throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead calls `std::terminate()` on information loss. **Default is 0.**
+Define this macro to 1 to have `narrow<>()` always throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead terminates on information loss (using `std::terminate()` if available and a trap instruction otherwise, e.g. for CUDA device code). **Default is 0.**
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. **Default is 0.**
