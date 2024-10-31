@@ -576,7 +576,7 @@ Define this macro to 1 to add the unconstrained span constructor for containers 
 Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=0`
-Define this macro to 1 to have `narrow<>()` always throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead calls `std::terminate()` on information loss. **Default is 0.**
+Define this macro to 1 to have `narrow<>()` always throw a `narrowing_error` exception if the narrowing conversion loses information due to truncation. If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead terminates on information loss (using `std::terminate()` if available and a trap instruction otherwise, e.g. for CUDA device code). **Default is 0.**
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. **Default is 0.**
@@ -703,16 +703,16 @@ The table below mentions the compiler versions and platforms *gsl-lite* is repor
 
 Compiler             | OS              | Platforms | Versions          | CI |
 --------------------:|:----------------|-----------|------------------:|----|
-GCC                  | Linux           | x64       | 4.7 and newer     | [7, 8, 9, 10, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | Linux           | x64       | 4.7 and newer     | [7, 8, 9, 10, 11, 12, 13](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
-GCC                  | MacOS           | x64       | 6 and newer       | [10, 11, 12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang with libstdc++ | Linux           | x64       | 11 and newer      | [16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | MacOS           | x64       | 6 and newer       | [11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang with libstdc++ | Linux           | x64       | 11 and newer      | [19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS 2019 | [latest](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [11.0.3, 12, 12.0.5, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [11.8, 12.1](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [13, 14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [11.7, 11.8, 12.1, 12.6](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 ARMCC                |                 | ARM       | 5 and newer       | |
 
 
@@ -1215,11 +1215,11 @@ on_error: Allows to perform action on leaving scope via an exception (gsl_FEATUR
 narrow_cast<>: Allows narrowing without value loss
 narrow_cast<>: Allows narrowing with value loss
 narrow<>(): Allows narrowing without value loss
-narrow<>(): Terminates when narrowing with value loss
-narrow<>(): Terminates when narrowing with sign loss
+narrow<>(): Throws when narrowing with value loss
+narrow<>(): Throws when narrowing with sign loss
 narrow_failfast<>(): Allows narrowing without value loss
-narrow_failfast<>(): Terminates when narrowing with value loss
-narrow_failfast<>(): Terminates when narrowing with sign loss
+narrow_failfast<>(): Fails when narrowing with value loss
+narrow_failfast<>(): Fails when narrowing with sign loss
 CUDA: Precondition/postcondition checks and assertions can be used in kernel code
 CUDA: span<> can be passed to kernel code
 CUDA: span<> can be used in kernel code

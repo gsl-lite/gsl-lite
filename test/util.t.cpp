@@ -266,9 +266,9 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
 #endif // gsl_HAVE( EXCEPTIONS )
 }
 
-CASE( "narrow<>(): Terminates when narrowing with value loss" )
+CASE( "narrow<>(): Throws when narrowing with value loss" )
 {
-#if gsl_HAVE( EXCEPTIONS )
+#if gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
     EXPECT_THROWS_AS( (void) narrow<char>( 300 ), narrowing_error );
 
 # if gsl_STDLIB_CPP11_OR_GREATER
@@ -285,12 +285,12 @@ CASE( "narrow<>(): Terminates when narrowing with value loss" )
     EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t( u8 ) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t(u16 ) ), narrowing_error );
 # endif // gsl_STDLIB_CPP11_OR_GREATER
-#endif // gsl_HAVE( EXCEPTIONS )
+#endif // gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 }
 
-CASE( "narrow<>(): Terminates when narrowing with sign loss" )
+CASE( "narrow<>(): Throws when narrowing with sign loss" )
 {
-#if gsl_HAVE( EXCEPTIONS )
+#if gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
     EXPECT_THROWS_AS( (void) narrow<unsigned>( -42 ), narrowing_error );
 
 # if gsl_STDLIB_CPP11_OR_GREATER
@@ -300,7 +300,7 @@ CASE( "narrow<>(): Terminates when narrowing with sign loss" )
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t( i8n) ), narrowing_error );
     EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16n) ), narrowing_error );
 # endif // gsl_STDLIB_CPP11_OR_GREATER
-#endif // gsl_HAVE( EXCEPTIONS )
+#endif // gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 }
 
 CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
@@ -336,7 +336,7 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
-CASE( "narrow_failfast<>(): Terminates when narrowing with value loss" )
+CASE( "narrow_failfast<>(): Fails when narrowing with value loss" )
 {
     EXPECT_THROWS_AS( (void) narrow_failfast<char>( 300 ), fail_fast );
 
@@ -356,7 +356,7 @@ CASE( "narrow_failfast<>(): Terminates when narrowing with value loss" )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
-CASE( "narrow_failfast<>(): Terminates when narrowing with sign loss" )
+CASE( "narrow_failfast<>(): Fails when narrowing with sign loss" )
 {
     EXPECT_THROWS_AS( (void) narrow_failfast<unsigned>( -42 ), fail_fast );
 

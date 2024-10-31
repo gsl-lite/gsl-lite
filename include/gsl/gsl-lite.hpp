@@ -575,6 +575,10 @@
 // AppleClang 13.1.6  __apple_build_version__ == 13160021  gsl_COMPILER_APPLECLANG_VERSION == 1316  (Xcode 13.3–13.4.1)              (LLVM 13.0.0)
 // AppleClang 14.0.0  __apple_build_version__ == 14000029  gsl_COMPILER_APPLECLANG_VERSION == 1400  (Xcode 14.0–14.2)                (LLVM 14.0.0)
 // AppleClang 14.0.3  __apple_build_version__ == 14030022  gsl_COMPILER_APPLECLANG_VERSION == 1403  (Xcode 14.3)                     (LLVM 15.0.0)
+// AppleClang 15.0.0  __apple_build_version__ == 15000040  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.0)                     (LLVM 16.0.0)
+// AppleClang 15.0.0  __apple_build_version__ == 15000100  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.1–15.2)                (LLVM 16.0.0)
+// AppleClang 15.0.0  __apple_build_version__ == 15000309  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.3–15.4)                (LLVM 16.0.0)
+// AppleClang 16.0.0  __apple_build_version__ == 16000026  gsl_COMPILER_APPLECLANG_VERSION == 1600  (Xcode 16.0)                     (LLVM 17.0.6)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
@@ -2525,13 +2529,13 @@ namespace detail {
 
 template< class T, class U >
 gsl_NODISCARD gsl_constexpr14
-#if !gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && !defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 gsl_api
-#endif
+#endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 inline T
 narrow( U u )
 {
-#if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) && ! gsl_HAVE( EXCEPTIONS )
+#if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
     gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
         "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
         "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
@@ -2540,21 +2544,14 @@ narrow( U u )
 
     T t = static_cast<T>( u );
 
-    if ( static_cast<U>( t ) != u )
-    {
-#if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
-        throw narrowing_error();
-#else
-        std::terminate();
-#endif
-    }
-
 #if gsl_HAVE( TYPE_TRAITS )
 # if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
-    if ( ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
+    if ( static_cast<U>( t ) != u
+        || ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-    if ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) )
+    if ( static_cast<U>( t ) != u
+        || ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) ) )
 # endif
 #else
     // Don't assume T() works:
@@ -2563,7 +2560,8 @@ narrow( U u )
     // Suppress: pointless comparison of unsigned integer with zero.
 #  pragma diag_suppress 186
 # endif
-    if ( ( t < 0 ) != ( u < 0 ) )
+    if ( static_cast<U>( t ) != u
+        || ( t < 0 ) != ( u < 0 ) )
 # if gsl_COMPILER_NVHPC_VERSION
     // Restore: pointless comparison of unsigned integer with zero.
 #  pragma diag_default 186
@@ -2571,11 +2569,15 @@ narrow( U u )
 
 #endif
     {
-#if gsl_HAVE( EXCEPTIONS ) && ( gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) )
+#if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
         throw narrowing_error();
-#else
+#else // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+# if gsl_DEVICE_CODE
+        gsl_TRAP_();
+# else // host code
         std::terminate();
-#endif
+# endif
+#endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
     }
 
     return t;
@@ -2587,14 +2589,14 @@ narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
 
-    gsl_Expects( static_cast<U>( t ) == u );
+    gsl_Assert( static_cast<U>( t ) == u );
 
 #if gsl_HAVE( TYPE_TRAITS )
 # if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
-    gsl_Expects( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
+    gsl_Assert( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-    gsl_Expects( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+    gsl_Assert( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
 # endif
 #else
     // Don't assume T() works:
@@ -2603,7 +2605,7 @@ narrow_failfast( U u )
     // Suppress: pointless comparison of unsigned integer with zero.
 #  pragma diag_suppress 186
 # endif
-    gsl_Expects( ( t < 0 ) == ( u < 0 ) );
+    gsl_Assert( ( t < 0 ) == ( u < 0 ) );
 # if gsl_COMPILER_NVHPC_VERSION
     // Restore: pointless comparison of unsigned integer with zero.
 #  pragma diag_default 186
