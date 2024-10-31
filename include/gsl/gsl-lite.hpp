@@ -575,6 +575,10 @@
 // AppleClang 13.1.6  __apple_build_version__ == 13160021  gsl_COMPILER_APPLECLANG_VERSION == 1316  (Xcode 13.3–13.4.1)              (LLVM 13.0.0)
 // AppleClang 14.0.0  __apple_build_version__ == 14000029  gsl_COMPILER_APPLECLANG_VERSION == 1400  (Xcode 14.0–14.2)                (LLVM 14.0.0)
 // AppleClang 14.0.3  __apple_build_version__ == 14030022  gsl_COMPILER_APPLECLANG_VERSION == 1403  (Xcode 14.3)                     (LLVM 15.0.0)
+// AppleClang 15.0.0  __apple_build_version__ == 15000040  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.0)                     (LLVM 16.0.0)
+// AppleClang 15.0.0  __apple_build_version__ == 15000100  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.1–15.2)                (LLVM 16.0.0)
+// AppleClang 15.0.0  __apple_build_version__ == 15000309  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.3–15.4)                (LLVM 16.0.0)
+// AppleClang 16.0.0  __apple_build_version__ == 16000026  gsl_COMPILER_APPLECLANG_VERSION == 1600  (Xcode 16.0)                     (LLVM 17.0.6)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
