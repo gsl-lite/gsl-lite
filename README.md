@@ -706,7 +706,7 @@ Compiler             | OS              | Platforms | Versions          | CI |
 GCC                  | Linux           | x64       | 4.7 and newer     | [7, 8, 9, 10, 11, 12, 13](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
-GCC                  | MacOS           | x64       | 6 and newer       | [10, 11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | MacOS           | x64       | 6 and newer       | [11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Linux           | x64       | 3.5 and newer     | [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang with libstdc++ | Linux           | x64       | 11 and newer      | [19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS 2019 | [latest](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
