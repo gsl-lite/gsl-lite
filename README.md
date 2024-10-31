@@ -703,16 +703,16 @@ The table below mentions the compiler versions and platforms *gsl-lite* is repor
 
 Compiler             | OS              | Platforms | Versions          | CI |
 --------------------:|:----------------|-----------|------------------:|----|
-GCC                  | Linux           | x64       | 4.7 and newer     | [7, 8, 9, 10, 11](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | Linux           | x64       | 4.7 and newer     | [7, 8, 9, 10, 11, 12, 13](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
-GCC                  | MacOS           | x64       | 6 and newer       | [10, 11, 12](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang with libstdc++ | Linux           | x64       | 11 and newer      | [16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC                  | MacOS           | x64       | 6 and newer       | [10, 11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang with libstdc++ | Linux           | x64       | 11 and newer      | [19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS 2019 | [latest](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [11.0.3, 12, 12.0.5, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [11.8, 12.1](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [13, 14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [11.7, 11.8, 12.1, 12.6](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 ARMCC                |                 | ARM       | 5 and newer       | |
 
 
