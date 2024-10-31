@@ -1215,11 +1215,11 @@ on_error: Allows to perform action on leaving scope via an exception (gsl_FEATUR
 narrow_cast<>: Allows narrowing without value loss
 narrow_cast<>: Allows narrowing with value loss
 narrow<>(): Allows narrowing without value loss
-narrow<>(): Terminates when narrowing with value loss
-narrow<>(): Terminates when narrowing with sign loss
+narrow<>(): Throws when narrowing with value loss
+narrow<>(): Throws when narrowing with sign loss
 narrow_failfast<>(): Allows narrowing without value loss
-narrow_failfast<>(): Terminates when narrowing with value loss
-narrow_failfast<>(): Terminates when narrowing with sign loss
+narrow_failfast<>(): Fails when narrowing with value loss
+narrow_failfast<>(): Fails when narrowing with sign loss
 CUDA: Precondition/postcondition checks and assertions can be used in kernel code
 CUDA: span<> can be passed to kernel code
 CUDA: span<> can be used in kernel code
