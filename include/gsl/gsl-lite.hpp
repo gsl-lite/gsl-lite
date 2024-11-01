@@ -2589,14 +2589,14 @@ narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
 
-    gsl_Assert( static_cast<U>( t ) == u );
-
 #if gsl_HAVE( TYPE_TRAITS )
 # if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
-    gsl_Assert( ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
+    gsl_Assert( static_cast<U>( t ) == u
+        && ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-    gsl_Assert( ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+    gsl_Assert( static_cast<U>( t ) == u
+        && ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
 # endif
 #else
     // Don't assume T() works:
@@ -2605,7 +2605,8 @@ narrow_failfast( U u )
     // Suppress: pointless comparison of unsigned integer with zero.
 #  pragma diag_suppress 186
 # endif
-    gsl_Assert( ( t < 0 ) == ( u < 0 ) );
+    gsl_Assert( static_cast<U>( t ) == u
+        && ( t < 0 ) == ( u < 0 ) );
 # if gsl_COMPILER_NVHPC_VERSION
     // Restore: pointless comparison of unsigned integer with zero.
 #  pragma diag_default 186
