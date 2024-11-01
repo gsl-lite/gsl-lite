@@ -30,7 +30,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [12]
+      cxxCompilerVersions: [13]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
@@ -49,10 +49,10 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [12]
+      cxxCompilerVersions: [13]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_1]
+      cudaCompilerVersions: [12_6]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -68,7 +68,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [16]
+      cxxCompilerVersions: [19]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
@@ -107,14 +107,14 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_8]
+      cudaCompilerVersions: [12_6]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [14]
+      cxxCompilerVersions: [16]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
@@ -133,7 +133,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [12]
+      cxxCompilerVersions: [13]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
       platforms: [x64]
@@ -150,12 +150,12 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      cxxCompilerVersions: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [16]
+      cxxCompilerVersions: [19]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
@@ -166,7 +166,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [16]
+      cxxCompilerVersions: [19]
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
@@ -196,10 +196,10 @@ jobs:
 
     - os: MacOS
       cxxCompiler: GCC
-      cxxCompilerVersions: [10, 11, 12]
+      cxxCompilerVersions: [11, 12, 13, 14]
       platforms: [x64]
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [11_0_3, 12, 12_0_5, 13, 13_1_6, 14]
+      cxxCompilerVersions: [13, 14, 15, 16]
       platforms: [x64]
