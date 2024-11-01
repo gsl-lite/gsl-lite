@@ -86,7 +86,7 @@ The recommended way to consume *gsl-lite* in your CMake project is to use `find_
 ```CMake
 cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
     
-find_package( gsl-lite 0.41 REQUIRED )
+find_package( gsl-lite 0.42 REQUIRED )
     
 project( my-program LANGUAGES CXX )
     
@@ -227,7 +227,7 @@ Example:
 
 ```cmake
 # my-statistics-lib/CMakeLists.txt
-find_package( gsl-lite 0.41 REQUIRED )
+find_package( gsl-lite 0.42 REQUIRED )
 
 add_library( my-statistics-lib STATIC mean.cpp )
 target_link_libraries( my-statistics-lib PUBLIC gsl::gsl-lite-v1 )

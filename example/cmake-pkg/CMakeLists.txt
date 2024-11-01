@@ -4,7 +4,7 @@ endif()
 
 # gsl-lite version, updated by script/update-version.py:
 
-set( gsl_lite_version "0.41" )
+set( gsl_lite_version "0.42" )
 
 find_package( gsl-lite ${gsl_lite_version} REQUIRED )
 

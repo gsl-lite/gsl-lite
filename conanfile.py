@@ -1,7 +1,7 @@
 from conans import ConanFile, CMake
 
 class GslLiteConan(ConanFile):
-    version = "0.41.0"
+    version = "0.42.0"
     name = "gsl-lite"
     description = "A single-file header-only version of ISO C++ Guidelines Support Library (GSL) for C++98, C++11 and later"
     license = "MIT License. https://opensource.org/licenses/MIT"

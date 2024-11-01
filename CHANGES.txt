@@ -1,6 +1,31 @@
 Changes in gsl-lite
 ===================
 
+version 0.42.0 2024-11-01
+
+Additions:
+- Define `gsl_MAYBE_UNUSED_MEMBER` for `[[maybe_unused]]` annotations on members
+  (https://github.com/gsl-lite/gsl-lite/commit/34ba5141492a88912e2055e08cd1bdd6714431c5)
+- Support `not_null<void*>` (#341, thanks to @BenFrantzDale)
+- Support `not_null<>` for `unique_ptr<void, D>` and `shared_ptr<void>` (#349, thanks to @BenFrantzDale)
+
+Changes:
+- For modern (≥v1) defaults, `finally()`, `on_return()`, and `on_error()` are now implemented without virtual function calls (#342)
+- Deprecate `finally()`, `on_return()`, and `on_error()` for pre-C++11 (#342)
+- `narrow_failfast<>()` now uses `gsl_Assert()` rather than `gsl_Expects()` to express the contract check (#351)
+- `std::hash<gsl_lite::byte>` now forwards to `std::hash<unsigned char>` (#343)
+- Add Continuous Integration for GCC 13, Clang 17 to 19, and for NVCC 12.6; remove CI for GCC 10 on macOS and for
+  Apple Clang 12.0.5 and earlier (#351)
+
+Fixes:
+- `std::terminate()` cannot be called from CUDA device code, but the call may go undetected due to a NVCC issue;
+  for `!gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )`, `narrow<>()` now makes sure that the program is terminated by
+  issuing a trap instruction if `std::terminate()` is not available (#351, thanks to @pauleonix for helping track this down)
+- `narrow<>()` no longer responds to `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` because it does not do contract checking;
+  therefore, it now plainly fails to compile if `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is set to 1 even though
+  exceptions are unavailable (e.g. in device code) (#351)
+- Fix issues in test suite (#338, thanks to @musicinmybrain)
+
 version 0.41.0 2023-04-12
 
 Additions:
