@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -31,7 +31,7 @@
 #include <cstdlib>   // for abort()
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  42
+#define  gsl_lite_MINOR  43
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
