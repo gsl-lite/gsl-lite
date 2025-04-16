@@ -996,6 +996,10 @@ not_null<>: Can handle unique_ptr<void, DeleterT>
 not_null<>: Can handle shared_ptr<void>
 not_null<>: Hashes match the hashes of the wrapped pointer
 not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers
+not_null<>: Supports function pointer type for construction, assignment, and invocation
+not_null<>: Supports std::function<> for construction, assignment, and invocation
+not_null<>: Supports converting to std::function<> from function reference
+not_null<>: Supports constructing and assigning std::function<> from non-nullable function object
 owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for
