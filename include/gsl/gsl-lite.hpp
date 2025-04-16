@@ -1471,10 +1471,10 @@ template < class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, 
 
 #else // a.k.a. ! gsl_HAVE( VARIADIC_TEMPLATE )
 
-template < bool V0, class T0, class T1 > struct conjunction_ { using type = T0; };
-template < class T0, class T1 > struct conjunction_<true, T0, T1> { using type = T1; };
-template < bool V0, class T0, class T1 > struct disjunction_ { using type = T0; };
-template < class T0, class T1 > struct disjunction_<false, T0, T1> { using type = T1; };
+template < bool V0, class T0, class T1 > struct conjunction_ { typedef T0 type; };
+template < class T0, class T1 > struct conjunction_<true, T0, T1> { typedef T1 type; };
+template < bool V0, class T0, class T1 > struct disjunction_ { typedef T0 type; };
+template < class T0, class T1 > struct disjunction_<false, T0, T1> { typedef T1 type; };
 
 #endif // gsl_HAVE( VARIADIC_TEMPLATE )
 
