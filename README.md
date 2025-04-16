@@ -1000,6 +1000,7 @@ not_null<>: Supports function pointer type for construction, assignment, and inv
 not_null<>: Supports std::function<> for construction, assignment, and invocation
 not_null<>: Supports converting to std::function<> from function reference
 not_null<>: Supports constructing and assigning std::function<> from non-nullable function object
+not_null<>: Invocability is correctly reported by type traits
 owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)
 owner<>: Allows its use as the (pointer) type it stands for
 Owner(): Allows its use as the (pointer) type it stands for

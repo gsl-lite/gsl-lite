@@ -1882,5 +1882,42 @@ CASE( "not_null<>: Supports constructing and assigning std::function<> from non-
 }
 #endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
 
+CASE( "not_null<>: Invocability is correctly reported by type traits" )
+{
+#if gsl_STDLIB_CPP17_OR_GREATER
+
+    // No invocability for raw pointers.
+    static_assert( !std::is_invocable< not_null< int* > >::value );
+    static_assert( !std::is_invocable< not_null< int* >, int >::value );
+
+    // No invocability for `unique_ptr<>`.
+    static_assert( !std::is_invocable< not_null< unique_ptr< int > > >::value );
+    static_assert( !std::is_invocable< not_null< unique_ptr< int > >, int >::value );
+
+    // Invocability for function pointers with suitable argument list.
+    static_assert(  std::is_invocable< not_null< int (*)( ) > >::value );
+    static_assert(  std::is_invocable< not_null< int (*)( int const& ) >, int & >::value );
+    static_assert(  std::is_invocable< not_null< int (*)( int & ) >, int & >::value );
+    static_assert( !std::is_invocable< not_null< int (*)( int & ) >, int >::value );
+
+    // Invocability for `std::function<>` with suitable argument list.
+    static_assert(  std::is_invocable< not_null< std::function< int( ) > > >::value );
+    static_assert(  std::is_invocable< not_null< std::function< int( int const& ) > >, int & >::value );
+    static_assert(  std::is_invocable< not_null< std::function< int( int & ) > >, int & >::value );
+    static_assert( !std::is_invocable< not_null< std::function< int( int & ) > >, int >::value );
+
+    // Correct return type is inferred for function pointers.
+    static_assert(  std::is_invocable_r< void,  not_null< int & (*)( int const& ) >, int >::value );
+    static_assert(  std::is_invocable_r< int &, not_null< int & (*)( int const& ) >, int >::value );
+    static_assert( !std::is_invocable_r< int &, not_null< int   (*)( int const& ) >, int >::value );
+
+    // Correct return type is inferred for `std::function<>`.
+    static_assert(  std::is_invocable_r< void,  not_null< std::function<int &( int const& ) > >, int >::value );
+    static_assert(  std::is_invocable_r< int &, not_null< std::function<int &( int const& ) > >, int >::value );
+    static_assert( !std::is_invocable_r< int &, not_null< std::function<int  ( int const& ) > >, int >::value );
+
+#endif // gsl_STDLIB_CPP20_OR_GREATER
+}
+
 
 // end of file
