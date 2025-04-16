@@ -1,4 +1,4 @@
-
+﻿
 variables:
   System.Debug: true
 
@@ -52,7 +52,7 @@ jobs:
       cxxCompilerVersions: [13]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_6]
+      cudaCompilerVersions: [12_8]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -107,7 +107,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_6]
+      cudaCompilerVersions: [12_8]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
@@ -175,7 +175,7 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [11]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_7]
+      cudaCompilerVersions: [12_6]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
