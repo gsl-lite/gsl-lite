@@ -1871,7 +1871,7 @@ CASE( "not_null<>: Supports constructing and assigning std::function<> from non-
     i = 41;
     mut( i );
     EXPECT( i == 41 );
-# endif ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
 
