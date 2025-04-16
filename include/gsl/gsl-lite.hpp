@@ -4467,14 +4467,14 @@ template< class T >
 inline span<T>
 make_span( std::vector<T> & cont )
 {
-    return span<T>( cont.data(), cont.data() + std17::ssize( cont ) );
+    return span<T>( cont.data(), cont.data() + cont.size() );
 }
 
 template< class T >
 inline span<const T>
 make_span( std::vector<T> const & cont )
 {
-    return span<const T>( cont.data(), cont.data() + std17::ssize( cont ) );
+    return span<const T>( cont.data(), cont.data() + cont.size() );
 }
 
 #endif
