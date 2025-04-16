@@ -30,7 +30,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [13]
+      cxxCompilerVersions: [14]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
@@ -49,7 +49,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [13]
+      cxxCompilerVersions: [14]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       cudaCompiler: NVCC
       cudaCompilerVersions: [12_8]
@@ -128,12 +128,12 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [7, 8, 9, 10, 11, 12]
+      cxxCompilerVersions: [9, 10, 11, 12, 13]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [13]
+      cxxCompilerVersions: [14]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
       platforms: [x64]
