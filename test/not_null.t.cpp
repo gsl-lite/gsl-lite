@@ -1832,7 +1832,10 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     EXPECT( insp( i ) == 41 );
     auto insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
-    EXPECT_THROWS( insp( i ) );
+    if ( ! gsl::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
+    {
+        EXPECT_THROWS( insp( i ) );
+    }
 
     not_null< std::function< int( int & ) > > mut = mutator;
     mut( i );

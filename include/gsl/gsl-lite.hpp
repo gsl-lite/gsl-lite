@@ -4462,22 +4462,21 @@ make_span( Container const & cont ) -> span< const typename std::remove_pointer<
 }
 
 #else
-# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 template< class T >
 inline span<T>
 make_span( std::vector<T> & cont )
 {
-    return span<T>( with_container, cont );
+    return span<T>( cont );
 }
 
 template< class T >
 inline span<const T>
 make_span( std::vector<T> const & cont )
 {
-    return span<const T>( with_container, cont );
+    return span<const T>( cont );
 }
-# endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
+
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
