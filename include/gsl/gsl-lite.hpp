@@ -1469,7 +1469,15 @@ template < class T0, class T1, class... Ts > struct conjunction_<true, T0, T1, T
 template < bool V0, class T0, class... Ts > struct disjunction_ { using type = T0; };
 template < class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
 
-#endif
+#else // a.k.a. ! gsl_HAVE( VARIADIC_TEMPLATE )
+
+template < bool V0, class T0, class T1 > struct conjunction_ { using type = T0; };
+template < class T0, class T1 > struct conjunction_<true, T0, T1> { using type = T1; };
+template < bool V0, class T0, class T1 > struct disjunction_ { using type = T0; };
+template < class T0, class T1 > struct disjunction_<false, T0, T1> { using type = T1; };
+
+#endif // gsl_HAVE( VARIADIC_TEMPLATE )
+
 
 template <typename> struct dependent_false : std11::integral_constant<bool, false> { };
 
@@ -1481,6 +1489,8 @@ namespace std17 {
 
 template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
+template < class T > struct negation : std11::integral_constant<bool, !T::value> { };
+
 #if gsl_CPP11_120
 
 template < class... Ts > struct conjunction;
@@ -1489,7 +1499,6 @@ template < class T0, class... Ts > struct conjunction<T0, Ts...> : detail::conju
 template < class... Ts > struct disjunction;
 template < > struct disjunction< > : std11::false_type { };
 template < class T0, class... Ts > struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
-template < class T > struct negation : std11::integral_constant<bool, !T::value> { };
 
 # if gsl_CPP14_OR_GREATER
 
@@ -1504,6 +1513,12 @@ struct make_void { typedef void type; };
 
 template< class... Ts >
 using void_t = typename make_void< Ts... >::type;
+
+#else // a.k.a. ! gsl_CPP11_120
+
+// For C++98, define simpler binary variants of `conjunction<>` and `disjunction<>`.
+template < class T0, class T1 > struct conjunction : detail::conjunction_<T0::value, T0, T1>::type { };
+template < class T0, class T1 > struct disjunction : detail::disjunction_<T0::value, T0, T1>::type { };
 
 #endif // gsl_CPP11_120
 
