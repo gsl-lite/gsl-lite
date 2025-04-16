@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,6 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 #include <vector>
+#include <functional>
 
 using namespace gsl;
 
@@ -1766,5 +1767,76 @@ CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled f
 }
 
 #endif // gsl_HAVE( HASH )
+
+#if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+
+int inspector( int const& p )
+{
+    return p;
+}
+int mutator( int& p )
+{
+    p = 42;
+    return p;
+}
+int extractor( std::unique_ptr< int > value )
+{
+    return *value;
+}
+
+CASE( "not_null<>: Supports function pointer type for construction, assignment, and invocation" )
+{
+    not_null< int (*)( int const& ) > insp = make_not_null( inspector );
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+
+    not_null< int (*)( int& ) > mut = make_not_null( mutator );
+    mut( i );
+    EXPECT( i == 42 );
+
+    not_null< int (*)( std::unique_ptr<int> ) > xtr = make_not_null( extractor );
+    EXPECT( xtr( std::make_unique<int>( 1 ) ) == 1 );
+}
+
+CASE( "not_null<>: Supports std::function<> for construction, assignment, and invocation" )
+{
+    not_null< std::function< int( int ) > > insp = make_not_null( std::function< int( int ) >( inspector ) );
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+    auto insp2 = std::move( insp );
+    EXPECT( insp2( i ) == 41 );
+    EXPECT_THROWS( insp( i ) );
+
+    not_null< std::function< int( int& ) > > mut = make_not_null( std::function< int( int& ) >( mutator ) );
+    mut( i );
+    EXPECT( i == 42 );
+    mut = std::move( insp2 );
+    i = 41;
+    mut( i );
+    EXPECT( i == 41 );
+
+    not_null< std::function< int( std::unique_ptr<int> ) > > xtr = make_not_null( std::function< int( std::unique_ptr<int> ) >( extractor ) );
+    EXPECT( xtr( std::make_unique<int>( 1 ) ) == 1 );
+}
+
+CASE( "not_null<>: Supports converting to std::function<> from function pointer" )
+{
+    not_null< std::function< int( int ) > > insp = make_not_null( inspector );
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+    auto insp2 = std::move( insp );
+    EXPECT( insp2( i ) == 41 );
+    EXPECT_THROWS( insp( i ) );
+
+    not_null< std::function< int( int& ) > > mut = make_not_null( mutator );
+    mut( i );
+    EXPECT( i == 42 );
+    mut = make_not_null( inspector );
+    i = 41;
+    mut( i );
+    EXPECT( i == 41 );
+}
+#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+
 
 // end of file

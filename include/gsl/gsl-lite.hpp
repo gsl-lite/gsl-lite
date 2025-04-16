@@ -2676,6 +2676,21 @@ class not_null;
 
 namespace detail {
 
+template< class T > struct is_void : std11::false_type { };
+template< > struct is_void< void > : std11::true_type { };
+
+// helper class to figure out whether a pointer has an element type
+#if gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE )
+template< class T, class E = void >
+struct has_element_type : std11::false_type { };
+template< class T >
+struct has_element_type< T, std17::void_t< decltype( *std::declval<T>() ) > > : std11::true_type { };
+# else // a.k.a. ! ( gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE ) )
+// Without C++11 and expression SFINAE, just assume that non-pointer types (e.g. smart pointers) have an `element_type` member
+template< class T, class E = void >
+struct has_element_type : std11::true_type { };
+# endif // gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE )
+
 // helper class to figure out the pointed-to type of a pointer
 #if gsl_STDLIB_CPP11_OR_GREATER
 template< class T, class E = void >
@@ -2684,7 +2699,6 @@ struct element_type_helper
     // For types without a member element_type (this could handle typed raw pointers but not `void*`)
     typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
 };
-
 template< class T >
 struct element_type_helper< T, std17::void_t< typename T::element_type > >
 {
@@ -2692,16 +2706,15 @@ struct element_type_helper< T, std17::void_t< typename T::element_type > >
     typedef typename T::element_type type;
 };
 #else // ! gsl_STDLIB_CPP11_OR_GREATER
-// Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
+// Pre-C++11, we cannot have `decltype`, so we cannot handle non-pointer types without a member `element_type`
 template< class T, class E = void >
 struct element_type_helper
 {
     typedef typename T::element_type type;
 };
 #endif // gsl_STDLIB_CPP11_OR_GREATER
-
 template< class T >
-struct element_type_helper< T* >
+struct element_type_helper< T * >
 {
     typedef T type;
 };
@@ -2820,7 +2833,7 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 template< class T >
 struct not_null_accessor;
 
-template< class Derived, class T, bool IsVoidPtr >
+template< class Derived, class T, bool HasElementType, bool IsDereferencable >
 struct not_null_deref
 {
     typedef typename element_type_helper<T>::type element_type;
@@ -2832,21 +2845,25 @@ struct not_null_deref
     }
 };
 template< class Derived, class T >
-struct not_null_deref< Derived, T, true >
+struct not_null_deref< Derived, T, true, false >  // e.g. `void*`
+{
+    typedef typename element_type_helper<T>::type element_type;
+};
+template< class Derived, class T >
+struct not_null_deref< Derived, T, false, false >  // e.g. `std::function<>`
 {
 };
 
-template< class T > struct is_void : std11::false_type { };
-template< > struct is_void< void > : std11::true_type { };
-
 template< class T > struct is_void_ptr : is_void< typename detail::element_type_helper< T >::type > { };
+
+template< class T > struct is_dereferencable : std17::conjunction< has_element_type< T >, std17::negation< is_void_ptr< T > > > { };
 
 } // namespace detail
 
 template< class T >
 class
 gsl_EMPTY_BASES_  // not strictly needed, but will become necessary if we add more base classes
-not_null : public detail::not_null_deref< not_null< T >, T, detail::is_void_ptr< T >::value >
+not_null : public detail::not_null_deref< not_null< T >, T, detail::has_element_type< T >::value, detail::is_dereferencable< T >::value >
 {
 private:
     detail::not_null_data< T, detail::is_copyable< T >::value > data_;
@@ -2858,8 +2875,6 @@ private:
     typedef detail::not_null_accessor<T> accessor;
 
 public:
-    typedef typename detail::element_type_helper<T>::type element_type;
-
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( ! std::is_reference<T>::value, "T may not be a reference type" );
     static_assert( ! std::is_const<T>::value && ! std::is_volatile<T>::value, "T may not be cv-qualified" );
@@ -2983,26 +2998,31 @@ public:
 #endif // gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
+    gsl_NODISCARD gsl_api gsl_constexpr14
+# if gsl_HAVE( AUTO )
+    auto  // avoid referring to `element_type`, which may not be defined e.g. for `std::function<>`
+# else // a.k.a. ! gsl_HAVE( AUTO )
+    typename detail::element_type_helper<T>::type *
+# endif // gsl_HAVE( AUTO )
     get() const
     {
         return accessor::get_checked( *this ).get();
     }
-#else
+#else // a.k.a. ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
     {
         return accessor::get_checked( *this );
     }
-# else
+# else // a.k.a. ! gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T
     get() const
     {
         return accessor::get_checked( *this );
     }
-# endif
-#endif
+# endif // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+#endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
 
     // We want an implicit conversion operator that can be used to convert from both lvalues (by
     // const reference or by copy) and rvalues (by move). So it seems like we could define
@@ -3138,6 +3158,16 @@ gsl_is_delete_access:
     not_null(             int ) gsl_is_delete;
     not_null & operator=( int ) gsl_is_delete;
 #endif
+
+#if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+    template <typename... Ts>
+    gsl_api gsl_constexpr14 auto
+    operator()(Ts&&... args) const
+        -> decltype(data_.ptr_(std::forward<Ts>(args)...))
+    {
+        return accessor::get_checked( *this )(std::forward<Ts>(args)...);
+    }
+#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
 
     // unwanted operators...pointers only point to single objects!
     not_null & operator++() gsl_is_delete;
