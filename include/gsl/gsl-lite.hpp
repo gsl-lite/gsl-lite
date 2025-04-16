@@ -2854,24 +2854,36 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 template< class T >
 struct not_null_accessor;
 
-template< class Derived, class T, bool HasElementType, bool IsDereferencable >
-struct not_null_deref
+template< class Derived, class T, bool HasElementType >
+struct not_null_elem
 {
     typedef typename element_type_helper<T>::type element_type;
 
-    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
-    operator*() const
+#if gsl_CONFIG( TRANSPARENT_NOT_NULL )
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
+    get() const
     {
+        return not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) ).get();
+    }
+#endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
+};
+template< class Derived, class T >
+struct not_null_elem< Derived, T, false >
+{
+};
+template< class Derived, class T, bool IsDereferencable >
+struct gsl_EMPTY_BASES_ not_null_deref
+    : not_null_elem< Derived, T, detail::has_element_type< T >::value >
+{
+    gsl_NODISCARD gsl_api gsl_constexpr14 typename element_type_helper<T>::type &
+    operator*() const
+{
         return *not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) );
     }
 };
 template< class Derived, class T >
-struct not_null_deref< Derived, T, true, false >  // e.g. `void*`
-{
-    typedef typename element_type_helper<T>::type element_type;
-};
-template< class Derived, class T >
-struct not_null_deref< Derived, T, false, false >  // e.g. `std::function<>`
+struct gsl_EMPTY_BASES_ not_null_deref< Derived, T, false >  // e.g. `void*`, `std::function<>`
+    : not_null_elem< Derived, T, detail::has_element_type< T >::value >
 {
 };
 
@@ -2884,7 +2896,7 @@ template< class T > struct is_dereferencable : std17::conjunction< has_element_t
 template< class T >
 class
 gsl_EMPTY_BASES_  // not strictly needed, but will become necessary if we add more base classes
-not_null : public detail::not_null_deref< not_null< T >, T, detail::has_element_type< T >::value, detail::is_dereferencable< T >::value >
+not_null : public detail::not_null_deref< not_null< T >, T, detail::is_dereferencable< T >::value >
 {
 private:
     detail::not_null_data< T, detail::is_copyable< T >::value > data_;
@@ -3038,18 +3050,7 @@ public:
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
-#if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_NODISCARD gsl_api gsl_constexpr14
-# if gsl_HAVE( AUTO )
-    auto  // avoid referring to `element_type`, which may not be defined e.g. for `std::function<>`
-# else // a.k.a. ! gsl_HAVE( AUTO )
-    typename detail::element_type_helper<T>::type *
-# endif // gsl_HAVE( AUTO )
-    get() const
-    {
-        return accessor::get_checked( *this ).get();
-    }
-#else // a.k.a. ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+#if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
@@ -3063,7 +3064,7 @@ public:
         return accessor::get_checked( *this );
     }
 # endif // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-#endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
+#endif // ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
 
     // We want an implicit conversion operator that can be used to convert from both lvalues (by
     // const reference or by copy) and rvalues (by move). So it seems like we could define
