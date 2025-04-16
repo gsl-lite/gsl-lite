@@ -1774,7 +1774,7 @@ int inspector( int const& p )
 {
     return p;
 }
-int mutator( int& p )
+int mutator( int & p )
 {
     p = 42;
     return p;
@@ -1786,16 +1786,18 @@ int extractor( std::unique_ptr< int > value )
 
 CASE( "not_null<>: Supports function pointer type for construction, assignment, and invocation" )
 {
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     not_null< int (*)( int const& ) > insp = inspector;
     int i = 41;
     EXPECT( insp( i ) == 41 );
 
-    not_null< int (*)( int& ) > mut = mutator;
+    not_null< int (*)( int & ) > mut = mutator;
     mut( i );
     EXPECT( i == 42 );
 
-    not_null< int (*)( std::unique_ptr<int> ) > xtr = extractor;
-    EXPECT( xtr( std::make_unique<int>( 1 ) ) == 1 );
+    not_null< int (*)( std::unique_ptr< int > ) > xtr = extractor;
+    EXPECT( xtr( my_make_unique< int >( 1 ) ) == 1 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
 
 CASE( "not_null<>: Supports std::function<> for construction, assignment, and invocation" )
@@ -1805,9 +1807,12 @@ CASE( "not_null<>: Supports std::function<> for construction, assignment, and in
     EXPECT( insp( i ) == 41 );
     auto insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
-    EXPECT_THROWS( insp( i ) );
+    if ( ! gsl::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
+    {
+        EXPECT_THROWS( insp( i ) );
+    }
 
-    not_null< std::function< int( int& ) > > mut = make_not_null( std::function< int( int& ) >( mutator ) );
+    not_null< std::function< int( int & ) > > mut = make_not_null( std::function< int( int & ) >( mutator ) );
     mut( i );
     EXPECT( i == 42 );
     mut = std::move( insp2 );
@@ -1815,12 +1820,13 @@ CASE( "not_null<>: Supports std::function<> for construction, assignment, and in
     mut( i );
     EXPECT( i == 41 );
 
-    not_null< std::function< int( std::unique_ptr<int> ) > > xtr = make_not_null( std::function< int( std::unique_ptr<int> ) >( extractor ) );
-    EXPECT( xtr( std::make_unique<int>( 1 ) ) == 1 );
+    not_null< std::function< int( std::unique_ptr< int > ) > > xtr = make_not_null( std::function< int( std::unique_ptr< int > ) >( extractor ) );
+    EXPECT( xtr( my_make_unique< int >( 1 ) ) == 1 );
 }
 
 CASE( "not_null<>: Supports converting to std::function<> from function reference" )
 {
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     not_null< std::function< int( int ) > > insp = inspector;
     int i = 41;
     EXPECT( insp( i ) == 41 );
@@ -1828,13 +1834,14 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     EXPECT( insp2( i ) == 41 );
     EXPECT_THROWS( insp( i ) );
 
-    not_null< std::function< int( int& ) > > mut = mutator;
+    not_null< std::function< int( int & ) > > mut = mutator;
     mut( i );
     EXPECT( i == 42 );
     mut = inspector;
     i = 41;
     mut( i );
     EXPECT( i == 41 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
 
 struct Mutator
@@ -1864,7 +1871,7 @@ CASE( "not_null<>: Supports constructing and assigning std::function<> from non-
     int i = 41;
     EXPECT( insp( i ) == 41 );
 
-    not_null< std::function< int( int& ) > > mut = Mutator{ };
+    not_null< std::function< int( int & ) > > mut = Mutator{ };
     mut( i );
     EXPECT( i == 0 );
     mut = Inspector{ };

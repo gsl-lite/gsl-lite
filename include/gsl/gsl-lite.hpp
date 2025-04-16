@@ -4449,6 +4449,7 @@ make_span( Container const & cont ) -> span< const typename std::remove_pointer<
 }
 
 #else
+# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 template< class T >
 inline span<T>
@@ -4463,6 +4464,7 @@ make_span( std::vector<T> const & cont )
 {
     return span<const T>( with_container, cont );
 }
+# endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
@@ -5566,8 +5568,10 @@ using ::gsl::to_integer;
 using ::gsl::to_uchar;
 using ::gsl::to_string;
 
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 using ::gsl::with_container_t;
 using ::gsl::with_container;
+#endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 using ::gsl::span;
 using ::gsl::make_span;
