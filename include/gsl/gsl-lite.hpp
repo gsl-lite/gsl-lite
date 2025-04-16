@@ -2697,10 +2697,15 @@ template< > struct is_void< void > : std11::true_type { };
 
 // helper class to figure out whether a pointer has an element type
 #if gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE )
+// Avoid SFINAE for unary `operator*` (doesn't work for `std::unique_ptr<>` and the like) if an `element_type` member exists.
 template< class T, class E = void >
-struct has_element_type : std11::false_type { };
+struct has_element_type_ : std11::false_type { };
 template< class T >
-struct has_element_type< T, std17::void_t< decltype( *std::declval<T>() ) > > : std11::true_type { };
+struct has_element_type_< T, std17::void_t< decltype( *std::declval<T>() ) > > : std11::true_type { };
+template< class T, class E = void >
+struct has_element_type : has_element_type_< T > { };
+template< class T >
+struct has_element_type< T, std17::void_t< typename T::element_type > > : std11::true_type { };
 # else // a.k.a. ! ( gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE ) )
 // Without C++11 and expression SFINAE, just assume that non-pointer types (e.g. smart pointers) have an `element_type` member
 template< class T, class E = void >
