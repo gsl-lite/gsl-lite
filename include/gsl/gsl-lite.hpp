@@ -2888,7 +2888,7 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && std::is_assignable<U&, std::nullptr_t>::value ), int >::type = 0
 #  endif
     >
     gsl_api gsl_constexpr14 explicit not_null( U other )
@@ -2896,6 +2896,26 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    // Define the non-explicit constructors for non-nullable arguments only if the explicit constructor has a SFINAE constraint.
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && std::is_function<U>::value ), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 /*implicit*/ not_null( U const& other )
+    : data_( T( other ) )
+    {
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && ! std::is_function<U>::value  && ! std::is_assignable<U&, std::nullptr_t>::value), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 /*implicit*/ not_null( U other )
+    : data_( T( std::move( other ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
     gsl_api gsl_constexpr14 explicit not_null( U const& other )

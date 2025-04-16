@@ -1786,15 +1786,15 @@ int extractor( std::unique_ptr< int > value )
 
 CASE( "not_null<>: Supports function pointer type for construction, assignment, and invocation" )
 {
-    not_null< int (*)( int const& ) > insp = make_not_null( inspector );
+    not_null< int (*)( int const& ) > insp = inspector;
     int i = 41;
     EXPECT( insp( i ) == 41 );
 
-    not_null< int (*)( int& ) > mut = make_not_null( mutator );
+    not_null< int (*)( int& ) > mut = mutator;
     mut( i );
     EXPECT( i == 42 );
 
-    not_null< int (*)( std::unique_ptr<int> ) > xtr = make_not_null( extractor );
+    not_null< int (*)( std::unique_ptr<int> ) > xtr = extractor;
     EXPECT( xtr( std::make_unique<int>( 1 ) ) == 1 );
 }
 
@@ -1819,22 +1819,59 @@ CASE( "not_null<>: Supports std::function<> for construction, assignment, and in
     EXPECT( xtr( std::make_unique<int>( 1 ) ) == 1 );
 }
 
-CASE( "not_null<>: Supports converting to std::function<> from function pointer" )
+CASE( "not_null<>: Supports converting to std::function<> from function reference" )
 {
-    not_null< std::function< int( int ) > > insp = make_not_null( inspector );
+    not_null< std::function< int( int ) > > insp = inspector;
     int i = 41;
     EXPECT( insp( i ) == 41 );
     auto insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
     EXPECT_THROWS( insp( i ) );
 
-    not_null< std::function< int( int& ) > > mut = make_not_null( mutator );
+    not_null< std::function< int( int& ) > > mut = mutator;
     mut( i );
     EXPECT( i == 42 );
-    mut = make_not_null( inspector );
+    mut = inspector;
     i = 41;
     mut( i );
     EXPECT( i == 41 );
+}
+
+struct Mutator
+{
+    template < typename T >
+    T
+    operator ()( T& arg )
+    {
+        arg = { };
+        return arg;
+    }
+};
+struct Inspector
+{
+    template < typename T >
+    T
+    operator ()( T arg )
+    {
+        return arg;
+    }
+};
+
+CASE( "not_null<>: Supports constructing and assigning std::function<> from non-nullable function object" )
+{
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    not_null< std::function< int( int& ) > > insp = Inspector{ };
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+
+    not_null< std::function< int( int& ) > > mut = Mutator{ };
+    mut( i );
+    EXPECT( i == 0 );
+    mut = Inspector{ };
+    i = 41;
+    mut( i );
+    EXPECT( i == 41 );
+# endif ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
 #endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
 
