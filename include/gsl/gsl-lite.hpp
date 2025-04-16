@@ -2877,7 +2877,7 @@ struct gsl_EMPTY_BASES_ not_null_deref
 {
     gsl_NODISCARD gsl_api gsl_constexpr14 typename element_type_helper<T>::type &
     operator*() const
-{
+    {
         return *not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) );
     }
 };
@@ -2892,6 +2892,15 @@ template< class T > struct is_void_ptr : is_void< typename detail::element_type_
 template< class T > struct is_dereferencable : std17::conjunction< has_element_type< T >, std17::negation< is_void_ptr< T > > > { };
 
 } // namespace detail
+
+#if gsl_HAVE( TYPE_TRAITS )
+template< class T > struct is_nullable : std::is_assignable< typename std::remove_cv< T >::type &, std::nullptr_t > { };
+
+# if gsl_CPP14_OR_GREATER
+template< class T > constexpr bool is_nullable_v = is_nullable< T >::value;
+# endif // gsl_CPP14_OR_GREATER
+
+#endif // gsl_HAVE( TYPE_TRAITS )
 
 template< class T >
 class
@@ -2911,7 +2920,7 @@ public:
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( ! std::is_reference<T>::value, "T may not be a reference type" );
     static_assert( ! std::is_const<T>::value && ! std::is_volatile<T>::value, "T may not be cv-qualified" );
-    static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr" );
+    static_assert( is_nullable<T>::value, "T must be a nullable type" );
 #endif
 
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
@@ -2921,7 +2930,7 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && std::is_assignable<U&, std::nullptr_t>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && is_nullable<U>::value ), int >::type = 0
 #  endif
     >
     gsl_api gsl_constexpr14 explicit not_null( U other )
@@ -2941,7 +2950,7 @@ public:
     }
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && ! std::is_function<U>::value  && ! std::is_assignable<U&, std::nullptr_t>::value), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && ! std::is_function<U>::value  && ! is_nullable<U>::value), int >::type = 0
     >
     gsl_api gsl_constexpr14 /*implicit*/ not_null( U other )
     : data_( T( std::move( other ) ) )
