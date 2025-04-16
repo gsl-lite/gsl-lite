@@ -143,7 +143,11 @@
 #  pragma message ("invalid configuration value gsl_FEATURE_WITH_CONTAINER_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_WITH_CONTAINER_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
 # endif
 #else
-# define gsl_FEATURE_WITH_CONTAINER_TO_STD  99  // default
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  define gsl_FEATURE_WITH_CONTAINER_TO_STD  0   // version-1 default
+# else // gsl_CONFIG_DEFAULTS_VERSION == 0
+#  define gsl_FEATURE_WITH_CONTAINER_TO_STD  99  // version-0 default
+# endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 #endif
 #define gsl_FEATURE_WITH_CONTAINER_TO_STD_()  gsl_FEATURE_WITH_CONTAINER_TO_STD
 
