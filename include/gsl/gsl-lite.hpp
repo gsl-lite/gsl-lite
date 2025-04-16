@@ -3201,15 +3201,18 @@ gsl_is_delete_access:
     not_null & operator=( int ) gsl_is_delete;
 #endif
 
-#if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+#if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
     template <typename... Ts>
     gsl_api gsl_constexpr14 auto
     operator()(Ts&&... args) const
+# if ! gsl_COMPILER_NVCC_VERSION
+        // NVCC thinks that Substitution Failure Is An Error here
         -> decltype(data_.ptr_(std::forward<Ts>(args)...))
+# endif // ! gsl_COMPILER_NVCC_VERSION
     {
         return accessor::get_checked( *this )(std::forward<Ts>(args)...);
     }
-#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+#endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
 
     // unwanted operators...pointers only point to single objects!
     not_null & operator++() gsl_is_delete;

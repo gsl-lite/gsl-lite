@@ -1768,7 +1768,7 @@ CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled f
 
 #endif // gsl_HAVE( HASH )
 
-#if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+#if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
 
 int inspector( int const& p )
 {
@@ -1873,7 +1873,7 @@ CASE( "not_null<>: Supports constructing and assigning std::function<> from non-
     EXPECT( i == 41 );
 # endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
-#endif // gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( VARIADIC_TEMPLATE ) && gsl_HAVE( EXPRESSION_SFINAE )
+#endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
 
 
 // end of file
