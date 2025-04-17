@@ -1,4 +1,4 @@
-
+﻿
 variables:
   System.Debug: true
 
@@ -30,7 +30,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [13]
+      cxxCompilerVersions: [14]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
@@ -49,10 +49,10 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [13]
+      cxxCompilerVersions: [14]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_6]
+      cudaCompilerVersions: [12_8]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -107,7 +107,7 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_6]
+      cudaCompilerVersions: [12_8]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
@@ -128,12 +128,12 @@ jobs:
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [7, 8, 9, 10, 11, 12]
+      cxxCompilerVersions: [9, 10, 11, 12, 13]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: GCC
-      cxxCompilerVersions: [13]
+      cxxCompilerVersions: [14]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
       platforms: [x64]
@@ -150,7 +150,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+      cxxCompilerVersions: [11, 12, 13, 14, 15, 16, 17, 18]
       platforms: [x64]
 
     - os: Linux
@@ -175,7 +175,7 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [11]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_7]
+      cudaCompilerVersions: [12_6]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -201,5 +201,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [13, 14, 15, 16]
+      cxxCompilerVersions: [14, 15, 16]
       platforms: [x64]

@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -31,7 +31,7 @@
 #include <cstdlib>   // for abort()
 
 #define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  42
+#define  gsl_lite_MINOR  43
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
@@ -143,7 +143,11 @@
 #  pragma message ("invalid configuration value gsl_FEATURE_WITH_CONTAINER_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_WITH_CONTAINER_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
 # endif
 #else
-# define gsl_FEATURE_WITH_CONTAINER_TO_STD  99  // default
+# if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  define gsl_FEATURE_WITH_CONTAINER_TO_STD  0   // version-1 default
+# else // gsl_CONFIG_DEFAULTS_VERSION == 0
+#  define gsl_FEATURE_WITH_CONTAINER_TO_STD  99  // version-0 default
+# endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 #endif
 #define gsl_FEATURE_WITH_CONTAINER_TO_STD_()  gsl_FEATURE_WITH_CONTAINER_TO_STD
 
@@ -578,7 +582,8 @@
 // AppleClang 15.0.0  __apple_build_version__ == 15000040  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.0)                     (LLVM 16.0.0)
 // AppleClang 15.0.0  __apple_build_version__ == 15000100  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.1–15.2)                (LLVM 16.0.0)
 // AppleClang 15.0.0  __apple_build_version__ == 15000309  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.3–15.4)                (LLVM 16.0.0)
-// AppleClang 16.0.0  __apple_build_version__ == 16000026  gsl_COMPILER_APPLECLANG_VERSION == 1600  (Xcode 16.0)                     (LLVM 17.0.6)
+// AppleClang 16.0.0  __apple_build_version__ == 16000026  gsl_COMPILER_APPLECLANG_VERSION == 1600  (Xcode 16.0–16.2)                (LLVM 17.0.6)
+// AppleClang 17.0.0  __apple_build_version__ == 17000013  gsl_COMPILER_APPLECLANG_VERSION == 1700  (Xcode 16.3)                     (LLVM 19.1.4)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
@@ -1468,7 +1473,15 @@ template < class T0, class T1, class... Ts > struct conjunction_<true, T0, T1, T
 template < bool V0, class T0, class... Ts > struct disjunction_ { using type = T0; };
 template < class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
 
-#endif
+#else // a.k.a. ! gsl_HAVE( VARIADIC_TEMPLATE )
+
+template < bool V0, class T0, class T1 > struct conjunction_ { typedef T0 type; };
+template < class T0, class T1 > struct conjunction_<true, T0, T1> { typedef T1 type; };
+template < bool V0, class T0, class T1 > struct disjunction_ { typedef T0 type; };
+template < class T0, class T1 > struct disjunction_<false, T0, T1> { typedef T1 type; };
+
+#endif // gsl_HAVE( VARIADIC_TEMPLATE )
+
 
 template <typename> struct dependent_false : std11::integral_constant<bool, false> { };
 
@@ -1480,6 +1493,8 @@ namespace std17 {
 
 template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
+template < class T > struct negation : std11::integral_constant<bool, !T::value> { };
+
 #if gsl_CPP11_120
 
 template < class... Ts > struct conjunction;
@@ -1488,7 +1503,6 @@ template < class T0, class... Ts > struct conjunction<T0, Ts...> : detail::conju
 template < class... Ts > struct disjunction;
 template < > struct disjunction< > : std11::false_type { };
 template < class T0, class... Ts > struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
-template < class T > struct negation : std11::integral_constant<bool, !T::value> { };
 
 # if gsl_CPP14_OR_GREATER
 
@@ -1503,6 +1517,12 @@ struct make_void { typedef void type; };
 
 template< class... Ts >
 using void_t = typename make_void< Ts... >::type;
+
+#else // a.k.a. ! gsl_CPP11_120
+
+// For C++98, define simpler binary variants of `conjunction<>` and `disjunction<>`.
+template < class T0, class T1 > struct conjunction : detail::conjunction_<T0::value, T0, T1>::type { };
+template < class T0, class T1 > struct disjunction : detail::disjunction_<T0::value, T0, T1>::type { };
 
 #endif // gsl_CPP11_120
 
@@ -2676,6 +2696,26 @@ class not_null;
 
 namespace detail {
 
+template< class T > struct is_void : std11::false_type { };
+template< > struct is_void< void > : std11::true_type { };
+
+// helper class to figure out whether a pointer has an element type
+#if gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE )
+// Avoid SFINAE for unary `operator*` (doesn't work for `std::unique_ptr<>` and the like) if an `element_type` member exists.
+template< class T, class E = void >
+struct has_element_type_ : std11::false_type { };
+template< class T >
+struct has_element_type_< T, std17::void_t< decltype( *std::declval<T>() ) > > : std11::true_type { };
+template< class T, class E = void >
+struct has_element_type : has_element_type_< T > { };
+template< class T >
+struct has_element_type< T, std17::void_t< typename T::element_type > > : std11::true_type { };
+# else // a.k.a. ! ( gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE ) )
+// Without C++11 and expression SFINAE, just assume that non-pointer types (e.g. smart pointers) have an `element_type` member
+template< class T, class E = void >
+struct has_element_type : std11::true_type { };
+# endif // gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE )
+
 // helper class to figure out the pointed-to type of a pointer
 #if gsl_STDLIB_CPP11_OR_GREATER
 template< class T, class E = void >
@@ -2684,7 +2724,6 @@ struct element_type_helper
     // For types without a member element_type (this could handle typed raw pointers but not `void*`)
     typedef typename std::remove_reference< decltype( *std::declval<T>() ) >::type type;
 };
-
 template< class T >
 struct element_type_helper< T, std17::void_t< typename T::element_type > >
 {
@@ -2692,16 +2731,15 @@ struct element_type_helper< T, std17::void_t< typename T::element_type > >
     typedef typename T::element_type type;
 };
 #else // ! gsl_STDLIB_CPP11_OR_GREATER
-// Pre-C++11, we cannot have decltype, so we cannot handle types without a member element_type
+// Pre-C++11, we cannot have `decltype`, so we cannot handle non-pointer types without a member `element_type`
 template< class T, class E = void >
 struct element_type_helper
 {
     typedef typename T::element_type type;
 };
 #endif // gsl_STDLIB_CPP11_OR_GREATER
-
 template< class T >
-struct element_type_helper< T* >
+struct element_type_helper< T * >
 {
     typedef T type;
 };
@@ -2820,33 +2858,58 @@ struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
 template< class T >
 struct not_null_accessor;
 
-template< class Derived, class T, bool IsVoidPtr >
-struct not_null_deref
+template< class Derived, class T, bool HasElementType >
+struct not_null_elem
 {
     typedef typename element_type_helper<T>::type element_type;
 
-    gsl_NODISCARD gsl_api gsl_constexpr14 element_type &
+#if gsl_CONFIG( TRANSPARENT_NOT_NULL )
+    gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
+    get() const
+    {
+        return not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) ).get();
+    }
+#endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
+};
+template< class Derived, class T >
+struct not_null_elem< Derived, T, false >
+{
+};
+template< class Derived, class T, bool IsDereferencable >
+struct gsl_EMPTY_BASES_ not_null_deref
+    : not_null_elem< Derived, T, detail::has_element_type< T >::value >
+{
+    gsl_NODISCARD gsl_api gsl_constexpr14 typename element_type_helper<T>::type &
     operator*() const
     {
         return *not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) );
     }
 };
 template< class Derived, class T >
-struct not_null_deref< Derived, T, true >
+struct gsl_EMPTY_BASES_ not_null_deref< Derived, T, false >  // e.g. `void*`, `std::function<>`
+    : not_null_elem< Derived, T, detail::has_element_type< T >::value >
 {
 };
 
-template< class T > struct is_void : std11::false_type { };
-template< > struct is_void< void > : std11::true_type { };
-
 template< class T > struct is_void_ptr : is_void< typename detail::element_type_helper< T >::type > { };
 
+template< class T > struct is_dereferencable : std17::conjunction< has_element_type< T >, std17::negation< is_void_ptr< T > > > { };
+
 } // namespace detail
+
+#if gsl_HAVE( TYPE_TRAITS )
+template< class T > struct is_nullable : std::is_assignable< typename std::remove_cv< T >::type &, std::nullptr_t > { };
+
+# if gsl_CPP14_OR_GREATER
+template< class T > constexpr bool is_nullable_v = is_nullable< T >::value;
+# endif // gsl_CPP14_OR_GREATER
+
+#endif // gsl_HAVE( TYPE_TRAITS )
 
 template< class T >
 class
 gsl_EMPTY_BASES_  // not strictly needed, but will become necessary if we add more base classes
-not_null : public detail::not_null_deref< not_null< T >, T, detail::is_void_ptr< T >::value >
+not_null : public detail::not_null_deref< not_null< T >, T, detail::is_dereferencable< T >::value >
 {
 private:
     detail::not_null_data< T, detail::is_copyable< T >::value > data_;
@@ -2858,12 +2921,10 @@ private:
     typedef detail::not_null_accessor<T> accessor;
 
 public:
-    typedef typename detail::element_type_helper<T>::type element_type;
-
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( ! std::is_reference<T>::value, "T may not be a reference type" );
     static_assert( ! std::is_const<T>::value && ! std::is_volatile<T>::value, "T may not be cv-qualified" );
-    static_assert( std::is_assignable<T&, std::nullptr_t>::value, "T cannot be assigned nullptr" );
+    static_assert( is_nullable<T>::value, "T must be a nullable type" );
 #endif
 
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
@@ -2873,7 +2934,7 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value ), int >::type = 0
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && is_nullable<U>::value ), int >::type = 0
 #  endif
     >
     gsl_api gsl_constexpr14 explicit not_null( U other )
@@ -2881,6 +2942,26 @@ public:
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
+#  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    // Define the non-explicit constructors for non-nullable arguments only if the explicit constructor has a SFINAE constraint.
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && std::is_function<U>::value ), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 /*implicit*/ not_null( U const& other )
+    : data_( T( other ) )
+    {
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        , typename std::enable_if< ( std::is_constructible<T, U>::value && ! std::is_function<U>::value  && ! is_nullable<U>::value), int >::type = 0
+    >
+    gsl_api gsl_constexpr14 /*implicit*/ not_null( U other )
+    : data_( T( std::move( other ) ) )
+    {
+        gsl_Expects( data_.ptr_ != gsl_nullptr );
+    }
+#  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
     gsl_api gsl_constexpr14 explicit not_null( U const& other )
@@ -2982,27 +3063,21 @@ public:
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
-#if gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
-    get() const
-    {
-        return accessor::get_checked( *this ).get();
-    }
-#else
+#if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
 # if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
     {
         return accessor::get_checked( *this );
     }
-# else
+# else // a.k.a. ! gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T
     get() const
     {
         return accessor::get_checked( *this );
     }
-# endif
-#endif
+# endif // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+#endif // ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
 
     // We want an implicit conversion operator that can be used to convert from both lvalues (by
     // const reference or by copy) and rvalues (by move). So it seems like we could define
@@ -3138,6 +3213,19 @@ gsl_is_delete_access:
     not_null(             int ) gsl_is_delete;
     not_null & operator=( int ) gsl_is_delete;
 #endif
+
+#if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
+    template <typename... Ts>
+    gsl_api gsl_constexpr14 auto
+    operator()(Ts&&... args) const
+# if ! gsl_COMPILER_NVCC_VERSION
+        // NVCC thinks that Substitution Failure Is An Error here
+        -> decltype(data_.ptr_(std::forward<Ts>(args)...))
+# endif // ! gsl_COMPILER_NVCC_VERSION
+    {
+        return accessor::get_checked( *this )(std::forward<Ts>(args)...);
+    }
+#endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
 
     // unwanted operators...pointers only point to single objects!
     not_null & operator++() gsl_is_delete;
@@ -4379,15 +4467,16 @@ template< class T >
 inline span<T>
 make_span( std::vector<T> & cont )
 {
-    return span<T>( with_container, cont );
+    return span<T>( cont.data(), cont.data() + cont.size() );
 }
 
 template< class T >
 inline span<const T>
 make_span( std::vector<T> const & cont )
 {
-    return span<const T>( with_container, cont );
+    return span<const T>( cont.data(), cont.data() + cont.size() );
 }
+
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
@@ -5491,8 +5580,10 @@ using ::gsl::to_integer;
 using ::gsl::to_uchar;
 using ::gsl::to_string;
 
+#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 using ::gsl::with_container_t;
 using ::gsl::with_container;
+#endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 using ::gsl::span;
 using ::gsl::make_span;

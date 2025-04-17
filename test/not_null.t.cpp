@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,6 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 #include <vector>
+#include <functional>
 
 using namespace gsl;
 
@@ -1766,5 +1767,160 @@ CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled f
 }
 
 #endif // gsl_HAVE( HASH )
+
+#if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
+
+int inspector( int const& p )
+{
+    return p;
+}
+int mutator( int & p )
+{
+    p = 42;
+    return p;
+}
+int extractor( std::unique_ptr< int > value )
+{
+    return *value;
+}
+
+CASE( "not_null<>: Supports function pointer type for construction, assignment, and invocation" )
+{
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    not_null< int (*)( int const& ) > insp = inspector;
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+
+    not_null< int (*)( int & ) > mut = mutator;
+    mut( i );
+    EXPECT( i == 42 );
+
+    not_null< int (*)( std::unique_ptr< int > ) > xtr = extractor;
+    EXPECT( xtr( my_make_unique< int >( 1 ) ) == 1 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+}
+
+CASE( "not_null<>: Supports std::function<> for construction, assignment, and invocation" )
+{
+    not_null< std::function< int( int ) > > insp = make_not_null( std::function< int( int ) >( inspector ) );
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+    auto insp2 = std::move( insp );
+    EXPECT( insp2( i ) == 41 );
+    if ( ! gsl::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
+    {
+        EXPECT_THROWS( insp( i ) );
+    }
+
+    not_null< std::function< int( int & ) > > mut = make_not_null( std::function< int( int & ) >( mutator ) );
+    mut( i );
+    EXPECT( i == 42 );
+    mut = std::move( insp2 );
+    i = 41;
+    mut( i );
+    EXPECT( i == 41 );
+
+    not_null< std::function< int( std::unique_ptr< int > ) > > xtr = make_not_null( std::function< int( std::unique_ptr< int > ) >( extractor ) );
+    EXPECT( xtr( my_make_unique< int >( 1 ) ) == 1 );
+}
+
+CASE( "not_null<>: Supports converting to std::function<> from function reference" )
+{
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    not_null< std::function< int( int ) > > insp = inspector;
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+    auto insp2 = std::move( insp );
+    EXPECT( insp2( i ) == 41 );
+    if ( ! gsl::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
+    {
+        EXPECT_THROWS( insp( i ) );
+    }
+
+    not_null< std::function< int( int & ) > > mut = mutator;
+    mut( i );
+    EXPECT( i == 42 );
+    mut = inspector;
+    i = 41;
+    mut( i );
+    EXPECT( i == 41 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+}
+
+struct Mutator
+{
+    template < typename T >
+    T
+    operator ()( T& arg )
+    {
+        arg = { };
+        return arg;
+    }
+};
+struct Inspector
+{
+    template < typename T >
+    T
+    operator ()( T arg )
+    {
+        return arg;
+    }
+};
+
+CASE( "not_null<>: Supports constructing and assigning std::function<> from non-nullable function object" )
+{
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    not_null< std::function< int( int& ) > > insp = Inspector{ };
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+
+    not_null< std::function< int( int & ) > > mut = Mutator{ };
+    mut( i );
+    EXPECT( i == 0 );
+    mut = Inspector{ };
+    i = 41;
+    mut( i );
+    EXPECT( i == 41 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+}
+#endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
+
+CASE( "not_null<>: Invocability is correctly reported by type traits" )
+{
+#if gsl_STDLIB_CPP17_OR_GREATER
+
+    // No invocability for raw pointers.
+    static_assert( !std::is_invocable< not_null< int* > >::value );
+    static_assert( !std::is_invocable< not_null< int* >, int >::value );
+
+    // No invocability for `unique_ptr<>`.
+    static_assert( !std::is_invocable< not_null< unique_ptr< int > > >::value );
+    static_assert( !std::is_invocable< not_null< unique_ptr< int > >, int >::value );
+
+    // Invocability for function pointers with suitable argument list.
+    static_assert(  std::is_invocable< not_null< int (*)( ) > >::value );
+    static_assert(  std::is_invocable< not_null< int (*)( int const& ) >, int & >::value );
+    static_assert(  std::is_invocable< not_null< int (*)( int & ) >, int & >::value );
+    static_assert( !std::is_invocable< not_null< int (*)( int & ) >, int >::value );
+
+    // Invocability for `std::function<>` with suitable argument list.
+    static_assert(  std::is_invocable< not_null< std::function< int( ) > > >::value );
+    static_assert(  std::is_invocable< not_null< std::function< int( int const& ) > >, int & >::value );
+    static_assert(  std::is_invocable< not_null< std::function< int( int & ) > >, int & >::value );
+    static_assert( !std::is_invocable< not_null< std::function< int( int & ) > >, int >::value );
+
+    // Correct return type is inferred for function pointers.
+    static_assert(  std::is_invocable_r< void,  not_null< int & (*)( int const& ) >, int >::value );
+    static_assert(  std::is_invocable_r< int &, not_null< int & (*)( int const& ) >, int >::value );
+    static_assert( !std::is_invocable_r< int &, not_null< int   (*)( int const& ) >, int >::value );
+
+    // Correct return type is inferred for `std::function<>`.
+    static_assert(  std::is_invocable_r< void,  not_null< std::function<int &( int const& ) > >, int >::value );
+    static_assert(  std::is_invocable_r< int &, not_null< std::function<int &( int const& ) > >, int >::value );
+    static_assert( !std::is_invocable_r< int &, not_null< std::function<int  ( int const& ) > >, int >::value );
+
+#endif // gsl_STDLIB_CPP20_OR_GREATER
+}
+
 
 // end of file
