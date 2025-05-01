@@ -1038,66 +1038,66 @@
 #if gsl_HAVE( TYPE_TRAITS )
 
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                    \
-    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator~( ENUM val ) gsl_noexcept                                \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( ~U( val ) );                                     \
     }                                                                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator|( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) | U( rhs ) );                           \
     }                                                                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator&( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) & U( rhs ) );                           \
     }                                                                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr ENUM                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator^( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) ^ U( rhs ) );                           \
     }                                                                 \
-    gsl_api inline gsl_constexpr14 ENUM &                             \
+    gsl_MAYBE_UNUSED gsl_api inline gsl_constexpr14 ENUM &            \
     operator|=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
     {                                                                 \
         return lhs = lhs | rhs;                                       \
     }                                                                 \
-    gsl_api inline gsl_constexpr14 ENUM &                             \
+    gsl_MAYBE_UNUSED gsl_api inline gsl_constexpr14 ENUM &            \
     operator&=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
     {                                                                 \
         return lhs = lhs & rhs;                                       \
     }                                                                 \
-    gsl_api inline gsl_constexpr14 ENUM &                             \
+    gsl_MAYBE_UNUSED gsl_api inline gsl_constexpr14 ENUM &            \
     operator^=( ENUM & lhs, ENUM rhs ) gsl_noexcept                   \
     {                                                                 \
         return lhs = lhs ^ rhs;                                       \
     }
 
 #define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) < U( rhs );                                   \
     }                                                                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator>( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) > U( rhs );                                   \
     }                                                                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator<=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) <= U( rhs );                                  \
     }                                                                 \
-    gsl_NODISCARD gsl_api inline gsl_constexpr bool                   \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator>=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
     {                                                                 \
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
