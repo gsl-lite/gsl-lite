@@ -43,7 +43,7 @@ CASE( "span<>: free comparation functions fail for different const-ness [issue #
 
 CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]" )
 {
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( TYPE_TRAITS )
+#if gsl_FEATURE( BYTE )&& gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( TYPE_TRAITS )
     struct S
     {
         int data_{ };
@@ -67,7 +67,7 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
 
 CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [issue #34](GSL issue #313, PR #390)" )
 {
-#if gsl_HAVE( ENUM_CLASS )
+#if gsl_FEATURE( BYTE ) && gsl_HAVE( ENUM_CLASS )
     struct F {
         static int f( int & i, gsl::byte & r )
         {
@@ -86,7 +86,7 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [i
     {
         EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte*>( &i )[sizeof i - 1] ) );
     }
-#endif // gsl_HAVE( ENUM_CLASS )
+#endif // gsl_FEATURE( BYTE ) && gsl_HAVE( ENUM_CLASS )
 }
 
 #if gsl_COMPILER_MSVC_VERSION
@@ -117,7 +117,7 @@ CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
 
 CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) [issue #53a]" )
 {
-# if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
+# if gsl_FEATURE( STRING_SPAN ) && gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     cstring_span span = "Hello world";
     std::string str = to_string( span );
 # endif

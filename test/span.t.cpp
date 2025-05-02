@@ -1227,11 +1227,12 @@ static bool is_little_endian()
 
 CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated-2 as member]" )
 {
-#if gsl_HAVE( SIZED_TYPES )
+#if gsl_FEATURE( BYTE )
+# if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type;
-#else
+# else
     typedef int type;
-#endif
+# endif
     typedef gsl::byte gyte;
 
     EXPECT( sizeof( type ) == size_t( 4 ) );
@@ -1250,25 +1251,27 @@ CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated-2 a
     EXPECT( vc[2] == b[2] );
     EXPECT( vc[3] == b[3] );
 
-#if !gsl_DEPRECATE_TO_LEVEL( 2 )
+# if !gsl_DEPRECATE_TO_LEVEL( 2 )
     span<const gyte> vb( va.as_bytes()  );  // deprecated since v0.17.0
 
     EXPECT( vb[0] == b[0] );
     EXPECT( vb[1] == b[1] );
     EXPECT( vb[2] == b[2] );
     EXPECT( vb[3] == b[3] );
-#else
+# else
     EXPECT( !!"span<>::as_bytes() is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 2)" );
-#endif
+# endif
+#endif // gsl_FEATURE( BYTE )
 }
 
 CASE( "span<>: Allows to view and change the elements as writable bytes " "[deprecated-2 as member]" )
 {
-#if gsl_HAVE( SIZED_TYPES )
+#if gsl_FEATURE( BYTE )
+# if gsl_HAVE( SIZED_TYPES )
     typedef int32_t type;
-#else
+# else
     typedef int type;
-#endif
+# endif
     typedef gsl::byte gyte;
 
     EXPECT( sizeof(type) == size_t( 4 ) );
@@ -1292,7 +1295,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes " "[depr
         }
     }
 
-#if !gsl_DEPRECATE_TO_LEVEL( 2 )
+# if !gsl_DEPRECATE_TO_LEVEL( 2 )
     {
         type  a[] = { 0x0, };
         span<type> va( a );
@@ -1311,9 +1314,10 @@ CASE( "span<>: Allows to view and change the elements as writable bytes " "[depr
             EXPECT( vb[i] == to_byte(0) );
         }
     }
-#else
+# else
     EXPECT( !!"as_bytes() is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 2)" );
-#endif
+# endif
+#endif // gsl_FEATURE( BYTE )
 }
 
 CASE( "span<>: Allows to view the elements as a span of another type" )
@@ -1710,7 +1714,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++
 
 #endif // gsl_FEATURE( MAKE_SPAN )
 
-#if ! gsl_FEATURE_TO_STD( BYTE_SPAN )
+#if ! gsl_FEATURE( BYTE ) || ! gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 CASE( "byte_span(): unavailable (gsl_FEATURE_BYTE_SPAN=0)" )
 {

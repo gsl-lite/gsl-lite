@@ -114,10 +114,12 @@ inline const void * nullptr_void() { return gsl_nullptr; }
 // use operator<< instead of to_string() overload;
 // see  http://stackoverflow.com/a/10651752/437272
 
+#if gsl_FEATURE( BYTE )
 inline std::ostream & operator<<( std::ostream & os, byte b )
 {
     return os << std::hex << "0x" << to_integer<int>(b);
 }
+#endif // gsl_FEATURE( BYTE )
 
 template< typename T >
 inline std::ostream & operator<<( std::ostream & os, span<T> s )

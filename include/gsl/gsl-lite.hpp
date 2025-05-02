@@ -194,6 +194,15 @@
 #endif
 #define gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
 
+#if defined( gsl_FEATURE_BYTE )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_BYTE )
+#  pragma message ("invalid configuration value gsl_FEATURE_BYTE=" gsl_STRINGIFY(gsl_FEATURE_BYTE) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_BYTE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+#endif
+#define gsl_FEATURE_BYTE_()  gsl_FEATURE_BYTE
+
 #if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 #  pragma message ("invalid configuration value gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=" gsl_STRINGIFY(gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD) ", must be 0 or 1")
@@ -3623,37 +3632,38 @@ make_shared( Args &&... args )
 #endif // gsl_HAVE( VARIADIC_TEMPLATE )
 
 
+#if gsl_FEATURE( BYTE )
 //
 // Byte-specific type.
 //
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
   enum class gsl_may_alias byte : unsigned char {};
-#else
+# else
   struct gsl_may_alias byte { typedef unsigned char type; type v; };
-#endif
+# endif
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr byte
 to_byte( T v ) gsl_noexcept
 {
-#if    gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if    gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
     return static_cast<byte>( v );
-#elif  gsl_HAVE( CONSTEXPR_11 )
+# elif  gsl_HAVE( CONSTEXPR_11 )
     return { static_cast<typename byte::type>( v ) };
-#else
+# else
     byte b = { static_cast<typename byte::type>( v ) }; return b;
-#endif
+# endif
 }
 
 template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
 gsl_NODISCARD gsl_api inline gsl_constexpr IntegerType
 to_integer( byte b ) gsl_noexcept
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
     return static_cast<typename std::underlying_type<byte>::type>( b );
-#else
+# else
     return b.v;
-#endif
+# endif
 }
 
 gsl_NODISCARD gsl_api inline gsl_constexpr unsigned char
@@ -3672,11 +3682,11 @@ template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::val
 gsl_api inline gsl_constexpr14 byte &
 operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
     return b = ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
-#else
+# else
     b.v = ::gsl::to_uchar( b.v << shift ); return b;
-#endif
+# endif
 }
 
 template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
@@ -3690,11 +3700,11 @@ template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::val
 gsl_NODISCARD gsl_api inline gsl_constexpr14 byte &
 operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
     return b = ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
-#else
+# else
     b.v = ::gsl::to_uchar( b.v >> shift ); return b;
-#endif
+# endif
 }
 
 template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
@@ -3704,10 +3714,10 @@ operator>>( byte b, IntegerType shift ) gsl_noexcept
     return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
 }
 
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 gsl_DEFINE_ENUM_BITMASK_OPERATORS( byte )
 gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( byte )
-#else // a.k.a. !gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# else // a.k.a. !gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 gsl_api inline gsl_constexpr bool operator==( byte l, byte r ) gsl_noexcept
 {
     return l.v == r.v;
@@ -3772,7 +3782,8 @@ gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 {
     return ::gsl::to_byte( ~b.v );
 }
-#endif // gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# endif // gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+#endif // gsl_FEATURE( BYTE )
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
@@ -4235,7 +4246,7 @@ public:
     }
 #endif
 
-#if ! gsl_DEPRECATE_TO_LEVEL( 2 )
+#if gsl_FEATURE( BYTE ) && ! gsl_DEPRECATE_TO_LEVEL( 2 )
     // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
 
     gsl_DEPRECATED_MSG("use free function gsl::as_bytes() instead")
@@ -4392,6 +4403,7 @@ gsl_api gsl_constexpr14 inline void copy( span<T> src, span<U> dest )
     detail::copy_n( src.data(), src.size(), dest.data() );
 }
 
+#if gsl_FEATURE( BYTE )
 // span creator functions (see ctors)
 
 template< class T >
@@ -4408,14 +4420,15 @@ as_writable_bytes( span<T> spn ) gsl_noexcept
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
-#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 template< class T>
 gsl_DEPRECATED_MSG("use as_writable_bytes() (different spelling) instead")
 gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
-#endif // deprecate
+# endif // deprecate
+#endif // gsl_FEATURE( BYTE )
 
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )
 
@@ -4528,7 +4541,7 @@ make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type coun
 }
 #endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
 
-#if gsl_FEATURE_TO_STD( BYTE_SPAN )
+#if gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<byte>
@@ -4544,7 +4557,7 @@ byte_span( T const & t ) gsl_noexcept
     return span<const byte>( reinterpret_cast<byte const *>( &t ), sizeof(T) );
 }
 
-#endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
+#endif // gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 #if gsl_FEATURE( STRING_SPAN )
 //
@@ -5127,6 +5140,7 @@ operator>=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
 
 # endif // gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
+# if gsl_FEATURE( BYTE )
 // convert basic_string_span to byte span:
 
 template< class T >
@@ -5135,6 +5149,7 @@ as_bytes( basic_string_span<T> spn ) gsl_noexcept
 {
     return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
+# endif // gsl_FEATURE( BYTE )
 #endif // gsl_FEATURE( STRING_SPAN )
 
 //
@@ -5476,20 +5491,22 @@ public:
     }
 };
 
+# if gsl_FEATURE( BYTE )
 template<>
 struct hash< ::gsl::byte >
 {
 public:
     gsl_NODISCARD std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
     {
-#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  if gsl_CONFIG_DEFAULTS_VERSION >= 1
         return std::hash<unsigned char>{ }( ::gsl::to_uchar( v ) );
-#else // gsl_CONFIG_DEFAULTS_VERSION < 1
+#  else // gsl_CONFIG_DEFAULTS_VERSION < 1
             // Keep the old hashing algorithm if legacy defaults are used.
         return ::gsl::to_integer<std::size_t>( v );
-#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
     }
 };
+# endif // gsl_FEATURE( BYTE )
 
 } // namespace std
 
@@ -5582,11 +5599,13 @@ using ::gsl::not_null;
 using ::gsl::not_null_ic;
 using ::gsl::make_not_null;
 
+# if gsl_FEATURE( BYTE )
 using ::gsl::byte;
 
 using ::gsl::to_byte;
 using ::gsl::to_integer;
 using ::gsl::to_uchar;
+# endif // gsl_FEATURE( BYTE )
 
 # if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 using ::gsl::with_container_t;
@@ -5597,15 +5616,17 @@ using ::gsl::span;
 # if gsl_FEATURE_TO_STD( MAKE_SPAN )
 using ::gsl::make_span;
 # endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
-# if gsl_FEATURE_TO_STD( BYTE_SPAN )
+# if gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
 using ::gsl::byte_span;
-# endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
+# endif // gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
 using ::gsl::copy;
+# if gsl_FEATURE( BYTE )
 using ::gsl::as_bytes;
 using ::gsl::as_writable_bytes;
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+#  if ! gsl_DEPRECATE_TO_LEVEL( 6 )
 using ::gsl::as_writeable_bytes;
-# endif
+#  endif
+# endif // gsl_FEATURE( BYTE )
 
 # if gsl_FEATURE( STRING_SPAN )
 using ::gsl::to_string;

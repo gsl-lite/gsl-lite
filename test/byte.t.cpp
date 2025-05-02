@@ -20,6 +20,8 @@
 
 using namespace gsl;
 
+#if gsl_FEATURE( BYTE )
+
 // Use gsl::byte instead of plain byte to prevent collisions with
 // other byte declarations, such as in rpcndr.h (Windows kit).
 
@@ -28,23 +30,23 @@ using namespace gsl;
 
 CASE( "byte: Allows to construct from integral via static cast (C++17)" )
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
     gsl::byte b = static_cast<gsl::byte>( 4 );
     EXPECT( static_cast<unsigned char>(b) == 4 );
     EXPECT( to_integer<int>( b ) == 4 );
-#else
+# else
     EXPECT( !!"enum class is not constructible from underlying type (no C++17)" );
-#endif
+# endif
 }
 
 CASE( "byte: Allows to construct from integral via byte() (C++17)" )
 {
-#if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+# if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
     gsl::byte b = gsl::byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
-#else
+# else
     EXPECT( !!"enum class is not constructible from underlying type (no C++17)" );
-#endif
+# endif
 }
 
 CASE( "byte: Allows to construct from integral via to_byte()" )
@@ -179,7 +181,7 @@ CASE( "byte: Allows shift-right assignment" )
 
 CASE( "byte: Provides constexpr non-assignment operations (C++11)" )
 {
-#if gsl_HAVE( CONSTEXPR_11 )
+# if gsl_HAVE( CONSTEXPR_11 )
     static_assert( to_byte( 0xa5 ) == to_byte( 0xa5 )                      , "" );
     static_assert(          0xa5   == to_integer<int>( to_byte( 0xa5 )    ), "" );
 
@@ -191,23 +193,24 @@ CASE( "byte: Provides constexpr non-assignment operations (C++11)" )
     static_assert( to_byte( 0x00 ) == ( to_byte( 0x01 ) ^ to_byte( 0x01 ) ), "" );
 
     static_assert( to_byte( 0xff ) ==  ~to_byte( 0x00 ), "" );
-#endif
+# endif
 }
 
 CASE( "byte: Provides constexpr assignment operations (C++14)" )
 {
-#if gsl_HAVE( CONSTEXPR_14 )
+# if gsl_HAVE( CONSTEXPR_14 )
 //  ...
-#endif
+# endif
 }
 
 CASE( "byte: Provides hash support (C++11)" )
 {
-#if gsl_HAVE( HASH )
+# if gsl_HAVE( HASH )
     EXPECT_NO_THROW( (void) std::hash<gsl::byte>{}( to_byte( 42 ) ) );
-#else
+# else
     EXPECT( !!"hash support is not available (no C++11)" );
-#endif
+# endif
 }
+#endif // gsl_FEATURE( BYTE )
 
 // end of file
