@@ -30,6 +30,7 @@ struct Incomplete;
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( VARIADIC_TEMPLATE )
 
 
+#if gsl_FEATURE( STRING_SPAN ) || gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 CASE( "equal()" )
 {
     char const* arg1 = "foo";
@@ -89,6 +90,7 @@ CASE( "lexicographical_compare()" )
         EXPECT( ! detail::lexicographical_compare( it1, it1End, it2, it2End ));
     }
 }
+#endif // gsl_FEATURE( STRING_SPAN ) || gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 CASE( "conjunction<> and disjunction<>: Short-circuiting is handled correctly" )
 {

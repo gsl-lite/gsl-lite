@@ -1343,10 +1343,9 @@ namespace gsl {
 template< class T >
 class span;
 
-// C++98 emulation:
-
 namespace detail {
 
+#if gsl_FEATURE( STRING_SPAN ) || gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 // We implement `equal()` and `lexicographical_compare()` here to avoid having to pull in the <algorithm> header.
 template< class InputIt1, class InputIt2 >
 bool equal( InputIt1 first1, InputIt1 last1, InputIt2 first2 )
@@ -1369,6 +1368,7 @@ bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, 
     }
     return first1 == last1 && first2 != last2;
 }
+#endif // gsl_FEATURE( STRING_SPAN ) || gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 } // namespace detail
 
@@ -5075,7 +5075,7 @@ operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 }
 #  endif
 
-# else //gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# else // ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
