@@ -190,6 +190,7 @@ Macro                                                                           
 [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
 [`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0) | 0                                                        | 1                 | enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)) |
 [`gsl_FEATURE_WITH_CONTAINER_TO_STD`](#gsl_feature_owner_macro1)                     | 99                                                       | 0                 | |
+[default runtime contract violation handling](#contract-checking-configuration-macros) | `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`             | `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` | |
 
 Note that the v1 defaults are not yet stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
 
