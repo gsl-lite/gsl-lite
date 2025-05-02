@@ -176,23 +176,62 @@ To simplify migration to the next major version, *gsl-lite* 0.36 introduces the 
 a set of version-specific default options can be selected. Alternatively, when consuming *gsl-lite* [as a CMake package](#as-cmake-package), versioned defaults can be selected by linking to the target
 `gsl::gsl-lite-v0` or `gsl::gsl-lite-v1` rather than `gsl::gsl-lite`.
 
-The following table gives an overview of the configuration options affected by versioned defaults:
+The following configuration options are affected by versioned defaults:
 
+- [**`gsl_FEATURE_OWNER_MACRO`**](#gsl_feature_owner_macro1)  
+  Version-0 default: `gsl_FEATURE_OWNER_MACRO=1`  
+  Version-1 default: `gsl_FEATURE_OWNER_MACRO=0`  
+  Reason: an unprefixed macro `Owner()` may interfere with user code.
 
-Macro                                                                                | v0 default                                               | v1 default        | |
-------------------------------------------------------------------------------------:|:---------------------------------------------------------|-------------------|-|
-[`gsl_FEATURE_OWNER_MACRO`](#gsl_feature_owner_macro1)                               | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
-[`gsl_FEATURE_STRING_SPAN`](#gsl_feature_string_span1)                               | 1                                                        | 0                 | string spans are no longer part of the GSL specification |
-[`gsl_FEATURE_BYTE`](#gsl_feature_byte1)                                             | 1                                                        | 0                 | `byte` has been superseded by [`std::byte`](https://en.cppreference.com/w/cpp/types/byte) in C++17 |
-[`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)                 | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
-[`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 8                 | |
-[`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
-[`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison1)           | 1                                                        | 0                 | C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear |
-[`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)           | 0                                                        | 1                 | cf. reasoning in [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395) (note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699)) |
-[`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)               | 0                                                        | 1                 | enables conformant behavior for `not_null<>::get()` |
-[`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0) | 0                                                        | 1                 | enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)) |
-[`gsl_FEATURE_WITH_CONTAINER_TO_STD`](#gsl_feature_owner_macro1)                     | 99                                                       | 0                 | |
-[default runtime contract violation handling](#contract-checking-configuration-macros) | `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`             | `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` | |
+- [`gsl_FEATURE_STRING_SPAN`](#gsl_feature_string_span1)  
+  Version-0 default: `gsl_FEATURE_STRING_SPAN=1`  
+  Version-1 default: `gsl_FEATURE_STRING_SPAN=0`  
+  Reason: string spans are no longer part of the GSL specification.
+
+- [`gsl_FEATURE_BYTE`](#gsl_feature_byte1)  
+  Version-0 default: `gsl_FEATURE_BYTE=1`  
+  Version-1 default: `gsl_FEATURE_BYTE=0`  
+  Reason: `byte` has been superseded by [`std::byte`](https://en.cppreference.com/w/cpp/types/byte) in C++17.
+
+- [`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)  
+  Version-0 default: `gsl_FEATURE_GSL_LITE_NAMESPACE=0`  
+  Version-1 default: `gsl_FEATURE_GSL_LITE_NAMESPACE=1`  
+  Reason: preparing for migration to the `gsl_lite` namespace; cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries).
+
+- [`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)  
+  Version-0 default: `gsl_CONFIG_DEPRECATE_TO_LEVEL=0`  
+  Version-1 default: `gsl_CONFIG_DEPRECATE_TO_LEVEL=8`  
+
+- [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)  
+  Version-0 default: `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`)
+  Version-1 default: `std::ptrdiff_t`
+  Reason: the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t`.
+
+- [`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison1)  
+  Version-0 default: `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=1`  
+  Version-1 default: `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=0`  
+  Reason: C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear.
+
+- [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)  
+  Version-0 default: `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=0`  
+  Version-1 default: `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`  
+  Reason: see [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395). (Note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699).)
+
+- [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)  
+  Version-0 default: `gsl_CONFIG_TRANSPARENT_NOT_NULL=0`  
+  Version-1 default: `gsl_CONFIG_TRANSPARENT_NOT_NULL=1`  
+  Reason: enables conformant behavior for `not_null<>::get()`.
+
+- [`gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION`](#gsl_config_narrow_throws_on_truncation0)  
+  Version-0 default: `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=0`  
+  Version-1 default: `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=1`  
+  Reason: enables conformant behavior for `narrow<>()` (cf. [#52](https://github.com/gsl-lite/gsl-lite/issues/52)).
+
+- **[default runtime contract violation handling](#contract-checking-configuration-macros)**  
+  Version-0 default: `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`  
+  Version-1 default: `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS`  
+  Reason: the mode enabled by `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` is consistent with the behavior of the `assert()` macro
+  while retaining runtime contract checks even if `NDEBUG` is defined.
 
 Note that the v1 defaults are not yet stable; future 0.\* releases may introduce more configuration switches with different version-specific defaults.
 
@@ -504,7 +543,7 @@ contract checks if `NDEBUG` is defined.
     
   The use of compiler-specific "assume" intrinsics may lead to spurious runtime evaluation of contract expressions. Because
   *gsl-lite* implements contract checks with macros (rather than as a language feature as the defunct C++2a Contracts proposal
-  did), it cannot reliably suppress runtime evaluation for all compilers. E.g., if the contract check fed to the "assume"
+  did), it cannot reliably suppress runtime evaluation for all compilers. For instance, if the contract check fed to the "assume"
   intrinsic comprises a function call which is opaque to the compiler, many compilers will generate the runtime function call.
   Therefore, `gsl_Expects()`, `gsl_Ensures()`, and `gsl_Assert()` should be used only for conditions that can be proven
   side-effect-free by the compiler, and `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, `gsl_AssertDebug()`, `gsl_ExpectsAudit()`,
