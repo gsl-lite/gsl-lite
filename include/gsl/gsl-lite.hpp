@@ -1001,13 +1001,27 @@
 
 #if gsl_HAVE( NORETURN )
 # define gsl_NORETURN  [[noreturn]]
-#elif defined(_MSC_VER)
+#elif defined( _MSC_VER )
 # define gsl_NORETURN  __declspec(noreturn)
 #elif defined( __GNUC__ ) || gsl_COMPILER_ARMCC_VERSION
 # define gsl_NORETURN  __attribute__((noreturn))
 #else
 # define gsl_NORETURN
 #endif
+
+#if gsl_CPP20_OR_GREATER
+# if defined( _MSC_VER )
+#  if _MSC_VER >= 1929 // VS2019 v16.10 and later
+// Works with /std:c++14 and /std:c++17, and performs optimization
+#   define gsl_NO_UNIQUE_ADDRESS    [[msvc::no_unique_address]]
+#  else
+// no-op in MSVC v14x ABI
+#   define gsl_NO_UNIQUE_ADDRESS    /*[[no_unique_address]]*/
+#  endif
+# else // ! defined( _MSC_VER )
+#  define  gsl_NO_UNIQUE_ADDRESS    [[no_unique_address]]
+# endif // defined( _MSC_VER )
+#endif // gsl_CPP20_OR_GREATER
 
 #if gsl_HAVE( MAYBE_UNUSED )
 # define gsl_MAYBE_UNUSED           [[maybe_unused]]
