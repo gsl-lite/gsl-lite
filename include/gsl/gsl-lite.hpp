@@ -40,7 +40,7 @@
 #define gsl_CONCAT2_( a, b )  a##b
 #define gsl_EVALF_( f )  f()
 
-// configuration argument checking:
+// Configuration argument checking:
 
 #define gsl_DETAIL_CFG_TOGGLE_VALUE_1  1
 #define gsl_DETAIL_CFG_TOGGLE_VALUE_0  1
@@ -184,6 +184,15 @@
 # define gsl_FEATURE_OWNER_MACRO  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
 #define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
+
+#if defined( gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS )
+#  pragma message ("invalid configuration value gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+#endif
+#define gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS_()  gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS
 
 #if defined( gsl_FEATURE_STRING_SPAN )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
@@ -2021,7 +2030,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #else
 # define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
+#if gsl_FEATURE( UNPREFIXED_EXPECTS_ENSURES_MACROS )
 #define   Expects( x )           gsl_Expects( x )
+#endif // gsl_FEATURE( UNPREFIXED_EXPECTS_ENSURES_MACROS )
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (debug)", x )
 #else
@@ -2038,7 +2049,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #else
 # define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
+#if gsl_FEATURE( UNPREFIXED_EXPECTS_ENSURES_MACROS )
 #define   Ensures( x )           gsl_Ensures( x )
+#endif // gsl_FEATURE( UNPREFIXED_EXPECTS_ENSURES_MACROS )
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (debug)", x )
 #else
