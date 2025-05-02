@@ -496,7 +496,7 @@
 # endif
 #endif
 
-// C++ language version detection (C++23 is speculative):
+// C++ language version detection:
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
 #ifndef   gsl_CPLUSPLUS
@@ -518,7 +518,8 @@
 #define gsl_CPP14_OR_GREATER  ( gsl_CPLUSPLUS >= 201402L )
 #define gsl_CPP17_OR_GREATER  ( gsl_CPLUSPLUS >= 201703L )
 #define gsl_CPP20_OR_GREATER  ( gsl_CPLUSPLUS >= 202002L )
-#define gsl_CPP23_OR_GREATER  ( gsl_CPLUSPLUS >  202002L )  // tentative
+#define gsl_CPP23_OR_GREATER  ( gsl_CPLUSPLUS >= 202302L )
+#define gsl_CPP26_OR_GREATER  ( gsl_CPLUSPLUS >  202302L )  // not finalized yet
 
 // C++ language version (represent 98 as 3):
 
@@ -584,6 +585,7 @@
 // AppleClang 15.0.0  __apple_build_version__ == 15000309  gsl_COMPILER_APPLECLANG_VERSION == 1500  (Xcode 15.3–15.4)                (LLVM 16.0.0)
 // AppleClang 16.0.0  __apple_build_version__ == 16000026  gsl_COMPILER_APPLECLANG_VERSION == 1600  (Xcode 16.0–16.2)                (LLVM 17.0.6)
 // AppleClang 17.0.0  __apple_build_version__ == 17000013  gsl_COMPILER_APPLECLANG_VERSION == 1700  (Xcode 16.3)                     (LLVM 19.1.4)
+// AppleClang 17.0.0  __apple_build_version__ == 17000013  gsl_COMPILER_APPLECLANG_VERSION == 1700  (Xcode 16.4)                     (LLVM 19.1.5)
 
 #if defined( __apple_build_version__ )
 # define gsl_COMPILER_APPLECLANG_VERSION  gsl_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
@@ -817,6 +819,7 @@
 # define gsl_STDLIB_CPP17_OR_GREATER  0
 # define gsl_STDLIB_CPP20_OR_GREATER  0
 # define gsl_STDLIB_CPP23_OR_GREATER  0
+# define gsl_STDLIB_CPP26_OR_GREATER  0
 #else
 # define gsl_STDLIB_CPP98_OR_GREATER  gsl_CPP98_OR_GREATER
 # define gsl_STDLIB_CPP11_OR_GREATER  gsl_CPP11_OR_GREATER
@@ -824,6 +827,7 @@
 # define gsl_STDLIB_CPP17_OR_GREATER  gsl_CPP17_OR_GREATER
 # define gsl_STDLIB_CPP20_OR_GREATER  gsl_CPP20_OR_GREATER
 # define gsl_STDLIB_CPP23_OR_GREATER  gsl_CPP23_OR_GREATER
+# define gsl_STDLIB_CPP26_OR_GREATER  gsl_CPP26_OR_GREATER
 #endif
 
 #define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
@@ -2138,31 +2142,31 @@ class final_action
 public:
     explicit final_action( F action ) gsl_noexcept
         : action_( std::move( action ) )
-#if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
         , invoke_( true )
-#endif
+# endif
     {
     }
 
         // We only provide the move constructor for legacy defaults, or if we cannot rely on C++17 guaranteed copy elision.
-#if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
     final_action( final_action && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , invoke_( other.invoke_ )
     {
         other.invoke_ = false;
     }
-#endif // gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# endif // gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
 
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
-#if gsl_CONFIG_DEFAULTS_VERSION < 1  // we avoid the unnecessary virtual calls if modern defaults are selected
+# if gsl_CONFIG_DEFAULTS_VERSION < 1  // we avoid the unnecessary virtual calls if modern defaults are selected
     virtual
-#endif
+# endif
     ~final_action() gsl_noexcept
     {
-#if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
         if ( invoke_ )
-#endif
+# endif
         {
             action_();
         }
@@ -2173,13 +2177,13 @@ gsl_is_delete_access:
     final_action & operator=( final_action const & ) gsl_is_delete;
     final_action & operator=( final_action && ) gsl_is_delete;
 
-#if gsl_CONFIG_DEFAULTS_VERSION < 1
+# if gsl_CONFIG_DEFAULTS_VERSION < 1
 protected:
     void dismiss() gsl_noexcept
     {
         invoke_ = false;
     }
-#endif // gsl_CONFIG_DEFAULTS_VERSION < 1
+# endif // gsl_CONFIG_DEFAULTS_VERSION < 1
 
 private:
     F action_;
@@ -2195,7 +2199,7 @@ finally( F && action ) gsl_noexcept
 
 # if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-#if gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  if gsl_CONFIG_DEFAULTS_VERSION >= 1
 template< class F >
 class final_action_return
 {
@@ -2207,21 +2211,21 @@ public:
     }
 
         // We only provide the move constructor if we cannot rely on C++17 guaranteed copy elision.
-#if ! gsl_CPP17_OR_GREATER
+#   if ! gsl_CPP17_OR_GREATER
     final_action_return( final_action_return && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
     {
         other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
     }
-#endif // ! gsl_CPP17_OR_GREATER
+#   endif // ! gsl_CPP17_OR_GREATER
 
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_return() gsl_noexcept
     {
-#if ! gsl_CPP17_OR_GREATER
+#   if ! gsl_CPP17_OR_GREATER
         if ( exception_count_ != 0xFF )  // abuse member as special "no-invoke" marker
-#endif
+#   endif
         {
             if ( std11::uncaught_exceptions() == exception_count_ )
             {
@@ -2250,21 +2254,21 @@ public:
     }
 
         // We only provide the move constructor if we cannot rely on C++17 guaranteed copy elision.
-#if ! gsl_CPP17_OR_GREATER
+#   if ! gsl_CPP17_OR_GREATER
     final_action_error( final_action_error && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
     {
         other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
     }
-#endif // ! gsl_CPP17_OR_GREATER
+#   endif // ! gsl_CPP17_OR_GREATER
 
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_error() gsl_noexcept
     {
-#if ! gsl_CPP17_OR_GREATER
+#   if ! gsl_CPP17_OR_GREATER
         if ( exception_count_ != 0xFF )  // abuse member as special "no-invoke" marker
-#endif
+#   endif
         {
             if ( std11::uncaught_exceptions() != exception_count_ )
             {
@@ -2282,7 +2286,7 @@ private:
     F action_;
     unsigned char exception_count_;
 };
-#else // gsl_CONFIG_DEFAULTS_VERSION < 1
+#  else // gsl_CONFIG_DEFAULTS_VERSION < 1
 template< class F >
 class final_action_return : public final_action<F>
 {
@@ -2338,7 +2342,7 @@ gsl_is_delete_access:
 private:
     unsigned char exception_count;
 };
-#endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
+#  endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 
 template< class F >
 gsl_NODISCARD inline final_action_return<typename std::decay<F>::type>
@@ -4428,7 +4432,7 @@ make_span( T (&arr)[N] )
     return span<T>( gsl_ADDRESSOF( arr[0] ), N );
 }
 
-#if gsl_HAVE( ARRAY )
+# if gsl_HAVE( ARRAY )
 
 template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr span<T>
@@ -4443,9 +4447,9 @@ make_span( std::array<T,N> const & arr )
 {
     return span<const T>( arr );
 }
-#endif
+# endif
 
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( AUTO )
+# if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( AUTO )
 
 template< class Container, class EP = decltype( std17::data(std::declval<Container&>())) >
 gsl_NODISCARD inline gsl_constexpr auto
@@ -4461,7 +4465,7 @@ make_span( Container const & cont ) -> span< const typename std::remove_pointer<
     return span< const typename std::remove_pointer<EP>::type >( cont );
 }
 
-#else
+# else
 
 template< class T >
 inline span<T>
@@ -4477,9 +4481,9 @@ make_span( std::vector<T> const & cont )
     return span<const T>( cont.data(), cont.data() + cont.size() );
 }
 
-#endif
+# endif
 
-#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 template< class Container >
 gsl_NODISCARD inline gsl_constexpr span<typename Container::value_type>
@@ -4495,9 +4499,9 @@ make_span( with_container_t, Container const & cont ) gsl_noexcept
     return span< const typename Container::value_type >( with_container, cont );
 }
 
-#endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
-#if !gsl_DEPRECATE_TO_LEVEL( 4 )
+# if !gsl_DEPRECATE_TO_LEVEL( 4 )
 template< class Ptr >
 gsl_DEPRECATED
 inline span<typename Ptr::element_type>
@@ -4505,7 +4509,7 @@ make_span( Ptr & ptr )
 {
     return span<typename Ptr::element_type>( ptr );
 }
-#endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
+# endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
 
 template< class Ptr >
 gsl_DEPRECATED
@@ -4514,7 +4518,6 @@ make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type coun
 {
     return span<typename Ptr::element_type>( ptr, count );
 }
-
 #endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
 
 #if gsl_FEATURE_TO_STD( BYTE_SPAN )
@@ -4989,7 +4992,7 @@ operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
     gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
@@ -5015,7 +5018,7 @@ operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
-#endif
+# endif
 
 #else //gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
@@ -5260,7 +5263,6 @@ std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t,
 }
 
 #endif // gsl_HAVE( WCHAR )
-//#endif // gsl_FEATURE( STRING_SPAN )
 
 //
 // ensure_sentinel()
@@ -5319,7 +5321,6 @@ ensure_z( Container & cont )
 }
 # endif
 
-//#if gsl_FEATURE( STRING_SPAN )
 //
 // basic_zstring_span<> - A view of contiguous null-terminated characters, replace (*,len).
 //
@@ -5580,14 +5581,18 @@ using ::gsl::to_integer;
 using ::gsl::to_uchar;
 using ::gsl::to_string;
 
-#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 using ::gsl::with_container_t;
 using ::gsl::with_container;
-#endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 using ::gsl::span;
+# if gsl_FEATURE_TO_STD( MAKE_SPAN )
 using ::gsl::make_span;
+# endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
+# if gsl_FEATURE_TO_STD( BYTE_SPAN )
 using ::gsl::byte_span;
+# endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
 using ::gsl::copy;
 using ::gsl::as_bytes;
 using ::gsl::as_writable_bytes;
