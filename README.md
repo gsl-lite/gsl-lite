@@ -988,12 +988,14 @@ not_null<>: Allows to compare less than another not_null of the same type
 not_null<>: Allows to compare less than or equal to another not_null of the same type
 not_null<>: Allows to compare greater than another not_null of the same type
 not_null<>: Allows to compare greater than or equal to another not_null of the same type
+not_null<>: Allows to 3-way compare with another not_null of the same type
 not_null<>: Allows to compare equal to a raw pointer of the same type
 not_null<>: Allows to compare unequal to a raw pointer of the same type
 not_null<>: Allows to compare less than a raw pointer of the same type
 not_null<>: Allows to compare less than or equal to a raw pointer of the same type
 not_null<>: Allows to compare greater than a raw pointer of the same type
 not_null<>: Allows to compare greater than or equal to a raw pointer of the same type
+not_null<>: Allows to 3-way compare with a raw pointer of the same type
 not_null<>: Able to deduce element_type of raw pointers
 not_null<>: Able to deduce element_type of unique_ptr
 not_null<>: Able to deduce element_type of shared_ptr

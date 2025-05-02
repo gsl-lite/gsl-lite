@@ -1093,7 +1093,16 @@
         return lhs = lhs ^ rhs;                                       \
     }
 
-#define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                 \
+#if gsl_STDLIB_CPP20_OR_GREATER
+# define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                        \
+    [[maybe_unused, nodiscard]] gsl_api inline constexpr std::strong_ordering \
+    operator<=>( ENUM lhs, ENUM rhs ) gsl_noexcept                            \
+    {                                                                         \
+        using U = std::underlying_type_t<ENUM>;                               \
+        return U( lhs ) <=> U( rhs );                                         \
+    }
+#else // ! gsl_STDLIB_CPP20_OR_GREATER
+# define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
@@ -1118,6 +1127,7 @@
         typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) >= U( rhs );                                  \
     }
+#endif // gsl_STDLIB_CPP20_OR_GREATER
 
     //
     // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
@@ -1214,6 +1224,10 @@
 #if ! gsl_HAVE( ARRAY )
 # include <iterator> // for reverse_iterator<>
 #endif
+
+#if gsl_STDLIB_CPP20_OR_GREATER
+# include <compare>
+#endif // gsl_STDLIB_CPP20_OR_GREATER
 
 #if ! gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || ! gsl_HAVE( AUTO )
 # include <vector>
@@ -3469,6 +3483,7 @@ gsl_RETURN_DECLTYPE_(l.operator->() == r )
 {
     return l.operator->() == r;
 }
+#if ! gsl_CPP20_OR_GREATER
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( T const & l, not_null<U> const & r )
@@ -3476,6 +3491,7 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
 {
     return l == r.operator->();
 }
+#endif // ! gsl_CPP20_OR_GREATER
 
 // The C++ Core Guidelines discourage the use of pointer arithmetic, and gsl-lite consequently refrains from defining operators
 // for pointer arithmetic or the subscript operator in `not_null<>`. However, comparison of `not_null<>` objects is supported;
@@ -3485,6 +3501,22 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
 // can be sorted and searched, or that pointers can be used as a key in a relational container such as `std::map<>`.
 // Therefore, we also define relational comparison operators for `not_null<>`.
 
+#if gsl_STDLIB_CPP20_OR_GREATER
+template< class T, class U >
+[[nodiscard]] inline gsl_api constexpr auto
+operator<=>( not_null<T> const & l, not_null<U> const & r )
+-> decltype( l.operator->() <=> r.operator->() )
+{
+    return l.operator->() <=> r.operator->();
+}
+template< class T, class U >
+[[nodiscard]] inline gsl_api constexpr auto
+operator<=>( not_null<T> const & l, U const & r )
+-> decltype( l.operator->() <=> r )
+{
+    return l.operator->() <=> r;
+}
+#endif // gsl_STDLIB_CPP20_OR_GREATER
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
@@ -3507,6 +3539,7 @@ gsl_RETURN_DECLTYPE_( l < r.operator->() )
     return l < r.operator->();
 }
 
+#if ! gsl_CPP20_OR_GREATER
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, not_null<U> const & r )
@@ -3528,6 +3561,7 @@ gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
+#endif // ! gsl_CPP20_OR_GREATER
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )

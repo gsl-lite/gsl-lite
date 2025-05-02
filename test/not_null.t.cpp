@@ -1455,6 +1455,17 @@ CASE( "not_null<>: Allows to compare greater than or equal to another not_null o
     EXPECT( ( _.p2() >= _.p1() ) == ( _.pv2 >= _.pv1 ) );
 }
 
+#if gsl_STDLIB_CPP20_OR_GREATER
+CASE( "not_null<>: Allows to 3-way compare with another not_null of the same type" )
+{
+    NotNull _;
+
+    EXPECT( ( _.p1() <=> _.p1() == 0 ) );
+    EXPECT( ( ( _.p1() <=> _.p2() ) == ( _.pv1 <=> _.pv2 ) ) );
+    EXPECT( ( ( _.p2() <=> _.p1() ) == ( _.pv2 <=> _.pv1 ) ) );
+}
+#endif // gsl_STDLIB_CPP20_OR_GREATER
+
 // raw pointer
 
 CASE( "not_null<>: Allows to compare equal to a raw pointer of the same type" )
@@ -1508,6 +1519,17 @@ CASE( "not_null<>: Allows to compare greater than or equal to a raw pointer of t
     EXPECT( ( _.p1() >= _.pv2 ) == ( _.pv1 >= _.pv2 ) );
     EXPECT( ( _.p2() >= _.pv1 ) == ( _.pv2 >= _.pv1 ) );
 }
+
+#if gsl_STDLIB_CPP20_OR_GREATER
+CASE( "not_null<>: Allows to 3-way compare with a raw pointer of the same type" )
+{
+    NotNull _;
+
+    EXPECT( ( _.p1() <=> _.pv1 == 0 ) );
+    EXPECT( ( ( _.p1() <=> _.pv2 ) == ( _.pv1 <=> _.pv2 ) ) );
+    EXPECT( ( ( _.p2() <=> _.pv1 ) == ( _.pv2 <=> _.pv1 ) ) );
+}
+#endif // gsl_STDLIB_CPP20_OR_GREATER
 
 // user-defined types to check element_type deduction
 
