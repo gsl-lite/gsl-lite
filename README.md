@@ -61,7 +61,7 @@ In a nutshell
 -------------
 **gsl-lite** is a single-file header-only implementation of the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) originally based on [Microsoft GSL](https://github.com/microsoft/gsl) and adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20.
 
-The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, `string_span` and [others](#features).
+The Guidelines Support Library (GSL) contains functions and types that are suggested for use by the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines) maintained by the [Standard C++ Foundation](https://isocpp.org/). The library includes types like `owner<>`, `not_null<>`, `span<>`, and [others](#features).
 
 *gsl-lite* recognizes when it is compiled for the CUDA platform and decorates some functions with `__host__` and `__device__`. See also section [API macro](#api-macro).
 
@@ -182,6 +182,7 @@ The following table gives an overview of the configuration options affected by v
 Macro                                                                                | v0 default                                               | v1 default        | |
 ------------------------------------------------------------------------------------:|:---------------------------------------------------------|-------------------|-|
 [`gsl_FEATURE_OWNER_MACRO`](#gsl_feature_owner_macro1)                               | 1                                                        | 0                 | an unprefixed macro `Owner()` may interfere with user code |
+[`gsl_FEATURE_STRING_SPAN`](#gsl_feature_string_span1)                               | 1                                                        | 0                 | string spans are no longer part of the GSL specification |
 [`gsl_FEATURE_GSL_LITE_NAMESPACE`](#gsl_feature_gsl_lite_namespace0)                 | 0                                                        | 1                 | cf. [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) |
 [`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level0)                   | 0                                                        | 8                 | |
 [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)          | `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`) | `std::ptrdiff_t`  | the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t` |
@@ -294,6 +295,9 @@ Define this macro to 1 to provide the `implicit` macro. **Default is 0.**
 
 #### `gsl_FEATURE_OWNER_MACRO=1`
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. **Default is 1.**
+
+#### `gsl_FEATURE_STRING_SPAN=1`
+String spans and related functionality are no longer part of the GSL specification. If the macro `gsl_FEATURE_STRING_SPAN` is set to 1, *gsl-lite* continues to provide an implementation of the class `basic_string_span<>` along with the aliases `string_span`, `cstring_span`, `wstring_span`, `cwstring_span`, the deprecated class `basic_zstring_span<>` with the aliases `zstring_span`, `czstring_span`, `wzstring_span`, `cwzstring_span`, and related classes and functions such as `as_bytes()`, `to_string()`, and `ensure_z()`. **Default is 1.**
 
 #### `gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=0`
 Provide experimental types `final_action_return` and `final_action_error` and convenience functions `on_return()` and `on_error()`. **Default is 0.**

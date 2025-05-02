@@ -23,9 +23,7 @@
 #include <limits>
 #include <memory>    // for addressof(), unique_ptr<>, shared_ptr<>
 #include <iosfwd>    // for basic_ostream<>
-#include <ios>       // for ios_base, streamsize
 #include <stdexcept> // for logic_error
-#include <string>
 #include <utility>   // for move(), forward<>(), swap()
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 #include <cstdlib>   // for abort()
@@ -187,14 +185,14 @@
 #endif
 #define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
-//#if defined( gsl_FEATURE_STRING_SPAN )
-//# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
-//#  pragma message ("invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
-//# endif
-//#else
-//# define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
-//#endif
-//#define gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
+#if defined( gsl_FEATURE_STRING_SPAN )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
+#  pragma message ("invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+#endif
+#define gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
 
 #if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
@@ -1189,6 +1187,12 @@
 #endif
 
 // Additional includes:
+
+#if gsl_FEATURE( STRING_SPAN )
+# include <ios>    // for ios_base, streamsize
+# include <string>
+#endif // gsl_FEATURE( STRING_SPAN )
+
 
 #if ! gsl_CPP11_OR_GREATER
 # include <algorithm> // for swap() before C++11
@@ -4542,7 +4546,7 @@ byte_span( T const & t ) gsl_noexcept
 
 #endif // gsl_FEATURE_TO_STD( BYTE_SPAN )
 
-//#if gsl_FEATURE( STRING_SPAN )
+#if gsl_FEATURE( STRING_SPAN )
 //
 // basic_string_span:
 //
@@ -4600,71 +4604,71 @@ public:
 
     // construction:
 
-#if gsl_HAVE( IS_DEFAULT )
+# if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr basic_string_span() gsl_noexcept = default;
-#else
+# else
     gsl_api gsl_constexpr basic_string_span() gsl_noexcept {}
-#endif
+# endif
 
-#if gsl_HAVE( NULLPTR )
+# if gsl_HAVE( NULLPTR )
     gsl_api gsl_constexpr basic_string_span( std::nullptr_t ) gsl_noexcept
     : span_( nullptr, static_cast<index_type>( 0 ) )
     {}
-#endif
+# endif
 
-#ifdef __CUDACC_RELAXED_CONSTEXPR__
+# ifdef __CUDACC_RELAXED_CONSTEXPR__
     gsl_api
-#endif // __CUDACC_RELAXED_CONSTEXPR__
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // __CUDACC_RELAXED_CONSTEXPR__
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( pointer ptr )
     : span_( remove_z( ptr, (std::numeric_limits<index_type>::max)() ) )
     {}
 
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( pointer ptr, index_type count )
     : span_( ptr, count )
     {}
 
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( pointer firstElem, pointer lastElem )
     : span_( firstElem, lastElem )
     {}
 
     template< std::size_t N >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( element_type (&arr)[N] )
     : span_( remove_z( gsl_ADDRESSOF( arr[0] ), N ) )
     {}
 
-#if gsl_HAVE( ARRAY )
+# if gsl_HAVE( ARRAY )
 
     template< std::size_t N >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> & arr )
     : span_( remove_z( arr ) )
     {}
 
     template< std::size_t N >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( std::array< typename std11::remove_const<element_type>::type, N> const & arr )
     : span_( remove_z( arr ) )
     {}
 
-#endif
+# endif // gsl_HAVE( ARRAY )
 
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+# if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
     // Exclude: array, [basic_string,] basic_string_span
 
@@ -4676,9 +4680,9 @@ public:
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container>().data()) >::value
         ))
     >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container & cont )
     : span_( ( cont ) )
     {}
@@ -4693,101 +4697,101 @@ public:
             && std::is_convertible< typename Container::pointer, decltype(std::declval<Container const &>().data()) >::value
         ))
     >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container const & cont )
     : span_( ( cont ) )
     {}
 
-#elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
+# elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
     template< class Container >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container & cont )
     : span_( cont )
     {}
 
     template< class Container >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( Container const & cont )
     : span_( cont )
     {}
 
-#else
+# else
 
     template< class U >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( span<U> const & rhs )
     : span_( rhs )
     {}
 
-#endif
+# endif
 
-#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
     template< class Container >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span( with_container_t, Container & cont )
     : span_( with_container, cont )
     {}
-#endif
+# endif
 
-#if gsl_HAVE( IS_DEFAULT )
-# if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
+# if gsl_HAVE( IS_DEFAULT )
+#  if gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 440, 600 )
     gsl_constexpr basic_string_span( basic_string_span const & ) = default;
 
     gsl_constexpr basic_string_span( basic_string_span && ) = default;
-# else
+#  else
     gsl_constexpr basic_string_span( basic_string_span const & ) gsl_noexcept = default;
 
     gsl_constexpr basic_string_span( basic_string_span && ) gsl_noexcept = default;
+#  endif
 # endif
-#endif
 
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> const & rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
 
-#if gsl_STDLIB_CPP11_120
+# if gsl_STDLIB_CPP11_120
     template< class U
         gsl_ENABLE_IF_(( std::is_convertible<typename basic_string_span<U>::pointer, pointer>::value ))
     >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+#  if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+#  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr basic_string_span( basic_string_span<U> && rhs )
     : span_( reinterpret_cast<pointer>( rhs.data() ), rhs.length() ) // NOLINT
     {}
-#endif // gsl_STDLIB_CPP11_120
+# endif // gsl_STDLIB_CPP11_120
 
     template< class CharTraits, class Allocator >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span(
         std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > & str )
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
     {}
 
     template< class CharTraits, class Allocator >
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_DEPRECATED_MSG("basic_string_span<><> is deprecated; use span<> instead")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
+    gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_constexpr basic_string_span(
         std::basic_string< typename std11::remove_const<element_type>::type, CharTraits, Allocator > const & str )
     : span_( gsl_ADDRESSOF( str[0] ), str.length() )
@@ -4795,11 +4799,11 @@ public:
 
     // assignment:
 
-#if gsl_HAVE( IS_DEFAULT )
+# if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr14 basic_string_span & operator=( basic_string_span const & ) gsl_noexcept = default;
 
     gsl_constexpr14 basic_string_span & operator=( basic_string_span && ) gsl_noexcept = default;
-#endif
+# endif
 
     // sub span:
 
@@ -4869,13 +4873,13 @@ public:
         return span_[idx];
     }
 
-#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
+# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
     gsl_DEPRECATED_MSG("use subscript indexing instead")
     gsl_api gsl_constexpr14 reference operator()( index_type idx ) const
     {
         return span_[idx];
     }
-#endif // deprecate
+# endif // deprecate
 
     gsl_NODISCARD gsl_api gsl_constexpr14 reference
     front() const
@@ -4951,7 +4955,7 @@ private:
         return span_type( sz, detail::string_length( sz, max ) );
     }
 
-#if gsl_HAVE( ARRAY )
+# if gsl_HAVE( ARRAY )
     template< size_t N >
     gsl_NODISCARD static gsl_constexpr14 span_type
     remove_z( std::array<typename std11::remove_const<element_type>::type, N> & arr )
@@ -4965,7 +4969,7 @@ private:
     {
         return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
     }
-#endif
+# endif
 
 private:
     span_type span_;
@@ -4973,7 +4977,7 @@ private:
 
 // basic_string_span comparison functions:
 
-#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -4996,7 +5000,7 @@ operator<( basic_string_span<T> const & l, U const & u ) gsl_noexcept
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#  if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
     gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
@@ -5022,9 +5026,9 @@ operator<( U const & u, basic_string_span<T> const & r ) gsl_noexcept
 
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
-# endif
+#  endif
 
-#else //gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# else //gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -5043,7 +5047,7 @@ operator<( basic_string_span<T> const & l, basic_string_span<T> const & r ) gsl_
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-#endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr14 bool
@@ -5056,24 +5060,24 @@ template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator<=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     return !( r < l );
-#else
+# else
     basic_string_span< typename std11::add_const<T>::type > rr( r );
     return !( rr < l );
-#endif
+# endif
 }
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_constexpr14 bool
 operator>( basic_string_span<T> const & l, U const & r ) gsl_noexcept
 {
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) || ! gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     return ( r < l );
-#else
+# else
     basic_string_span< typename std11::add_const<T>::type > rr( r );
     return ( rr < l );
-#endif
+# endif
 }
 
 template< class T, class U >
@@ -5083,7 +5087,7 @@ operator>=( basic_string_span<T> const & l, U const & r ) gsl_noexcept
     return !( l < r );
 }
 
-#if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T, class U
     gsl_ENABLE_IF_(( !detail::is_basic_string_span<U>::value ))
@@ -5121,7 +5125,7 @@ operator>=( U const & l, basic_string_span<T> const & r ) gsl_noexcept
     return !( l < r );
 }
 
-#endif // gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# endif // gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 // convert basic_string_span to byte span:
 
@@ -5131,7 +5135,7 @@ as_bytes( basic_string_span<T> spn ) gsl_noexcept
 {
     return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
-//#endif // gsl_FEATURE( STRING_SPAN )
+#endif // gsl_FEATURE( STRING_SPAN )
 
 //
 // String types:
@@ -5140,24 +5144,24 @@ as_bytes( basic_string_span<T> spn ) gsl_noexcept
 typedef char * zstring;
 typedef const char * czstring;
 
-#if gsl_HAVE( WCHAR )
+# if gsl_HAVE( WCHAR )
 typedef wchar_t * wzstring;
 typedef const wchar_t * cwzstring;
-#endif
+# endif
 
-//#if gsl_FEATURE( STRING_SPAN )
+#if gsl_FEATURE( STRING_SPAN )
 
 typedef basic_string_span< char > string_span;
 typedef basic_string_span< char const > cstring_span;
 
-#if gsl_HAVE( WCHAR )
+# if gsl_HAVE( WCHAR )
 typedef basic_string_span< wchar_t > wstring_span;
 typedef basic_string_span< wchar_t const > cwstring_span;
-#endif
+# endif
 
 // to_string() allow (explicit) conversions from string_span to string
 
-#if 0
+# if 0
 
 template< class T >
 inline std::basic_string< typename std::remove_const<T>::type > to_string( basic_string_span<T> spn )
@@ -5165,7 +5169,7 @@ inline std::basic_string< typename std::remove_const<T>::type > to_string( basic
      std::string( spn.data(), spn.length() );
 }
 
-#else
+# else
 
 gsl_NODISCARD inline std::string
 to_string( string_span const & spn )
@@ -5179,7 +5183,7 @@ to_string( cstring_span const & spn )
     return std::string( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
-#if gsl_HAVE( WCHAR )
+#  if gsl_HAVE( WCHAR )
 
 gsl_NODISCARD inline std::wstring
 to_string( wstring_span const & spn )
@@ -5193,8 +5197,8 @@ to_string( cwstring_span const & spn )
     return std::wstring( spn.data(), static_cast<std::size_t>( spn.length() ) );
 }
 
-#endif // gsl_HAVE( WCHAR )
-#endif // to_string()
+#  endif // gsl_HAVE( WCHAR )
+# endif // to_string()
 
 //
 // Stream output for string_span types
@@ -5252,7 +5256,7 @@ std::basic_ostream< char, Traits > & operator<<( std::basic_ostream< char, Trait
     return detail::write_to_stream( os, spn );
 }
 
-#if gsl_HAVE( WCHAR )
+# if gsl_HAVE( WCHAR )
 
 template< typename Traits >
 std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t, Traits > & os, wstring_span const & spn )
@@ -5266,7 +5270,7 @@ std::basic_ostream< wchar_t, Traits > & operator<<( std::basic_ostream< wchar_t,
     return detail::write_to_stream( os, spn );
 }
 
-#endif // gsl_HAVE( WCHAR )
+# endif // gsl_HAVE( WCHAR )
 
 //
 // ensure_sentinel()
@@ -5342,9 +5346,9 @@ public:
     typedef element_type * czstring_type;
     typedef basic_string_span<element_type> string_span_type;
 
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_api gsl_constexpr14 basic_zstring_span( span_type s )
         : span_( s )
     {
@@ -5352,15 +5356,15 @@ public:
         gsl_Expects( s.back() == '\0' );
     }
 
-#if gsl_HAVE( IS_DEFAULT )
+# if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr basic_zstring_span( basic_zstring_span const & ) = default;
     gsl_constexpr basic_zstring_span( basic_zstring_span &&      ) = default;
     gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span const & ) = default;
     gsl_constexpr14 basic_zstring_span & operator=( basic_zstring_span &&      ) = default;
-#else
+# else
     gsl_api gsl_constexpr basic_zstring_span( basic_zstring_span const & other) : span_ ( other.span_ ) {}
     gsl_api gsl_constexpr basic_zstring_span & operator=( basic_zstring_span const & other ) { span_ = other.span_; return *this; }
-#endif
+# endif
 
     gsl_NODISCARD gsl_api gsl_constexpr bool
     empty() const gsl_noexcept
@@ -5368,18 +5372,18 @@ public:
         return false;
     }
 
-#if gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_NODISCARD gsl_api gsl_constexpr string_span_type
     as_string_span() const gsl_noexcept
     {
         return string_span_type( span_.data(), span_.size() - 1 );
     }
 
- #if gsl_DEPRECATE_TO_LEVEL( 7 )
+# if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_zstring_span<> is deprecated")
-#endif // gsl_DEPRECATE_TO_LEVEL( 7 )
+# endif // gsl_DEPRECATE_TO_LEVEL( 7 )
    /*gsl_api*/ // currently disabled due to an apparent NVCC bug
     gsl_NODISCARD gsl_constexpr string_span_type
     ensure_z() const
@@ -5404,11 +5408,11 @@ private:
 typedef basic_zstring_span< char > zstring_span;
 typedef basic_zstring_span< char const > czstring_span;
 
-#if gsl_HAVE( WCHAR )
+# if gsl_HAVE( WCHAR )
 typedef basic_zstring_span< wchar_t > wzstring_span;
 typedef basic_zstring_span< wchar_t const > cwzstring_span;
-#endif
-//#endif // gsl_FEATURE( STRING_SPAN )
+# endif
+#endif // gsl_FEATURE( STRING_SPAN )
 
 } // namespace gsl
 
@@ -5583,7 +5587,6 @@ using ::gsl::byte;
 using ::gsl::to_byte;
 using ::gsl::to_integer;
 using ::gsl::to_uchar;
-using ::gsl::to_string;
 
 # if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 using ::gsl::with_container_t;
@@ -5604,7 +5607,9 @@ using ::gsl::as_writable_bytes;
 using ::gsl::as_writeable_bytes;
 # endif
 
-//# if gsl_FEATURE( STRING_SPAN )
+# if gsl_FEATURE( STRING_SPAN )
+using ::gsl::to_string;
+
 using ::gsl::basic_string_span;
 using ::gsl::string_span;
 using ::gsl::cstring_span;
@@ -5612,7 +5617,9 @@ using ::gsl::cstring_span;
 using ::gsl::basic_zstring_span;
 using ::gsl::zstring_span;
 using ::gsl::czstring_span;
-//# endif // gsl_FEATURE( STRING_SPAN )
+
+using ::gsl::ensure_z;
+# endif // gsl_FEATURE( STRING_SPAN )
 
 using ::gsl::zstring;
 using ::gsl::czstring;
@@ -5621,13 +5628,11 @@ using ::gsl::czstring;
 using ::gsl::wzstring;
 using ::gsl::cwzstring;
 
-//#  if gsl_FEATURE( STRING_SPAN )
+#  if gsl_FEATURE( STRING_SPAN )
 using ::gsl::wzstring_span;
 using ::gsl::cwzstring_span;
-//#  endif // gsl_FEATURE( STRING_SPAN )
+#  endif // gsl_FEATURE( STRING_SPAN )
 # endif // gsl_HAVE( WCHAR )
-
-using ::gsl::ensure_z;
 
 } // namespace gsl_lite
 

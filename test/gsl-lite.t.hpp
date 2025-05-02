@@ -127,10 +127,12 @@ inline std::ostream & operator<<( std::ostream & os, span<T> s )
 
 } // namespace gsl
 
+# if gsl_FEATURE( STRING_SPAN )
 inline void suppress_warning_unused_template_ensure_sentinel()
 {
     (void) gsl::ensure_z( "zero-terminated" );
 }
+# endif // gsl_FEATURE( STRING_SPAN )
 
 #endif // GSL_TEST_GSL_LITE_HPP_INCLUDED
 

@@ -22,8 +22,9 @@ using namespace gsl;
 
 CASE( "span<>: free comparation functions fail for different const-ness [issue #32]" )
 {
-#if gsl_FEATURE_TO_STD( MAKE_SPAN )
-#if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+#if gsl_FEATURE( STRING_SPAN )
+# if gsl_FEATURE_TO_STD( MAKE_SPAN )
+#  if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
     char data[] = { 'a', 'b' };
     string_span  a = make_span( data );
     cstring_span b = make_span( data ).last( 1 );
@@ -31,12 +32,13 @@ CASE( "span<>: free comparation functions fail for different const-ness [issue #
     // worked as expected before 0.9.0, in 0.9.[0,1] converts to bool and compares equal!
 
     EXPECT( a != b );
-#else
+#  else
     EXPECT( !!"span<>: cannot compare different types (gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0)" );
-#endif
-#else
+#  endif
+# else
     EXPECT( !!"span<>: make_span() is not available (gsl_FEATURE_MAKE_SPAN_TO_STD)" );
-#endif
+# endif
+#endif // gsl_FEATURE( STRING_SPAN )
 }
 
 CASE( "span<>: constrained container constructor suffers hard failure for arguments with reference-returning data() function [issue #242]" )
@@ -93,6 +95,7 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [i
 
 CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
 {
+#if gsl_FEATURE( STRING_SPAN )
     char const data[] = "ab";
     char const * text = "ab";
     cstring_span span = "ab";
@@ -109,21 +112,22 @@ CASE( "string_span<>: must not include terminating '\\0' [issue #53]" )
 
     EXPECT( a == span );
     EXPECT( a == b );
+#endif // gsl_FEATURE( STRING_SPAN )
 }
 
 CASE( "string_span<>: to_string triggers SFINAE errors on basic_string_span's move & copy constructor with Clang-3.9 (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) [issue #53a]" )
 {
-#if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
+# if gsl_CONFIG( CONFIRMS_COMPILATION_ERRORS )
     cstring_span span = "Hello world";
     std::string str = to_string( span );
-#endif
+# endif
 }
 
 CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning C4127: conditional expression is constant [issue #115]" )
 {
-#if gsl_HAVE( EXCEPTIONS )
+# if gsl_HAVE( EXCEPTIONS )
     try { (void) narrow<float>( 1.0 ); } catch(...) {}
-#endif // gsl_HAVE( EXCEPTIONS )
+# endif // gsl_HAVE( EXCEPTIONS )
 }
 
 CASE( "detail::is_compatible_container<>: Not a proper type trait [PR #238]" )
