@@ -212,7 +212,7 @@ The following configuration options are affected by versioned defaults:
 - [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type)  
   Version-0 default: `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`)
   Version-1 default: `std::ptrdiff_t`
-  Reason: the GSL specifies `gsl::index` to be a signed type, and M-GSL also uses `std::ptrdiff_t`.
+  Reason: the GSL specifies `gsl::index` to be a signed type, and Microsoft GSL also uses `std::ptrdiff_t`.
 
 - [`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison1)  
   Version-0 default: `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=1`  
@@ -222,7 +222,7 @@ The following configuration options are affected by versioned defaults:
 - [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor0)  
   Version-0 default: `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=0`  
   Version-1 default: `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`  
-  Reason: see [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395). (Note that `not_null<>` in M-GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699).)
+  Reason: see [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395). (Note that `not_null<>` in Microsoft GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699).)
 
 - [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null0)  
   Version-0 default: `gsl_CONFIG_TRANSPARENT_NOT_NULL=0`  
@@ -251,10 +251,10 @@ Many features of *gsl-lite* are very useful for defining library interfaces, e.g
 However, please mind the following considerations:
 
 -  *gsl-lite* is an implementation of the [Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl), which is not a library but a non-formal specification.
-   There are other libraries implementing the GSL, most notably the [Microsoft GSL](https://github.com/microsoft/GSL/) (herein often referred to as "M-GSL"). Both libraries live in different headers and consist
-   of unrelated implementations. There is considerable API compatibility between M-GSL and *gsl-lite*, but some differences are inevitable because the GSL specification is rather loose and informal, and because
+   There are other libraries implementing the GSL, most notably the [Microsoft GSL](https://github.com/microsoft/GSL/). Both libraries live in different headers and consist
+   of unrelated implementations. There is considerable API compatibility between Microsoft GSL and *gsl-lite*, but some differences are inevitable because the GSL specification is rather loose and informal, and because
    both implementations take some liberties at interpreting and extending the specification (cf. e.g. [#6](https://github.com/gsl-lite/gsl-lite/issues/6), [#52](https://github.com/gsl-lite/gsl-lite/issues/52),
-   [#153](https://github.com/gsl-lite/gsl-lite/issues/153)). Also, the ABIs of *gsl-lite* and M-GSL are generally incompatible.
+   [#153](https://github.com/gsl-lite/gsl-lite/issues/153)). Also, the ABIs of *gsl-lite* and Microsoft GSL are generally incompatible.
 
 -  It is not clear whether the GSL specification envisions that multiple implementations of the specification should coexist (cf. [CppCoreGuidelines/#1519](https://github.com/isocpp/CppCoreGuidelines/issues/1519)),
    but because all existing implementations currently live in the same `namespace gsl`, using more than one GSL implementation in the same target will usually fail with compile/link errors. This is clearly
@@ -269,7 +269,7 @@ Our goal is to make *gsl-lite* suitable for use in libraries; we want to address
 - include the new header \<gsl-lite/gsl-lite.hpp\> rather than \<gsl/gsl-lite.hpp\>
 - refer to the new `namespace gsl_lite` instead of `namespace gsl` (or define a `namespace gsl = ::gsl_lite;` alias in your own namespace)
 - use the prefixed contract checking macros `gsl_Expects()`/`gsl_Ensures()` rather than the unprefixed `Expects()`/`Ensures()`  
-  (M-GSL prefixes its macros with uppercase `GSL_`; we traditionally consider lowercase `gsl_` the realm of *gsl-lite*)
+  (Microsoft GSL prefixes its macros with uppercase `GSL_`; we traditionally consider lowercase `gsl_` the realm of *gsl-lite*)
 - avoid any changes to the configuration options
 
 
@@ -302,7 +302,7 @@ namespace my_statistics_lib {
 ```
 
 The idea is that *gsl-lite* will move all its definitions to `namespace gsl_lite` in the next major version, and provide a `namespace gsl` with aliases only if the traditional header \<gsl/gsl-lite.hpp\> is
-included. This way, any code that only uses the new header \<gsl-lite/gsl-lite.hpp\> will not risk collision with M-GSL.
+included. This way, any code that only uses the new header \<gsl-lite/gsl-lite.hpp\> will not risk collision with Microsoft GSL.
 
 
 Configuration options
@@ -650,7 +650,7 @@ Features
 --------
 See also section [GSL: Guidelines Support Library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines [9]. 
 
-Feature / library           | GSL     | M-GSL   | *gsl-lite* | Notes |
+Feature / library           | GSL     | Microsoft GSL | *gsl-lite* | Notes |
 ----------------------------|:-------:|:-------:|:----------:|:------|
 **1.Lifetime&nbsp;safety**  | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
 **1.1 Indirection**         | &nbsp;  | &nbsp;  | &nbsp;     | &nbsp; |
