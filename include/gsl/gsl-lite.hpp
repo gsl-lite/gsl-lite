@@ -823,6 +823,12 @@
 
 #define gsl_HAVE_CONSTEXPR_23_()           gsl_HAVE_CONSTEXPR_23
 
+// Presence of C++26 language features:
+
+#define gsl_HAVE_CONSTEXPR_26              gsl_CPP26_OR_GREATER
+
+#define gsl_HAVE_CONSTEXPR_26_()           gsl_HAVE_CONSTEXPR_26
+
 // Presence of C++ library features:
 
 #if gsl_BETWEEN( gsl_COMPILER_ARMCC_VERSION, 1, 600 )
@@ -953,6 +959,12 @@
 # define gsl_constexpr23  constexpr
 #else
 # define gsl_constexpr23  /*constexpr*/
+#endif
+
+#if gsl_HAVE( CONSTEXPR_26 )
+# define gsl_constexpr26  constexpr
+#else
+# define gsl_constexpr26  /*constexpr*/
 #endif
 
 #if gsl_HAVE( EXPLICIT )
