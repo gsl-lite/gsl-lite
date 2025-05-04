@@ -1025,9 +1025,8 @@
 #endif
 
 #if gsl_CPP20_OR_GREATER
-# if defined( _MSC_VER )
-#  if _MSC_VER >= 1929 // VS2019 v16.10 and later
-// Works with /std:c++14 and /std:c++17, and performs optimization
+# if defined( _MSC_VER ) // MSVC or MSVC-compatible compiler
+#  if gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 // VS2019 v16.10 and later, or Clang 18 and later
 #   define gsl_NO_UNIQUE_ADDRESS    [[msvc::no_unique_address]]
 #  endif
 # else // ! defined( _MSC_VER )
@@ -1237,7 +1236,6 @@
 # include <ios>    // for ios_base, streamsize
 # include <string>
 #endif // gsl_FEATURE( STRING_SPAN )
-
 
 #if ! gsl_CPP11_OR_GREATER
 # include <algorithm> // for swap() before C++11

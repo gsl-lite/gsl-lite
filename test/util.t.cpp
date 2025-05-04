@@ -370,7 +370,7 @@ CASE( "narrow_failfast<>(): Fails when narrowing with sign loss" )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
-#if gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || _MSC_VER >= 1929 )
+#if gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 )
 struct Empty { };
 struct NoEmptyMember
 {
@@ -388,6 +388,6 @@ CASE( "gsl_NO_UNIQUE_ADDRESS: Class layout is compressed if attribute is used on
     EXPECT( sizeof( OneEmptyMember ) == sizeof( NoEmptyMember ) );
     EXPECT( offsetof( OneEmptyMember, nonEmpty ) == offsetof( NoEmptyMember, nonEmpty ) );
 }
-#endif // gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || _MSC_VER >= 1929 )
+#endif // gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 )
 
 // end of file
