@@ -240,7 +240,7 @@
 
 #if ! defined( gsl_CONFIG_DEPRECATE_TO_LEVEL )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
-#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  7
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  8
 # else
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 # endif
