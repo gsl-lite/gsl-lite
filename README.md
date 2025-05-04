@@ -183,13 +183,6 @@ The following configuration options are affected by versioned defaults:
   Version-1 default: `gsl_FEATURE_OWNER_MACRO=0`  
   Reason: an unprefixed macro `Owner()` may interfere with user code.
 
-- [**`gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS`**](#gsl_feature_unprefixed_expects_ensures_owner_macros1)  
-  Version-0 default: `gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS=1`  
-  Version-1 default: `gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS=0`  
-  Reason: despite conforming to the GSL specification, the unprefixed macros `Expects()` and `Ensures()` are rather generic and
-  may interfere with existing code. In addition, they are also defined by [Microsoft GSL](https://github.com/microsoft/gsl),
-  hence defining them in *gsl-lite* as well would be an obstacle to future coexistence.
-
 - [`gsl_FEATURE_STRING_SPAN`](#gsl_feature_string_span1)  
   Version-0 default: `gsl_FEATURE_STRING_SPAN=1`  
   Version-1 default: `gsl_FEATURE_STRING_SPAN=0`  
@@ -337,12 +330,6 @@ Provide experimental types `final_action_return<>` and `final_action_error<>` an
 #### `gsl_FEATURE_OWNER_MACRO=1`
 At default macro `Owner()` is defined for all C++ versions. This may be useful to transition  from a compiler that doesn't provide alias templates to one that does. Define this macro to 0 to omit the `Owner()` macro. **Default is 1.**
 
-#### `gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS=1`
-If enabled, the macros `Expects()` and `Ensures()` are defined as aliases of the contract checking macros `gsl_Expects()` and `gsl_Ensures()`.
-`Expects()` and `Ensures()` are required by the GSL specification, whereas all contract checking macros prefixed with `gsl_` are *gsl-lite* extensions.
-Nevertheless, the unprefixed macros `Expects()` and `Ensures()` are rather generic and may interfere with existing code.
-Define this macro to 0 to omit the unprefixed `Expects()` and `Ensures()` macros. **Default is 1.**
-
 #### `gsl_FEATURE_STRING_SPAN=1`
 String spans and related functionality are no longer part of the GSL specification. If the macro `gsl_FEATURE_STRING_SPAN` is set to 1, *gsl-lite* continues to provide an implementation of the class `basic_string_span<>` along with the aliases `string_span`, `cstring_span`, `wstring_span`, `cwstring_span`, the deprecated class `basic_zstring_span<>` with the aliases `zstring_span`, `czstring_span`, `wzstring_span`, `cwzstring_span`, and related classes and functions such as `to_string()`, and `ensure_z()`. **Default is 1.**
 
@@ -380,8 +367,7 @@ There are several macros for expressing preconditions, postconditions, and invar
 - `gsl_EnsuresAudit( cond )` for postconditions that are expensive or include potentially opaque function calls
 - `gsl_AssertAudit( cond )` for assertions that are expensive or include potentially opaque function calls
 
-If the configuration option `gsl_FEATURE_UNPREFIXED_EXPECTS_ENSURES_MACROS` is set to 1,
-the macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
+The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
 The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of configuration macros:
 
