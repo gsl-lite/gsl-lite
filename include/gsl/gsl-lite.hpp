@@ -117,6 +117,7 @@
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
+# pragma message ("do not use legacy M-GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
@@ -124,6 +125,7 @@
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
+# pragma message ("do not use legacy M-GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
 # define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
@@ -131,6 +133,7 @@
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
+# pragma message ("do not use legacy M-GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 

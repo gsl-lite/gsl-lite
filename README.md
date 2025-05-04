@@ -594,17 +594,20 @@ contract checks if `NDEBUG` is defined.
 
 ### Microsoft GSL compatibility macros
 
+*gsl-lite* recognizes some configuration macros originally defined for earlier revisions of Microsoft GSL.
+If any of these macros is detected, *gsl-lite* emits a diagnostic that urges to migrate to the corresponding *gsl-lite* configuration macro.
+
 #### `GSL_UNENFORCED_ON_CONTRACT_VIOLATION`
 
-Equivalent to defining `gsl_CONFIG_CONTRACT_CHECKING_OFF`.
+Define `gsl_CONFIG_CONTRACT_CHECKING_OFF` instead.
 
 #### `GSL_TERMINATE_ON_CONTRACT_VIOLATION`
 
-Equivalent to defining `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`.
+Define `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` instead.
 
 #### `GSL_THROW_ON_CONTRACT_VIOLATION`
 
-Equivalent to defining `gsl_CONFIG_CONTRACT_VIOLATION_THROWS`.
+Define `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` instead.
 
 
 ### Other configuration macros
