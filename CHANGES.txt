@@ -1,6 +1,34 @@
 Changes in gsl-lite
 ===================
 
+version 0.43.0 2025-05-05
+
+Additions:
+- `not_null<>` now supports function pointers and nullable function objects such as `std::function<>` and (for C++11 and
+  newer) defines a conditionally enabled forwarding `operator()` to permit function-call syntax (#353, thanks to @n0F4x)
+- `not_null<>` now supports implicit construction from non-nullable arguments such as function objects and functions (#353)
+- Add `is_nullable<>` trait (#353, thanks to @BenFrantzDale)
+- Add tentative C++26 detection macro `gsl_CPP26_OR_GREATER`, `CONSTEXPR_26` language feature, and `gsl_constexpr26`
+  keyword macro
+- For C++20 and newer, define `operator<=>` for `not_null<>` in C++20
+- For C++20 and newer, Add `gsl_NO_UNIQUE_ADDRESS` which uses MSVC's ABI-breaking `[[msvc::no_unique_address]]` if
+  necessary
+
+Changes:
+- Add feature macro `gsl_FEATURE_STRING_SPAN`, defaulting to 0 for version-1 defaults, to control the availability of
+  string spans, which are no longer part of the GSL specification and have been deprecated for a while
+- Add feature macro `gsl_FEATURE_BYTE`, defaulting to 0 for version-1 defaults, to control the availability of `byte`,
+  which has been superseded by `std::byte` in C++17
+- If `gsl_FEATURE_STRING_SPAN=0`, we now avoid pulling in standard library header files `<ios>` and `<string>`
+- In version-1 mode, default to `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` rather than `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`,
+  which is more convenient in practice
+- `gsl_FEATURE_WITH_CONTAINER_TO_STD` now defaults to 0 with version-1 defaults (#353)
+- Remove unsupported CUDA toolkits and older GCC versions no longer available through Azure Pipelines (#353)
+
+Fixes:
+- Add `[[maybe_unused]]` annotations to macro-generated function definitions to avoid Clang warnings about unused functions
+  in anonymous namespaces
+
 version 0.42.0 2024-11-01
 
 Additions:
