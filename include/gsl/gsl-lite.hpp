@@ -1017,9 +1017,6 @@
 #  if _MSC_VER >= 1929 // VS2019 v16.10 and later
 // Works with /std:c++14 and /std:c++17, and performs optimization
 #   define gsl_NO_UNIQUE_ADDRESS    [[msvc::no_unique_address]]
-#  else
-// no-op in MSVC v14x ABI
-#   define gsl_NO_UNIQUE_ADDRESS    /*[[no_unique_address]]*/
 #  endif
 # else // ! defined( _MSC_VER )
 #  define  gsl_NO_UNIQUE_ADDRESS    [[no_unique_address]]

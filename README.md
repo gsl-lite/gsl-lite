@@ -1279,6 +1279,7 @@ narrow<>(): Throws when narrowing with sign loss
 narrow_failfast<>(): Allows narrowing without value loss
 narrow_failfast<>(): Fails when narrowing with value loss
 narrow_failfast<>(): Fails when narrowing with sign loss
+gsl_NO_UNIQUE_ADDRESS: Class layout is compressed if attribute is used on empty members
 CUDA: Precondition/postcondition checks and assertions can be used in kernel code
 CUDA: span<> can be passed to kernel code
 CUDA: span<> can be used in kernel code

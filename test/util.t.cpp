@@ -17,6 +17,7 @@
 // THE SOFTWARE.
 
 #include "gsl-lite.t.hpp"
+#include <cstddef>
 #include <functional>
 
 #if gsl_STDLIB_CPP11_OR_GREATER
@@ -368,5 +369,25 @@ CASE( "narrow_failfast<>(): Fails when narrowing with sign loss" )
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
+
+#if gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || _MSC_VER >= 1929 )
+struct Empty { };
+struct NoEmptyMember
+{
+    int nonEmpty;
+};
+struct OneEmptyMember
+{
+    gsl_NO_UNIQUE_ADDRESS Empty empty;
+    int nonEmpty;
+};
+
+CASE( "gsl_NO_UNIQUE_ADDRESS: Class layout is compressed if attribute is used on empty members" )
+{
+    EXPECT( sizeof( NoEmptyMember ) == sizeof( int ) );
+    EXPECT( sizeof( OneEmptyMember ) == sizeof( NoEmptyMember ) );
+    EXPECT( offsetof( OneEmptyMember, nonEmpty ) == offsetof( NoEmptyMember, nonEmpty ) );
+}
+#endif // gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || _MSC_VER >= 1929 )
 
 // end of file
