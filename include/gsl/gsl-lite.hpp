@@ -2105,9 +2105,10 @@ gsl_NORETURN inline void fail_fast_abort() gsl_noexcept
 // Should be defined by user
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
 
-#if   defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#if gsl_CONFIG_DEFAULTS_VERSION == 0
+# if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 
-# if gsl_HAVE( EXCEPTIONS )
+#  if gsl_HAVE( EXCEPTIONS )
 gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
 gsl_constexpr14 inline
 void fail_fast_assert( bool cond, char const * const message )
@@ -2115,9 +2116,9 @@ void fail_fast_assert( bool cond, char const * const message )
     if ( !cond )
         throw fail_fast( message );
 }
-# endif // gsl_HAVE( EXCEPTIONS )
+#  endif // gsl_HAVE( EXCEPTIONS )
 
-#elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 
 gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
 gsl_api gsl_constexpr14 inline
@@ -2127,7 +2128,7 @@ void fail_fast_assert( bool cond, char const * const expression, char const * co
         ::gsl::fail_fast_assert_handler( expression, message, file, line );
 }
 
-#else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
+# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
 
 gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
 gsl_constexpr14 inline
@@ -2137,8 +2138,8 @@ void fail_fast_assert( bool cond ) gsl_noexcept
         std::terminate();
 }
 
-#endif
-
+# endif
+#endif // gsl_CONFIG_DEFAULTS_VERSION == 0
 
 //
 // GSL.util: utilities
