@@ -33,20 +33,6 @@
 
 namespace gsl = ::gsl_lite;
 
-//# if gsl_HAVE( C99_PREPROCESSOR )
-//#  define gsl_DEPRECATED_PRAGMA_EXPECTS_MSG_  _Pragma("message(\"warning: gsl-lite defines the Expects() macro in GSL compatibility mode only; please use the prefixed macro gsl_Expects() instead or enable GSL compatibility mode by defining the macro gsl_FEATURE_GSL_COMPATIBILITY_MODE=1 in the build options\")")
-//#  define gsl_DEPRECATED_PRAGMA_ENSURES_MSG_  _Pragma("message(\"warning: gsl-lite defines the Ensures() macro in GSL compatibility mode only; please use the prefixed macro gsl_Ensures() instead or enable GSL compatibility mode by defining the macro gsl_FEATURE_GSL_COMPATIBILITY_MODE=1 in the build options\")")
-//# elif defined( _MSC_VER )
-//#  define gsl_DEPRECATED_PRAGMA_EXPECTS_MSG_  __pragma("message(\"warning: gsl-lite defines the Expects() macro in GSL compatibility mode only; please use the prefixed macro gsl_Expects() instead or enable GSL compatibility mode by defining the macro gsl_FEATURE_GSL_COMPATIBILITY_MODE=1 in the build options\")")
-//#  define gsl_DEPRECATED_PRAGMA_ENSURES_MSG_  __pragma("message(\"warning: gsl-lite defines the Ensures() macro in GSL compatibility mode only; please use the prefixed macro gsl_Ensures() instead or enable GSL compatibility mode by defining the macro gsl_FEATURE_GSL_COMPATIBILITY_MODE=1 in the build options\")")
-//# else
-//#  define gsl_DEPRECATED_PRAGMA_EXPECTS_MSG_
-//#  define gsl_DEPRECATED_PRAGMA_ENSURES_MSG_
-//# endif 
-//
-//# define Expects( x )  gsl_DEPRECATED_PRAGMA_EXPECTS_MSG_ gsl_Expects( x )
-//# define Ensures( x )  gsl_DEPRECATED_PRAGMA_ENSURES_MSG_ gsl_Ensures( x )
-
 # define Expects( x )  gsl_Expects( x )
 # define Ensures( x )  gsl_Ensures( x )
 
