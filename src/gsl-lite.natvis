@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="gsl_lite::fail_fast">
+    <!-- na hides the address, otherwise it would appear as 0x.... "Message" -->
+    <DisplayString>{_Data._What,nasb}</DisplayString>
+  </Type>
+
+  <Type Name="gsl_lite::span&lt;*&gt;">
+    <DisplayString>{{ size={last_ - first_} }}</DisplayString>
+    <Expand>
+      <Item Name="[size]">last_ - first_</Item>
+      <ArrayItems>
+        <Size>last_ - first_</Size>
+        <ValuePointer>first_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+
+  <Type Name="gsl_lite::not_null&lt;*&gt;">
+      <DisplayString>{data_.ptr_}</DisplayString>
+      <Expand>
+          <ExpandedItem>data_.ptr_</ExpandedItem>
+      </Expand>
+  </Type>
+</AutoVisualizer>
