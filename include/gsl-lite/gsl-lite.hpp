@@ -67,6 +67,12 @@
 
 // gsl-lite backward compatibility:
 
+#if defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+# if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=" gsl_STRINGIFY(gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI) "; macro must be defined without value")
+# endif
+#endif
+
 #if defined( gsl_CONFIG_DEFAULTS_VERSION )
 # if ! gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( gsl_CONFIG_DEFAULTS_VERSION )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEFAULTS_VERSION=" gsl_STRINGIFY(gsl_CONFIG_DEFAULTS_VERSION) ", must be 0 or 1")
@@ -269,16 +275,27 @@
 # endif
 #endif
 
-#if ! defined( gsl_CONFIG_SPAN_INDEX_TYPE )
+#if defined( gsl_CONFIG_SPAN_INDEX_TYPE )
+# if ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: defining a custom gsl_CONFIG_SPAN_INDEX_TYPE changes the ABI of gsl-lite, which may lead to ODR violations and undefined behavior; define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
+# endif
+#else // ! defined( gsl_CONFIG_SPAN_INDEX_TYPE )
 # define gsl_CONFIG_SPAN_INDEX_TYPE  std::size_t
 #endif
 # define gsl_CONFIG_SPAN_INDEX_TYPE_()  gsl_CONFIG_SPAN_INDEX_TYPE
 
-#if ! defined( gsl_CONFIG_INDEX_TYPE )
+#if defined( gsl_CONFIG_INDEX_TYPE )
+# if ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: defining a custom gsl_CONFIG_INDEX_TYPE changes the ABI of gsl-lite, which may lead to ODR violations and undefined behavior; define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
+# endif
+#else // ! defined( gsl_CONFIG_INDEX_TYPE )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
 // p0122r3 uses std::ptrdiff_t
 #  define gsl_CONFIG_INDEX_TYPE  std::ptrdiff_t
 # else
+#  if ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#   pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: with version-0 defaults, gsl_CONFIG_INDEX_TYPE defaults to gsl_CONFIG_SPAN_INDEX_TYPE, which changes the ABI of gsl-lite and may lead to ODR violations and undefined behavior; use version-1 defaults or define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
+#  endif
 #  define gsl_CONFIG_INDEX_TYPE  gsl_CONFIG_SPAN_INDEX_TYPE
 # endif
 #endif
@@ -342,8 +359,14 @@
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=" gsl_STRINGIFY(gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION) ", must be 0 or 1")
 # endif
+# if ! gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION && ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: the configuration value gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=0 changes the ABI of gsl-lite, which may lead to ODR violations and undefined behavior; define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
+# endif
 #else
 # define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
+# if gsl_CONFIG_DEFAULTS_VERSION < 1 && ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: with version-0 defaults, gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION defaults to 0, which changes the ABI of gsl-lite and may lead to ODR violations and undefined behavior; use version-1 defaults or define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
+# endif
 #endif
 #define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_()  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 
@@ -661,6 +684,7 @@
 # define gsl_COMPILER_ARMCC_VERSION       0
 # define gsl_COMPILER_ARMCC_VERSION_FULL  0
 #endif
+
 
 // Compiler non-strict aliasing:
 
@@ -1219,6 +1243,40 @@
 #endif
 
 
+// Link-time ABI incompatibility detection (MSVC only):
+
+#if defined( _MSC_VER ) && _MSC_VER >= 1900 // VS 2015 and newer
+# if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+#  define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ 1
+# else
+#  define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ 0
+# endif
+# if gsl_FEATURE( BYTE ) && ! gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
+#  define gsl_CPP98_BYTE_VAL_ 1
+# else
+#  define gsl_CPP98_BYTE_VAL_ 0
+# endif
+# if defined( gsl_api )
+#  define gsl_GSL_API_VAL_ gsl_api
+# else
+#  define gsl_GSL_API_VAL_ default
+# endif
+# if gsl_HAVE( INTEGRAL_CONSTANT )
+#  define gsl_INTEGRAL_CONSTANT_VAL_ std
+# elif gsl_HAVE( TR1_INTEGRAL_CONSTANT )
+#  define gsl_INTEGRAL_CONSTANT_VAL_ tr1
+# else
+#  define gsl_INTEGRAL_CONSTANT_VAL_ gsl-lite
+# endif
+//# pragma message( "v" gsl_STRINGIFY( gsl_lite_MAJOR ) " gsl_api:" gsl_STRINGIFY( gsl_GSL_API_VAL_ ) " gsl_CONFIG_SPAN_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_SPAN_INDEX_TYPE ) " gsl_CONFIG_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_INDEX_TYPE )" gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION:" gsl_STRINGIFY( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ ) " byte98:" gsl_STRINGIFY( gsl_CPP98_BYTE_VAL_ ) " integral_constant:" gsl_STRINGIFY( gsl_INTEGRAL_CONSTANT_VAL_ ) )
+# pragma detect_mismatch( "gsl-lite", "v" gsl_STRINGIFY( gsl_lite_MAJOR ) " gsl_api:" gsl_STRINGIFY( gsl_GSL_API_VAL_ ) " gsl_CONFIG_SPAN_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_SPAN_INDEX_TYPE ) " gsl_CONFIG_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_INDEX_TYPE )" gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION:" gsl_STRINGIFY( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ ) " byte98:" gsl_STRINGIFY( gsl_CPP98_BYTE_VAL_ ) " integral_constant:" gsl_STRINGIFY( gsl_INTEGRAL_CONSTANT_VAL_ ) )
+# undef gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_
+# undef gsl_CPP98_BYTE_VAL_
+# undef gsl_GSL_API_VAL_
+# undef gsl_INTEGRAL_CONSTANT_VAL_
+#endif // defined( _MSC_VER ) && _MSC_VER >= 1900
+
+
 // Other features:
 
 #define gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR       ( gsl_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG && gsl_HAVE_CONTAINER_DATA_METHOD )
@@ -1238,7 +1296,7 @@
 // of NVCC (currently an experimental feature) will implicitly consider constexpr functions `__host__ __device__` functions
 // but tolerates calls to host-only or device-only functions.
 
-#ifndef   gsl_api
+#if ! defined( gsl_api )
 # ifdef   __CUDACC__
 #  define gsl_api __host__ __device__
 # else
@@ -1416,33 +1474,7 @@ bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, 
 
 namespace std11 {
 
-#if gsl_HAVE( ADD_CONST )
-
-using std::add_const;
-
-#elif gsl_HAVE( TR1_ADD_CONST )
-
-using std::tr1::add_const;
-
-#else
-
 template< class T > struct add_const { typedef const T type; };
-
-#endif // gsl_HAVE( ADD_CONST )
-
-#if gsl_HAVE( REMOVE_CONST )
-
-using std::remove_cv;
-using std::remove_const;
-using std::remove_volatile;
-
-#elif gsl_HAVE( TR1_REMOVE_CONST )
-
-using std::tr1::remove_cv;
-using std::tr1::remove_const;
-using std::tr1::remove_volatile;
-
-#else
 
 template< class T > struct remove_const          { typedef T type; };
 template< class T > struct remove_const<T const> { typedef T type; };
@@ -1456,25 +1488,11 @@ struct remove_cv
     typedef typename remove_volatile<typename remove_const<T>::type>::type type;
 };
 
-#endif // gsl_HAVE( REMOVE_CONST )
-
-#if gsl_HAVE( REMOVE_REFERENCE )
-
-using std::remove_reference;
-
-#elif gsl_HAVE( TR1_REMOVE_REFERENCE )
-
-using std::tr1::remove_reference;
-
-#else
-
 template< class T > struct remove_reference { typedef T type; };
 template< class T > struct remove_reference<T&> { typedef T type; };
 # if gsl_HAVE( RVALUE_REFERENCE )
 template< class T > struct remove_reference<T&&> { typedef T type; };
 # endif
-
-#endif // gsl_HAVE( REMOVE_REFERENCE )
 
 
 #if gsl_HAVE( INTEGRAL_CONSTANT )
@@ -1722,15 +1740,7 @@ ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
 
 #endif // gsl_HAVE( STD_SSIZE )
 
-#if gsl_HAVE( REMOVE_CVREF )
-
-using std::remove_cvref;
-
-#else
-
 template< class T > struct remove_cvref { typedef typename std11::remove_cv< typename std11::remove_reference< T >::type >::type type; };
-
-#endif // gsl_HAVE( REMOVE_CVREF )
 
 } // namespace std20
 
@@ -2684,7 +2694,7 @@ struct not_null_data< T *, true >
 template< class T >
 struct is_copyable
 #if gsl_HAVE( TYPE_TRAITS )
-: std11::integral_constant< bool, std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value >
+: std::integral_constant< bool, std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value >
 #else
 : std11::true_type
 #endif
@@ -3481,6 +3491,9 @@ make_shared( Args &&... args )
 # if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
   enum class gsl_may_alias byte : unsigned char {};
 # else
+#  if ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
+#   pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: in pre-C++11 mode, byte is defined as a struct rather than an enum, which changes the ABI of gsl-lite and may lead to ODR violations and undefined behavior; define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
+#  endif
   struct gsl_may_alias byte { typedef unsigned char type; type v; };
 # endif
 

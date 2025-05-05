@@ -64,8 +64,18 @@ set( SOURCES
     "string_span.t.cpp"
     "util.t.cpp"
 )
-make_test_targets( "gsl-lite-v0" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v0 )
-make_test_targets( "gsl-lite-v1" 99 SOURCES ${SOURCES} DEFAULTS_VERSION v1 )
+make_test_targets(
+    "gsl-lite-v0" 99
+    SOURCES ${SOURCES}
+    DEFAULTS_VERSION v0
+    EXTRA_OPTIONS
+        "-Dgsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1"
+)
+make_test_targets(
+    "gsl-lite-v1" 99
+    SOURCES ${SOURCES}
+    DEFAULTS_VERSION v1
+)
 
 
 # Add test targets for no-exception build:
