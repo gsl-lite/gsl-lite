@@ -2121,41 +2121,36 @@ gsl_api void fail_fast_assert_handler( char const * const expression, char const
 // GSL.util: utilities
 //
 
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-
-// Add uncaught_exceptions for pre-2017 MSVC, GCC and Clang
-// Return unsigned char to save stack space, uncaught_exceptions can only increase by 1 in a scope
+// Add uncaught_exceptions() for pre-2017 MSVC, GCC and Clang
 
 namespace std11 {
 
-# if gsl_HAVE( UNCAUGHT_EXCEPTIONS )
+#if gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 
-inline unsigned char uncaught_exceptions() gsl_noexcept
+inline int uncaught_exceptions() gsl_noexcept
 {
-    return static_cast<unsigned char>( std::uncaught_exceptions() );
+    return std::uncaught_exceptions();
 }
 
-# else // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-#  if defined( _MSC_VER ) // MS-STL with either MSVC or clang-cl
+#else // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
+# if defined( _MSC_VER ) // MS-STL with either MSVC or clang-cl
 
-inline unsigned char uncaught_exceptions() gsl_noexcept
+inline int uncaught_exceptions() gsl_noexcept
 {
-    return static_cast<unsigned char>( *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) ) );
+    return *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) );
 }
 
-#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
+# elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 
-inline unsigned char uncaught_exceptions() gsl_noexcept
+inline int uncaught_exceptions() gsl_noexcept
 {
-    return static_cast<unsigned char>( ( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) ) );
+    return ( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) );
 }
 
-#  endif
 # endif
+#endif
 
 } // namespace std11
-
-#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 #if gsl_STDLIB_CPP11_110
 
@@ -2163,33 +2158,33 @@ gsl_DISABLE_MSVC_WARNINGS( 4702 ) // unreachable code
 
 template< class F >
 class final_action
+# if gsl_HAVE( OVERRIDE_FINAL )
+final
+# endif
 {
 public:
     explicit final_action( F action ) gsl_noexcept
         : action_( std::move( action ) )
-# if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# if ! gsl_CPP17_OR_GREATER
         , invoke_( true )
 # endif
     {
     }
 
         // We only provide the move constructor for legacy defaults, or if we cannot rely on C++17 guaranteed copy elision.
-# if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# if ! gsl_CPP17_OR_GREATER
     final_action( final_action && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , invoke_( other.invoke_ )
     {
         other.invoke_ = false;
     }
-# endif // gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# endif // ! gsl_CPP17_OR_GREATER
 
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
-# if gsl_CONFIG_DEFAULTS_VERSION < 1  // we avoid the unnecessary virtual calls if modern defaults are selected
-    virtual
-# endif
     ~final_action() gsl_noexcept
     {
-# if gsl_CONFIG_DEFAULTS_VERSION < 1 || ! gsl_CPP17_OR_GREATER
+# if ! gsl_CPP17_OR_GREATER
         if ( invoke_ )
 # endif
         {
@@ -2201,14 +2196,6 @@ gsl_is_delete_access:
     final_action( final_action const & ) gsl_is_delete;
     final_action & operator=( final_action const & ) gsl_is_delete;
     final_action & operator=( final_action && ) gsl_is_delete;
-
-# if gsl_CONFIG_DEFAULTS_VERSION < 1
-protected:
-    void dismiss() gsl_noexcept
-    {
-        invoke_ = false;
-    }
-# endif // gsl_CONFIG_DEFAULTS_VERSION < 1
 
 private:
     F action_;
@@ -2224,9 +2211,11 @@ finally( F && action ) gsl_noexcept
 
 # if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-#  if gsl_CONFIG_DEFAULTS_VERSION >= 1
 template< class F >
 class final_action_return
+#  if gsl_HAVE( OVERRIDE_FINAL )
+final
+#  endif
 {
 public:
     explicit final_action_return( F action ) gsl_noexcept
@@ -2236,21 +2225,21 @@ public:
     }
 
         // We only provide the move constructor if we cannot rely on C++17 guaranteed copy elision.
-#   if ! gsl_CPP17_OR_GREATER
+#  if ! gsl_CPP17_OR_GREATER
     final_action_return( final_action_return && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
     {
-        other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
+        other.exception_count_ = -1;  // abuse member as special "no-invoke" marker
     }
-#   endif // ! gsl_CPP17_OR_GREATER
+#  endif // ! gsl_CPP17_OR_GREATER
 
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_return() gsl_noexcept
     {
-#   if ! gsl_CPP17_OR_GREATER
-        if ( exception_count_ != 0xFF )  // abuse member as special "no-invoke" marker
-#   endif
+#  if ! gsl_CPP17_OR_GREATER
+        if ( exception_count_ != -1 )  // abuse member as special "no-invoke" marker
+#  endif
         {
             if ( std11::uncaught_exceptions() == exception_count_ )
             {
@@ -2266,10 +2255,13 @@ gsl_is_delete_access:
 
 private:
     F action_;
-    unsigned char exception_count_;
+    int exception_count_;
 };
 template< class F >
 class final_action_error
+#  if gsl_HAVE( OVERRIDE_FINAL )
+final
+#  endif
 {
 public:
     explicit final_action_error( F action ) gsl_noexcept
@@ -2279,21 +2271,21 @@ public:
     }
 
         // We only provide the move constructor if we cannot rely on C++17 guaranteed copy elision.
-#   if ! gsl_CPP17_OR_GREATER
+#  if ! gsl_CPP17_OR_GREATER
     final_action_error( final_action_error && other ) gsl_noexcept
         : action_( std::move( other.action_ ) )
         , exception_count_( other.exception_count_ )
     {
-        other.exception_count_ = 0xFF;  // abuse member as special "no-invoke" marker
+        other.exception_count_ = -1;  // abuse member as special "no-invoke" marker
     }
-#   endif // ! gsl_CPP17_OR_GREATER
+#  endif // ! gsl_CPP17_OR_GREATER
 
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_error() gsl_noexcept
     {
-#   if ! gsl_CPP17_OR_GREATER
-        if ( exception_count_ != 0xFF )  // abuse member as special "no-invoke" marker
-#   endif
+#  if ! gsl_CPP17_OR_GREATER
+        if ( exception_count_ != -1 )  // abuse member as special "no-invoke" marker
+#  endif
         {
             if ( std11::uncaught_exceptions() != exception_count_ )
             {
@@ -2309,65 +2301,8 @@ gsl_is_delete_access:
 
 private:
     F action_;
-    unsigned char exception_count_;
+    int exception_count_;
 };
-#  else // gsl_CONFIG_DEFAULTS_VERSION < 1
-template< class F >
-class final_action_return : public final_action<F>
-{
-public:
-    explicit final_action_return( F && action ) gsl_noexcept
-        : final_action<F>( std::move( action ) )
-        , exception_count( std11::uncaught_exceptions() )
-    {}
-
-    final_action_return( final_action_return && other ) gsl_noexcept
-        : final_action<F>( std::move( other ) )
-        , exception_count( std11::uncaught_exceptions() )
-    {}
-
-    ~final_action_return() override
-    {
-        if ( std11::uncaught_exceptions() != exception_count )
-            this->dismiss();
-    }
-
-gsl_is_delete_access:
-    final_action_return( final_action_return const & ) gsl_is_delete;
-    final_action_return & operator=( final_action_return const & ) gsl_is_delete;
-
-private:
-    unsigned char exception_count;
-};
-
-template< class F >
-class final_action_error : public final_action<F>
-{
-public:
-    explicit final_action_error( F && action ) gsl_noexcept
-        : final_action<F>( std::move( action ) )
-        , exception_count( std11::uncaught_exceptions() )
-    {}
-
-    final_action_error( final_action_error && other ) gsl_noexcept
-        : final_action<F>( std::move( other ) )
-        , exception_count( std11::uncaught_exceptions() )
-    {}
-
-    ~final_action_error() override
-    {
-        if ( std11::uncaught_exceptions() == exception_count )
-            this->dismiss();
-    }
-
-gsl_is_delete_access:
-    final_action_error( final_action_error const & ) gsl_is_delete;
-    final_action_error & operator=( final_action_error const & ) gsl_is_delete;
-
-private:
-    unsigned char exception_count;
-};
-#  endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
 
 template< class F >
 gsl_NODISCARD inline final_action_return<typename std::decay<F>::type>
@@ -2386,127 +2321,6 @@ on_error( F && action ) gsl_noexcept
 # endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 gsl_RESTORE_MSVC_WARNINGS()
-
-#else // ! gsl_STDLIB_CPP11_110
-
-# if gsl_DEPRECATE_TO_LEVEL( 8 )
-gsl_DEPRECATED_MSG("final_action for pre-C++11 compilers is deprecated")
-# endif // gsl_DEPRECATE_TO_LEVEL( 8 )
-class final_action
-{
-public:
-    typedef void (*Action)();
-
-    final_action( Action action )
-    : action_( action )
-    , invoke_( true )
-    {}
-
-    final_action( final_action const & other )
-        : action_( other.action_ )
-        , invoke_( other.invoke_ )
-    {
-        other.invoke_ = false;
-    }
-
-    virtual ~final_action()
-    {
-        if ( invoke_ )
-            action_();
-    }
-
-protected:
-    void dismiss()
-    {
-        invoke_ = false;
-    }
-
-private:
-    final_action & operator=( final_action const & );
-
-private:
-    Action action_;
-    mutable bool invoke_;
-};
-
-template< class F >
-# if gsl_DEPRECATE_TO_LEVEL( 8 )
-gsl_DEPRECATED_MSG("finally() for pre-C++11 compilers is deprecated")
-# endif // gsl_DEPRECATE_TO_LEVEL( 8 )
-inline final_action finally( F const & f )
-{
-    return final_action( f );
-}
-
-# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-
-#  if gsl_DEPRECATE_TO_LEVEL( 8 )
-gsl_DEPRECATED_MSG("final_action_return for pre-C++11 compilers is deprecated")
-#  endif // gsl_DEPRECATE_TO_LEVEL( 8 )
-class final_action_return : public final_action
-{
-public:
-    explicit final_action_return( Action action )
-        : final_action( action )
-        , exception_count( std11::uncaught_exceptions() )
-    {}
-
-    ~final_action_return()
-    {
-        if ( std11::uncaught_exceptions() != exception_count )
-            this->dismiss();
-    }
-
-private:
-    final_action_return & operator=( final_action_return const & );
-
-private:
-    unsigned char exception_count;
-};
-
-template< class F >
-#  if gsl_DEPRECATE_TO_LEVEL( 8 )
-gsl_DEPRECATED_MSG("on_return() for pre-C++11 compilers is deprecated")
-#  endif // gsl_DEPRECATE_TO_LEVEL( 8 )
-inline final_action_return on_return( F const & action )
-{
-    return final_action_return( action );
-}
-
-#  if gsl_DEPRECATE_TO_LEVEL( 8 )
-gsl_DEPRECATED_MSG("final_action_error for pre-C++11 compilers is deprecated")
-#  endif // gsl_DEPRECATE_TO_LEVEL( 8 )
-class final_action_error : public final_action
-{
-public:
-    explicit final_action_error( Action action )
-        : final_action( action )
-        , exception_count( std11::uncaught_exceptions() )
-    {}
-
-    ~final_action_error()
-    {
-        if ( std11::uncaught_exceptions() == exception_count )
-            this->dismiss();
-    }
-
-private:
-    final_action_error & operator=( final_action_error const & );
-
-private:
-    unsigned char exception_count;
-};
-
-template< class F >
-#  if gsl_DEPRECATE_TO_LEVEL( 8 )
-gsl_DEPRECATED_MSG("on_error() for pre-C++11 compilers is deprecated")
-#  endif // gsl_DEPRECATE_TO_LEVEL( 8 )
-inline final_action_error on_error( F const & action )
-{
-    return final_action_error( action );
-}
-
-# endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
 #endif // gsl_STDLIB_CPP11_110
 

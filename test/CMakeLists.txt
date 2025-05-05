@@ -86,6 +86,7 @@ make_test_targets( "gsl-lite-v1-special" 11
     SOURCES
         gsl-lite.t.cpp
         not_null.t.cpp
+        util.t.cpp
     EXTRA_OPTIONS
         "-Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1"
         "-Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t"
