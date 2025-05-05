@@ -46,12 +46,17 @@ int dereference(int const* pi) noexcept // expect C26429
 {
     return *pi;
 }
-int dereferenceNotNull(gsl::not_null<int*> pi)
+int dereferenceNotNull(gsl::not_null<int const*> pi)
 {
     return *pi;
 }
-int dereferenceNotNull2(gsl_lite::not_null<int*> pi)
+int dereferenceNotNull2(gsl_lite::not_null<int const*> pi)
 {
+    return *pi;
+}
+int dereferenceNotNull3(int const* pi)
+{
+    Expects(pi != nullptr);
     return *pi;
 }
 

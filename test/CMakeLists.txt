@@ -164,7 +164,7 @@ if( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS AND MSVC AND CMAKE_GENERATOR MATCHE
     make_test_target( "${PROGRAM}-v1-cpplatest-CppCoreCheck"
         STD latest
         EXTRA_OPTIONS
-            "-Dgsl_FEATURE_GSL_MODE=1"
+            "-Dgsl_FEATURE_GSL_COMPATIBILITY_MODE=1"
         SOURCES "core_check.t.cpp"
         DEFAULTS_VERSION v1
         COMPILE_ONLY
