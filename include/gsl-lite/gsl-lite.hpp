@@ -69,7 +69,7 @@
 
 #if defined( gsl_CONFIG_DEFAULTS_VERSION )
 # if ! gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( gsl_CONFIG_DEFAULTS_VERSION )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEFAULTS_VERSION=" gsl_STRINGIFY(gsl_CONFIG_DEFAULTS_VERSION) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEFAULTS_VERSION=" gsl_STRINGIFY(gsl_CONFIG_DEFAULTS_VERSION) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_DEFAULTS_VERSION  gsl_lite_MAJOR  // default
@@ -78,39 +78,39 @@
 
 #if defined( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR )
-#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
 # endif
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
-# pragma message ("gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ON )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ON) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ON) "; macro must be defined without value")
 # endif
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ON.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ON.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 #endif
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_OFF )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_OFF) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_OFF) "; macro must be defined without value")
 # endif
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_OFF.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 #if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY) "; macro must be defined without value")
 # endif
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF
 # define gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF
 #elif defined( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY) "; macro must be defined without value")
 # endif
-# pragma message ("gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF
 # define gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF
@@ -119,43 +119,43 @@
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
-# pragma message ("do not use legacy M-GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy M-GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
-#  pragma message ("invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
-# pragma message ("do not use legacy M-GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy M-GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
-#  pragma message ("invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
 # define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
-# pragma message ("do not use legacy M-GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy M-GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
-#  pragma message ("invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 
 // Configuration: Features
 
-#if defined( gsl_FEATURE_GSL_MODE )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_MODE )
-#  pragma message ("invalid configuration value gsl_FEATURE_GSL_MODE=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
+#if defined( gsl_FEATURE_GSL_COMPATIBILITY_MODE )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_COMPATIBILITY_MODE )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_GSL_COMPATIBILITY_MODE=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
 # endif
 #else
-# define gsl_FEATURE_GSL_MODE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+# define gsl_FEATURE_GSL_COMPATIBILITY_MODE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
-#define gsl_FEATURE_GSL_MODE_()  gsl_FEATURE_GSL_MODE
+#define gsl_FEATURE_GSL_COMPATIBILITY_MODE_()  gsl_FEATURE_GSL_COMPATIBILITY_MODE
 
 #if defined( gsl_FEATURE_WITH_CONTAINER_TO_STD )
 # if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_WITH_CONTAINER_TO_STD )
-#  pragma message ("invalid configuration value gsl_FEATURE_WITH_CONTAINER_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_WITH_CONTAINER_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_WITH_CONTAINER_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_WITH_CONTAINER_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
 # endif
 #else
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
@@ -168,7 +168,7 @@
 
 #if defined( gsl_FEATURE_MAKE_SPAN_TO_STD )
 # if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_MAKE_SPAN_TO_STD )
-#  pragma message ("invalid configuration value gsl_FEATURE_MAKE_SPAN_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_MAKE_SPAN_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_MAKE_SPAN_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_MAKE_SPAN_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
 # endif
 #else
 # define gsl_FEATURE_MAKE_SPAN_TO_STD  99  // default
@@ -177,7 +177,7 @@
 
 #if defined( gsl_FEATURE_BYTE_SPAN_TO_STD )
 # if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_BYTE_SPAN_TO_STD )
-#  pragma message ("invalid configuration value gsl_FEATURE_BYTE_SPAN_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_BYTE_SPAN_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_BYTE_SPAN_TO_STD=" gsl_STRINGIFY(gsl_FEATURE_BYTE_SPAN_TO_STD) ", must be 98, 3, 11, 14, 17, or 20")
 # endif
 #else
 # define gsl_FEATURE_BYTE_SPAN_TO_STD  99  // default
@@ -186,7 +186,7 @@
 
 #if defined( gsl_FEATURE_IMPLICIT_MACRO )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_IMPLICIT_MACRO )
-#  pragma message ("invalid configuration value gsl_FEATURE_IMPLICIT_MACRO=" gsl_STRINGIFY(gsl_FEATURE_IMPLICIT_MACRO) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_IMPLICIT_MACRO=" gsl_STRINGIFY(gsl_FEATURE_IMPLICIT_MACRO) ", must be 0 or 1")
 # endif
 #else
 # define gsl_FEATURE_IMPLICIT_MACRO  0  // default
@@ -195,7 +195,7 @@
 
 #if defined( gsl_FEATURE_OWNER_MACRO )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_OWNER_MACRO )
-#  pragma message ("invalid configuration value gsl_FEATURE_OWNER_MACRO=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_OWNER_MACRO=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
 # endif
 #else
 # define gsl_FEATURE_OWNER_MACRO  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
@@ -204,7 +204,7 @@
 
 #if defined( gsl_FEATURE_STRING_SPAN )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
-#  pragma message ("invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
 # endif
 #else
 # define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
@@ -213,7 +213,7 @@
 
 #if defined( gsl_FEATURE_BYTE )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_BYTE )
-#  pragma message ("invalid configuration value gsl_FEATURE_BYTE=" gsl_STRINGIFY(gsl_FEATURE_BYTE) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_BYTE=" gsl_STRINGIFY(gsl_FEATURE_BYTE) ", must be 0 or 1")
 # endif
 #else
 # define gsl_FEATURE_BYTE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
@@ -222,7 +222,7 @@
 
 #if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
-#  pragma message ("invalid configuration value gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=" gsl_STRINGIFY(gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=" gsl_STRINGIFY(gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD) ", must be 0 or 1")
 # endif
 #else
 # define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0 // default
@@ -231,7 +231,7 @@
 
 #if defined( gsl_FEATURE_GSL_LITE_NAMESPACE )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_LITE_NAMESPACE )
-#  pragma message ("invalid configuration value gsl_FEATURE_GSL_LITE_NAMESPACE=" gsl_STRINGIFY(gsl_FEATURE_GSL_LITE_NAMESPACE) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_GSL_LITE_NAMESPACE=" gsl_STRINGIFY(gsl_FEATURE_GSL_LITE_NAMESPACE) ", must be 0 or 1")
 # endif
 # if ! gsl_FEATURE_GSL_LITE_NAMESPACE
 #  error gsl_FEATURE_GSL_LITE_NAMESPACE is a required feature since gsl-lite v1.0 and cannot be switched off
@@ -245,7 +245,7 @@
 
 #if defined( gsl_CONFIG_TRANSPARENT_NOT_NULL )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_TRANSPARENT_NOT_NULL )
-#  pragma message ("invalid configuration value gsl_CONFIG_TRANSPARENT_NOT_NULL=" gsl_STRINGIFY(gsl_CONFIG_TRANSPARENT_NOT_NULL) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_TRANSPARENT_NOT_NULL=" gsl_STRINGIFY(gsl_CONFIG_TRANSPARENT_NOT_NULL) ", must be 0 or 1")
 # endif
 # if gsl_CONFIG_TRANSPARENT_NOT_NULL && defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
 #  error configuration option gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF is meaningless if gsl_CONFIG_TRANSPARENT_NOT_NULL=1
@@ -280,7 +280,7 @@
 
 #if defined( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
-#  pragma message ("invalid configuration value gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
@@ -289,7 +289,7 @@
 
 #if defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
-#  pragma message ("invalid configuration value gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=" gsl_STRINGIFY(gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0  // default
@@ -298,7 +298,7 @@
 
 #if defined( gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=" gsl_STRINGIFY(gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=" gsl_STRINGIFY(gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0  // default
@@ -307,7 +307,7 @@
 
 #if defined( gsl_CONFIG_ALLOWS_SPAN_COMPARISON )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_SPAN_COMPARISON )
-#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_SPAN_COMPARISON=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_COMPARISON) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_ALLOWS_SPAN_COMPARISON=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_COMPARISON) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_ALLOWS_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
@@ -316,7 +316,7 @@
 
 #if defined( gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON )
-#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1  // default
@@ -325,7 +325,7 @@
 
 #if defined( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR )
-#  pragma message ("invalid configuration value gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0  // default
@@ -334,7 +334,7 @@
 
 #if defined( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
-#  pragma message ("invalid configuration value gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=" gsl_STRINGIFY(gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=" gsl_STRINGIFY(gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
@@ -343,7 +343,7 @@
 
 #if defined( gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
-#  pragma message ("invalid configuration value gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS=" gsl_STRINGIFY(gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS) ", must be 0 or 1")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS=" gsl_STRINGIFY(gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS) ", must be 0 or 1")
 # endif
 #else
 # define gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS  1  // default
@@ -352,107 +352,107 @@
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_AUDIT=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_AUDIT) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_AUDIT=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_AUDIT) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_ON )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_ON )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ON) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_ON) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_OFF )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_AUDIT) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_ON) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_CHECKING_OFF) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_THROWS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_THROWS) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_THROWS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_THROWS) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_TRAPS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_TRAPS) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_TRAPS=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_TRAPS) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  pragma message ("invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME )
-#  pragma message ("invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE )
-#  pragma message ("invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ASSUME) "; macro must be defined without value")
 # endif
 #endif
 #if defined( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE )
-#  pragma message ("invalid configuration value gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE=" gsl_STRINGIFY(gsl_CONFIG_DEVICE_UNENFORCED_CONTRACTS_ELIDE) "; macro must be defined without value")
 # endif
 #endif
 
@@ -5551,13 +5551,13 @@ public:
 #endif // gsl_HAVE( HASH )
 
 
-#if gsl_FEATURE( GSL_MODE )
+#if gsl_FEATURE( GSL_COMPATIBILITY_MODE )
 
-// Enable GSL mode by aliasing all symbols in the `gsl` namespace and defining the unprefixed macros
-// `Expects()` and `Ensures()`.
+// Enable GSL compatibility mode by aliasing all symbols in the `gsl` namespace and defining the unprefixed
+// macros `Expects()` and `Ensures()`.
 //
-// gsl-lite can generally coexist with Microsoft GSL. However, if GSL mode is enabled, gsl-lite cannot
-// be used in the same translation unit as Microsoft GSL.
+// gsl-lite can generally coexist with Microsoft GSL. However, if GSL compatibility mode is enabled,
+// gsl-lite cannot be used in the same translation unit as Microsoft GSL.
 // (Link-time compatibility is unaffected; different translation units that use either Microsoft GSL
 // or gsl-lite may be linked together.)
 
@@ -5566,7 +5566,7 @@ namespace gsl = ::gsl_lite;
 #define   Expects( x )           gsl_Expects( x )
 #define   Ensures( x )           gsl_Ensures( x )
 
-#endif // gsl_FEATURE( GSL_MODE )
+#endif // gsl_FEATURE( GSL_COMPATIBILITY_MODE )
 
 gsl_RESTORE_MSVC_WARNINGS()
 #if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
