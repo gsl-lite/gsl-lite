@@ -172,7 +172,9 @@ if( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS AND MSVC AND CMAKE_GENERATOR MATCHE
         STD latest
         EXTRA_OPTIONS
             "-Dgsl_FEATURE_GSL_COMPATIBILITY_MODE=1"
-        SOURCES "core_check.t.cpp"
+        SOURCES
+            "core_check.t.cpp"
+            "core_check_lite.t.cpp"
         DEFAULTS_VERSION v1
         COMPILE_ONLY
         NO_PCH
