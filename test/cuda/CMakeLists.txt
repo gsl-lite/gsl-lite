@@ -9,11 +9,7 @@ cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 project( gsl-lite-test-cuda LANGUAGES CXX CUDA )
 
-set( unit_name "gsl" )
-set( PACKAGE   ${unit_name}-lite )
-set( PROGRAM   ${unit_name}-lite )
-
-message( STATUS "Subproject '${PROJECT_NAME}', programs '${PROGRAM}-*'")
+message( STATUS "Subproject '${PROJECT_NAME}', programs 'gsl-lite-*'")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../MakeTestTarget.cmake)
 
@@ -39,11 +35,11 @@ set( SOURCES
 )
 set_property( SOURCE ${SOURCES} PROPERTY LANGUAGE CUDA ) # compile .cpp files with the CUDA compiler
 
-make_cuda_test_targets( "${PROGRAM}" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} )
-make_cuda_test_targets( "${PROGRAM}-expt" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} EXTRA_OPTIONS "--expt-relaxed-constexpr" )
+make_cuda_test_targets( "gsl-lite" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} )
+make_cuda_test_targets( "gsl-lite-expt" 99 SOURCES ${SOURCES} ${CUDA_SOURCES} EXTRA_OPTIONS "--expt-relaxed-constexpr" )
 
 if( CMAKE_CUDA_COMPILER_ID MATCHES "Clang" OR ( CMAKE_CUDA_COMPILER_ID MATCHES "NVIDIA" AND CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER 11.3 ) )
-    make_cuda_test_targets( "${PROGRAM}-assume" 14
+    make_cuda_test_targets( "gsl-lite-assume" 14
         SOURCES ${SOURCES} ${CUDA_SOURCES}
         DEFAULTS_VERSION v1
         CONTRACT_CHECKING OFF

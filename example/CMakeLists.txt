@@ -7,7 +7,7 @@
 
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
-project( gsl-lite-example LANGUAGES CXX )
+project( gsl-lite-examples LANGUAGES CXX )
 
 message( STATUS "Subproject '${PROJECT_NAME}'")
 
