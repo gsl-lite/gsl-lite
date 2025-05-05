@@ -1,12 +1,11 @@
-# Copyright 2015-2018 by Martin Moene
-# Copyright 2019-2021 by Moritz Beutel
+﻿# Copyright 2015-2019 by Martin Moene
+# Copyright 2019-2025 by Moritz Beutel
 #
-# gsl-lite is based on GSL: Guidelines Support Library,
-# https://github.com/microsoft/gsl
+# https://github.com/gsl-lite/gsl-lite
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.17 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 project( gsl-lite-test-cuda LANGUAGES CXX CUDA )
 
@@ -52,6 +51,3 @@ if( CMAKE_CUDA_COMPILER_ID MATCHES "Clang" OR ( CMAKE_CUDA_COMPILER_ID MATCHES "
         COMPILE_ONLY
     )
 endif()
-
-
-# end of file

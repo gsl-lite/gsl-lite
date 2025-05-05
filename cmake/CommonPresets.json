@@ -1,0 +1,235 @@
+﻿// Collection of generally useful CMake configuration presets.
+// The contents of this file are in the public domain.
+// (Moritz Beutel, 2025)
+{
+    "version": 7,
+    "configurePresets": [
+        {
+            "name": "use Vcpkg",
+            "hidden": true,
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+
+        {
+            "name": "compiler presets",
+            "hidden": true,
+            "environment": {
+                "_CFLAGS": "$penv{CFLAGS} $env{_PRESET_CFLAGS} $env{_USE_PRESET_WARN} $env{_USE_PRESET_WARNERR} $env{_USE_PRESET_ASAN} $env{_USE_PRESET_UBSAN} $env{_USE_PRESET_TSAN} $env{_USE_PRESET_STDLIB}",
+                "_CXXFLAGS": "$penv{CXXFLAGS} $env{_PRESET_CXXFLAGS} $env{_USE_PRESET_WARN} $env{_USE_PRESET_WARNERR} $env{_USE_PRESET_ASAN} $env{_USE_PRESET_UBSAN} $env{_USE_PRESET_TSAN} $env{_USE_PRESET_STDLIB} $env{_USE_PRESET_DEBUGCHECKS}",
+                "CFLAGS": "$env{_CFLAGS}",
+                "CXXFLAGS": "$env{_CXXFLAGS}"
+            }
+        },
+
+        {
+            // "CI" covers AppVeyor, GitHub Actions, GitLab CI, Travis CI, and possibly others.
+            "name": "CI",
+            "hidden": true,
+            "condition": {
+                "type": "notEquals",
+                "lhs": "$env{CI}$env{CIRCLECI}$env{TF_BUILD}",
+                "rhs": ""
+            }
+        },
+
+        {
+            // For MSVC, enable UTF-8 source file encoding, the highest warning level, and some additional warnings:
+            // W44062: enumerator 'identifier' in a switch of enum 'enumeration' is not handled
+            // W44242: 'identifier': conversion from 'type1' to 'type2', possible loss of data
+            // W44254: 'operator': conversion from 'type1' to 'type2', possible loss of data
+            // W44265: 'class': class has virtual functions, but destructor is not virtual
+            "name": "MSVC presets",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_PRESET_CFLAGS": "/utf-8 /permissive-",
+                "_PRESET_CXXFLAGS": "/utf-8 /permissive-",
+                "_PRESET_WARN": "/W4 /w44062 /w44242 /w44254 /w44265",
+                "_PRESET_WARNERR": "/WX",
+                "_PRESET_ASAN": "/fsanitize=address",
+                "_PRESET_UBSAN": "/fsanitize=undefined", // not currently supported
+                "_PRESET_TSAN": "/fsanitize=thread", // not currently supported
+                "_PRESET_DEBUGCHECKS": "/D_ITERATOR_DEBUG_LEVEL=1"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            // For clang-cl, use the same general presets as for MSVC with some minor changes.
+            "name": "clang-cl presets",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_PRESET_CFLAGS": "/utf-8 /permissive-",
+                "_PRESET_CXXFLAGS": "/utf-8 /permissive-",
+                "_PRESET_WARN": "/W4 /w44062 /w44242 /w44254 /w44265",
+                "_PRESET_WARNERR": "/WX",
+                "_PRESET_ASAN": "/fsanitize=address",
+                "_PRESET_UBSAN": "-fsanitize=undefined -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
+                "_PRESET_TSAN": "-fsanitize=thread", // not currently supported
+                "_PRESET_DEBUGCHECKS": "/D_ITERATOR_DEBUG_LEVEL=1"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            // For GCC, enable the highest warning level and pedantic mode.
+            "name": "GCC presets",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_PRESET_CFLAGS": "",
+                "_PRESET_CXXFLAGS": "",
+                "_PRESET_WARN": "-Wall -Wextra -pedantic",
+                "_PRESET_WARNERR": "-Werror",
+                "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
+                "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-undefined-trap-on-error",
+                "_PRESET_TSAN": "-fsanitize=thread",
+                "_PRESET_DEBUGCHECKS": "-D_GLIBCXX_DEBUG"
+            }
+        },
+        {
+            // For Clang, enable the highest warning level and pedantic mode.
+            "name": "Clang presets",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_PRESET_CFLAGS": "",
+                "_PRESET_CXXFLAGS": "",
+                "_PRESET_WARN": "-Wall -Wextra -pedantic",
+                "_PRESET_WARNERR": "-Werror",
+                "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
+                "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
+                "_PRESET_TSAN": "-fsanitize=thread",
+                "_PRESET_DEBUGCHECKS": "-D_LIBCPP_DEBUG=1"
+            }
+        },
+
+        {
+            "name": "ASan",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_ASAN": "$env{_PRESET_ASAN}"
+            }
+        },
+        {
+            "name": "UBSan",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_UBSAN": "$env{_PRESET_UBSAN}"
+            }
+        },
+        {
+            "name": "TSan",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_TSAN": "$env{_PRESET_TSAN}"
+            }
+        },
+        {
+            "name": "library debug checks",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_DEBUGCHECKS": "$env{_PRESET_DEBUGCHECKS} $env{_PRESET_DEBUGCHECKS2}"
+            }
+        },
+        {
+            "name": "high warning level",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_WARN": "$env{_PRESET_WARN}"
+            }
+        },
+        {
+            "name": "warnings as errors",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_WARNERR": "$env{_PRESET_WARNERR}"
+            }
+        },
+
+        {
+            "name": "libstdc++ for Clang",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_STDLIB": "-stdlib=libstdc++",
+                "_PRESET_DEBUGCHECKS2": "-D_GLIBCXX_DEBUG"
+            }
+        },
+
+        {
+            "name": "force MSVC",
+            "hidden": true,
+            "inherits":  "MSVC presets",
+            "environment": {
+                "CC": "cl",
+                "CXX": "cl"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "force clang-cl",
+            "hidden": true,
+            "inherits": "clang-cl presets",
+            "environment": {
+                "CC": "clang-cl",
+                "CXX": "clang-cl"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "force GCC",
+            "hidden": true,
+            "inherits": "GCC presets",
+            "environment": {
+                "CC": "gcc",
+                "CXX": "g++"
+            }
+        },
+        {
+            "name": "force Clang",
+            "hidden": true,
+            "inherits": "Clang presets",
+            "environment": {
+                "CC": "clang",
+                "CXX": "clang++"
+            }
+        }
+    ],
+    "buildPresets": [
+    ],
+    "testPresets": [
+        {
+            "name": "defaults",
+            "hidden": true,
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        }
+    ]
+}

@@ -1,12 +1,11 @@
-# Copyright 2015-2019 by Martin Moene
-# Copyright 2019-2021 by Moritz Beutel
+﻿# Copyright 2015-2019 by Martin Moene
+# Copyright 2019-2025 by Moritz Beutel
 #
-# gsl-lite is based on GSL: Guidelines Support Library,
-# https://github.com/microsoft/gsl
+# https://github.com/gsl-lite/gsl-lite
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
+cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 project( gsl-lite-test LANGUAGES CXX )
 
@@ -165,5 +164,3 @@ if( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS AND MSVC AND CMAKE_GENERATOR MATCHE
     make_test_target( "${PROGRAM}-v1-cpplatest-CppCoreCheck" STD latest SOURCES "core_check.t.cpp" DEFAULTS_VERSION v1 COMPILE_ONLY NO_PCH )
     enable_msvs_guideline_checker( "${PROGRAM}-v1-cpplatest-CppCoreCheck" )
 endif()
-
-# end of file
