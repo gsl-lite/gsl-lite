@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 Martin Moene
+﻿// Copyright (c) 2015-2019 Martin Moene
 // Copyright (c) 2019-2021 Moritz Beutel
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
 //
@@ -11,16 +11,8 @@
 #ifndef GSL_TEST_GSL_LITE_HPP_INCLUDED
 #define GSL_TEST_GSL_LITE_HPP_INCLUDED
 
-// Compiler warning suppression for ancient versions of Visual Studio:
 
-
-// Select GSL Lite for VC6 if compiling with VC6:
-
-#if defined(_MSC_VER) && _MSC_VER < 1300
-# include "gsl/gsl-lite-vc6.hpp"
-#else
-# include "gsl/gsl-lite.hpp"
-#endif
+#include "gsl-lite/gsl-lite.hpp"
 
 
 // gsl-lite only depends on <ios>, but we're instantiating templates using streams, so we need <ostream>.
@@ -107,7 +99,7 @@ inline std::ostream & operator<<( std::ostream & os, std::wstring const & text )
 
 extern lest::tests & specification();
 
-namespace gsl {
+namespace gsl_lite {
 
 inline const void * nullptr_void() { return gsl_nullptr; }
 
@@ -127,12 +119,12 @@ inline std::ostream & operator<<( std::ostream & os, span<T> s )
     return os << "[", std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os, ",") ), os << "]";
 }
 
-} // namespace gsl
+} // namespace gsl_lite
 
 # if gsl_FEATURE( STRING_SPAN )
 inline void suppress_warning_unused_template_ensure_sentinel()
 {
-    (void) gsl::ensure_z( "zero-terminated" );
+    (void) gsl_lite::ensure_z( "zero-terminated" );
 }
 # endif // gsl_FEATURE( STRING_SPAN )
 

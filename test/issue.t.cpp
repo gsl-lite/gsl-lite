@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,7 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 
-using namespace gsl;
+using namespace gsl_lite;
 
 CASE( "span<>: free comparation functions fail for different const-ness [issue #32]" )
 {
@@ -48,13 +48,13 @@ CASE( "span<>: constrained container constructor suffers hard failure for argume
     {
         int data_{ };
 
-        explicit S( gsl::span<gsl::byte const> ) { }
+        explicit S( gsl_lite::span<gsl_lite::byte const> ) { }
         int const & data() const { return data_; }
     };
 
     // S is not a `contiguous_range`, hence the range constructor should not be instantiable, but this needs to be a substitution
     // failure, not a hard error.
-    EXPECT( !(std::is_constructible< gsl::span< gsl::byte const >, S >::value) );
+    EXPECT( !(std::is_constructible< gsl_lite::span< gsl_lite::byte const >, S >::value) );
 #else
     EXPECT( !!"span<>: constrained container constructor is not available (gsl_HAVE_CONSTRAINED_SPAN_CONTAINER_CTOR=0)" );
 #endif
@@ -69,7 +69,7 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [i
 {
 #if gsl_FEATURE( BYTE ) && gsl_HAVE( ENUM_CLASS )
     struct F {
-        static int f( int & i, gsl::byte & r )
+        static int f( int & i, gsl_lite::byte & r )
         {
            i = 7;
            r <<= 1;
@@ -80,11 +80,11 @@ CASE( "byte: aliasing rules lead to undefined behaviour when using enum class [i
     int i = 0;
     if ( std20::endian::native == std20::endian::little )
     {
-        EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte*>( &i )[0] ) );
+        EXPECT( 14 == F::f( i, reinterpret_cast<gsl_lite::byte*>( &i )[0] ) );
     }
     else if ( std20::endian::native == std20::endian::big )
     {
-        EXPECT( 14 == F::f( i, reinterpret_cast<gsl::byte*>( &i )[sizeof i - 1] ) );
+        EXPECT( 14 == F::f( i, reinterpret_cast<gsl_lite::byte*>( &i )[sizeof i - 1] ) );
     }
 #endif // gsl_FEATURE( BYTE ) && gsl_HAVE( ENUM_CLASS )
 }
@@ -133,7 +133,7 @@ CASE( "narrow<>(): Allows narrowing double to float without MSVC level 4 warning
 CASE( "detail::is_compatible_container<>: Not a proper type trait [PR #238]" )
 {
 #if gsl_HAVE( TYPE_TRAITS ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
-    static_assert( std::is_base_of<gsl::std11::false_type, gsl::detail::is_compatible_container< int, int > >::value, "static assertion failed" );
+    static_assert( std::is_base_of<gsl_lite::std11::false_type, gsl_lite::detail::is_compatible_container< int, int > >::value, "static assertion failed" );
 #endif
 }
 

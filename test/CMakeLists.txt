@@ -161,6 +161,14 @@ if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VS 2012 and 
 endif()
 
 if( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS AND MSVC AND CMAKE_GENERATOR MATCHES "Visual Studio" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.2 )
-    make_test_target( "${PROGRAM}-v1-cpplatest-CppCoreCheck" STD latest SOURCES "core_check.t.cpp" DEFAULTS_VERSION v1 COMPILE_ONLY NO_PCH )
+    make_test_target( "${PROGRAM}-v1-cpplatest-CppCoreCheck"
+        STD latest
+        EXTRA_OPTIONS
+            "-Dgsl_FEATURE_GSL_MODE=1"
+        SOURCES "core_check.t.cpp"
+        DEFAULTS_VERSION v1
+        COMPILE_ONLY
+        NO_PCH
+    )
     enable_msvs_guideline_checker( "${PROGRAM}-v1-cpplatest-CppCoreCheck" )
 endif()

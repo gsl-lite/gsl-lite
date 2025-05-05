@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -25,7 +25,7 @@
 # include <wchar.h> // wcslen()
 #endif
 
-using namespace gsl;
+using namespace gsl_lite;
 
 #if gsl_FEATURE( STRING_SPAN )
 
@@ -1108,7 +1108,7 @@ CASE( "string_span: Allows to view the elements as read-only bytes" )
     char const *    hello = "hello";
     cstring_span s( hello);
 
-    span<const gsl::byte> b = as_bytes( s );
+    span<const gsl_lite::byte> b = as_bytes( s );
 
     EXPECT( b[0] == to_byte( hello[0] ) );
     EXPECT( b[1] == to_byte( hello[1] ) );

@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -27,7 +27,7 @@
 
 #define gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL ( gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110 )
 
-using namespace gsl;
+using namespace gsl_lite;
 
 CASE( "finally: Allows to run lambda on leaving scope" )
 {

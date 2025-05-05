@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,7 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 
-using namespace gsl;
+using namespace gsl_lite;
 
 typedef span<int>::index_type index_type;
 typedef std::ptrdiff_t        size_type;
@@ -495,61 +495,61 @@ CASE( "span<>: Allows to tag-construct from a temporary container (potentially d
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
+CASE( "span<>: Allows to construct from an empty gsl_lite::shared_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( SHARED_PTR )
-    span<int> ptr = gsl::shared_ptr<int>( gsl_nullptr );
+    span<int> ptr = gsl_lite::shared_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
 
     EXPECT( s.size() == index_type( 0  ) );
     EXPECT( s.data() == gsl_nullptr      );
 #else
-    EXPECT( !!"gsl::shared_ptr is not available" );
+    EXPECT( !!"gsl_lite::shared_ptr is not available" );
 #endif
 #else
     EXPECT( !!"construction from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
+CASE( "span<>: Allows to construct from an empty gsl_lite::unique_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
-    gsl::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
+    gsl_lite::unique_ptr<int> ptr = std::unique_ptr<int>( gsl_nullptr );
 
     span<int> s( ptr );
 
     EXPECT( s.size() == index_type( 0 ) );
     EXPECT( s.data() == gsl_nullptr     );
 #else
-    EXPECT( !!"gsl::unique_ptr is not available" );
+    EXPECT( !!"gsl_lite::unique_ptr is not available" );
 #endif
 #else
     EXPECT( !!"construction from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "span<>: Allows to construct from an empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
+CASE( "span<>: Allows to construct from an empty gsl_lite::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
-    gsl::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
+    gsl_lite::unique_ptr<int[]> ptr = unique_ptr<int[]>( gsl_nullptr );
 
     span<int> s( ptr, 0 );
 
     EXPECT( s.size() == index_type( 0 ) );
     EXPECT( s.data() == gsl_nullptr     );
 #else
-    EXPECT( !!"gsl::unique_ptr is not available" );
+    EXPECT( !!"gsl_lite::unique_ptr is not available" );
 #endif
 #else
     EXPECT( !!"construction from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
+CASE( "span<>: Allows to construct from a non-empty gsl_lite::shared_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( SHARED_PTR )
@@ -561,21 +561,21 @@ CASE( "span<>: Allows to construct from a non-empty gsl::shared_ptr (C++11) " "[
     EXPECT( s.data() == ptr.get()       );
     EXPECT( s[0]     == 4               );
 #else
-    EXPECT( !!"gsl::shared_ptr is not available" );
+    EXPECT( !!"gsl_lite::shared_ptr is not available" );
 #endif
 #else
     EXPECT( !!"construction from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
+CASE( "span<>: Allows to construct from a non-empty gsl_lite::unique_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
 #if  gsl_HAVE( MAKE_UNIQUE )
-    gsl::unique_ptr<int> ptr = std::make_unique<int>( 4 );
+    gsl_lite::unique_ptr<int> ptr = std::make_unique<int>( 4 );
 #else
-    gsl::unique_ptr<int> ptr = unique_ptr<int>( new int( 4 ) );
+    gsl_lite::unique_ptr<int> ptr = unique_ptr<int>( new int( 4 ) );
 #endif
 
     span<int> s( ptr );
@@ -584,21 +584,21 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (C++11) " "[
     EXPECT( s.data() == ptr.get()       );
     EXPECT( s[0]     == 4               );
 #else
-    EXPECT( !!"gsl::unique_ptr is not available" );
+    EXPECT( !!"gsl_lite::unique_ptr is not available" );
 #endif
 #else
     EXPECT( !!"construction from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
+CASE( "span<>: Allows to construct from a non-empty gsl_lite::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
 #if  gsl_HAVE( MAKE_UNIQUE )
-    gsl::unique_ptr<size_t[]> arr = std::make_unique<size_t[]>( 4 );
+    gsl_lite::unique_ptr<size_t[]> arr = std::make_unique<size_t[]>( 4 );
 #else
-    gsl::unique_ptr<size_t[]> arr = unique_ptr<size_t[]>( new size_t[4] );
+    gsl_lite::unique_ptr<size_t[]> arr = unique_ptr<size_t[]>( new size_t[4] );
 #endif
 
     for ( size_t i = 0; i < 4; i++ )
@@ -611,7 +611,7 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
     EXPECT( s[0]     == 1u              );
     EXPECT( s[1]     == 2u              );
 #else
-    EXPECT( !!"gsl::unique_ptr is not available" );
+    EXPECT( !!"gsl_lite::unique_ptr is not available" );
 #endif
 #else
     EXPECT( !!"construction from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
@@ -621,7 +621,7 @@ CASE( "span<>: Allows to construct from a non-empty gsl::unique_ptr (array, C++1
 CASE( "span<>: Allows to default construct in a constexpr context")
 {
 #if gsl_HAVE( CONSTEXPR_11 )
-    constexpr auto spn = gsl::span<int>{ };
+    constexpr auto spn = gsl_lite::span<int>{ };
     EXPECT( spn.size() == index_type( 0 ) );
 #else
     EXPECT( !!"construction in a constexpr context is not available (C++11)");
@@ -1233,7 +1233,7 @@ CASE( "span<>: Allows to view the elements as read-only bytes " "[deprecated-2 a
 # else
     typedef int type;
 # endif
-    typedef gsl::byte gyte;
+    typedef gsl_lite::byte gyte;
 
     EXPECT( sizeof( type ) == size_t( 4 ) );
 
@@ -1272,7 +1272,7 @@ CASE( "span<>: Allows to view and change the elements as writable bytes " "[depr
 # else
     typedef int type;
 # endif
-    typedef gsl::byte gyte;
+    typedef gsl_lite::byte gyte;
 
     EXPECT( sizeof(type) == size_t( 4 ) );
 
@@ -1590,43 +1590,43 @@ CASE( "make_span(): Allows to tag-build from a temporary container (potentially 
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
+CASE( "make_span(): Allows to build from an empty gsl_lite::shared_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( SHARED_PTR )
-    auto ptr = gsl::shared_ptr<int>( gsl_nullptr );
+    auto ptr = gsl_lite::shared_ptr<int>( gsl_nullptr );
 
     auto s = make_span( ptr );
 
     EXPECT( s.size() == index_type( 0) );
     EXPECT( s.data() == gsl_nullptr    );
 #else
-    EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
+    EXPECT( !!"gsl_lite::shared_ptr<> is not available (no C++11)" );
 #endif
 #else
     EXPECT( !!"make_span() from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
+CASE( "make_span(): Allows to build from an empty gsl_lite::unique_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
-    auto ptr = gsl::unique_ptr<int>( gsl_nullptr );
+    auto ptr = gsl_lite::unique_ptr<int>( gsl_nullptr );
 
     auto s = make_span( ptr );
 
     EXPECT( s.size() == index_type( 0 ) );
     EXPECT( s.data() == gsl_nullptr     );
 #else
-    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+    EXPECT( !!"gsl_lite::unique_ptr<> is not available (no C++11)" );
 #endif
 #else
     EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
+CASE( "make_span(): Allows to build from an empty gsl_lite::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
@@ -1637,14 +1637,14 @@ CASE( "make_span(): Allows to build from an empty gsl::unique_ptr (array, C++11)
     EXPECT( s.size() == index_type( 0 ) );
     EXPECT( s.data() == gsl_nullptr     );
 #else
-    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+    EXPECT( !!"gsl_lite::unique_ptr<> is not available (no C++11)" );
 #endif
 #else
     EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "[deprecated-4]" )
+CASE( "make_span(): Allows to build from a non-empty gsl_lite::shared_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( SHARED_PTR )
@@ -1656,21 +1656,21 @@ CASE( "make_span(): Allows to build from a non-empty gsl::shared_ptr (C++11) " "
     EXPECT( s.data() == ptr.get()       );
     EXPECT( s[0]     == 4               );
 #else
-    EXPECT( !!"gsl::shared_ptr<> is not available (no C++11)" );
+    EXPECT( !!"gsl_lite::shared_ptr<> is not available (no C++11)" );
 #endif
 #else
     EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "[deprecated-4]" )
+CASE( "make_span(): Allows to build from a non-empty gsl_lite::unique_ptr (C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
 #if  gsl_HAVE( MAKE_UNIQUE )
     auto ptr = std::make_unique<int>( 4 );
 #else
-    auto ptr = gsl::unique_ptr<int>( new int(4) );
+    auto ptr = gsl_lite::unique_ptr<int>( new int(4) );
 #endif
 
     auto s = make_span( ptr );
@@ -1679,14 +1679,14 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (C++11) " "
     EXPECT( s.data() == ptr.get()       );
     EXPECT( s[0]     == 4               );
 #else
-    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+    EXPECT( !!"gsl_lite::unique_ptr<> is not available (no C++11)" );
 #endif
 #else
     EXPECT( !!"make_span() from unique_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
 #endif
 }
 
-CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++11) " "[deprecated-4]" )
+CASE( "make_span(): Allows to build from a non-empty gsl_lite::unique_ptr (array, C++11) " "[deprecated-4]" )
 {
 #if !gsl_DEPRECATE_TO_LEVEL( 4 )
 #if  gsl_HAVE( UNIQUE_PTR )
@@ -1705,7 +1705,7 @@ CASE( "make_span(): Allows to build from a non-empty gsl::unique_ptr (array, C++
     EXPECT( s[0]     == 1u              );
     EXPECT( s[1]     == 2u              );
 #else
-    EXPECT( !!"gsl::unique_ptr<> is not available (no C++11)" );
+    EXPECT( !!"gsl_lite::unique_ptr<> is not available (no C++11)" );
 #endif
 #else
     EXPECT( !!"make_span() from shared_ptr is not available (gsl_CONFIG_DEPRECATE_TO_LEVEL >= 4)" );
@@ -1733,12 +1733,12 @@ CASE( "byte_span() (gsl_FEATURE_BYTE_SPAN=1)" )
 #  pragma warning( disable : 4127 ) // conditional expression is constant
 # endif
 
-CASE( "byte_span(): Allows to build a span of gsl::byte from a single object" )
+CASE( "byte_span(): Allows to build a span of gsl_lite::byte from a single object" )
 {
 # if gsl_HAVE( ENUM_CLASS )
     int x = (std::numeric_limits<int>::max)();
 
-    span<gsl::byte> spn = byte_span( x );
+    span<gsl_lite::byte> spn = byte_span( x );
 
     EXPECT( spn.size() == index_type( sizeof x ) );
     if ( sizeof x > 1 )
@@ -1757,12 +1757,12 @@ CASE( "byte_span(): Allows to build a span of gsl::byte from a single object" )
 # endif // gsl_HAVE( ENUM_CLASS )
 }
 
-CASE( "byte_span(): Allows to build a span of const gsl::byte from a single const object" )
+CASE( "byte_span(): Allows to build a span of const gsl_lite::byte from a single const object" )
 {
 # if gsl_HAVE( ENUM_CLASS )
     const int x = (std::numeric_limits<int>::max)();
 
-    span<const gsl::byte> spn = byte_span( x );
+    span<const gsl_lite::byte> spn = byte_span( x );
 
     EXPECT( spn.size() == index_type( sizeof x ) );
     if ( sizeof x > 1 )

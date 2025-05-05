@@ -1,6 +1,8 @@
 ﻿//
-// gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
+//
+// gsl-lite is originally based on Microsoft GSL, which is an implementation of the C++ Core Guidelines Support Library:
+// https://github.com/microsoft/GSL
 //
 // Copyright (c) 2015-2019 Martin Moene
 // Copyright (c) 2019-2025 Moritz Beutel
@@ -16,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef GSL_GSL_LITE_HPP_INCLUDED
-#define GSL_GSL_LITE_HPP_INCLUDED
+#ifndef GSL_LITE_GSL_LITE_HPP_INCLUDED
+#define GSL_LITE_GSL_LITE_HPP_INCLUDED
 
 #include <exception> // for exception, terminate(), uncaught_exceptions()
 #include <limits>
@@ -28,8 +30,8 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 #include <cstdlib>   // for abort()
 
-#define  gsl_lite_MAJOR  0
-#define  gsl_lite_MINOR  43
+#define  gsl_lite_MAJOR  1
+#define  gsl_lite_MINOR  0
 #define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
@@ -47,12 +49,15 @@
 #define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_1  1
 #define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_0  1
 #define gsl_DETAIL_CFG_STD_VALUE_98  1
+#define gsl_DETAIL_CFG_STD_VALUE_0   1
 #define gsl_DETAIL_CFG_STD_VALUE_3   1
 #define gsl_DETAIL_CFG_STD_VALUE_03  1
 #define gsl_DETAIL_CFG_STD_VALUE_11  1
 #define gsl_DETAIL_CFG_STD_VALUE_14  1
 #define gsl_DETAIL_CFG_STD_VALUE_17  1
 #define gsl_DETAIL_CFG_STD_VALUE_20  1
+#define gsl_DETAIL_CFG_STD_VALUE_23  1
+#define gsl_DETAIL_CFG_STD_VALUE_26  1
 #define gsl_DETAIL_CFG_NO_VALUE_   1
 #define gsl_DETAIL_CFG_NO_VALUE_1  1 // many compilers treat the command-line parameter "-Dfoo" as equivalent to "-Dfoo=1", so we tolerate that
 #define gsl_CHECK_CFG_TOGGLE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_TOGGLE_VALUE_, x )
@@ -114,30 +119,39 @@
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
+# pragma message ("do not use legacy M-GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
-# pragma message ("do not use legacy M-GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
 # define gsl_CONFIG_CONTRACT_VIOLATION_THROWS
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
+# pragma message ("do not use legacy M-GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
-# pragma message ("do not use legacy M-GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
 # define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
+# pragma message ("do not use legacy M-GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
 #  pragma message ("invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
-# pragma message ("do not use legacy M-GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 
 // Configuration: Features
+
+#if defined( gsl_FEATURE_GSL_MODE )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_MODE )
+#  pragma message ("invalid configuration value gsl_FEATURE_GSL_MODE=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_GSL_MODE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+#endif
+#define gsl_FEATURE_GSL_MODE_()  gsl_FEATURE_GSL_MODE
 
 #if defined( gsl_FEATURE_WITH_CONTAINER_TO_STD )
 # if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_WITH_CONTAINER_TO_STD )
@@ -219,8 +233,11 @@
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_LITE_NAMESPACE )
 #  pragma message ("invalid configuration value gsl_FEATURE_GSL_LITE_NAMESPACE=" gsl_STRINGIFY(gsl_FEATURE_GSL_LITE_NAMESPACE) ", must be 0 or 1")
 # endif
+# if ! gsl_FEATURE_GSL_LITE_NAMESPACE
+#  error gsl_FEATURE_GSL_LITE_NAMESPACE is a required feature since gsl-lite v1.0 and cannot be switched off
+# endif
 #else
-# define gsl_FEATURE_GSL_LITE_NAMESPACE  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
+# define gsl_FEATURE_GSL_LITE_NAMESPACE  1
 #endif
 #define gsl_FEATURE_GSL_LITE_NAMESPACE_()  gsl_FEATURE_GSL_LITE_NAMESPACE
 
@@ -1081,25 +1098,25 @@
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator~( ENUM val ) gsl_noexcept                                \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return ENUM( ~U( val ) );                                     \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator|( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) | U( rhs ) );                           \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator&( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) & U( rhs ) );                           \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM  \
     operator^( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return ENUM( U( lhs ) ^ U( rhs ) );                           \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_api inline gsl_constexpr14 ENUM &            \
@@ -1131,25 +1148,25 @@
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) < U( rhs );                                   \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator>( ENUM lhs, ENUM rhs ) gsl_noexcept                      \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) > U( rhs );                                   \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator<=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) <= U( rhs );                                  \
     }                                                                 \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool  \
     operator>=( ENUM lhs, ENUM rhs ) gsl_noexcept                     \
     {                                                                 \
-        typedef typename ::gsl::std11::underlying_type<ENUM>::type U; \
+        typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) >= U( rhs );                                  \
     }
 #endif // gsl_STDLIB_CPP20_OR_GREATER
@@ -1196,7 +1213,7 @@
 # if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
 #  define gsl_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
 # else
-#  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl::detail::enabler >::type
+#  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl_lite::detail::enabler >::type
 # endif
 #else
 # define  gsl_ENABLE_IF_(VA)
@@ -1284,11 +1301,11 @@
 
 #if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
 
-// Declare __cxa_get_globals() or equivalent in namespace gsl::detail for uncaught_exceptions():
+// Declare __cxa_get_globals() or equivalent in namespace gsl_lite::detail for uncaught_exceptions():
 
 # if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 #  if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
-namespace gsl { namespace detail { extern "C" char * __cdecl _getptd(); } }
+namespace gsl_lite { namespace detail { extern "C" char * __cdecl _getptd(); } }
 #  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 #   if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
 #    include  <cxxabi.h>
@@ -1299,7 +1316,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals() gsl_noexcept; }
 #    endif
 #   endif
-    namespace gsl { namespace detail { using ::__cxxabiv1::__cxa_get_globals; } }
+    namespace gsl_lite { namespace detail { using ::__cxxabiv1::__cxa_get_globals; } }
 #  endif
 # endif // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 #endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
@@ -1338,14 +1355,14 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 // - C26415: gsl::r.30  : smart pointer parameter 'ptr' is used only to access contained pointer. Use T* or T& instead
 // - C26418: gsl::r.36  : shared pointer parameter 'ptr' is not copied or moved. Use T* or T& instead
 // - C26472: gsl::t.1   : don't use a static_cast for arithmetic conversions;
-//                        use brace initialization, gsl::narrow_cast or gsl::narrow
+//                        use brace initialization, gsl_lite::narrow_cast or gsl_lite::narrow
 // - C26439: gsl::f.6   : special function 'function' can be declared 'noexcept'
 // - C26440: gsl::f.6   : function 'function' can be declared 'noexcept'
 // - C26455: gsl::f.6   : default constructor may not throw. Declare it 'noexcept'
 // - C26473: gsl::t.1   : don't cast between pointer types where the source type and the target type are the same
 // - C26481: gsl::b.1   : don't use pointer arithmetic. Use span instead
 // - C26482: gsl::b.2   : only index into arrays using constant expressions
-// - C26446: gdl::b.4   : prefer to use gsl::at() instead of unchecked subscript operator
+// - C26446: gdl::b.4   : prefer to use gsl_lite::at() instead of unchecked subscript operator
 // - C26490: gsl::t.1   : don't use reinterpret_cast
 // - C26487: gsl::l.4   : don't return a pointer '(<some number>'s result)' that may be invalid
 // - C26434: gsl::c.128 : function 'symbol_1' hides a non-virtual function 'symbol_2' (false positive for compiler-generated functions such as constructors)
@@ -1360,7 +1377,7 @@ gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473
 # pragma warning(disable: 4577)  // 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
 #endif // gsl_COMPILER_MSVC_VERSION == 140
 
-namespace gsl {
+namespace gsl_lite {
 
 // forward declare span<>:
 
@@ -1879,9 +1896,9 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 // TODO vNext: remove
 #if gsl_FEATURE( OWNER_MACRO )
 # if gsl_HAVE( OWNER_TEMPLATE )
-#  define Owner(t)  ::gsl::owner<t>
+#  define Owner(t)  ::gsl_lite::owner<t>
 # else
-#  define Owner(t)  ::gsl::owner<t>::type
+#  define Owner(t)  ::gsl_lite::owner<t>::type
 # endif
 #endif
 
@@ -1957,8 +1974,8 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
 #  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
 # elif defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
 # else // defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS ) [default]
 #  if ! defined( NDEBUG )
 #   define gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
@@ -1984,27 +2001,27 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #  endif
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
 #  if gsl_COMPILER_MSVC_VERSION
-#   define gsl_FAILFAST_()                ( gsl_TRAP_(), ::gsl::detail::fail_fast_terminate() )
+#   define gsl_FAILFAST_()                ( gsl_TRAP_(), ::gsl_lite::detail::fail_fast_terminate() )
 #  else
 #   define gsl_FAILFAST_()                ( gsl_TRAP_() )
 #  endif
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl_lite::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 #  if ! defined( NDEBUG )
 #   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#   define gsl_FAILFAST_()                ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_, ::gsl::detail::fail_fast_abort() )
+#   define gsl_FAILFAST_()                ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_, ::gsl_lite::detail::fail_fast_abort() )
 #  else
-#   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_abort() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#   define gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_abort() )
+#   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_abort() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#   define gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_abort() )
 #  endif
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 # else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl::detail::fail_fast_terminate() )
+#  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_terminate() )
 # endif
 #endif // gsl_DEVICE_CODE
 
@@ -2031,7 +2048,6 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #else
 # define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
-#define   Expects( x )           gsl_Expects( x )
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (debug)", x )
 #else
@@ -2048,7 +2064,6 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 #else
 # define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
-#define   Ensures( x )           gsl_Ensures( x )
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
 # define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (debug)", x )
 #else
@@ -2111,42 +2126,6 @@ gsl_NORETURN inline void fail_fast_abort() gsl_noexcept
 
 // Should be defined by user
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
-
-#if gsl_CONFIG_DEFAULTS_VERSION == 0
-# if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-
-#  if gsl_HAVE( EXCEPTIONS )
-gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
-gsl_constexpr14 inline
-void fail_fast_assert( bool cond, char const * const message )
-{
-    if ( !cond )
-        throw fail_fast( message );
-}
-#  endif // gsl_HAVE( EXCEPTIONS )
-
-# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-
-gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
-gsl_api gsl_constexpr14 inline
-void fail_fast_assert( bool cond, char const * const expression, char const * const message, char const * const file, int line )
-{
-    if ( !cond )
-        ::gsl::fail_fast_assert_handler( expression, message, file, line );
-}
-
-# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-
-gsl_DEPRECATED_MSG("don't call gsl::fail_fast_assert() directly; use contract checking macros instead")
-gsl_constexpr14 inline
-void fail_fast_assert( bool cond ) gsl_noexcept
-{
-    if ( !cond )
-        std::terminate();
-}
-
-# endif
-#endif // gsl_CONFIG_DEFAULTS_VERSION == 0
 
 //
 // GSL.util: utilities
@@ -2672,11 +2651,11 @@ narrow_failfast( U u )
 #if gsl_HAVE( TYPE_TRAITS )
 # if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     gsl_Assert( static_cast<U>( t ) == u
-        && ::gsl::detail::have_same_sign( t, u, ::gsl::detail::is_same_signedness<T, U>() ) );
+        && ::gsl_lite::detail::have_same_sign( t, u, ::gsl_lite::detail::is_same_signedness<T, U>() ) );
 # else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     gsl_Assert( static_cast<U>( t ) == u
-        && ( ::gsl::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+        && ( ::gsl_lite::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
 # endif
 #else
     // Don't assume T() works:
@@ -3670,7 +3649,7 @@ gsl_NODISCARD not_null<std::unique_ptr<T>>
 make_unique( Args &&... args )
 {
 #  if gsl_HAVE( TYPE_TRAITS )
-    static_assert( !std::is_array<T>::value, "gsl::make_unique<T>() returns `gsl::not_null<std::unique_ptr<T>>`, which is not "
+    static_assert( !std::is_array<T>::value, "gsl_lite::make_unique<T>() returns `gsl_lite::not_null<std::unique_ptr<T>>`, which is not "
         "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
 #  endif
     return not_null<std::unique_ptr<T>>( new T( std::forward<Args>( args )... ) );
@@ -3682,7 +3661,7 @@ gsl_NODISCARD not_null<std::shared_ptr<T>>
 make_shared( Args &&... args )
 {
 #  if gsl_HAVE( TYPE_TRAITS )
-    static_assert( !std::is_array<T>::value, "gsl::make_shared<T>() returns `gsl::not_null<std::shared_ptr<T>>`, which is not "
+    static_assert( !std::is_array<T>::value, "gsl_lite::make_shared<T>() returns `gsl_lite::not_null<std::shared_ptr<T>>`, which is not "
         "defined for array types because the Core Guidelines advise against pointer arithmetic, cf. \"Bounds safety profile\"." );
 #  endif
     return not_null<std::shared_ptr<T>>( std::make_shared<T>( std::forward<Args>( args )... ) );
@@ -3742,9 +3721,9 @@ gsl_api inline gsl_constexpr14 byte &
 operator<<=( byte & b, IntegerType shift ) gsl_noexcept
 {
 # if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
+    return b = ::gsl_lite::to_byte( ::gsl_lite::to_uchar( b ) << shift );
 # else
-    b.v = ::gsl::to_uchar( b.v << shift ); return b;
+    b.v = ::gsl_lite::to_uchar( b.v << shift ); return b;
 # endif
 }
 
@@ -3752,7 +3731,7 @@ template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::val
 gsl_NODISCARD gsl_api inline gsl_constexpr byte
 operator<<( byte b, IntegerType shift ) gsl_noexcept
 {
-    return ::gsl::to_byte( ::gsl::to_uchar( b ) << shift );
+    return ::gsl_lite::to_byte( ::gsl_lite::to_uchar( b ) << shift );
 }
 
 template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::value )) >
@@ -3760,9 +3739,9 @@ gsl_NODISCARD gsl_api inline gsl_constexpr14 byte &
 operator>>=( byte & b, IntegerType shift ) gsl_noexcept
 {
 # if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    return b = ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
+    return b = ::gsl_lite::to_byte( ::gsl_lite::to_uchar( b ) >> shift );
 # else
-    b.v = ::gsl::to_uchar( b.v >> shift ); return b;
+    b.v = ::gsl_lite::to_uchar( b.v >> shift ); return b;
 # endif
 }
 
@@ -3770,7 +3749,7 @@ template< class IntegerType  gsl_ENABLE_IF_(( std::is_integral<IntegerType>::val
 gsl_NODISCARD gsl_api inline gsl_constexpr byte
 operator>>( byte b, IntegerType shift ) gsl_noexcept
 {
-    return ::gsl::to_byte( ::gsl::to_uchar( b ) >> shift );
+    return ::gsl_lite::to_byte( ::gsl_lite::to_uchar( b ) >> shift );
 }
 
 # if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
@@ -3814,7 +3793,7 @@ gsl_api inline gsl_constexpr14 byte & operator|=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator|( byte l, byte r ) gsl_noexcept
 {
-    return ::gsl::to_byte( l.v | r.v );
+    return ::gsl_lite::to_byte( l.v | r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcept
@@ -3824,7 +3803,7 @@ gsl_api inline gsl_constexpr14 byte & operator&=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator&( byte l, byte r ) gsl_noexcept
 {
-    return ::gsl::to_byte( l.v & r.v );
+    return ::gsl_lite::to_byte( l.v & r.v );
 }
 
 gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcept
@@ -3834,12 +3813,12 @@ gsl_api inline gsl_constexpr14 byte & operator^=( byte & l, byte r ) gsl_noexcep
 
 gsl_api inline gsl_constexpr byte operator^( byte l, byte r ) gsl_noexcept
 {
-    return ::gsl::to_byte( l.v ^ r.v );
+    return ::gsl_lite::to_byte( l.v ^ r.v );
 }
 
 gsl_api inline gsl_constexpr byte operator~( byte b ) gsl_noexcept
 {
-    return ::gsl::to_byte( ~b.v );
+    return ::gsl_lite::to_byte( ~b.v );
 }
 # endif // gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
 #endif // gsl_FEATURE( BYTE )
@@ -4308,13 +4287,13 @@ public:
 #if gsl_FEATURE( BYTE ) && ! gsl_DEPRECATE_TO_LEVEL( 2 )
     // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
 
-    gsl_DEPRECATED_MSG("use free function gsl::as_bytes() instead")
+    gsl_DEPRECATED_MSG("use free function gsl_lite::as_bytes() instead")
     gsl_api span< const byte > as_bytes() const gsl_noexcept
     {
         return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() ); // NOLINT
     }
 
-    gsl_DEPRECATED_MSG("use free function gsl::as_writable_bytes() instead")
+    gsl_DEPRECATED_MSG("use free function gsl_lite::as_writable_bytes() instead")
     gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
     {
         return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() ); // NOLINT
@@ -5295,7 +5274,7 @@ Stream & write_to_stream( Stream & os, Span const & spn )
     if ( !os )
         return os;
 
-    const std::streamsize length = gsl::narrow_failfast<std::streamsize>( spn.length() );
+    const std::streamsize length = gsl_lite::narrow_failfast<std::streamsize>( spn.length() );
 
     // Whether, and how, to pad
     const bool pad = ( length < os.width() );
@@ -5369,7 +5348,7 @@ gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::nu
 
     gsl_Expects( *cur == Sentinel );
 
-    return span<T>( seq, gsl::narrow_cast< typename span<T>::index_type >( cur - seq ) );
+    return span<T>( seq, gsl_lite::narrow_cast< typename span<T>::index_type >( cur - seq ) );
 }
 } // namespace detail
 
@@ -5390,7 +5369,7 @@ template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr14 span<T>
 ensure_z( T (&sz)[N] )
 {
-    return ::gsl::ensure_z( gsl_ADDRESSOF( sz[0] ), N );
+    return ::gsl_lite::ensure_z( gsl_ADDRESSOF( sz[0] ), N );
 }
 
 # if gsl_HAVE( TYPE_TRAITS )
@@ -5399,7 +5378,7 @@ template< class Container >
 gsl_NODISCARD inline gsl_constexpr14 span< typename std::remove_pointer<typename Container::pointer>::type >
 ensure_z( Container & cont )
 {
-    return ::gsl::ensure_z( cont.data(), cont.length() );
+    return ::gsl_lite::ensure_z( cont.data(), cont.length() );
 }
 # endif
 
@@ -5462,7 +5441,7 @@ public:
     gsl_NODISCARD gsl_constexpr string_span_type
     ensure_z() const
     {
-        return ::gsl::ensure_z(span_.data(), span_.size());
+        return ::gsl_lite::ensure_z(span_.data(), span_.size());
     }
 
     gsl_NODISCARD gsl_api gsl_constexpr czstring_type
@@ -5488,7 +5467,7 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 # endif
 #endif // gsl_FEATURE( STRING_SPAN )
 
-} // namespace gsl
+} // namespace gsl_lite
 
 #if gsl_HAVE( HASH )
 
@@ -5496,7 +5475,7 @@ typedef basic_zstring_span< wchar_t const > cwzstring_span;
 // std::hash specializations for GSL types
 //
 
-namespace gsl {
+namespace gsl_lite {
 
 namespace detail {
 
@@ -5524,44 +5503,44 @@ gsl_is_delete_access:
 
 } // namespace detail
 
-} // namespace gsl
+} // namespace gsl_lite
 
 namespace std {
 
 template< class T >
-struct hash< ::gsl::not_null< T > > : public ::gsl::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
+struct hash< ::gsl_lite::not_null< T > > : public ::gsl_lite::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
 {
 public:
     gsl_NODISCARD std::size_t
-    operator()( ::gsl::not_null<T> const & v ) const
+    operator()( ::gsl_lite::not_null<T> const & v ) const
     // hash function is not `noexcept` because `as_nullable()` has preconditions
     {
-        return hash<T>()( ::gsl::as_nullable( v ) );
+        return hash<T>()( ::gsl_lite::as_nullable( v ) );
     }
 };
 template< class T >
-struct hash< ::gsl::not_null< T* > >
+struct hash< ::gsl_lite::not_null< T* > >
 {
 public:
     gsl_NODISCARD std::size_t
-    operator()( ::gsl::not_null< T* > const & v ) const gsl_noexcept
+    operator()( ::gsl_lite::not_null< T* > const & v ) const gsl_noexcept
     {
-        return hash<T*>()( ::gsl::as_nullable( v ) );
+        return hash<T*>()( ::gsl_lite::as_nullable( v ) );
     }
 };
 
 # if gsl_FEATURE( BYTE )
 template<>
-struct hash< ::gsl::byte >
+struct hash< ::gsl_lite::byte >
 {
 public:
-    gsl_NODISCARD std::size_t operator()( ::gsl::byte v ) const gsl_noexcept
+    gsl_NODISCARD std::size_t operator()( ::gsl_lite::byte v ) const gsl_noexcept
     {
 #  if gsl_CONFIG_DEFAULTS_VERSION >= 1
-        return std::hash<unsigned char>{ }( ::gsl::to_uchar( v ) );
+        return std::hash<unsigned char>{ }( ::gsl_lite::to_uchar( v ) );
 #  else // gsl_CONFIG_DEFAULTS_VERSION < 1
             // Keep the old hashing algorithm if legacy defaults are used.
-        return ::gsl::to_integer<std::size_t>( v );
+        return ::gsl_lite::to_integer<std::size_t>( v );
 #  endif // gsl_CONFIG_DEFAULTS_VERSION >= 1
     }
 };
@@ -5571,152 +5550,23 @@ public:
 
 #endif // gsl_HAVE( HASH )
 
-#if gsl_FEATURE( GSL_LITE_NAMESPACE )
 
-// gsl_lite namespace:
+#if gsl_FEATURE( GSL_MODE )
 
-// gsl-lite currently keeps all symbols in the namespace `gsl`. The `gsl_lite` namespace contains all the symbols in the
-// `gsl` namespace, plus some extensions that are not specified in the Core Guidelines.
+// Enable GSL mode by aliasing all symbols in the `gsl` namespace and defining the unprefixed macros
+// `Expects()` and `Ensures()`.
 //
-// Going forward, we want to support coexistence of gsl-lite with M-GSL, so we want to encourage using the `gsl_lite`
-// namespace when consuming gsl-lite. Typical use in library code would be:
-//
-//     #include <gsl-lite/gsl-lite.hpp>  // instead of <gsl/gsl-lite.hpp>
-//
-//     namespace foo {
-//         namespace gsl = ::gsl_lite;  // convenience alias
-//         double mean( gsl::span<double const> elements )
-//         {
-//             gsl_Expects( ! elements.empty() );  // instead of Expects()
-//             ...
-//         }
-//     } // namespace foo
-//
-// In a future version, the new <gsl-lite/gsl-lite.hpp> header will only define the `gsl_lite` namespace and no
-// unprefixed `Expects()` and `Ensures()` macros to avoid collision with M-GSL. To ensure backward compatibility, the
-// old header <gsl/gsl-lite.hpp> will keep defining the `gsl` namespace and the `Expects()` and `Ensures()` macros.
+// gsl-lite can generally coexist with Microsoft GSL. However, if GSL mode is enabled, gsl-lite cannot
+// be used in the same translation unit as Microsoft GSL.
+// (Link-time compatibility is unaffected; different translation units that use either Microsoft GSL
+// or gsl-lite may be linked together.)
 
-namespace gsl_lite {
+namespace gsl = ::gsl_lite;
 
-namespace std11 = ::gsl::std11;
-namespace std14 = ::gsl::std14;
-namespace std17 = ::gsl::std17;
-namespace std20 = ::gsl::std20;
-namespace std23 = ::gsl::std23;
+#define   Expects( x )           gsl_Expects( x )
+#define   Ensures( x )           gsl_Ensures( x )
 
-using namespace std11;
-//using namespace std14;  // contains only make_unique<>(), which is superseded by `gsl::make_unique<>()`
-using namespace std17;
-using namespace std20;
-using namespace std23;
-
-using namespace ::gsl::detail::no_adl;
-
-# if gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( SHARED_PTR )
-using std::unique_ptr;
-using std::shared_ptr;
-#  if gsl_HAVE( VARIADIC_TEMPLATE )
-using ::gsl::make_unique;
-using ::gsl::make_shared;
-#  endif
-# endif
-
-using ::gsl::index;
-using ::gsl::dim;
-using ::gsl::stride;
-using ::gsl::diff;
-
-# if gsl_HAVE( ALIAS_TEMPLATE )
-#  if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 141 )  // VS 2015 and earlier have trouble with `using` for alias templates
-  template< class T
-#   if gsl_HAVE( TYPE_TRAITS )
-          , typename = typename std::enable_if< std::is_pointer<T>::value >::type
-#   endif
-  >
-  using owner = T;
-#  else
-using ::gsl::owner;
-#  endif
-# endif
-
-using ::gsl::fail_fast;
-
-using ::gsl::finally;
-# if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-using ::gsl::on_return;
-using ::gsl::on_error;
-# endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-
-using ::gsl::narrow_cast;
-using ::gsl::narrowing_error;
-using ::gsl::narrow;
-using ::gsl::narrow_failfast;
-
-using ::gsl::at;
-
-using ::gsl::not_null;
-using ::gsl::not_null_ic;
-using ::gsl::make_not_null;
-
-# if gsl_FEATURE( BYTE )
-using ::gsl::byte;
-
-using ::gsl::to_byte;
-using ::gsl::to_integer;
-using ::gsl::to_uchar;
-# endif // gsl_FEATURE( BYTE )
-
-# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
-using ::gsl::with_container_t;
-using ::gsl::with_container;
-# endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
-
-using ::gsl::span;
-# if gsl_FEATURE_TO_STD( MAKE_SPAN )
-using ::gsl::make_span;
-# endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
-# if gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
-using ::gsl::byte_span;
-# endif // gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
-using ::gsl::copy;
-# if gsl_FEATURE( BYTE )
-using ::gsl::as_bytes;
-using ::gsl::as_writable_bytes;
-#  if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-using ::gsl::as_writeable_bytes;
-#  endif
-# endif // gsl_FEATURE( BYTE )
-
-# if gsl_FEATURE( STRING_SPAN )
-using ::gsl::to_string;
-
-using ::gsl::basic_string_span;
-using ::gsl::string_span;
-using ::gsl::cstring_span;
-
-using ::gsl::basic_zstring_span;
-using ::gsl::zstring_span;
-using ::gsl::czstring_span;
-
-using ::gsl::ensure_z;
-# endif // gsl_FEATURE( STRING_SPAN )
-
-using ::gsl::zstring;
-using ::gsl::czstring;
-
-# if gsl_HAVE( WCHAR )
-using ::gsl::wzstring;
-using ::gsl::cwzstring;
-
-#  if gsl_FEATURE( STRING_SPAN )
-using ::gsl::wzstring_span;
-using ::gsl::cwzstring_span;
-#  endif // gsl_FEATURE( STRING_SPAN )
-# endif // gsl_HAVE( WCHAR )
-
-} // namespace gsl_lite
-
-#endif // gsl_FEATURE( GSL_LITE_NAMESPACE )
+#endif // gsl_FEATURE( GSL_MODE )
 
 gsl_RESTORE_MSVC_WARNINGS()
 #if gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_APPLECLANG_VERSION
@@ -5732,6 +5582,6 @@ gsl_RESTORE_MSVC_WARNINGS()
 #undef gsl_TRAILING_RETURN_TYPE_
 #undef gsl_RETURN_DECLTYPE_
 
-#endif // GSL_GSL_LITE_HPP_INCLUDED
+#endif // GSL_LITE_GSL_LITE_HPP_INCLUDED
 
 // end of file

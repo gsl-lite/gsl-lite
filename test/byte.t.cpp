@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,11 +18,11 @@
 
 #include "gsl-lite.t.hpp"
 
-using namespace gsl;
+using namespace gsl_lite;
 
 #if gsl_FEATURE( BYTE )
 
-// Use gsl::byte instead of plain byte to prevent collisions with
+// Use gsl_lite::byte instead of plain byte to prevent collisions with
 // other byte declarations, such as in rpcndr.h (Windows kit).
 
 // We have a chicken & egg problem here:
@@ -31,7 +31,7 @@ using namespace gsl;
 CASE( "byte: Allows to construct from integral via static cast (C++17)" )
 {
 # if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    gsl::byte b = static_cast<gsl::byte>( 4 );
+    gsl_lite::byte b = static_cast<gsl_lite::byte>( 4 );
     EXPECT( static_cast<unsigned char>(b) == 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 # else
@@ -42,7 +42,7 @@ CASE( "byte: Allows to construct from integral via static cast (C++17)" )
 CASE( "byte: Allows to construct from integral via byte() (C++17)" )
 {
 # if gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )
-    gsl::byte b = gsl::byte( 4 );
+    gsl_lite::byte b = gsl_lite::byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 # else
     EXPECT( !!"enum class is not constructible from underlying type (no C++17)" );
@@ -51,20 +51,20 @@ CASE( "byte: Allows to construct from integral via byte() (C++17)" )
 
 CASE( "byte: Allows to construct from integral via to_byte()" )
 {
-    gsl::byte b = to_byte( 4 );
+    gsl_lite::byte b = to_byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 }
 
 CASE( "byte: Allows to convert to integral via to_integer()" )
 {
-    gsl::byte b = to_byte( 4 );
+    gsl_lite::byte b = to_byte( 4 );
     EXPECT( to_integer<int>( b ) == 4 );
 }
 
 CASE( "byte: Allows comparison operations" )
 {
-    gsl::byte a = to_byte( 3 );
-    gsl::byte b = to_byte( 7 );
+    gsl_lite::byte a = to_byte( 3 );
+    gsl_lite::byte b = to_byte( 7 );
 
     EXPECT(     a == a );
     EXPECT(     a != b );
@@ -85,7 +85,7 @@ CASE( "byte: Allows comparison operations" )
 
 CASE( "byte: Allows bitwise or operation" )
 {
-    gsl::byte const b = to_byte( 0xa5 );
+    gsl_lite::byte const b = to_byte( 0xa5 );
 
     EXPECT( ( b | b ) == b );
     EXPECT( ( b | to_byte( 0x00 ) ) == b );
@@ -94,7 +94,7 @@ CASE( "byte: Allows bitwise or operation" )
 
 CASE( "byte: Allows bitwise and operation" )
 {
-    gsl::byte const b = to_byte( 0xa5 );
+    gsl_lite::byte const b = to_byte( 0xa5 );
 
     EXPECT( ( b & b ) == b );
     EXPECT( ( b & to_byte( 0xff ) ) == b );
@@ -103,7 +103,7 @@ CASE( "byte: Allows bitwise and operation" )
 
 CASE( "byte: Allows bitwise x-or operation" )
 {
-    gsl::byte const b = to_byte( 0xa5 );
+    gsl_lite::byte const b = to_byte( 0xa5 );
 
     EXPECT( ( b ^ b ) == to_byte( 0 ) );
     EXPECT( ( b ^ to_byte( 0x00 ) ) ==  b );
@@ -114,8 +114,8 @@ CASE( "byte: Allows bitwise or assignment" )
 {
     SETUP("") {
 
-    gsl::byte const b_org = to_byte( 0xa5 );
-    gsl::byte       b     = b_org;
+    gsl_lite::byte const b_org = to_byte( 0xa5 );
+    gsl_lite::byte       b     = b_org;
 
     SECTION("Identity") { EXPECT( ( b |= b               ) == b_org           ); }
     SECTION("Identity") { EXPECT( ( b |= to_byte( 0x00 ) ) == b_org           ); }
@@ -127,8 +127,8 @@ CASE( "byte: Allows bitwise and assignment" )
 {
     SETUP("") {
 
-    gsl::byte const b_org = to_byte( 0xa5 );
-    gsl::byte       b     = b_org;
+    gsl_lite::byte const b_org = to_byte( 0xa5 );
+    gsl_lite::byte       b     = b_org;
 
     SECTION("Identity") { EXPECT( ( b &= b               ) == b_org           ); }
     SECTION("Identity") { EXPECT( ( b &= to_byte( 0xff ) ) == b_org           ); }
@@ -140,8 +140,8 @@ CASE( "byte: Allows bitwise x-or assignment" )
 {
     SETUP("") {
 
-    gsl::byte const b_org = to_byte( 0xa5 );
-    gsl::byte       b     = b_org;
+    gsl_lite::byte const b_org = to_byte( 0xa5 );
+    gsl_lite::byte       b     = b_org;
 
     SECTION("Identity") { EXPECT( ( b ^= b               ) == to_byte( 0 ) ); }
     SECTION("Identity") { EXPECT( ( b ^= to_byte( 0x00 ) ) ==  b_org       ); }
@@ -151,30 +151,30 @@ CASE( "byte: Allows bitwise x-or assignment" )
 
 CASE( "byte: Allows shift-left operation" )
 {
-    gsl::byte const b = to_byte( 0xa5 );
+    gsl_lite::byte const b = to_byte( 0xa5 );
 
     EXPECT( ( b << 3 ) == to_byte( to_uchar( b ) << 3 ) );
 }
 
 CASE( "byte: Allows shift-right operation" )
 {
-    gsl::byte const b = to_byte( 0xa5 );
+    gsl_lite::byte const b = to_byte( 0xa5 );
 
     EXPECT( ( b >> 3 ) == to_byte( to_uchar( b ) >> 3 ) );
 }
 
 CASE( "byte: Allows shift-left assignment" )
 {
-    gsl::byte const b_org = to_byte( 0xa5 );
-    gsl::byte       b     = b_org;
+    gsl_lite::byte const b_org = to_byte( 0xa5 );
+    gsl_lite::byte       b     = b_org;
 
     EXPECT( ( b <<= 3 ) == to_byte( to_uchar( b_org ) << 3 ) );
 }
 
 CASE( "byte: Allows shift-right assignment" )
 {
-    gsl::byte const b_org = to_byte( 0xa5 );
-    gsl::byte       b     = b_org;
+    gsl_lite::byte const b_org = to_byte( 0xa5 );
+    gsl_lite::byte       b     = b_org;
 
     EXPECT( ( b >>= 3 ) == to_byte( to_uchar( b_org ) >> 3 ) );
 }
@@ -206,7 +206,7 @@ CASE( "byte: Provides constexpr assignment operations (C++14)" )
 CASE( "byte: Provides hash support (C++11)" )
 {
 # if gsl_HAVE( HASH )
-    EXPECT_NO_THROW( (void) std::hash<gsl::byte>{}( to_byte( 42 ) ) );
+    EXPECT_NO_THROW( (void) std::hash<gsl_lite::byte>{}( to_byte( 42 ) ) );
 # else
     EXPECT( !!"hash support is not available (no C++11)" );
 # endif
