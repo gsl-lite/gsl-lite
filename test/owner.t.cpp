@@ -64,27 +64,4 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 #endif
 }
 
-CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
-{
-#if gsl_FEATURE( OWNER_MACRO )
-    struct F { static void incr( int * i ) { *i += 1; } };
-
-    Owner(int*) p = new int( 120 );
-
-    EXPECT( (p != NULL) );
-    EXPECT(  p != nullptr_void() );
-# if gsl_HAVE( NULLPTR )
-    EXPECT(  p != nullptr );
-# endif
-    EXPECT( *p == 120 );
-
-    F::incr( p );
-
-    EXPECT( *p == 121 );
-    delete p;
-#else
-    EXPECT( !!"Owner() macro is not available." );
-#endif
-}
-
 // end of file

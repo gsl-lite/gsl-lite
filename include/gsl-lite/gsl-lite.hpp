@@ -188,8 +188,11 @@
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_IMPLICIT_MACRO )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_IMPLICIT_MACRO=" gsl_STRINGIFY(gsl_FEATURE_IMPLICIT_MACRO) ", must be 0 or 1")
 # endif
+# if gsl_FEATURE_IMPLICIT_MACRO
+#  error configuration value gsl_FEATURE_IMPLICIT_MACRO=1 is no longer supported since gsl-lite v1.0
+# endif // gsl_FEATURE_IMPLICIT_MACRO
 #else
-# define gsl_FEATURE_IMPLICIT_MACRO  0  // default
+# define gsl_FEATURE_IMPLICIT_MACRO  0
 #endif
 #define gsl_FEATURE_IMPLICIT_MACRO_()  gsl_FEATURE_IMPLICIT_MACRO
 
@@ -197,8 +200,11 @@
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_OWNER_MACRO )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_OWNER_MACRO=" gsl_STRINGIFY(gsl_FEATURE_OWNER_MACRO) ", must be 0 or 1")
 # endif
+# if gsl_FEATURE_OWNER_MACRO
+#  error configuration value gsl_FEATURE_OWNER_MACRO=1 is no longer supported since gsl-lite v1.0
+# endif // gsl_FEATURE_OWNER_MACRO
 #else
-# define gsl_FEATURE_OWNER_MACRO  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+# define gsl_FEATURE_OWNER_MACRO  0
 #endif
 #define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
@@ -831,19 +837,16 @@
 // Presence of C++20 language features:
 
 #define gsl_HAVE_CONSTEXPR_20              gsl_CPP20_OR_GREATER
-
 #define gsl_HAVE_CONSTEXPR_20_()           gsl_HAVE_CONSTEXPR_20
 
 // Presence of C++23 language features:
 
 #define gsl_HAVE_CONSTEXPR_23              gsl_CPP23_OR_GREATER
-
 #define gsl_HAVE_CONSTEXPR_23_()           gsl_HAVE_CONSTEXPR_23
 
 // Presence of C++26 language features:
 
 #define gsl_HAVE_CONSTEXPR_26              gsl_CPP26_OR_GREATER
-
 #define gsl_HAVE_CONSTEXPR_26_()           gsl_HAVE_CONSTEXPR_26
 
 // Presence of C++ library features:
@@ -988,10 +991,6 @@
 # define gsl_explicit  explicit
 #else
 # define gsl_explicit  /*explicit*/
-#endif
-
-#if gsl_FEATURE( IMPLICIT_MACRO )
-# define implicit /*implicit*/
 #endif
 
 #if gsl_HAVE( IS_DELETE )
@@ -1874,8 +1873,8 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 // GSL.owner: ownership pointers
 //
 #if gsl_HAVE( SHARED_PTR )
-  using std::unique_ptr;
-  using std::shared_ptr;
+using std::unique_ptr;
+using std::shared_ptr;
 #endif
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
@@ -1892,15 +1891,6 @@ typedef gsl_CONFIG_INDEX_TYPE diff;
 
 #define gsl_HAVE_OWNER_TEMPLATE     gsl_HAVE_ALIAS_TEMPLATE
 #define gsl_HAVE_OWNER_TEMPLATE_()  gsl_HAVE_OWNER_TEMPLATE
-
-// TODO vNext: remove
-#if gsl_FEATURE( OWNER_MACRO )
-# if gsl_HAVE( OWNER_TEMPLATE )
-#  define Owner(t)  ::gsl_lite::owner<t>
-# else
-#  define Owner(t)  ::gsl_lite::owner<t>::type
-# endif
-#endif
 
 //
 // GSL.assert: assertions
