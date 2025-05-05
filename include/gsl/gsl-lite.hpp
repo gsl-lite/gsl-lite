@@ -44,11 +44,11 @@ namespace gsl = ::gsl_lite;
 //#  define gsl_DEPRECATED_PRAGMA_ENSURES_MSG_
 //# endif 
 //
-//# define  Expects( x )           gsl_DEPRECATED_PRAGMA_EXPECTS_MSG_ gsl_Expects( x )
-//# define  Ensures( x )           gsl_DEPRECATED_PRAGMA_ENSURES_MSG_ gsl_Ensures( x )
+//# define Expects( x )  gsl_DEPRECATED_PRAGMA_EXPECTS_MSG_ gsl_Expects( x )
+//# define Ensures( x )  gsl_DEPRECATED_PRAGMA_ENSURES_MSG_ gsl_Ensures( x )
 
-# define  Expects( x )           gsl_Expects( x )
-# define  Ensures( x )           gsl_Ensures( x )
+# define Expects( x )  gsl_Expects( x )
+# define Ensures( x )  gsl_Ensures( x )
 
 #endif // ! gsl_FEATURE( GSL_COMPATIBILITY_MODE )
 

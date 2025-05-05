@@ -81,28 +81,28 @@
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR=" gsl_STRINGIFY(gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR) ", must be 0 or 1")
 # endif
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; replace with gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR, or consider span(with_container, cont).")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: configuration macro gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR is deprecated since gsl-lite 0.7; if the constrained container constructor is not usable, define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR instead")
 #endif
 
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_ON )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ON )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ON=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ON) "; macro must be defined without value")
 # endif
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ON.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: configuration macro gsl_CONFIG_CONTRACT_LEVEL_ON is deprecated since gsl-lite v0.36; define gsl_CONFIG_CONTRACT_CHECKING_ON instead")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 #endif
 #if defined( gsl_CONFIG_CONTRACT_LEVEL_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_OFF )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_OFF=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_OFF) "; macro must be defined without value")
 # endif
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_OFF.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: configuration macro gsl_CONFIG_CONTRACT_LEVEL_OFF is deprecated since gsl-lite v0.36; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
 # define gsl_CONFIG_CONTRACT_CHECKING_OFF
 #endif
 #if   defined( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY) "; macro must be defined without value")
 # endif
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: configuration macro gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY is deprecated since gsl-lite v0.36; define gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF instead")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF
 # define gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF
@@ -110,7 +110,7 @@
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY=" gsl_STRINGIFY(gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY) "; macro must be defined without value")
 # endif
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite 0.36; replace with gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF.")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: configuration macro gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY is deprecated since gsl-lite v0.36; define gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF and gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF instead")
 # define gsl_CONFIG_CONTRACT_CHECKING_ON
 # define gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF
 # define gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF
@@ -119,7 +119,7 @@
 // M-GSL compatibility:
 
 #if defined( GSL_THROW_ON_CONTRACT_VIOLATION )
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy M-GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy Microsoft GSL configuration macro GSL_THROW_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_THROWS instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_THROW_ON_CONTRACT_VIOLATION )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value GSL_THROW_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_THROW_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
@@ -127,7 +127,7 @@
 #endif
 
 #if defined( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy M-GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy Microsoft GSL configuration macro GSL_TERMINATE_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_TERMINATE_ON_CONTRACT_VIOLATION )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value GSL_TERMINATE_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_TERMINATE_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
@@ -135,7 +135,7 @@
 #endif
 
 #if defined( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
-# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy M-GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
+# pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: do not use legacy Microsoft GSL configuration macro GSL_UNENFORCED_ON_CONTRACT_VIOLATION to configure gsl-lite; define gsl_CONFIG_CONTRACT_CHECKING_OFF instead")
 # if ! gsl_CHECK_CFG_NO_VALUE_( GSL_UNENFORCED_ON_CONTRACT_VIOLATION )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value GSL_UNENFORCED_ON_CONTRACT_VIOLATION=" gsl_STRINGIFY(GSL_UNENFORCED_ON_CONTRACT_VIOLATION) "; macro must be defined without value")
 # endif
@@ -2115,7 +2115,7 @@ gsl_NORETURN inline void fail_fast_abort() gsl_noexcept
 } // namespace detail
 
 // Should be defined by user
-gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line );
+gsl_api void fail_fast_assert_handler( char const * expression, char const * message, char const * file, int line );
 
 //
 // GSL.util: utilities
@@ -5367,8 +5367,8 @@ public:
 
 namespace gsl = ::gsl_lite;
 
-#define   Expects( x )           gsl_Expects( x )
-#define   Ensures( x )           gsl_Ensures( x )
+#define Expects( x )  gsl_Expects( x )
+#define Ensures( x )  gsl_Ensures( x )
 
 #endif // gsl_FEATURE( GSL_COMPATIBILITY_MODE )
 
