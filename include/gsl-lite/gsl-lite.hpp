@@ -1256,6 +1256,11 @@
 # else
 #  define gsl_CPP98_BYTE_VAL_ 0
 # endif
+# if gsl_HAVE( NOEXCEPT )
+#  define gsl_HAVE_NOEXCEPT_VAL_ 1
+# else
+#  define gsl_HAVE_NOEXCEPT_VAL_ 0
+# endif
 # if defined( gsl_api )
 #  define gsl_GSL_API_VAL_ gsl_api
 # else
@@ -1268,10 +1273,11 @@
 # else
 #  define gsl_INTEGRAL_CONSTANT_VAL_ gsl-lite
 # endif
-//# pragma message( "v" gsl_STRINGIFY( gsl_lite_MAJOR ) " gsl_api:" gsl_STRINGIFY( gsl_GSL_API_VAL_ ) " gsl_CONFIG_SPAN_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_SPAN_INDEX_TYPE ) " gsl_CONFIG_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_INDEX_TYPE )" gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION:" gsl_STRINGIFY( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ ) " byte98:" gsl_STRINGIFY( gsl_CPP98_BYTE_VAL_ ) " integral_constant:" gsl_STRINGIFY( gsl_INTEGRAL_CONSTANT_VAL_ ) )
-# pragma detect_mismatch( "gsl-lite", "v" gsl_STRINGIFY( gsl_lite_MAJOR ) " gsl_api:" gsl_STRINGIFY( gsl_GSL_API_VAL_ ) " gsl_CONFIG_SPAN_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_SPAN_INDEX_TYPE ) " gsl_CONFIG_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_INDEX_TYPE )" gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION:" gsl_STRINGIFY( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ ) " byte98:" gsl_STRINGIFY( gsl_CPP98_BYTE_VAL_ ) " integral_constant:" gsl_STRINGIFY( gsl_INTEGRAL_CONSTANT_VAL_ ) )
+//# pragma message( "v" gsl_STRINGIFY( gsl_lite_MAJOR ) " gsl_api:" gsl_STRINGIFY( gsl_GSL_API_VAL_ ) " gsl_CONFIG_SPAN_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_SPAN_INDEX_TYPE ) " gsl_CONFIG_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_INDEX_TYPE ) " have-noexcept:" gsl_STRINGIFY( gsl_HAVE_NOEXCEPT_VAL_ ) " gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION:" gsl_STRINGIFY( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ ) " byte98:" gsl_STRINGIFY( gsl_CPP98_BYTE_VAL_ ) " integral_constant:" gsl_STRINGIFY( gsl_INTEGRAL_CONSTANT_VAL_ ) )
+# pragma detect_mismatch( "gsl-lite", "v" gsl_STRINGIFY( gsl_lite_MAJOR ) " gsl_api:" gsl_STRINGIFY( gsl_GSL_API_VAL_ ) " gsl_CONFIG_SPAN_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_SPAN_INDEX_TYPE ) " gsl_CONFIG_INDEX_TYPE:" gsl_STRINGIFY( gsl_CONFIG_INDEX_TYPE ) " have-noexcept:" gsl_STRINGIFY( gsl_HAVE_NOEXCEPT_VAL_ ) " gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION:" gsl_STRINGIFY( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_ ) " byte98:" gsl_STRINGIFY( gsl_CPP98_BYTE_VAL_ ) " integral_constant:" gsl_STRINGIFY( gsl_INTEGRAL_CONSTANT_VAL_ ) )
 # undef gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_VAL_
 # undef gsl_CPP98_BYTE_VAL_
+# undef gsl_HAVE_NOEXCEPT_VAL_
 # undef gsl_GSL_API_VAL_
 # undef gsl_INTEGRAL_CONSTANT_VAL_
 #endif // defined( _MSC_VER ) && _MSC_VER >= 1900
