@@ -2726,7 +2726,7 @@ struct not_null_elem
     gsl_NODISCARD gsl_api gsl_constexpr14 element_type *
     get() const
     {
-        return not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) ).get();
+        return not_null_accessor<T>::get_checked( static_cast< Derived const & >( *this ) ).get();
     }
 #endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
 };
@@ -2741,7 +2741,7 @@ struct gsl_EMPTY_BASES_ not_null_deref
     gsl_NODISCARD gsl_api gsl_constexpr14 typename element_type_helper<T>::type &
     operator*() const
     {
-        return *not_null_accessor<T>::get_checked( static_cast<Derived const&>( *this ) );
+        return *not_null_accessor<T>::get_checked( static_cast< Derived const & >( *this ) );
     }
 };
 template< class Derived, class T >
@@ -2807,7 +2807,7 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         , typename std::enable_if< ( std::is_constructible<T, U>::value && std::is_function<U>::value ), int >::type = 0
     >
-    gsl_api gsl_constexpr14 /*implicit*/ not_null( U const& other )
+    gsl_api gsl_constexpr14 /*implicit*/ not_null( U const & other )
     : data_( T( other ) )
     {
     }
@@ -2823,7 +2823,7 @@ public:
 #  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_api gsl_constexpr14 explicit not_null( U const& other )
+    gsl_api gsl_constexpr14 explicit not_null( U const & other )
     : data_( T( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2864,7 +2864,7 @@ public:
 #  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_api gsl_constexpr14 not_null( U const& other )
+    gsl_api gsl_constexpr14 not_null( U const & other )
     : data_( T( other ) )
     {
         gsl_Expects( data_.ptr_ != gsl_nullptr );
@@ -2910,7 +2910,7 @@ public:
 # endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 #else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
     template< class U >
-    gsl_api gsl_constexpr14 not_null( not_null<U> const& other )
+    gsl_api gsl_constexpr14 not_null( not_null<U> const & other )
     : data_( T( detail::not_null_accessor<U>::get_checked( other ) ) )
     {
     }
