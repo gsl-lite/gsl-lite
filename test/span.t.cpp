@@ -20,8 +20,8 @@
 
 using namespace gsl_lite;
 
-typedef span<int>::index_type index_type;
-typedef std::ptrdiff_t        size_type;
+typedef span<int>::size_type size_type;
+typedef std::ptrdiff_t       difference_type;
 
 
 static std::vector<int> vector_iota( int n )
@@ -214,22 +214,22 @@ CASE( "span<>: Allows to default-construct" )
     span<int> v;
     span<int, 0> w;
 
-    EXPECT( v.size() == index_type( 0 ) );
-    EXPECT( w.size() == index_type( 0 ) );
+    EXPECT( v.size() == size_type( 0 ) );
+    EXPECT( w.size() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 {
 #if  gsl_HAVE( NULLPTR )
-    span<      int>    v ( nullptr, index_type( 0 ) );
-    span<const int>    cv( nullptr, index_type( 0 ) );
-    span<      int, 0> w ( nullptr, index_type( 0 ) );
-    span<const int, 0> cw( nullptr, index_type( 0 ) );
+    span<      int>    v ( nullptr, size_type( 0 ) );
+    span<const int>    cv( nullptr, size_type( 0 ) );
+    span<      int, 0> w ( nullptr, size_type( 0 ) );
+    span<const int, 0> cw( nullptr, size_type( 0 ) );
 
-    EXPECT( v.size()  == index_type( 0 ) );
-    EXPECT( cv.size() == index_type( 0 ) );
-    EXPECT( w.size()  == index_type( 0 ) );
-    EXPECT( cw.size() == index_type( 0 ) );
+    EXPECT( v.size()  == size_type( 0 ) );
+    EXPECT( cv.size() == size_type( 0 ) );
+    EXPECT( w.size()  == size_type( 0 ) );
+    EXPECT( cw.size() == size_type( 0 ) );
 #else
     EXPECT( !!"nullptr is not available (no C++11)" );
 #endif
@@ -317,10 +317,10 @@ CASE( "span<>: Allows to construct from any pointer and a zero size" )
 {
     struct F {
         static void null() {
-            int * p = gsl_nullptr; span<int> v( p, index_type( 0 ) );
+            int * p = gsl_nullptr; span<int> v( p, size_type( 0 ) );
         }
         static void nonnull() {
-            int i = 7; int * p = &i; span<int> v( p, index_type( 0 ) );
+            int i = 7; int * p = &i; span<int> v( p, size_type( 0 ) );
         }
     };
 
@@ -583,8 +583,8 @@ CASE( "span<>: Allows to default construct in a constexpr context")
 #if gsl_HAVE( CONSTEXPR_11 )
     constexpr auto spn = gsl_lite::span<int>{ };
     constexpr auto spn2 = gsl_lite::span<int, 0>{ };
-    EXPECT( spn.size() == index_type( 0 ) );
-    EXPECT( spn2.size() == index_type( 0 ) );
+    EXPECT( spn.size() == size_type( 0 ) );
+    EXPECT( spn2.size() == size_type( 0 ) );
 #else
     EXPECT( !!"construction in a constexpr context is not available (C++11)");
 #endif
@@ -712,7 +712,7 @@ CASE( "span<>: Allows to create a sub span of the first n elements" )
     int arr[] = { 1, 2, 3, 4, 5, };
     span<int> v( arr );
     span<int, 5> w( arr );
-    index_type count = 3;
+    size_type count = 3;
 
     span<      int> s1 = v.first( count );
     span<const int> t1 = v.first( count );
@@ -746,7 +746,7 @@ CASE( "span<>: Allows to create a sub span of the last n elements" )
     int arr[] = { 1, 2, 3, 4, 5, };
     span<int> v( arr );
     span<int, 5> w( arr );
-    index_type count = 3;
+    size_type count = 3;
 
     span<      int> s1 = v.last( count );
     span<const int> t1 = v.last( count );
@@ -780,7 +780,7 @@ CASE( "span<>: Allows to create a sub span starting at a given offset" )
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
     span<int, 3> w( arr );
-    index_type offset = 1;
+    size_type offset = 1;
 
     span<      int> s1 = v.subspan( offset );
     span<const int> t1 = v.subspan( offset );
@@ -814,8 +814,8 @@ CASE( "span<>: Allows to create a sub span starting at a given offset with a giv
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
     span<int, 3> w( arr );
-    index_type offset = 1;
-    index_type length = 1;
+    size_type offset = 1;
+    size_type length = 1;
 
     span<      int> s1 = v.subspan( offset, length );
     span<const int> t1 = v.subspan( offset, length );
@@ -849,7 +849,7 @@ CASE( "span<>: Allows to create an empty sub span at full offset" )
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
     span<int, 3> w( arr );
-    index_type offset = v.size();
+    size_type offset = v.size();
 
     span<      int> s1 = v.subspan( offset );
     span<const int> t1 = v.subspan( offset );
@@ -875,8 +875,8 @@ CASE( "span<>: Allows to create an empty sub span at full offset with zero lengt
     int arr[] = { 1, 2, 3, };
     span<int> v( arr );
     span<int, 3> w( arr );
-    index_type offset = v.size();
-    index_type length = 0;
+    size_type offset = v.size();
+    size_type length = 0;
 
     span<      int> s1 = v.subspan( offset, length );
     span<const int> t1 = v.subspan( offset, length );
@@ -973,7 +973,7 @@ CASE( "span<>: Allows to observe an element via array indexing" )
     span<int, 3>       w ( arr );
     span<int, 3> const cw( arr );
 
-    for ( index_type i = 0; i < v.size(); ++i )
+    for ( size_type i = 0; i < v.size(); ++i )
     {
         EXPECT(   v[i] ==  arr[i] );
         EXPECT(  cv[i] ==  arr[i] );
@@ -1022,7 +1022,7 @@ CASE( "span<>: Allows to observe an element via data()" )
     EXPECT( *cw.data() ==  *v.begin() );
     EXPECT(  cw.data() == &*v.begin() );
 
-    for ( index_type i = 0; i < v.size(); ++i )
+    for ( size_type i = 0; i < v.size(); ++i )
     {
         EXPECT(  v.data()[i] == arr[i] );
         EXPECT( cv.data()[i] == arr[i] );
@@ -1268,9 +1268,9 @@ CASE( "span<>: Allows to compare empty spans as equal" )
 
     span<int> p;
     span<int> q;
-    span<int> r( &a, index_type( 0 ) );
+    span<int> r( &a, size_type( 0 ) );
     span<int, 0> s;
-    span<int, 0> t( &a, index_type( 0 ) );
+    span<int, 0> t( &a, size_type( 0 ) );
 
     EXPECT( p == q );
     EXPECT( p == r );
@@ -1311,12 +1311,12 @@ CASE( "span<>: Allows to obtain the number of elements via size(), as configured
     span<int, 3> wa( a );
     span<int, 5> wb( b );
 
-    EXPECT( va.size() == index_type( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( vb.size() == index_type( gsl_DIMENSION_OF( b ) ) );
-    EXPECT( wa.size() == index_type( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( wb.size() == index_type( gsl_DIMENSION_OF( b ) ) );
-    EXPECT(  z.size() == index_type( 0 ) );
-    EXPECT(  y.size() == index_type( 0 ) );
+    EXPECT( va.size() == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( vb.size() == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( wa.size() == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( wb.size() == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT(  z.size() == size_type( 0 ) );
+    EXPECT(  y.size() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows to obtain the number of elements via ssize(), signed" )
@@ -1331,12 +1331,12 @@ CASE( "span<>: Allows to obtain the number of elements via ssize(), signed" )
     span<int, 3> wa( a );
     span<int, 5> wb( b );
 
-    EXPECT( va.ssize() == std::ptrdiff_t( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( vb.ssize() == std::ptrdiff_t( gsl_DIMENSION_OF( b ) ) );
-    EXPECT( wa.ssize() == std::ptrdiff_t( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( wb.ssize() == std::ptrdiff_t( gsl_DIMENSION_OF( b ) ) );
-    EXPECT(  z.ssize() == std::ptrdiff_t( 0 ) );
-    EXPECT(  y.ssize() == std::ptrdiff_t( 0 ) );
+    EXPECT( va.ssize() == difference_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( vb.ssize() == difference_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( wa.ssize() == difference_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( wb.ssize() == difference_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT(  z.ssize() == difference_type( 0 ) );
+    EXPECT(  y.ssize() == difference_type( 0 ) );
 }
 
 CASE( "span<>: Allows to obtain the number of bytes via size_bytes()" )
@@ -1351,12 +1351,12 @@ CASE( "span<>: Allows to obtain the number of bytes via size_bytes()" )
     span<int, 3> wa( a );
     span<int, 5> wb( b );
 
-    EXPECT( va.size_bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
-    EXPECT( vb.size_bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
-    EXPECT( wa.size_bytes() == index_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
-    EXPECT( wb.size_bytes() == index_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
-    EXPECT(  z.size_bytes() == index_type( 0 ) );
-    EXPECT(  y.size_bytes() == index_type( 0 ) );
+    EXPECT( va.size_bytes() == size_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
+    EXPECT( vb.size_bytes() == size_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
+    EXPECT( wa.size_bytes() == size_type( gsl_DIMENSION_OF( a ) * sizeof(int) ) );
+    EXPECT( wb.size_bytes() == size_type( gsl_DIMENSION_OF( b ) * sizeof(int) ) );
+    EXPECT(  z.size_bytes() == size_type( 0 ) );
+    EXPECT(  y.size_bytes() == size_type( 0 ) );
 }
 
 CASE( "span<>: Allows to swap with another span of the same type" )
@@ -1601,16 +1601,16 @@ CASE( "span<>: Allows dereferencing iterators" )
         span<int>::iterator beyond = s.end();
         EXPECT(it != beyond);
 
-        EXPECT(beyond - first == 4);
-        EXPECT(first - first == 0);
-        EXPECT(beyond - beyond == 0);
+        EXPECT(beyond - first == difference_type( 4 ));
+        EXPECT(first - first == difference_type( 0 ));
+        EXPECT(beyond - beyond == difference_type( 0 ));
 
         ++it;
-        EXPECT(it - first == 1);
+        EXPECT(it - first == difference_type( 1 ));
         EXPECT(*it == 2);
         *it = 22;
         EXPECT(*it == 22);
-        EXPECT(beyond - it == 3);
+        EXPECT(beyond - it == difference_type( 3 ));
 
         it = first;
         EXPECT(it == first);
@@ -1621,7 +1621,7 @@ CASE( "span<>: Allows dereferencing iterators" )
         }
 
         EXPECT(it == beyond);
-        EXPECT(it - beyond == 0);
+        EXPECT(it - beyond == difference_type( 0 ));
 
         for (span<int>::const_iterator pos = s.begin(); pos != s.end(); ++pos)
         {
@@ -1652,16 +1652,16 @@ CASE( "span<>: Allows dereferencing reverse iterators" )
     span<int>::reverse_iterator beyond = s.rend();
     EXPECT(it != beyond);
 
-    EXPECT(beyond - first == 4);
-    EXPECT(first - first == 0);
-    EXPECT(beyond - beyond == 0);
+    EXPECT(beyond - first == difference_type( 4 ));
+    EXPECT(first - first == difference_type( 0 ));
+    EXPECT(beyond - beyond == difference_type( 0 ));
 
     ++it;
-    EXPECT(it - s.rbegin() == 1);
+    EXPECT(it - s.rbegin() == difference_type( 1 ));
     EXPECT(*it == 3);
     *it = 22;
     EXPECT(*it == 22);
-    EXPECT(beyond - it == 3);
+    EXPECT(beyond - it == difference_type( 3 ));
 
     it = first;
     EXPECT(it == first);
@@ -1672,7 +1672,7 @@ CASE( "span<>: Allows dereferencing reverse iterators" )
     }
 
     EXPECT(it == beyond);
-    EXPECT(it - beyond == 0);
+    EXPECT(it - beyond == difference_type( 0 ));
 
     for (span<int>::const_reverse_iterator pos = s.rbegin(); pos != s.rend(); ++pos)
     {
@@ -1701,7 +1701,7 @@ CASE( "span<>: Allows appropriate fixed-size conversions" )
 
     // converting to a span from an equal size array is ok
     span<int, 4> s4 = arr;
-    EXPECT(s4.size() == 4);
+    EXPECT(s4.size() == size_type( 4 ));
 
     // converting to dynamic_range is always ok
     {
@@ -1794,7 +1794,7 @@ CASE( "copy(): Allows to copy a span to another span of a different element type
     copy( src2, dst3 );
     copy( src2, dst4 );
 
-    for ( span<int>::index_type i = 0; i < src1.size(); ++i )
+    for ( span<int>::size_type i = 0; i < src1.size(); ++i )
     {
         EXPECT( src1[i] == dst1[i] );
         EXPECT( src1[i] == dst2[i] );
@@ -1815,12 +1815,12 @@ CASE( "size(): Allows to obtain the number of elements in span via size(span), u
     span<int, 3> wa( a );
     span<int, 5> wb( b );
 
-    EXPECT( size( va ) == index_type( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( size( vb ) == index_type( gsl_DIMENSION_OF( b ) ) );
-    EXPECT( size( wa ) == index_type( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( size( wb ) == index_type( gsl_DIMENSION_OF( b ) ) );
-    EXPECT( size(  z ) == index_type( 0 ) );
-    EXPECT( size(  y ) == index_type( 0 ) );
+    EXPECT( size( va ) == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( size( vb ) == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( size( wa ) == size_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( size( wb ) == size_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( size(  z ) == size_type( 0 ) );
+    EXPECT( size(  y ) == size_type( 0 ) );
 }
 
 CASE( "ssize(): Allows to obtain the number of elements in span via ssize(span), signed" )
@@ -1835,12 +1835,12 @@ CASE( "ssize(): Allows to obtain the number of elements in span via ssize(span),
     span<int, 3> wa( a );
     span<int, 5> wb( b );
 
-    EXPECT( ssize( va ) == std::ptrdiff_t( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( ssize( vb ) == std::ptrdiff_t( gsl_DIMENSION_OF( b ) ) );
-    EXPECT( ssize( wa ) == std::ptrdiff_t( gsl_DIMENSION_OF( a ) ) );
-    EXPECT( ssize( wb ) == std::ptrdiff_t( gsl_DIMENSION_OF( b ) ) );
-    EXPECT( ssize(  z ) == std::ptrdiff_t( 0 ) );
-    EXPECT( ssize(  y ) == std::ptrdiff_t( 0 ) );
+    EXPECT( ssize( va ) == difference_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( ssize( vb ) == difference_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( ssize( wa ) == difference_type( gsl_DIMENSION_OF( a ) ) );
+    EXPECT( ssize( wb ) == difference_type( gsl_DIMENSION_OF( b ) ) );
+    EXPECT( ssize(  z ) == difference_type( 0 ) );
+    EXPECT( ssize(  y ) == difference_type( 0 ) );
 }
 
 #if ! gsl_FEATURE_TO_STD( MAKE_SPAN )
@@ -2034,7 +2034,7 @@ CASE( "byte_span(): Allows to build a span of gsl_lite::byte from a single objec
 
     span<gsl_lite::byte> spn = byte_span( x );
 
-    EXPECT( spn.size() == index_type( sizeof x ) );
+    EXPECT( spn.size() == size_type( sizeof x ) );
     if ( sizeof x > 1 )
     {
         if ( std20::endian::native == std20::endian::little )
@@ -2058,7 +2058,7 @@ CASE( "byte_span(): Allows to build a span of const gsl_lite::byte from a single
 
     span<const gsl_lite::byte> spn = byte_span( x );
 
-    EXPECT( spn.size() == index_type( sizeof x ) );
+    EXPECT( spn.size() == size_type( sizeof x ) );
     if ( sizeof x > 1 )
     {
         if ( std20::endian::native == std20::endian::little )
