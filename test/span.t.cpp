@@ -626,6 +626,7 @@ CASE( "span<>: Allows to copy-construct from another span of a compatible type" 
     span<const volatile int, 9> y3( v );
     span<const volatile int, 9> y4( cv );
 
+#if !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1500 )
     EXPECT( std::equal( x1.begin(), x1.end(), arr ) );
     EXPECT( std::equal( x2.begin(), x2.end(), arr ) );
     EXPECT( std::equal( x3.begin(), x3.end(), arr ) );
@@ -634,6 +635,7 @@ CASE( "span<>: Allows to copy-construct from another span of a compatible type" 
     EXPECT( std::equal( y2.begin(), y2.end(), arr ) );
     EXPECT( std::equal( y3.begin(), y3.end(), arr ) );
     EXPECT( std::equal( y4.begin(), y4.end(), arr ) );
+#endif // !gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1500 )
 }
 
 CASE( "span<>: Allows to move-construct from another span of the same type (C++11)" )
