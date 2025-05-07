@@ -8,7 +8,8 @@
 #
 # This code is licensed under the MIT License (MIT).
 
-cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
+
+cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 project(
     gsl-lite
