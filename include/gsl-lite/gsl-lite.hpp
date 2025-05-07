@@ -4058,7 +4058,7 @@ public:
     typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
 
     template< size_type Other >
-    gsl_api gsl_constexpr14 gsl_explicit extent_type( extent_type< Other > ext )
+    gsl_api gsl_constexpr gsl_explicit extent_type( extent_type< Other > ext )
         : size_( ext.size() )
     {
     }
@@ -4141,7 +4141,7 @@ public:
     >
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     gsl_api gsl_constexpr span() gsl_noexcept
-        : storage_( gsl_nullptr, detail::extent_type< 0 >( ) )
+        : storage_( detail::extent_type< 0 >( ) )
     {
     }
 
@@ -4578,6 +4578,11 @@ private:
     class storage_type : public ExtentType
     {
     public:
+        gsl_api gsl_constexpr storage_type( detail::extent_type< 0 > ext )
+            : ExtentType( ext ), data_( gsl_nullptr )
+        {
+        }
+
         // known_not_null parameter is needed to remove unnecessary null check
         // in subspans and constructors from arrays
         template< class OtherExtentType >
