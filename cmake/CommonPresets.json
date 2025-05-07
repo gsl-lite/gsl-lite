@@ -107,7 +107,8 @@
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
                 "_PRESET_TSAN": "-fsanitize=thread",
-                "_PRESET_DEBUGCHECKS": "-D_LIBCPP_DEBUG=1"
+                // cf. https://libcxx.llvm.org/Hardening.html
+                "_PRESET_DEBUGCHECKS": "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG"
             }
         },
 
