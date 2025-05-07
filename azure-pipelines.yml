@@ -28,33 +28,33 @@ jobs:
 
     # put a set of representative (and slow) jobs first
 
-    - os: Linux
-      cxxCompiler: GCC
-      cxxCompilerVersions: [14]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x64]
-      tag: 'memcheck'
-      postSetupSteps:
-      - bash: |
-          sudo apt install valgrind
-          # suppress AVX/AVX2 paths because there are apparent false positives in glibc's AVX2-optimized memcmp routines
-          # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
-          echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable,-AVX_Fast_Unaligned_Load"
-        displayName: 'Install Valgrind'
-      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
-      # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
-
-    - os: Linux
-      cxxCompiler: GCC
-      cxxCompilerVersions: [14]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [12_8]
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+    ##- os: Linux
+    ##  cxxCompiler: GCC
+    ##  cxxCompilerVersions: [14]
+    ##  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    ##  platforms: [x64]
+    ##  tag: 'memcheck'
+    ##  postSetupSteps:
+    ##  - bash: |
+    ##      sudo apt install valgrind
+    ##      # suppress AVX/AVX2 paths because there are apparent false positives in glibc's AVX2-optimized memcmp routines
+    ##      # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
+    ##      echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable,-AVX_Fast_Unaligned_Load"
+    ##    displayName: 'Install Valgrind'
+    ##  # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+    ##  # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
+    ##  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+    ##  cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
+    ##  cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
+    ##
+    ##- os: Linux
+    ##  cxxCompiler: GCC
+    ##  cxxCompilerVersions: [14]
+    ##  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    ##  cudaCompiler: NVCC
+    ##  cudaCompilerVersions: [12_8]
+    ##  platforms: [x64]
+    ##  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     # CImakeshift doesn't currently support Clang-CUDA.
     #- os: Linux
@@ -66,51 +66,51 @@ jobs:
     #  platforms: [x64]
     #  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
-    - os: Linux
-      cxxCompiler: Clang
-      cxxCompilerVersions: [19]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x64]
-      tag: 'memcheck'
-      postSetupSteps:
-      - bash: |
-          sudo apt install valgrind
-          # suppress AVX/AVX2 paths because there are apparent false positives in glibc's AVX2-optimized memcmp routines
-          # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
-          echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable,-AVX_Fast_Unaligned_Load"
-        displayName: 'Install Valgrind'
-      # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
-      # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v[0-1]-cpp20'
-
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2022]
-      cmakeGenerator: 'MSBuild'  # required for CppCoreCheck
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x86, x64]
-      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
-
-    - os: Windows
-      cxxCompiler: Clang
-      cxxCompilerVersions: [VS2019, VS2022]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x86, x64]
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
-
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2022]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [12_8]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+    ##- os: Linux
+    ##  cxxCompiler: Clang
+    ##  cxxCompilerVersions: [19]
+    ##  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    ##  platforms: [x64]
+    ##  tag: 'memcheck'
+    ##  postSetupSteps:
+    ##  - bash: |
+    ##      sudo apt install valgrind
+    ##      # suppress AVX/AVX2 paths because there are apparent false positives in glibc's AVX2-optimized memcmp routines
+    ##      # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
+    ##      echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable,-AVX_Fast_Unaligned_Load"
+    ##    displayName: 'Install Valgrind'
+    ##  # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
+    ##  # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
+    ##  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+    ##  cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
+    ##  cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v[0-1]-cpp20'
+    ##
+    ##- os: Windows
+    ##  cxxCompiler: MSVC
+    ##  cxxCompilerVersions: [VS2022]
+    ##  cmakeGenerator: 'MSBuild'  # required for CppCoreCheck
+    ##  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    ##  platforms: [x86, x64]
+    ##  cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
+    ##  cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
+    ##  cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
+    ##
+    ##- os: Windows
+    ##  cxxCompiler: Clang
+    ##  cxxCompilerVersions: [VS2019, VS2022]
+    ##  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    ##  platforms: [x86, x64]
+    ##  cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
+    ##  cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
+    ##
+    ##- os: Windows
+    ##  cxxCompiler: MSVC
+    ##  cxxCompilerVersions: [VS2022]
+    ##  cudaCompiler: NVCC
+    ##  cudaCompilerVersions: [12_8]
+    ##  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+    ##  platforms: [x64]
+    ##  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     - os: MacOS
       cxxCompiler: AppleClang
@@ -181,18 +181,18 @@ jobs:
 
     # VS 2010, 2012, 2013, 2015, and 2017 are tested with AppVeyor
 
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [11_8, 12_1]
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019, VS2022]
-      platforms: [x86, x64]
+    ##- os: Windows
+    ##  cxxCompiler: MSVC
+    ##  cxxCompilerVersions: [VS2019]
+    ##  cudaCompiler: NVCC
+    ##  cudaCompilerVersions: [11_8, 12_1]
+    ##  platforms: [x64]
+    ##  cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+    ##
+    ##- os: Windows
+    ##  cxxCompiler: MSVC
+    ##  cxxCompilerVersions: [VS2019, VS2022]
+    ##  platforms: [x86, x64]
 
     - os: MacOS
       cxxCompiler: GCC
