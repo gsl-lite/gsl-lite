@@ -1581,11 +1581,19 @@ CASE( "span<>: Allows dereferencing iterators" )
         span<int> s = a;
 
         span<int>::iterator it = s.begin();
+#if gsl_STDLIB_CPP11_OR_GREATER
         span<int>::iterator it2 = std::begin(s);
+#else // ! gsl_STDLIB_CPP11_OR_GREATER
+        span<int>::iterator it2 = s.begin();
+#endif // gsl_STDLIB_CPP11_OR_GREATER
         EXPECT(it == it2);
 
         it = s.end();
+#if gsl_STDLIB_CPP11_OR_GREATER
         it2 = std::end(s);
+#else // ! gsl_STDLIB_CPP11_OR_GREATER
+        it2 = s.end();
+#endif // gsl_STDLIB_CPP11_OR_GREATER
         EXPECT(it == it2);
     }
 
@@ -1726,7 +1734,7 @@ CASE( "span<>: Allows appropriate fixed-size conversions" )
 
     // you can convert statically
     {
-        const span<int, 2> s2{&arr[0], 2};
+        const span<int, 2> s2( &arr[0], 2 );
         (void) s2;
     }
     {
