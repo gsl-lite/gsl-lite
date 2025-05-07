@@ -16,7 +16,7 @@ struct Widget
 
     ~Widget() { delete owned_ptr; }
 
-    void work() { non_owned_ptr = use( gsl_lite::make_not_null( owned_ptr ) ); }
+    void work() { non_owned_ptr = use( make_not_null( owned_ptr ) ); }
 
     owner<int *> owned_ptr;	// if alias template support
     int * non_owned_ptr;
