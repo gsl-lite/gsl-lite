@@ -30,7 +30,7 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 #include <cstdlib>   // for abort()
 
-#if defined( __has_include ) && __has_include( <version> )
+#if defined( __has_include )
 # include <version>
 #endif
 
