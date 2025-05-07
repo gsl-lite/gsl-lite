@@ -22,7 +22,7 @@ configuration:
     #- Release
 
 platform:
-    ##- Win32
+    - Win32
     - x64
 
 matrix:
