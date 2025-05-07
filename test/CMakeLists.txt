@@ -100,6 +100,7 @@ make_test_targets( "gsl-lite-v1-special" 11
     EXTRA_OPTIONS
         "-Dgsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1"
         "-Dgsl_CONFIG_SPAN_INDEX_TYPE=std::ptrdiff_t"
+        "-Dgsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1"
         "-Dgsl_CONFIG_TRANSPARENT_NOT_NULL=0"
         "-DNOT_NULL_GET_BY_CONST_REF=1"
     DEFAULTS_VERSION v1
