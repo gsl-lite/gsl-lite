@@ -1366,27 +1366,24 @@
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
-#if gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
-
 // Declare __cxa_get_globals() or equivalent in namespace gsl_lite::detail for uncaught_exceptions():
 
-# if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-#  if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
+#if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
+# if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
 namespace gsl_lite { namespace detail { extern "C" char * __cdecl _getptd(); } }
-#  elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
-#   if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
-#    include  <cxxabi.h>
-#   elif ! defined( BOOST_CORE_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED_ )  // libc++: prototype from Boost?
-#    if defined( __FreeBSD__ ) || defined( __OpenBSD__ )
+# elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
+#  if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
+#   include  <cxxabi.h>
+#  elif ! defined( BOOST_CORE_UNCAUGHT_EXCEPTIONS_HPP_INCLUDED_ )  // libc++: prototype from Boost?
+#   if defined( __FreeBSD__ ) || defined( __OpenBSD__ )
 namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals(); }
-#    else
+#   else
 namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __cxa_get_globals() gsl_noexcept; }
-#    endif
 #   endif
-    namespace gsl_lite { namespace detail { using ::__cxxabiv1::__cxa_get_globals; } }
 #  endif
-# endif // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-#endif // gsl_FEATURE( EXPERIMENTAL_RETURN_GUARD )
+    namespace gsl_lite { namespace detail { using ::__cxxabiv1::__cxa_get_globals; } }
+# endif
+#endif // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 
 
 // Warning suppression macros:
