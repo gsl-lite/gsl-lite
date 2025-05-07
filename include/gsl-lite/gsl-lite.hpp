@@ -1925,12 +1925,12 @@ using std::shared_ptr;
 // GSL.assert: assertions
 //
 
+#define gsl_NO_OP_()      ( static_cast<void>( 0 ) )
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_CONFIG( VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
 # define gsl_ELIDE_( x )  static_assert( ::std::is_constructible<bool, decltype( x )>::value, "argument of contract check must be convertible to bool" )
 #else
-# define gsl_ELIDE_( x )
+# define gsl_ELIDE_( x )  gsl_NO_OP_()
 #endif
-#define gsl_NO_OP_()      ( static_cast<void>( 0 ) )
 
 #if gsl_COMPILER_NVHPC_VERSION
 // Suppress "controlling expression is constant" warning when using `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, etc.
