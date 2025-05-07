@@ -114,7 +114,7 @@ inline std::ostream & operator<<( std::ostream & os, byte b )
 #endif // gsl_FEATURE( BYTE )
 
 template< typename T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
-inline std::ostream & operator<<( std::ostream & os, span<T, Extent> s )
+inline std::ostream & operator<<( std::ostream & os, span< T, Extent > s )
 {
     return os << "[", std::copy( s.begin(), s.end(), std::ostream_iterator<T>(os, ",") ), os << "]";
 }
@@ -122,13 +122,13 @@ inline std::ostream & operator<<( std::ostream & os, span<T, Extent> s )
 namespace detail {
 
 template< typename T >
-inline std::ostream & operator<<( std::ostream & os, span_iterator<T> s )
+inline std::ostream & operator<<( std::ostream & os, span_iterator< T > s )
 {
     return os << s.current_;
 }
 
 template< typename T >
-inline std::ostream & operator<<( std::ostream & os, std::reverse_iterator<span_iterator<T>> s )
+inline std::ostream & operator<<( std::ostream & os, std::reverse_iterator< span_iterator< T > > s )
 {
     return os << s.base().current_;
 }

@@ -5829,7 +5829,7 @@ gsl_is_delete_access:
 namespace std {
 
 template< class T >
-struct hash< ::gsl_lite::not_null< T > > : public ::gsl_lite::detail::conditionally_enabled_hash<is_default_constructible<hash<T>>::value>
+struct hash< ::gsl_lite::not_null< T > > : public ::gsl_lite::detail::conditionally_enabled_hash< is_default_constructible< hash< T > >::value >
 {
 public:
     gsl_NODISCARD std::size_t
