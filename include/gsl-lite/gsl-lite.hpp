@@ -273,7 +273,7 @@
 
 #if ! defined( gsl_CONFIG_DEPRECATE_TO_LEVEL )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
-#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  8
+#  define gsl_CONFIG_DEPRECATE_TO_LEVEL  9
 # else
 #  define gsl_CONFIG_DEPRECATE_TO_LEVEL  0
 # endif
@@ -1448,7 +1448,12 @@ namespace gsl_lite {
 
 // forward declare span<>:
 
-template< class T >
+#if gsl_CPP17_OR_GREATER
+inline
+#endif // gsl_CPP17_OR_GREATER
+gsl_constexpr const gsl_CONFIG_SPAN_INDEX_TYPE dynamic_extent = gsl_CONFIG_SPAN_INDEX_TYPE( -1 );
+
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent = dynamic_extent >
 class span;
 
 namespace detail {
@@ -1771,8 +1776,8 @@ namespace detail {
 template< class Q >
 struct is_span_oracle : std::false_type{};
 
-template< class T>
-struct is_span_oracle< span<T> > : std::true_type{};
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
+struct is_span_oracle< span<T, Extent > > : std::true_type{};
 
 template< class Q >
 struct is_span : is_span_oracle< typename std::remove_cv<Q>::type >{};
@@ -2539,9 +2544,9 @@ at( std::initializer_list<T> cont, size_t pos )
 }
 #endif
 
-template< class T >
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
-at( span<T> s, size_t pos )
+at( span<T, Extent> s, size_t pos )
 {
     return s[ pos ];
 }
@@ -3659,323 +3664,712 @@ const  gsl_constexpr   with_container_t with_container; // TODO: this can lead t
 
 #endif
 
+
+// The span<> and span_iterator<> implementation below was mostly borrowed from Microsoft GSL.
+
+
+#if gsl_COMPILER_MSVC_VER
+# pragma warning( push )
+
+// turn off some warnings that are noisy about our Expects statements
+# pragma warning( disable : 4127 ) // conditional expression is constant
+# pragma warning( disable : 4146 ) // unary minus operator applied to unsigned type, result still unsigned
+# pragma warning( disable : 4702 ) // unreachable code
+
+// Turn off MSVC /analyze rules that generate too much noise
+# pragma warning( disable : 26495 ) // uninitialized member when constructor calls constructor
+# pragma warning( disable : 26446 ) // parser bug does not allow attributes on some templates
+
+#endif // gsl_COMPILER_MSVC_VER
+
+// GCC 7 does not like the signed unsigned mismatch (size_t ptrdiff_t)
+// While there is a conversion from signed to unsigned, it happens at
+// compiletime, so the compiler wouldn't have to warn indiscriminately, but
+// could check if the source value actually doesn't fit into the target type
+// and only warn in those cases.
+#if defined( __GNUC__ ) && __GNUC__ > 6
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif // defined( __GNUC__ ) && __GNUC__ > 6
+
+// Turn off clang unsafe buffer warnings as all accessed are guarded by runtime checks
+#if defined( __clang__ )
+# if __has_warning( "-Wunsafe-buffer-usage" )
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+# endif // __has_warning( "-Wunsafe-buffer-usage" )
+#endif // defined( __clang__ )
+
 namespace detail {
 
 template< class T >
-gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )
+gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )  // TODO: remove?
 {
         // Be sure to run the check before doing pointer arithmetics, which would be UB for `nullptr` and non-0 integers.
     gsl_Expects( size == 0 || data != gsl_nullptr );
     return data + size;
 }
 
+template< gsl_CONFIG_SPAN_INDEX_TYPE From, gsl_CONFIG_SPAN_INDEX_TYPE To >
+struct is_allowed_extent_conversion
+    : std17::bool_constant< From == To || To == dynamic_extent >
+{
+};
+
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+template< class From, class To >
+struct is_allowed_element_type_conversion
+    : std17::bool_constant< std::is_convertible< From (*)[], To (*)[] >::value >
+{
+};
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+
+template< class T >
+class span_iterator
+{
+public:
+#if gsl_STDLIB_CPP20_OR_GREATER
+    typedef typename std::contiguous_iterator_tag iterator_concept;
+#endif // gsl_STDLIB_CPP20_OR_GREATER
+    typedef typename std::random_access_iterator_tag iterator_category;
+    typedef typename std::remove_cv< T >::type value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef T * pointer;
+    typedef T & reference;
+
+#ifdef _MSC_VER
+    typedef pointer _Unchecked_type;
+    typedef span_iterator _Prevent_inheriting_unwrap;
+#endif // _MSC_VER
+#if gsl_HAVE( IS_DEFAULT )
+    gsl_constexpr span_iterator() = default;
+#else // ! gsl_HAVE( IS_DEFAULT )
+    gsl_api gsl_constexpr span_iterator() gsl_noexcept { }
+#endif // gsl_HAVE( IS_DEFAULT )
+
+    gsl_api gsl_constexpr14 span_iterator( pointer begin, pointer end, pointer current )
+        : begin_( begin ), end_( end ), current_( current )
+    {
+        gsl_ExpectsDebug( begin_ <= current_ && current <= end_ );
+    }
+
+    gsl_api gsl_constexpr14 operator span_iterator< T const >() const gsl_noexcept
+    {
+        return span_iterator< T const >( begin_, end_, current_ );
+    }
+
+    gsl_api gsl_constexpr14 reference operator*() const
+    {
+        gsl_ExpectsDebug( current_ != end_ );
+        return *current_;
+    }
+
+    gsl_api gsl_constexpr14 pointer operator->() const
+    {
+        gsl_ExpectsDebug( current_ != end_ );
+        return current_;
+    }
+    gsl_api gsl_constexpr14 span_iterator& operator++()
+    {
+        gsl_ExpectsDebug( current_ != end_ );
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        ++current_;
+        return *this;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator operator++( int )
+    {
+        span_iterator ret = *this;
+        ++*this;
+        return ret;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator& operator--()
+    {
+        gsl_ExpectsDebug( begin_ != current_ );
+        --current_;
+        return *this;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator operator--( int )
+    {
+        span_iterator ret = *this;
+        --*this;
+        return ret;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator& operator+=( difference_type const n )
+    {
+        if ( n != 0 ) gsl_ExpectsDebug( begin_ && current_ && end_ );
+        if ( n > 0 )  gsl_ExpectsDebug( end_ - current_ >= n );
+        if ( n < 0 )  gsl_ExpectsDebug( current_ - begin_ >= -n );
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        current_ += n;
+        return *this;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator operator+( difference_type const n ) const
+    {
+        span_iterator ret = *this;
+        ret += n;
+        return ret;
+    }
+
+    friend gsl_api gsl_constexpr14 span_iterator operator+( difference_type const n,
+                                                            span_iterator const & rhs )
+    {
+        return rhs + n;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator& operator-=( difference_type const n )
+    {
+        if ( n != 0 ) gsl_ExpectsDebug( begin_ && current_ && end_ );
+        if ( n > 0 )  gsl_ExpectsDebug( current_ - begin_ >= n );
+        if ( n < 0 )  gsl_ExpectsDebug( end_ - current_ >= -n );
+        gsl_SUPPRESS_MSGSL_WARNING(bounds .1)
+        current_ -= n;
+        return *this;
+    }
+
+    gsl_api gsl_constexpr14 span_iterator operator-( difference_type const n ) const
+    {
+        span_iterator ret = *this;
+        ret -= n;
+        return ret;
+    }
+
+    template<
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 difference_type operator-( span_iterator< U > const & rhs ) const
+    {
+        gsl_ExpectsDebug( begin_ == rhs.begin_ && end_ == rhs.end_ );
+        return current_ - rhs.current_;
+    }
+
+    gsl_api gsl_constexpr14 reference operator[]( difference_type const n ) const
+    {
+        return *( *this + n );
+    }
+
+    template <
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 bool operator==( span_iterator< U > const & rhs ) const
+    {
+        gsl_ExpectsDebug( begin_ == rhs.begin_ && end_ == rhs.end_ );
+        return current_ == rhs.current_;
+    }
+
+    template <
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 bool operator!=( span_iterator< U > const & rhs ) const
+    {
+        return !( *this == rhs );
+    }
+
+    template <
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 bool operator<( span_iterator< U > const & rhs ) const
+    {
+        gsl_ExpectsDebug( begin_ == rhs.begin_ && end_ == rhs.end_ );
+        return current_ < rhs.current_;
+    }
+
+    template <
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 bool operator>( span_iterator< U > const & rhs ) const
+    {
+        return rhs < *this;
+    }
+
+    template <
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 bool operator<=( span_iterator< U > const & rhs ) const
+    {
+        return !( rhs < *this );
+    }
+
+    template <
+        class U
+        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+    >
+    gsl_api gsl_constexpr14 bool operator>=( span_iterator< U > const & rhs ) const
+    {
+        return !( *this < rhs );
+    }
+
+#ifdef _MSC_VER
+    // MSVC++ iterator debugging support; allows STL algorithms in 15.8+
+    // to unwrap span_iterator to a pointer type after a range check in STL
+    // algorithm calls.
+    friend gsl_api gsl_constexpr14 void _Verify_range( span_iterator lhs, span_iterator rhs ) gsl_noexcept
+    {
+        // test that [lhs, rhs) forms a valid range inside an STL algorithm
+        gsl_Expects( lhs.begin_ == rhs.begin_ // range spans have to match
+                && lhs.end_ == rhs.end_ &&
+                lhs.current_ <= rhs.current_ ); // range must not be transposed
+    }
+
+    gsl_api gsl_constexpr14 void _Verify_offset( difference_type const n ) const gsl_noexcept
+    {
+        // test that *this + n is within the range of this call
+        if ( n != 0 ) gsl_Expects( begin_ && current_ && end_ );
+        if ( n > 0 )  gsl_Expects( end_ - current_ >= n );
+        if ( n < 0 )  gsl_Expects( current_ - begin_ >= -n );
+    }
+
+    gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+    gsl_api gsl_constexpr14 pointer _Unwrapped() const gsl_noexcept
+    {
+        // after seeking *this to a high water mark, or using one of the
+        // _Verify_xxx functions above, unwrap this span_iterator to a raw
+        // pointer
+        return current_;
+    }
+
+    // Tell the STL that span_iterator should not be unwrapped if it can't
+    // validate in advance, even in release / optimized builds:
+# if gsl_CPP17_OR_GREATER
+    static constexpr bool _Unwrap_when_unverified = false;
+# else
+    static gsl_constexpr const bool _Unwrap_when_unverified = false;
+# endif
+    gsl_SUPPRESS_MSGSL_WARNING(con.3) // TODO: false positive
+    gsl_api gsl_constexpr14 void _Seek_to( pointer const p ) gsl_noexcept
+    {
+        // adjust the position of *this to previously verified location p
+        // after _Unwrapped
+        current_ = p;
+    }
+#endif
+
+    pointer begin_ = gsl_nullptr;
+    pointer end_ = gsl_nullptr;
+    pointer current_ = gsl_nullptr;
+
+#if gsl_STDLIB_CPP11_OR_GREATER
+    template< class Ptr >
+    friend struct std::pointer_traits;
+#endif // gsl_STDLIB_CPP11_OR_GREATER
+};
+
+template< gsl_CONFIG_SPAN_INDEX_TYPE Ext >
+class extent_type
+{
+public:
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
+
+#if gsl_HAVE( IS_DEFAULT )
+    gsl_constexpr extent_type() gsl_noexcept = default;
+#else // ! gsl_HAVE( IS_DEFAULT )
+    gsl_constexpr extent_type() gsl_noexcept { }
+#endif // gsl_HAVE( IS_DEFAULT )
+
+    gsl_api gsl_constexpr14 gsl_explicit extent_type( extent_type< dynamic_extent > );
+
+    gsl_api gsl_constexpr14 gsl_explicit extent_type( size_type size ) { gsl_Expects( size == Ext ); }
+
+    gsl_api gsl_constexpr size_type size() const gsl_noexcept { return Ext; }
+
+private:
+#if gsl_CPP17_OR_GREATER
+    static constexpr size_type size_ = Ext; // static size equal to Ext
+#else
+    static gsl_constexpr const size_type size_ = Ext; // static size equal to Ext
+#endif
+};
+
+template<>
+class extent_type< dynamic_extent >
+{
+public:
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
+
+    template< size_type Other >
+    gsl_api gsl_constexpr14 gsl_explicit extent_type( extent_type< Other > ext )
+        : size_( ext.size() )
+    {
+    }
+
+    gsl_api gsl_constexpr14 gsl_explicit extent_type( size_type size )
+        : size_( size )
+    {
+        gsl_Expects( size != dynamic_extent );
+    }
+
+    gsl_api gsl_constexpr size_type size() const noexcept { return size_; }
+
+private:
+    size_type size_;
+};
+
+template< gsl_CONFIG_SPAN_INDEX_TYPE Ext >
+gsl_api gsl_constexpr14 extent_type< Ext >::extent_type( extent_type< dynamic_extent > ext )
+{
+    gsl_Expects( ext.size() == Ext );
+}
+
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent, gsl_CONFIG_SPAN_INDEX_TYPE Offset, gsl_CONFIG_SPAN_INDEX_TYPE Count >
+struct calculate_subspan_type
+{
+    typedef span< T, Count != dynamic_extent
+                        ? Count
+                        : ( Extent != dynamic_extent ? Extent - Offset : Extent ) > type;
+};
+
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
+struct calculate_recast_span_type
+{
+    typedef span< U, Extent != dynamic_extent
+                        ? Extent * sizeof( T ) / sizeof( U )
+                        : dynamic_extent > type;
+};
+
 } // namespace detail
 
-//
-// span<> - A 1D view of contiguous T's, replace (*,len).
-//
-template< class T >
+// [span], class template span
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 class span
 {
-    template< class U > friend class span;
-
 public:
-    typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;
-
+    // constants and types
     typedef T element_type;
     typedef typename std11::remove_cv< T >::type value_type;
-
-    typedef T & reference;
-    typedef T * pointer;
-    typedef T const * const_pointer;
-    typedef T const & const_reference;
-
-    typedef pointer       iterator;
-    typedef const_pointer const_iterator;
-
-    typedef std::reverse_iterator< iterator >       reverse_iterator;
-    typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
-
     typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
+    typedef gsl_CONFIG_SPAN_INDEX_TYPE index_type;
+    typedef element_type * pointer;
+    typedef element_type const * const_pointer;
+    typedef element_type & reference;
+    typedef element_type const & const_reference;
     typedef std::ptrdiff_t difference_type;
 
-    // 26.7.3.2 Constructors, copy, and assignment [span.cons]
+    typedef detail::span_iterator< T > iterator;
+    typedef detail::span_iterator< T const > const_iterator;
+    typedef std::reverse_iterator< iterator > reverse_iterator;
+    typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
 
-    gsl_api gsl_constexpr span() gsl_noexcept
-        : first_( gsl_nullptr )
-        , last_ ( gsl_nullptr )
-    {
-    }
-
-#if ! gsl_DEPRECATE_TO_LEVEL( 5 )
-
-#if gsl_HAVE( NULLPTR )
-    gsl_api gsl_constexpr14 span( std::nullptr_t, index_type size_in )
-        : first_( nullptr )
-        , last_ ( nullptr )
-    {
-        gsl_Expects( size_in == 0 );
-    }
-#endif
-
-#if gsl_HAVE( IS_DELETE )
-    gsl_DEPRECATED
-    gsl_api gsl_constexpr span( reference data_in )
-        : span( &data_in, 1 )
-    {}
-
-    gsl_api gsl_constexpr span( element_type && ) = delete;
-#endif
-
-#endif // deprecate
-
-    gsl_api gsl_constexpr14 span( pointer data_in, index_type size_in )
-        : first_( data_in )
-        , last_( detail::endptr( data_in, size_in ) )
-    {
-    }
-
-    gsl_api gsl_constexpr14 span( pointer first_in, pointer last_in )
-        : first_( first_in )
-        , last_ ( last_in )
-    {
-        gsl_Expects( first_in <= last_in );
-    }
-
-#if ! gsl_DEPRECATE_TO_LEVEL( 5 )
-
-    template< class U >
-    gsl_api gsl_constexpr14 span( U * data_in, index_type size_in )
-        : first_( data_in )
-        , last_( detail::endptr( data_in, size_in ) )
-    {
-    }
-
-#endif // deprecate
-
-#if ! gsl_DEPRECATE_TO_LEVEL( 5 )
-    template< class U, size_t N >
-    gsl_api gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
-        : first_( gsl_ADDRESSOF( arr[0] ) )
-        , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
-    {}
+#if gsl_CPP17_OR_GREATER
+    static constexpr size_type extent{ Extent };
 #else
-    template< size_t N
-        gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
+    static gsl_constexpr const size_type extent = Extent;
+#endif
+
+    // [span.cons], span constructors, copy, assignment, and destructor
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( detail::is_allowed_extent_conversion< 0, MyExtent >::value ))
     >
-    gsl_api gsl_constexpr span( element_type (&arr)[N] ) gsl_noexcept
-        : first_( gsl_ADDRESSOF( arr[0] ) )
-        , last_ ( gsl_ADDRESSOF( arr[0] ) + N )
-    {}
-#endif // deprecate
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    gsl_api gsl_constexpr span() gsl_noexcept
+        : storage_( gsl_nullptr, detail::extent_type< 0 >( ) )
+    {
+    }
+
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent != dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 gsl_explicit span( pointer ptr, size_type count )
+        : storage_( ptr, count )
+    {
+        gsl_Expects( count == Extent );
+    }
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent == dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 span( pointer ptr, size_type count )
+        : storage_( ptr, count )
+    {
+    }
+
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent != dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 gsl_explicit span( pointer firstElem, pointer lastElem )
+        : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
+    {
+        gsl_Expects( firstElem <= lastElem );
+        gsl_Expects( lastElem - firstElem == static_cast< difference_type >( Extent ) );
+    }
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent == dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 span( pointer firstElem, pointer lastElem )
+        : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
+    {
+        gsl_Expects( firstElem <= lastElem );
+    }
+#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) )
+    gsl_api gsl_constexpr14 span( pointer ptr, size_type count )
+        : storage_( ptr, count )
+    {
+        gsl_Expects( Extent == dynamic_extent || count == Extent );
+    }
+    gsl_api gsl_constexpr14 span( pointer firstElem, pointer lastElem )
+        : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
+    {
+        gsl_Expects( firstElem <= lastElem );
+        gsl_Expects( Extent == dynamic_extent || lastElem - firstElem == static_cast< difference_type >( Extent ) );
+    }
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+
+    template<
+        class U, std::size_t N
+        gsl_ENABLE_IF_(( detail::is_allowed_extent_conversion< N, Extent >::value &&
+                         detail::is_allowed_element_type_conversion< U, element_type >::value ))
+    >
+    gsl_api gsl_constexpr span( U (&arr)[N] ) gsl_noexcept
+        : storage_( known_not_null( arr ), detail::extent_type< N >( ) )
+    {
+    }
 
 #if gsl_HAVE( ARRAY )
-#if ! gsl_DEPRECATE_TO_LEVEL( 5 )
-
-    template< class U, size_t N >
-    gsl_api gsl_constexpr span( std::array< U, N > & arr )
-        : first_( arr.data() )
-        , last_ ( arr.data() + N )
-    {}
-
-    template< class U, size_t N >
-    gsl_api gsl_constexpr span( std::array< U, N > const & arr )
-        : first_( arr.data() )
-        , last_ ( arr.data() + N )
-    {}
-
-#else
-
-    template< size_t N
-        gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
+    template<
+        class U, std::size_t N
+        gsl_ENABLE_IF_(( detail::is_allowed_extent_conversion< N, Extent >::value &&
+                         detail::is_allowed_element_type_conversion< U, element_type >::value ))
     >
-    gsl_constexpr span( std::array< value_type, N > & arr )
-        : first_( arr.data() )
-        , last_ ( arr.data() + N )
-    {}
-
-    template< size_t N
-        gsl_ENABLE_IF_(( std::is_convertible<value_type(*)[], element_type(*)[] >::value ))
+    gsl_api gsl_constexpr span( std::array<U, N> & arr ) gsl_noexcept
+        : storage_( known_not_null( arr.data() ), detail::extent_type< N >( ) )
+    {
+    }
+    template<
+        class U, std::size_t N
+        gsl_ENABLE_IF_(( detail::is_allowed_extent_conversion< N, Extent >::value &&
+                         detail::is_allowed_element_type_conversion< U const , element_type >::value ))
     >
-    gsl_constexpr span( std::array< value_type, N > const & arr )
-        : first_( arr.data() )
-        , last_ ( arr.data() + N )
-    {}
-
-#endif // deprecate
+    gsl_api gsl_constexpr span( std::array<U, N> const & arr ) gsl_noexcept
+        : storage_( known_not_null( arr.data() ), detail::extent_type< N >( ) )
+    {
+    }
 #endif // gsl_HAVE( ARRAY )
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
-    template< class Container
-        gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
+    template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent != dynamic_extent &&
+                         detail::is_compatible_container< Container, element_type >::value ))
+    >
+    gsl_api gsl_constexpr gsl_explicit span( Container & cont ) gsl_noexcept
+        : storage_( std17::data( cont ), std17::size( cont ) )
+    {
+    }
+    template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent == dynamic_extent &&
+                         detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
-        : first_( std17::data( cont ) )
-        , last_ ( std17::data( cont ) + std17::size( cont ) )
-    {}
+        : storage_( std17::data( cont ), std17::size( cont ) )
+    {
+    }
 
-    template< class Container
-        gsl_ENABLE_IF_((
-            std::is_const< element_type >::value
-            && detail::is_compatible_container< Container, element_type >::value
-        ))
+    template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent != dynamic_extent &&
+                         std::is_const< element_type >::value &&
+                         detail::is_compatible_container< Container, element_type >::value ))
+    >
+    gsl_api gsl_constexpr gsl_explicit span( Container const & cont ) gsl_noexcept
+        : storage_( std17::data( cont ), std17::size( cont ) )
+    {
+    }
+    template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent == dynamic_extent &&
+                         std::is_const< element_type >::value &&
+                         detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
-        : first_( std17::data( cont ) )
-        , last_ ( std17::data( cont ) + std17::size( cont ) )
-    {}
+        : storage_( std17::data( cont ), std17::size( cont ) )
+    {
+    }
 
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 
     template< class Container >
     gsl_constexpr span( Container & cont )
-        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
-    {}
+        : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
+    {
+    }
 
     template< class Container >
     gsl_constexpr span( Container const & cont )
-        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
-    {}
+        : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
+    {
+    }
 
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
     template< class Container >
-    gsl_constexpr span( with_container_t, Container & cont ) gsl_noexcept
-        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
-    {}
+    gsl_constexpr span( with_container_t, Container & cont )
+        : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
+    {
+    }
 
     template< class Container >
-    gsl_constexpr span( with_container_t, Container const & cont ) gsl_noexcept
-        : first_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) )
-        , last_ ( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ) + cont.size() )
-    {}
+    gsl_constexpr span( with_container_t, Container const & cont )
+        : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
+    {
+    }
 
 #endif
-
-#if !gsl_DEPRECATE_TO_LEVEL( 4 )
-    // constructor taking shared_ptr deprecated since 0.29.0
-
-# if gsl_HAVE( SHARED_PTR )
-    gsl_DEPRECATED
-    gsl_constexpr span( shared_ptr<element_type> const & ptr )
-        : first_( ptr.get() )
-        , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
-    {}
-# endif
-
-    // constructors taking unique_ptr deprecated since 0.29.0
-
-# if gsl_HAVE( UNIQUE_PTR )
-#  if gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-    template< class ArrayElementType = typename std::add_pointer<element_type>::type >
-#  else
-    template< class ArrayElementType >
-#  endif
-    gsl_DEPRECATED
-    gsl_constexpr span( unique_ptr<ArrayElementType> const & ptr, index_type count )
-        : first_( ptr.get() )
-        , last_ ( ptr.get() + count )
-    {}
-
-    gsl_DEPRECATED
-    gsl_constexpr span( unique_ptr<element_type> const & ptr )
-        : first_( ptr.get() )
-        , last_ ( ptr.get() ? ptr.get() + 1 : gsl_nullptr )
-    {}
-# endif
-
-#endif // deprecate shared_ptr, unique_ptr
 
 #if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
     gsl_constexpr span( span && ) gsl_noexcept = default;
     gsl_constexpr span( span const & ) = default;
 #else
     gsl_api gsl_constexpr span( span const & other )
-        : first_( other.begin() )
-        , last_ ( other.end() )
-    {}
+        : storage_( other.storage_ )
+    {
+    }
 #endif
 
 #if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
     gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
 #else
-    gsl_constexpr14 span & operator=( span other ) gsl_noexcept
+    gsl_constexpr14 span & operator=( span const & other ) gsl_noexcept
     {
-        first_ = other.first_;
-        last_ = other.last_;
+        storage_ = other.storage_;
         return *this;
     }
 #endif
 
-    template< class U
-        gsl_ENABLE_IF_(( std::is_convertible<U(*)[], element_type(*)[]>::value ))
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    template<
+        class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( ( MyExtent == dynamic_extent || MyExtent == OtherExtent ) &&
+                         //!( OtherExtent == MyExtent && std::is_same< OtherElementType, element_type >::value ) &&
+                         detail::is_allowed_element_type_conversion< OtherElementType, element_type >::value ))
     >
-    gsl_api gsl_constexpr span( span<U> const & other )
-        : first_( other.begin() )
-        , last_ ( other.end() )
-    {}
-
-#if 0
-    // Converting from other span ?
-    template< class U > operator=();
-#endif
-
-    // 26.7.3.3 Subviews [span.sub]
-
-    gsl_NODISCARD gsl_api gsl_constexpr14 span
-    first( index_type count ) const
+    gsl_api gsl_constexpr span( span< OtherElementType, OtherExtent > const & other ) gsl_noexcept
+        : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
     {
-        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
-        return span( this->data(), count );
+    }
+    template<
+        class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( MyExtent != dynamic_extent && OtherExtent == dynamic_extent &&
+                         //!( OtherExtent == MyExtent && std::is_same< OtherElementType, element_type >::value ) &&
+                         detail::is_allowed_element_type_conversion< OtherElementType, element_type >::value ))
+    >
+    gsl_api gsl_constexpr gsl_explicit span( span< OtherElementType, OtherExtent > const & other ) gsl_noexcept
+        : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
+    {
+    }
+#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) )
+    template< class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent >
+    gsl_api gsl_constexpr14 span( span<OtherElementType, OtherExtent> const & other )
+        : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
+    {
+        gsl_STATIC_ASSERT_(
+            Extent == dynamic_extent || OtherExtent == dynamic_extent || Extent == OtherExtent,
+            "attempting copy-construction from incompatible span" );
+        gsl_Expects( Extent == dynamic_extent || other.size() == Extent );
+    }
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+
+    // [span.sub], span subviews
+
+    template< gsl_CONFIG_SPAN_INDEX_TYPE Count >
+    gsl_NODISCARD gsl_api gsl_constexpr14 span< element_type, Count >
+    first() const
+    {
+        gsl_STATIC_ASSERT_(
+            Extent == dynamic_extent || Count <= Extent,
+            "first() cannot extract more elements from a span than it contains" );
+        gsl_Expects( static_cast<std::size_t>( Count ) <= static_cast<std::size_t>( size() ) );
+        return span< element_type, Count >( data(), Count );
     }
 
-    gsl_NODISCARD gsl_api gsl_constexpr14 span
-    last( index_type count ) const
+    template < gsl_CONFIG_SPAN_INDEX_TYPE Count >
+    gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+    gsl_NODISCARD gsl_api gsl_constexpr14 span< element_type, Count >
+    last() const
     {
-        gsl_Expects( std::size_t( count ) <= std::size_t( this->size() ) );
-        return span( this->data() + this->size() - count, count );
+        gsl_STATIC_ASSERT_(
+            Extent == dynamic_extent || Count <= Extent,
+            "last() cannot extract more elements from a span than it contains" );
+        gsl_Expects( static_cast<std::size_t>( Count ) <= static_cast<std::size_t>( size() ) );
+        return span< element_type, Count >( data() + ( size() - Count ), Count );
     }
 
-    gsl_NODISCARD gsl_api gsl_constexpr14 span
-    subspan( index_type offset ) const
+    template < gsl_CONFIG_SPAN_INDEX_TYPE Offset, gsl_CONFIG_SPAN_INDEX_TYPE Count >
+    gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+    gsl_NODISCARD gsl_api gsl_constexpr14 typename detail::calculate_subspan_type< T, Extent, Offset, Count >::type
+    subspan() const
     {
-        gsl_Expects( std::size_t( offset ) <= std::size_t( this->size() ) );
-        return span( this->data() + offset, this->size() - offset );
+        gsl_STATIC_ASSERT_(
+            Extent == dynamic_extent || ( Extent >= Offset && ( Count == dynamic_extent ||
+                                                                Count <= Extent - Offset ) ),
+            "subspan() cannot extract more elements from a span than it contains.");
+        gsl_Expects( static_cast<std::size_t>( size() ) >= static_cast<std::size_t>( Offset ) && ( Count == dynamic_extent || static_cast<std::size_t>( Count ) <= static_cast<std::size_t>( size() ) - static_cast<std::size_t>( Offset ) ) );
+        typedef typename detail::calculate_subspan_type< T, Extent, Offset, Count >::type type;
+        return type( data() + Offset, Count == dynamic_extent ? size() - Offset : Count );
+    }
+    template < gsl_CONFIG_SPAN_INDEX_TYPE Offset >
+    gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+    gsl_NODISCARD gsl_api gsl_constexpr14 typename detail::calculate_subspan_type< T, Extent, Offset, dynamic_extent >::type
+    subspan() const
+    {
+        gsl_STATIC_ASSERT_(
+            Extent == dynamic_extent || Extent >= Offset,
+            "subspan() cannot extract more elements from a span than it contains.");
+        gsl_Expects( static_cast<std::size_t>( size() ) >= static_cast<std::size_t>( Offset ) );
+        typedef typename detail::calculate_subspan_type< T, Extent, Offset, dynamic_extent >::type type;
+        return type( data() + Offset, size() - Offset );
     }
 
-    gsl_NODISCARD gsl_api gsl_constexpr14 span
-    subspan( index_type offset, index_type count ) const
+    gsl_NODISCARD gsl_api gsl_constexpr14 span< element_type, dynamic_extent >
+    first( size_type count ) const
     {
-        gsl_Expects(
-            std::size_t( offset ) <= std::size_t( this->size() ) &&
-            std::size_t( count ) <= std::size_t( this->size() - offset ) );
-        return span( this->data() + offset, count );
+        gsl_Expects( static_cast<std::size_t>( count ) <= static_cast<std::size_t>( size() ) );
+        return span< element_type, dynamic_extent >( data(), count );
+    }
+    gsl_NODISCARD gsl_api gsl_constexpr14 span< element_type, dynamic_extent >
+    last( size_type count ) const
+    {
+        gsl_Expects( static_cast<std::size_t>( count ) <= static_cast<std::size_t>( size() ) );
+        return make_subspan( size() - count, dynamic_extent, subspan_selector< Extent >() );
     }
 
-    // 26.7.3.4 Observers [span.obs]
+    gsl_NODISCARD gsl_api gsl_constexpr14 span<element_type, dynamic_extent>
+    subspan(size_type offset, size_type count = dynamic_extent) const
+    {
+        return make_subspan(offset, count, subspan_selector< Extent >() );
+    }
 
-    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    // [span.obs], span observers
+
+    gsl_NODISCARD gsl_api gsl_constexpr size_type
     size() const gsl_noexcept
     {
-        return narrow_cast<index_type>( last_ - first_ );
+        return storage_.size();
     }
-
     gsl_NODISCARD gsl_api gsl_constexpr std::ptrdiff_t
     ssize() const gsl_noexcept
     {
-        return narrow_cast<std::ptrdiff_t>( last_ - first_ );
+        return narrow_cast< std::ptrdiff_t >( storage_.size() );
     }
 
-    gsl_NODISCARD gsl_api gsl_constexpr index_type
+    gsl_NODISCARD gsl_api gsl_constexpr size_type
     size_bytes() const gsl_noexcept
     {
-        return size() * narrow_cast<index_type>( sizeof( element_type ) );
+        return size() * sizeof(element_type);
     }
 
     gsl_NODISCARD gsl_api gsl_constexpr bool
@@ -3984,242 +4378,309 @@ public:
         return size() == 0;
     }
 
-    // 26.7.3.5 Element access [span.elem]
+    // [span.elem], span element access
 
+    gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
     gsl_NODISCARD gsl_api gsl_constexpr14 reference
-    operator[]( index_type pos ) const
+    operator[](size_type idx) const
     {
-        gsl_Expects( pos < size() );
-        return first_[ pos ];
+        gsl_Expects( static_cast<std::size_t>( idx ) < static_cast<std::size_t>( size() ) );
+        return storage_.data()[ idx ];
     }
 
-#if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-    gsl_DEPRECATED_MSG("use subscript indexing instead")
-    gsl_api gsl_constexpr14 reference
-    operator()( index_type pos ) const
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    reference front() const
     {
-        return (*this)[ pos ];
+        gsl_Expects( size() > 0 );
+        return storage_.data()[ 0 ];
     }
 
-    gsl_DEPRECATED_MSG("use subscript indexing instead")
-    gsl_api gsl_constexpr14 reference
-    at( index_type pos ) const
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    reference back() const
     {
-        return (*this)[ pos ];
-    }
-#endif // deprecate
-
-    gsl_NODISCARD gsl_api gsl_constexpr14 reference
-    front() const
-    {
-        gsl_Expects( first_ != last_ );
-        return *first_;
-    }
-
-    gsl_NODISCARD gsl_api gsl_constexpr14 reference
-    back() const
-    {
-        gsl_Expects( first_ != last_ );
-        return *(last_ - 1);
+        gsl_Expects( size() > 0 );
+        return storage_.data()[ size() - 1 ];
     }
 
     gsl_NODISCARD gsl_api gsl_constexpr pointer
     data() const gsl_noexcept
     {
-        return first_;
+        return storage_.data();
     }
 
-    // 26.7.3.6 Iterator support [span.iterators]
+    // [span.iter], span iterator support
 
-    gsl_NODISCARD gsl_api gsl_constexpr iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 iterator
     begin() const gsl_noexcept
     {
-        return iterator( first_ );
+        const auto data = storage_.data();
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        return iterator( data, data + size(), data );
     }
-
-    gsl_NODISCARD gsl_api gsl_constexpr iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 iterator
     end() const gsl_noexcept
     {
-        return iterator( last_ );
+        const auto data = storage_.data();
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        const auto endData = data + storage_.size();
+        return iterator( data, endData, endData );
     }
-
-    gsl_NODISCARD gsl_api gsl_constexpr const_iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 const_iterator
     cbegin() const gsl_noexcept
     {
-#if gsl_CPP11_OR_GREATER
-        return { begin() };
-#else
-        return const_iterator( begin() );
-#endif
+        const auto data = storage_.data();
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        return const_iterator( data, data + size(), data );
     }
-
-    gsl_NODISCARD gsl_api gsl_constexpr const_iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 const_iterator
     cend() const gsl_noexcept
     {
-#if gsl_CPP11_OR_GREATER
-        return { end() };
-#else
-        return const_iterator( end() );
-#endif
+        const auto data = storage_.data();
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        const auto endData = data + storage_.size();
+        return const_iterator( data, endData, endData );
     }
 
-    gsl_NODISCARD gsl_constexpr17 reverse_iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 reverse_iterator
     rbegin() const gsl_noexcept
     {
         return reverse_iterator( end() );
     }
-
-    gsl_NODISCARD gsl_constexpr17 reverse_iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 reverse_iterator
     rend() const gsl_noexcept
     {
         return reverse_iterator( begin() );
     }
 
-    gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 const_reverse_iterator
     crbegin() const gsl_noexcept
     {
         return const_reverse_iterator( cend() );
     }
-
-    gsl_NODISCARD gsl_constexpr17 const_reverse_iterator
+    gsl_NODISCARD gsl_api gsl_constexpr14 const_reverse_iterator
     crend() const gsl_noexcept
     {
         return const_reverse_iterator( cbegin() );
     }
 
-    gsl_constexpr14 void swap( span & other ) gsl_noexcept
+    gsl_constexpr14 void
+    swap( span & other ) gsl_noexcept
     {
-        std::swap( first_, other.first_ );
-        std::swap( last_ , other.last_  );
+        std::swap( storage_, other.storage_ );
     }
 
-#if ! gsl_DEPRECATE_TO_LEVEL( 3 )
-    // member length() deprecated since 0.29.0
-
-    gsl_DEPRECATED_MSG("use size() instead")
-    gsl_api gsl_constexpr index_type length() const gsl_noexcept
-    {
-        return size();
-    }
-
-    // member length_bytes() deprecated since 0.29.0
-
-    gsl_DEPRECATED_MSG("use size_bytes() instead")
-    gsl_api gsl_constexpr index_type length_bytes() const gsl_noexcept
-    {
-        return size_bytes();
-    }
-#endif
-
-#if gsl_FEATURE( BYTE ) && ! gsl_DEPRECATE_TO_LEVEL( 2 )
-    // member as_bytes(), as_writeable_bytes deprecated since 0.17.0
-
-    gsl_DEPRECATED_MSG("use free function gsl_lite::as_bytes() instead")
-    gsl_api span< const byte > as_bytes() const gsl_noexcept
-    {
-        return span< const byte >( reinterpret_cast<const byte *>( data() ), size_bytes() ); // NOLINT
-    }
-
-    gsl_DEPRECATED_MSG("use free function gsl_lite::as_writable_bytes() instead")
-    gsl_api span< byte > as_writeable_bytes() const gsl_noexcept
-    {
-        return span< byte >( reinterpret_cast<byte *>( data() ), size_bytes() ); // NOLINT
-    }
-
-#endif
-
+#if ! gsl_DEPRECATE_TO_LEVEL( 9 )
     template< class U >
-    gsl_NODISCARD gsl_api span< U >
+    gsl_DEPRECATED_MSG("as_span() member function is unsafe")
+    gsl_NODISCARD gsl_api typename detail::calculate_recast_span_type< element_type, U, Extent >::type
     as_span() const
     {
-        gsl_Expects( ( this->size_bytes() % sizeof(U) ) == 0 );
-        return span< U >( reinterpret_cast<U *>( this->data() ), this->size_bytes() / sizeof( U ) ); // NOLINT
+        gsl_Expects( ( this->size_bytes() % sizeof( U ) ) == 0 );
+        typedef typename detail::calculate_recast_span_type< element_type, U, Extent >::type type;
+        return type( reinterpret_cast<U *>( data() ), size_bytes() / sizeof( U ) ); // NOLINT
     }
+#endif // ! gsl_DEPRECATE_TO_LEVEL( 9 )
+
+#ifdef _MSC_VER
+    // Tell MSVC how to unwrap spans in range-based-for
+    gsl_api gsl_constexpr pointer _Unchecked_begin() const gsl_noexcept { return data(); }
+    gsl_api gsl_constexpr pointer _Unchecked_end() const gsl_noexcept
+    {
+        gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+        return data() + size();
+    }
+#endif // _MSC_VER
 
 private:
-    pointer first_;
-    pointer last_;
+    // Needed to remove unnecessary null check in subspans
+    struct known_not_null
+    {
+        pointer p;
+
+        gsl_api gsl_constexpr known_not_null(pointer _p) gsl_noexcept
+            : p( _p )
+        {
+        }
+    };
+
+    // this implementation detail class lets us take advantage of the
+    // empty base class optimization to pay for only storage of a single
+    // pointer in the case of fixed-size spans
+    template< class ExtentType >
+    class storage_type : public ExtentType
+    {
+    public:
+        // known_not_null parameter is needed to remove unnecessary null check
+        // in subspans and constructors from arrays
+        template< class OtherExtentType >
+        gsl_api gsl_constexpr storage_type( known_not_null data, OtherExtentType ext )
+            : ExtentType( ext ), data_( data.p )
+        {}
+
+        template< class OtherExtentType >
+        gsl_api gsl_constexpr storage_type( pointer data, OtherExtentType ext )
+            : ExtentType( ext ), data_( data )
+        {
+            gsl_Expects( data || ExtentType::size() == 0 );
+        }
+
+        gsl_api gsl_constexpr pointer data() const gsl_noexcept { return data_; }
+
+    private:
+        pointer data_;
+    };
+
+    storage_type< detail::extent_type< Extent > > storage_;
+
+    // The rest is needed to remove unnecessary null check
+    // in subspans and constructors from arrays
+    gsl_api gsl_constexpr span( known_not_null ptr, size_type count ) gsl_noexcept
+        : storage_(ptr, count)
+    {
+    }
+
+    template< gsl_CONFIG_SPAN_INDEX_TYPE CallerExtent >
+    class subspan_selector
+    {
+    };
+
+    template < gsl_CONFIG_SPAN_INDEX_TYPE CallerExtent >
+    gsl_api gsl_constexpr14 span< element_type, dynamic_extent >
+    make_subspan( size_type offset, size_type count, subspan_selector< CallerExtent > ) const
+    {
+        span< element_type, dynamic_extent > const tmp( *this );
+        return tmp.subspan( offset, count );
+    }
+
+    gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
+    gsl_api gsl_constexpr14 span< element_type, dynamic_extent >
+    make_subspan( size_type offset, size_type count, subspan_selector< dynamic_extent > ) const
+    {
+        gsl_Expects( static_cast<std::size_t>( size() ) >= static_cast<std::size_t>( offset ) );
+
+        if (count == dynamic_extent)
+        {
+            return span< element_type, dynamic_extent >( known_not_null( data() + offset ), size() - offset );
+        }
+
+        gsl_Expects( static_cast<std::size_t>( size() ) - static_cast<std::size_t>( offset ) >= static_cast<std::size_t>( count ) );
+        return span< element_type, dynamic_extent >( known_not_null( data() + offset ), count );
+    }
 };
 
 // class template argument deduction guides:
 
 #if gsl_HAVE( DEDUCTION_GUIDES )   // gsl_CPP17_OR_GREATER
 
-template< class T, size_t N >
-span( T (&)[N] ) -> span<T /*, N*/>;
+template<class Type, std::size_t Extent >
+span( Type (&)[Extent] ) -> span< Type, Extent >;
 
-template< class T, size_t N >
-span( std::array<T, N> & ) -> span<T /*, N*/>;
+template< class Type, std::size_t Size >
+span( std::array<Type, Size> & ) -> span< Type, Size >;
 
-template< class T, size_t N >
-span( std::array<T, N> const & ) -> span<const T /*, N*/>;
+template< class Type, std::size_t Size >
+span( std::array<Type, Size> const & ) -> span< Type const, Size >;
 
-template< class Container >
-span( Container& ) -> span<typename Container::value_type>;
+template< class Container,
+          class Element = std::remove_pointer_t<decltype( std::declval< Container & >().data()) > >
+span( Container & ) -> span< Element >;
 
-template< class Container >
-span( Container const & ) -> span<const typename Container::value_type>;
+template< class Container,
+          class Element = std::remove_pointer_t<decltype( std::declval< Container const & >().data()) > >
+span( Container const & ) -> span< Element >;
 
 #endif // gsl_HAVE( DEDUCTION_GUIDES )
+
+#if ! gsl_CPP17_OR_GREATER
+# if defined( __clang__ ) && defined( _MSC_VER )
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdeprecated" // Bug in clang-cl.exe which raises a C++17 -Wdeprecated warning about this static constexpr workaround in C++14 mode.
+# endif // defined( __clang__ ) && defined( _MSC_VER )
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
+constexpr const typename span< T, Extent >::size_type span< T, Extent >::extent;
+# if defined( __clang__ ) && defined( _MSC_VER )
+#  pragma clang diagnostic pop
+# endif // defined( __clang__ ) && defined( _MSC_VER )
+#endif // ! gsl_CPP17_OR_GREATER
+
+#if gsl_COMPILER_MSVC_VER
+# pragma warning( pop )
+#endif // gsl_COMPILER_MSVC_VER
+
+#if defined( __GNUC__ ) && __GNUC__ > 6
+# pragma GCC diagnostic pop
+#endif // defined( __GNUC__ ) && __GNUC__ > 6
+
+#if defined( __clang__ )
+# if __has_warning( "-Wunsafe-buffer-usage" )
+#  pragma clang diagnostic pop
+# endif // __has_warning( "-Wunsafe-buffer-usage" )
+#endif // defined( __clang__ )
 
 // 26.7.3.7 Comparison operators [span.comparison]
 
 #if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 # if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
-template< class T, class U >
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
-gsl_NODISCARD inline gsl_constexpr bool operator==( span<T> const & l, span<U> const & r )
+gsl_NODISCARD inline gsl_constexpr bool operator==( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
+    gsl_STATIC_ASSERT_( LExtent == RExtent || LExtent == dynamic_extent || RExtent == dynamic_extent, "comparing spans of mismatching sizes" );
     return  l.size()  == r.size()
-        && (l.begin() == r.begin() || detail::equal( l.begin(), l.end(), r.begin() ) );
+        && ( l.data() == r.data() || detail::equal( l.begin(), l.end(), r.begin() ) );
 }
 
-template< class T, class U >
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
-gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T> const & l, span<U> const & r )
+gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
 # else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
-template< class T >
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
-gsl_NODISCARD inline gsl_constexpr bool operator==( span<T> const & l, span<T> const & r )
+gsl_NODISCARD inline gsl_constexpr bool operator==( span<T, LExtent> const & l, span<T, RExtent> const & r )
 {
+    gsl_STATIC_ASSERT_( LExtent == RExtent || LExtent == dynamic_extent || RExtent == dynamic_extent, "comparing spans of mismatching sizes" );
     return  l.size()  == r.size()
-        && (l.begin() == r.begin() || detail::equal( l.begin(), l.end(), r.begin() ) );
+        && ( l.data() == r.data() || detail::equal( l.begin(), l.end(), r.begin() ) );
 }
 
-template< class T >
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
-gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T> const & l, span<T> const & r )
+gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T, LExtent> const & l, span<T, RExtent> const & r )
 {
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 # endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
-template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr bool operator!=( span<T> const & l, span<U> const & r )
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
+gsl_NODISCARD inline gsl_constexpr bool
+operator!=( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
     return !( l == r );
 }
 
-template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr bool operator<=( span<T> const & l, span<U> const & r )
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
+gsl_NODISCARD inline gsl_constexpr bool
+operator<=( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
     return !( r < l );
 }
 
-template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr bool operator> ( span<T> const & l, span<U> const & r )
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
+gsl_NODISCARD inline gsl_constexpr bool
+operator>( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
     return ( r < l );
 }
 
-template< class T, class U >
-gsl_NODISCARD inline gsl_constexpr bool operator>=( span<T> const & l, span<U> const & r )
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
+gsl_NODISCARD inline gsl_constexpr bool
+operator>=( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
     return !( l < r );
 }
@@ -4227,16 +4688,16 @@ gsl_NODISCARD inline gsl_constexpr bool operator>=( span<T> const & l, span<U> c
 
 // span algorithms
 
-template< class T >
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline gsl_constexpr std::size_t
-size( span<T> const & spn )
+size( span<T, Extent> const & spn )
 {
     return static_cast<std::size_t>( spn.size() );
 }
 
-template< class T >
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline gsl_constexpr std::ptrdiff_t
-ssize( span<T> const & spn )
+ssize( span<T, Extent> const & spn )
 {
     return spn.ssize();
 }
@@ -4258,12 +4719,13 @@ gsl_api gsl_constexpr14 inline OI copy_n( II first, N count, OI result )
 }
 }
 
-template< class T, class U >
-gsl_api gsl_constexpr14 inline void copy( span<T> src, span<U> dest )
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
+gsl_api gsl_constexpr14 inline void copy( span<T, LExtent> src, span<U, RExtent> dest )
 {
 #if gsl_CPP14_OR_GREATER // gsl_HAVE( TYPE_TRAITS ) (circumvent Travis clang 3.4)
     static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
 #endif
+    gsl_STATIC_ASSERT_( RExtent >= LExtent || LExtent == dynamic_extent || RExtent == dynamic_extent ,"incompatible span extents" );
     gsl_Expects( dest.size() >= src.size() );
     detail::copy_n( src.data(), src.size(), dest.data() );
 }
@@ -4271,24 +4733,24 @@ gsl_api gsl_constexpr14 inline void copy( span<T> src, span<U> dest )
 #if gsl_FEATURE( BYTE )
 // span creator functions (see ctors)
 
-template< class T >
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline span< const byte >
-as_bytes( span<T> spn ) gsl_noexcept
+as_bytes( span< T, Extent > spn ) gsl_noexcept
 {
     return span< const byte >( reinterpret_cast<const byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
-template< class T>
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline span< byte >
-as_writable_bytes( span<T> spn ) gsl_noexcept
+as_writable_bytes( span< T, Extent > spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
 
 # if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-template< class T>
+template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_DEPRECATED_MSG("use as_writable_bytes() (different spelling) instead")
-gsl_api inline span< byte > as_writeable_bytes( span<T> spn ) gsl_noexcept
+gsl_api inline span< byte > as_writeable_bytes( span< T, Extent > spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
@@ -4312,26 +4774,26 @@ make_span( T * first, T * last )
 }
 
 template< class T, size_t N >
-gsl_NODISCARD inline gsl_constexpr span<T>
+gsl_NODISCARD inline gsl_constexpr span<T, N>
 make_span( T (&arr)[N] )
 {
-    return span<T>( gsl_ADDRESSOF( arr[0] ), N );
+    return span<T, N>( gsl_ADDRESSOF( arr[0] ), N );
 }
 
 # if gsl_HAVE( ARRAY )
 
 template< class T, size_t N >
-gsl_NODISCARD inline gsl_constexpr span<T>
+gsl_NODISCARD inline gsl_constexpr span<T, N>
 make_span( std::array<T,N> & arr )
 {
-    return span<T>( arr );
+    return span<T, N>( arr );
 }
 
 template< class T, size_t N >
-gsl_NODISCARD inline gsl_constexpr span<const T>
+gsl_NODISCARD inline gsl_constexpr span<const T, N>
 make_span( std::array<T,N> const & arr )
 {
-    return span<const T>( arr );
+    return span<const T, N>( arr );
 }
 # endif
 
@@ -4386,24 +4848,6 @@ make_span( with_container_t, Container const & cont ) gsl_noexcept
 }
 
 # endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
-
-# if !gsl_DEPRECATE_TO_LEVEL( 4 )
-template< class Ptr >
-gsl_DEPRECATED
-inline span<typename Ptr::element_type>
-make_span( Ptr & ptr )
-{
-    return span<typename Ptr::element_type>( ptr );
-}
-# endif // !gsl_DEPRECATE_TO_LEVEL( 4 )
-
-template< class Ptr >
-gsl_DEPRECATED
-inline span<typename Ptr::element_type>
-make_span( Ptr & ptr, typename span<typename Ptr::element_type>::index_type count )
-{
-    return span<typename Ptr::element_type>( ptr, count );
-}
 #endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
 
 #if gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
@@ -5111,7 +5555,7 @@ Stream & write_to_stream( Stream & os, Span const & spn )
         detail::write_padding( os, os.width() - length );
 
     // Write span characters
-    os.rdbuf()->sputn( spn.begin(), length );
+    os.rdbuf()->sputn( spn.data(), length );
 
     if ( pad && !left_pad )
         detail::write_padding( os, os.width() - length );
@@ -5377,6 +5821,21 @@ public:
 
 #endif // gsl_HAVE( HASH )
 
+#if gsl_STDLIB_CPP11_OR_GREATER
+namespace std {
+
+template< class T >
+struct pointer_traits< ::gsl_lite::detail::span_iterator< T > >
+{
+    typedef ::gsl_lite::detail::span_iterator< T > pointer;
+    typedef T element_type;
+    typedef ptrdiff_t difference_type;
+
+    static gsl_constexpr element_type * to_address( pointer const i ) gsl_noexcept { return i.current_; }
+};
+
+} // namespace std
+#endif // gsl_STDLIB_CPP11_OR_GREATER
 
 #if gsl_FEATURE( GSL_COMPATIBILITY_MODE )
 
