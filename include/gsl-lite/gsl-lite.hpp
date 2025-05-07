@@ -30,6 +30,10 @@
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
 #include <cstdlib>   // for abort()
 
+#if defined( __has_include ) && __has_include( <version> )
+# include <version>
+#endif
+
 #define  gsl_lite_MAJOR  1
 #define  gsl_lite_MINOR  0
 #define  gsl_lite_PATCH  0
