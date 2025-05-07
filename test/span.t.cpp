@@ -1720,7 +1720,7 @@ CASE( "span<>: Allows appropriate fixed-size conversions" )
         (void) s;
     }
 
-#if gsl_HAVE( TYPE_TRAITS )
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     // initialization or assignment to static span is NOT ok
     static_assert( !std::is_convertible< int[4], span<int, 2> >::value, "static assertion failed" );
     static_assert( !std::is_convertible< span<int, 4>, span<int, 2> >::value, "static assertion failed" );
@@ -1732,7 +1732,7 @@ CASE( "span<>: Allows appropriate fixed-size conversions" )
 
     // but doing so explicitly is ok
     static_assert(  std::is_constructible< span<int>, span<int, 2> >::value, "static assertion failed" );
-#endif
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
     // you can convert statically
     {
