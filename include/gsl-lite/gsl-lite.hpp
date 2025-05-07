@@ -1448,7 +1448,7 @@ namespace gsl_lite {
 #if gsl_CPP17_OR_GREATER
 inline
 #endif // gsl_CPP17_OR_GREATER
-gsl_constexpr const gsl_CONFIG_SPAN_INDEX_TYPE dynamic_extent = gsl_CONFIG_SPAN_INDEX_TYPE( -1 );
+gsl_constexpr const gsl_CONFIG_SPAN_INDEX_TYPE dynamic_extent = static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( -1 );
 
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent = dynamic_extent >
 class span;
@@ -2186,10 +2186,7 @@ final
 {
 public:
     explicit final_action( F action ) gsl_noexcept
-        : action_( std::move( action ) )
-# if ! gsl_CPP17_OR_GREATER
-        , invoke_( true )
-# endif
+        : action_( std::move( action ) ), invoke_( true )
     {
     }
 
