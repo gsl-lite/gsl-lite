@@ -1110,7 +1110,7 @@
 #if gsl_HAVE( TYPE_TRAITS )
 # define gsl_STATIC_ASSERT_( cond, msg )  static_assert( cond, msg )
 #else
-# define gsl_STATIC_ASSERT_( cond, msg )  ( ( void )sizeof( char[1 - 2*!!( cond ) ] ) )
+# define gsl_STATIC_ASSERT_( cond, msg )  ( static_cast<void>( sizeof( char[1 - 2*!( cond ) ] ) ) )
 #endif
 
 #if _MSC_VER >= 1900  // Visual Studio 2015 and newer, or Clang emulating a corresponding MSVC
@@ -4339,7 +4339,7 @@ public:
     }
 #else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) )
     template< class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent >
-    gsl_api gsl_constexpr14 span( span<OtherElementType, OtherExtent> const & other )
+    gsl_api gsl_constexpr14 span( span< OtherElementType, OtherExtent > const & other )
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
     {
         gsl_STATIC_ASSERT_(
@@ -4625,7 +4625,7 @@ private:
     {
         gsl_Expects( static_cast<std::size_t>( size() ) >= static_cast<std::size_t>( offset ) );
 
-        if (count == dynamic_extent)
+        if ( count == dynamic_extent )
         {
             return span< element_type, dynamic_extent >( known_not_null( data() + offset ), size() - offset );
         }
@@ -4835,7 +4835,7 @@ template< class T, size_t N >
 gsl_NODISCARD inline gsl_constexpr span<T, N>
 make_span( T (&arr)[N] )
 {
-    return span<T, N>( gsl_ADDRESSOF( arr[0] ), N );
+    return span<T, N>( arr );
 }
 
 # if gsl_HAVE( ARRAY )
@@ -5104,11 +5104,11 @@ public:
 
 # else
 
-    template< class U >
+    template< class U, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 #  if gsl_DEPRECATE_TO_LEVEL( 7 )
     gsl_DEPRECATED_MSG("basic_string_span<> is deprecated; use span<> instead")
 #  endif // gsl_DEPRECATE_TO_LEVEL( 7 )
-    gsl_api gsl_constexpr basic_string_span( span<U> const & rhs )
+    gsl_api gsl_constexpr basic_string_span( span< U, Extent > const & rhs )
     : span_( rhs )
     {}
 
