@@ -100,7 +100,7 @@ CASE( "CUDA: Precondition/postcondition checks and assertions can be used in ker
 }
 
 
-__global__ void spanKernel( gsl::span< int > span )
+__global__ void spanKernel( gsl_lite::span< int > span )
 {
     int* data = span.data();
     gsl_CONFIG_SPAN_INDEX_TYPE size = span.size();
@@ -113,7 +113,7 @@ __global__ void spanKernel( gsl::span< int > span )
 
 CASE( "CUDA: span<> can be passed to kernel code" )
 {
-    spanKernel<<<1, 1>>>( gsl::span< int >( ) );
+    spanKernel<<<1, 1>>>( gsl_lite::span< int >( ) );
     myCudaErrchk( cudaPeekAtLastError() );  // check for invalid launch arguments
     myCudaErrchk( cudaDeviceSynchronize() );  // check for execution errors
 }
@@ -122,14 +122,14 @@ CASE( "CUDA: span<> can be used in kernel code" )
 {
     std::size_t n = 3;
     auto array = cudaAllocUnique<int[]>(n);
-    auto span = gsl::make_span(array.get(), n);
+    auto span = gsl_lite::make_span(array.get(), n);
     spanKernel<<<1, 1>>>( span );
     myCudaErrchk( cudaPeekAtLastError() );  // check for invalid launch arguments
     myCudaErrchk( cudaDeviceSynchronize() );  // check for execution errors
 }
 
 
-__global__ void notNullRawKernel( gsl::not_null< int* > ptr )
+__global__ void notNullRawKernel( gsl_lite::not_null< int* > ptr )
 {
     *ptr = 1;
     auto ptr2 = ptr;
@@ -138,7 +138,7 @@ __global__ void notNullRawKernel( gsl::not_null< int* > ptr )
 }
 
 // Not supported yet because `std::unique_ptr<>` member functions are neither `constexpr` nor `__host__ __device__`.
-//__global__ void notNullUniqueKernel( gsl::not_null< CudaUniquePtr< int > > ptr )
+//__global__ void notNullUniqueKernel( gsl_lite::not_null< CudaUniquePtr< int > > ptr )
 //{
 //    *ptr = 3;
 //    auto ptr2 = std::move( ptr );
@@ -150,11 +150,11 @@ CASE( "CUDA: not_null<> can be passed to and used in kernel code" )
 {
     auto pi = cudaAllocUnique<int>();
 
-    notNullRawKernel<<<1, 1>>>( gsl::make_not_null( pi.get() ) );
+    notNullRawKernel<<<1, 1>>>( gsl_lite::make_not_null( pi.get() ) );
     myCudaErrchk( cudaPeekAtLastError() );  // check for invalid launch arguments
     myCudaErrchk( cudaDeviceSynchronize() );  // check for execution errors
 
-    //notNullUniqueKernel<<<1, 1>>>( gsl::make_not_null( std::move( pi ) ) );
+    //notNullUniqueKernel<<<1, 1>>>( gsl_lite::make_not_null( std::move( pi ) ) );
     //myCudaErrchk( cudaPeekAtLastError() );  // check for invalid launch arguments
     //myCudaErrchk( cudaDeviceSynchronize() );  // check for execution errors
 }
