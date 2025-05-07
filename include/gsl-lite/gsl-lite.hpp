@@ -31,7 +31,9 @@
 #include <cstdlib>   // for abort()
 
 #if defined( __has_include )
-# include <version>
+# if __has_include( <version> )
+#  include <version>
+# endif
 #endif
 
 #define  gsl_lite_MAJOR  1
@@ -2159,14 +2161,14 @@ inline int uncaught_exceptions() gsl_noexcept
 
 inline int uncaught_exceptions() gsl_noexcept
 {
-    return *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) );
+    return static_cast<int>( *reinterpret_cast<unsigned const*>( detail::_getptd() + (sizeof(void *) == 8 ? 0x100 : 0x90 ) ) );
 }
 
 # elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 inline int uncaught_exceptions() gsl_noexcept
 {
-    return ( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) );
+    return ( static_cast<int>( *reinterpret_cast<unsigned const *>( reinterpret_cast<unsigned char const *>(detail::__cxa_get_globals()) + sizeof(void *) ) ) );
 }
 
 # endif
