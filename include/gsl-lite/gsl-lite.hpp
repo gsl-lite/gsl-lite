@@ -3896,7 +3896,7 @@ public:
 
     template<
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 difference_type operator-( span_iterator< U > const & rhs ) const
     {
@@ -3911,7 +3911,7 @@ public:
 
     template <
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 bool operator==( span_iterator< U > const & rhs ) const
     {
@@ -3921,7 +3921,7 @@ public:
 
     template <
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 bool operator!=( span_iterator< U > const & rhs ) const
     {
@@ -3930,7 +3930,7 @@ public:
 
     template <
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 bool operator<( span_iterator< U > const & rhs ) const
     {
@@ -3940,7 +3940,7 @@ public:
 
     template <
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 bool operator>( span_iterator< U > const & rhs ) const
     {
@@ -3949,7 +3949,7 @@ public:
 
     template <
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 bool operator<=( span_iterator< U > const & rhs ) const
     {
@@ -3958,7 +3958,7 @@ public:
 
     template <
         class U
-        gsl_ENABLE_IF_(( std::is_same< std::remove_cv_t< U >, value_type >::value ))
+        gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
     gsl_api gsl_constexpr14 bool operator>=( span_iterator< U > const & rhs ) const
     {
