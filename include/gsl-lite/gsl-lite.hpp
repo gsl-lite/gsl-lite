@@ -1641,9 +1641,9 @@ template < class T0, class T1 > struct disjunction : detail::disjunction_<T0::va
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
-template< class T, size_t N >
+template< class T, std::size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr auto
-size( T const(&)[N] ) gsl_noexcept -> size_t
+size( T const(&)[N] ) gsl_noexcept -> std::size_t
 {
     return N;
 }
@@ -1655,7 +1655,7 @@ size( C const & cont ) -> decltype( cont.size() )
     return cont.size();
 }
 
-template< class T, size_t N >
+template< class T, std::size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr auto
 data( T(&arr)[N] ) gsl_noexcept -> T*
 {
@@ -2559,9 +2559,9 @@ narrow_failfast( U u )
 // at() - Bounds-checked way of accessing static arrays, std::array, std::vector.
 //
 
-template< class T, size_t N >
+template< class T, std::size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
-at( T(&arr)[N], size_t pos )
+at( T(&arr)[N], std::size_t pos )
 {
     gsl_Expects( pos < N );
     return arr[pos];
@@ -2569,7 +2569,7 @@ at( T(&arr)[N], size_t pos )
 
 template< class Container >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 typename Container::value_type &
-at( Container & cont, size_t pos )
+at( Container & cont, std::size_t pos )
 {
     gsl_Expects( pos < cont.size() );
     return cont[pos];
@@ -2577,7 +2577,7 @@ at( Container & cont, size_t pos )
 
 template< class Container >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 typename Container::value_type const &
-at( Container const & cont, size_t pos )
+at( Container const & cont, std::size_t pos )
 {
     gsl_Expects( pos < cont.size() );
     return cont[pos];
@@ -2587,7 +2587,7 @@ at( Container const & cont, size_t pos )
 
 template< class T >
 gsl_NODISCARD gsl_api inline const gsl_constexpr14 T
-at( std::initializer_list<T> cont, size_t pos )
+at( std::initializer_list<T> cont, std::size_t pos )
 {
     gsl_Expects( pos < cont.size() );
     return *( cont.begin() + pos );
@@ -2596,7 +2596,7 @@ at( std::initializer_list<T> cont, size_t pos )
 
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
-at( span<T, Extent> s, size_t pos )
+at( span<T, Extent> s, std::size_t pos )
 {
     return s[ pos ];
 }
@@ -3150,10 +3150,10 @@ gsl_is_delete_access:
     not_null & operator--() gsl_is_delete;
     not_null   operator++( int ) gsl_is_delete;
     not_null   operator--( int ) gsl_is_delete;
-    not_null & operator+ ( size_t ) gsl_is_delete;
-    not_null & operator+=( size_t ) gsl_is_delete;
-    not_null & operator- ( size_t ) gsl_is_delete;
-    not_null & operator-=( size_t ) gsl_is_delete;
+    not_null & operator+ ( std::size_t ) gsl_is_delete;
+    not_null & operator+=( std::size_t ) gsl_is_delete;
+    not_null & operator- ( std::size_t ) gsl_is_delete;
+    not_null & operator-=( std::size_t ) gsl_is_delete;
     not_null & operator+=( std::ptrdiff_t ) gsl_is_delete;
     not_null & operator-=( std::ptrdiff_t ) gsl_is_delete;
     void       operator[]( std::ptrdiff_t ) const gsl_is_delete;
@@ -5333,14 +5333,14 @@ private:
     }
 
 # if gsl_HAVE( ARRAY )
-    template< size_t N >
+    template< std::size_t N >
     gsl_NODISCARD static gsl_constexpr14 span_type
     remove_z( std::array<typename std11::remove_const<element_type>::type, N> & arr )
     {
         return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
     }
 
-    template< size_t N >
+    template< std::size_t N >
     gsl_NODISCARD static gsl_constexpr14 span_type
     remove_z( std::array<typename std11::remove_const<element_type>::type, N> const & arr )
     {
@@ -5686,12 +5686,12 @@ gsl_constexpr14 static span<T> ensure_sentinel( T * seq, SizeType max = (std::nu
 
 template< class T >
 gsl_NODISCARD inline gsl_constexpr14 span<T>
-ensure_z( T * const & sz, size_t max = (std::numeric_limits<size_t>::max)() )
+ensure_z( T * const & sz, std::size_t max = (std::numeric_limits<size_t>::max)() )
 {
-    return detail::ensure_sentinel<T, size_t, 0>( sz, max );
+    return detail::ensure_sentinel<T, std::size_t, 0>( sz, max );
 }
 
-template< class T, size_t N >
+template< class T, std::size_t N >
 gsl_NODISCARD inline gsl_constexpr14 span<T>
 ensure_z( T (&sz)[N] )
 {
