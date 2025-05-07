@@ -13,11 +13,11 @@ int * use( not_null<int *> p )
 struct Widget
 {
     Widget() : owned_ptr( new int(42) ) {}
-    
+
     ~Widget() { delete owned_ptr; }
 
     void work() { non_owned_ptr = use( gsl_lite::make_not_null( owned_ptr ) ); }
-    
+
     owner<int *> owned_ptr;	// if alias template support
     int * non_owned_ptr;
 };
