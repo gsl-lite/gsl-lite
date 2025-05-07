@@ -1911,14 +1911,11 @@ using std::shared_ptr;
 
 #if  gsl_HAVE( ALIAS_TEMPLATE )
   template< class T
-#if gsl_HAVE( TYPE_TRAITS )
+# if gsl_HAVE( TYPE_TRAITS )
           , typename = typename std::enable_if< std::is_pointer<T>::value >::type
-#endif
+# endif
   >
   using owner = T;
-#elif gsl_CONFIG( DEFAULTS_VERSION ) == 0
-  // TODO vNext: remove
-  template< class T > struct owner { typedef T type; };
 #endif
 
 #define gsl_HAVE_OWNER_TEMPLATE     gsl_HAVE_ALIAS_TEMPLATE
