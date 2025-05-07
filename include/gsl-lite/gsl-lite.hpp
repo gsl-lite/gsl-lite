@@ -1679,8 +1679,8 @@ data( C const & cont ) -> decltype( cont.data() )
 }
 
 template< class E >
-gsl_NODISCARD inline gsl_constexpr auto
-data( std::initializer_list<E> il ) gsl_noexcept -> E const *
+gsl_NODISCARD inline gsl_constexpr E const *
+data( std::initializer_list<E> il ) gsl_noexcept
 {
     return il.begin();
 }
