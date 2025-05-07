@@ -2411,15 +2411,17 @@ namespace detail {
 
 #endif
 
-template<
-    class T, class U
-    gsl_ENABLE_IF_(( std::is_arithmetic<T>::value ))
->
+template< class T, class U >
 gsl_NODISCARD gsl_constexpr14
 #if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 gsl_api
 #endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-inline T
+inline
+#if gsl_HAVE( TYPE_TRAITS )
+typename std::enable_if< std::is_arithmetic<T>::value, T >::type
+#else // ! gsl_HAVE( TYPE_TRAITS )
+T
+#endif // gsl_HAVE( TYPE_TRAITS )
 narrow( U u )
 {
 #if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2469,16 +2471,14 @@ narrow( U u )
 
     return t;
 }
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-template<
-    class T, class U
-    gsl_ENABLE_IF_(( !std::is_arithmetic<T>::value ))
->
+#if gsl_HAVE( TYPE_TRAITS )
+template< class T, class U  >
 gsl_NODISCARD gsl_constexpr14
 # if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 gsl_api
 # endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-inline T
+inline
+typename std::enable_if< !std::is_arithmetic<T>::value, T >::type
 narrow( U u )
 {
 # if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2505,13 +2505,15 @@ narrow( U u )
 
     return t;
 }
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#endif // gsl_HAVE( TYPE_TRAITS )
 
-template<
-    class T, class U
-    gsl_ENABLE_IF_(( std::is_arithmetic<T>::value ))
->
-gsl_NODISCARD gsl_api gsl_constexpr14 inline T
+template< class T, class U >
+gsl_NODISCARD gsl_api gsl_constexpr14 inline
+#if gsl_HAVE( TYPE_TRAITS )
+typename std::enable_if< std::is_arithmetic<T>::value, T >::type
+#else // ! gsl_HAVE( TYPE_TRAITS )
+T
+#endif // gsl_HAVE( TYPE_TRAITS )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
@@ -2542,19 +2544,17 @@ narrow_failfast( U u )
 
     return t;
 }
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
-template<
-    class T, class U
-    gsl_ENABLE_IF_(( !std::is_arithmetic<T>::value ))
->
-gsl_NODISCARD gsl_api gsl_constexpr14 inline T
+#if gsl_HAVE( TYPE_TRAITS )
+template< class T, class U >
+gsl_NODISCARD gsl_api gsl_constexpr14 inline
+typename std::enable_if< !std::is_arithmetic<T>::value, T >::type
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
     gsl_Assert( static_cast<U>( t ) == u );
     return t;
 }
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#endif // gsl_HAVE( TYPE_TRAITS )
 
 
 //
