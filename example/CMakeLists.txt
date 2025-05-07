@@ -14,7 +14,6 @@ message( STATUS "Subproject '${PROJECT_NAME}'")
 add_executable( 01-basic
     "01-basic.cpp"
 )
-target_compile_features( 01-basic PRIVATE cxx_std_17 )
 target_link_libraries( 01-basic
     PRIVATE
         gsl-lite::gsl-lite
@@ -23,7 +22,6 @@ target_link_libraries( 01-basic
 add_executable( 02-span
     "02-span.cpp"
 )
-target_compile_features( 02-span PRIVATE cxx_std_17 )
 target_link_libraries( 02-span
     PRIVATE
         gsl-lite::gsl-lite
