@@ -1238,6 +1238,12 @@
 //
 //       Also, please note that `gsl_ENABLE_IF_()` doesn't enforce the constraint at all if no compiler/library support is available (i.e. pre-C++11).
 
+#if gsl_HAVE( TYPE_TRAITS )
+# define gsl_ENABLE_IF_R_( VA, T )  typename std::enable_if< ( VA ), T >::type
+#else // ! gsl_HAVE( TYPE_TRAITS )
+# define gsl_ENABLE_IF_R_( VA, T )  T
+#endif // gsl_HAVE( TYPE_TRAITS )
+
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 # if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
 #  define gsl_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
@@ -2422,11 +2428,7 @@ gsl_NODISCARD gsl_constexpr14
 gsl_api
 #endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 inline
-#if gsl_HAVE( TYPE_TRAITS )
-typename std::enable_if< std::is_arithmetic<T>::value, T >::type
-#else // ! gsl_HAVE( TYPE_TRAITS )
-T
-#endif // gsl_HAVE( TYPE_TRAITS )
+gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value, T )
 narrow( U u )
 {
 #if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2483,7 +2485,7 @@ gsl_NODISCARD gsl_constexpr14
 gsl_api
 # endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 inline
-typename std::enable_if< !std::is_arithmetic<T>::value, T >::type
+gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value, T )
 narrow( U u )
 {
 # if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2514,11 +2516,7 @@ narrow( U u )
 
 template< class T, class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 inline
-#if gsl_HAVE( TYPE_TRAITS )
-typename std::enable_if< std::is_arithmetic<T>::value, T >::type
-#else // ! gsl_HAVE( TYPE_TRAITS )
-T
-#endif // gsl_HAVE( TYPE_TRAITS )
+gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value, T )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
@@ -2552,7 +2550,7 @@ narrow_failfast( U u )
 #if gsl_HAVE( TYPE_TRAITS )
 template< class T, class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 inline
-typename std::enable_if< !std::is_arithmetic<T>::value, T >::type
+gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value, T )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
@@ -5926,6 +5924,7 @@ gsl_RESTORE_MSVC_WARNINGS()
 
 // #undef internal macros
 #undef gsl_STATIC_ASSERT_
+#undef gsl_ENABLE_IF_R_
 #undef gsl_ENABLE_IF_
 #undef gsl_TRAILING_RETURN_TYPE_
 #undef gsl_RETURN_DECLTYPE_
