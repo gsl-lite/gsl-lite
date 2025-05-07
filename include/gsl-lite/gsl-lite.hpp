@@ -3269,7 +3269,7 @@ namespace no_adl {
 template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr auto as_nullable( T && p )
 gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
--> typename detail::as_nullable_helper<typename std20::remove_cvref<T>::type>::type
+-> typename detail::as_nullable_helper<typename ::gsl_lite::std20::remove_cvref<T>::type>::type
 {
     return std::move( p );
 }
@@ -3785,7 +3785,7 @@ public:
     typedef typename std::contiguous_iterator_tag iterator_concept;
 #endif // gsl_STDLIB_CPP20_OR_GREATER
     typedef typename std::random_access_iterator_tag iterator_category;
-    typedef typename std::remove_cv< T >::type value_type;
+    typedef typename std11::remove_cv< T >::type value_type;
     typedef std::ptrdiff_t difference_type;
     typedef T * pointer;
     typedef T & reference;
@@ -3797,7 +3797,10 @@ public:
 #if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr span_iterator() = default;
 #else // ! gsl_HAVE( IS_DEFAULT )
-    gsl_api gsl_constexpr span_iterator() gsl_noexcept { }
+    gsl_api gsl_constexpr span_iterator() gsl_noexcept
+        : begin_( gsl_nullptr ), end_( gsl_nullptr ), current_( gsl_nullptr )
+    {
+    }
 #endif // gsl_HAVE( IS_DEFAULT )
 
     gsl_api gsl_constexpr14 span_iterator( pointer begin, pointer end, pointer current )
@@ -4007,9 +4010,15 @@ public:
     }
 #endif
 
-    pointer begin_ = gsl_nullptr;
-    pointer end_ = gsl_nullptr;
-    pointer current_ = gsl_nullptr;
+#if gsl_HAVE( IS_DEFAULT )
+    pointer begin_ = nullptr;
+    pointer end_ = nullptr;
+    pointer current_ = nullptr;
+#else // ! gsl_HAVE( IS_DEFAULT )
+    pointer begin_;
+    pointer end_;
+    pointer current_;
+#endif // gsl_HAVE( IS_DEFAULT )
 
 #if gsl_STDLIB_CPP11_OR_GREATER
     template< class Ptr >
@@ -4061,7 +4070,7 @@ public:
         gsl_Expects( size != dynamic_extent );
     }
 
-    gsl_api gsl_constexpr size_type size() const noexcept { return size_; }
+    gsl_api gsl_constexpr size_type size() const gsl_noexcept { return size_; }
 
 private:
     size_type size_;
@@ -4466,31 +4475,31 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr14 iterator
     begin() const gsl_noexcept
     {
-        const auto data = storage_.data();
+        const pointer data = storage_.data();
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
         return iterator( data, data + size(), data );
     }
     gsl_NODISCARD gsl_api gsl_constexpr14 iterator
     end() const gsl_noexcept
     {
-        const auto data = storage_.data();
+        const pointer data = storage_.data();
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
-        const auto endData = data + storage_.size();
+        const pointer endData = data + storage_.size();
         return iterator( data, endData, endData );
     }
     gsl_NODISCARD gsl_api gsl_constexpr14 const_iterator
     cbegin() const gsl_noexcept
     {
-        const auto data = storage_.data();
+        const pointer data = storage_.data();
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
         return const_iterator( data, data + size(), data );
     }
     gsl_NODISCARD gsl_api gsl_constexpr14 const_iterator
     cend() const gsl_noexcept
     {
-        const auto data = storage_.data();
+        const pointer data = storage_.data();
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
-        const auto endData = data + storage_.size();
+        const pointer endData = data + storage_.size();
         return const_iterator( data, endData, endData );
     }
 
@@ -4650,7 +4659,7 @@ span( Container const & ) -> span< Element >;
 #  pragma clang diagnostic ignored "-Wdeprecated" // Bug in clang-cl.exe which raises a C++17 -Wdeprecated warning about this static constexpr workaround in C++14 mode.
 # endif // defined( __clang__ ) && defined( _MSC_VER )
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
-constexpr const typename span< T, Extent >::size_type span< T, Extent >::extent;
+gsl_constexpr const typename span< T, Extent >::size_type span< T, Extent >::extent;
 # if defined( __clang__ ) && defined( _MSC_VER )
 #  pragma clang diagnostic pop
 # endif // defined( __clang__ ) && defined( _MSC_VER )
