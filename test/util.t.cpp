@@ -18,6 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 #include <cstddef>
+#include <complex>
 #include <functional>
 
 #if gsl_STDLIB_CPP11_OR_GREATER
@@ -178,6 +179,15 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
 #endif // gsl_HAVE( EXCEPTIONS )
 }
 
+CASE( "narrow<>(): Allows narrowing unordered type without precision loss" )
+{
+#if gsl_HAVE( EXCEPTIONS ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    std::complex<float> cf;
+    EXPECT_NO_THROW( cf = narrow<std::complex<float>>( std::complex<double>( 4, 2 ) ) );
+    EXPECT( narrow<std::complex<float>>( std::complex<double>( 4, 2 ) ) == std::complex<float>( 4, 2 ) );
+#endif // gsl_HAVE( EXCEPTIONS ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+}
+
 CASE( "narrow<>(): Throws when narrowing with value loss" )
 {
 #if gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -215,6 +225,13 @@ CASE( "narrow<>(): Throws when narrowing with sign loss" )
 #endif // gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 }
 
+CASE( "narrow<>(): Throws when narrowing unordered type with precision loss" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    EXPECT_THROWS_AS( (void) narrow<std::complex<float>>( std::complex<double>( 4.2 ) ), narrowing_error );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+}
+
 CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 {
     EXPECT( narrow_failfast<char>( 120 ) == 120 );
@@ -248,6 +265,15 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
+CASE( "narrow_failfast<>(): Allows narrowing unordered type without precision loss" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    std::complex<float> cf;
+    EXPECT_NO_THROW( cf = narrow_failfast<std::complex<float>>( std::complex<double>( 4, 2 ) ) );
+    EXPECT( narrow_failfast<std::complex<float>>( std::complex<double>( 4, 2 ) ) == std::complex<float>( 4, 2 ) );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+}
+
 CASE( "narrow_failfast<>(): Fails when narrowing with value loss" )
 {
     EXPECT_THROWS_AS( (void) narrow_failfast<char>( 300 ), fail_fast );
@@ -279,6 +305,13 @@ CASE( "narrow_failfast<>(): Fails when narrowing with sign loss" )
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t( i8n) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
 #endif // gsl_STDLIB_CPP11_OR_GREATER
+}
+
+CASE( "narrow_failfast<>(): Fails when narrowing unordered type with precision loss" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::complex<float>>( std::complex<double>( 4.2 ) ), fail_fast );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 }
 
 #if gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 )

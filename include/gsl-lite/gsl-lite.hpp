@@ -2415,7 +2415,10 @@ namespace detail {
 
 #endif
 
-template< class T, class U >
+template<
+    class T, class U
+    gsl_ENABLE_IF_(( std::is_arithmetic<T>::value ))
+>
 gsl_NODISCARD gsl_constexpr14
 #if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 gsl_api
@@ -2470,8 +2473,48 @@ narrow( U u )
 
     return t;
 }
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+template<
+    class T, class U
+    gsl_ENABLE_IF_(( !std::is_arithmetic<T>::value ))
+>
+gsl_NODISCARD gsl_constexpr14
+# if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+gsl_api
+# endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+inline T
+narrow( U u )
+{
+# if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
+        "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
+        "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
+        "violation if the given value cannot be represented in the target type." );
+# endif
 
-template< class T, class U >
+    T t = static_cast<T>( u );
+
+    if ( static_cast<U>( t ) != u )
+    {
+# if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+        throw narrowing_error();
+# else // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+#  if gsl_DEVICE_CODE
+        gsl_TRAP_();
+#  else // host code
+        std::terminate();
+#  endif
+# endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    }
+
+    return t;
+}
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+
+template<
+    class T, class U
+    gsl_ENABLE_IF_(( std::is_arithmetic<T>::value ))
+>
 gsl_NODISCARD gsl_api gsl_constexpr14 inline T
 narrow_failfast( U u )
 {
@@ -2503,6 +2546,19 @@ narrow_failfast( U u )
 
     return t;
 }
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+template<
+    class T, class U
+    gsl_ENABLE_IF_(( !std::is_arithmetic<T>::value ))
+>
+gsl_NODISCARD gsl_api gsl_constexpr14 inline T
+narrow_failfast( U u )
+{
+    T t = static_cast<T>( u );
+    gsl_Assert( static_cast<U>( t ) == u );
+    return t;
+}
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 
 //
