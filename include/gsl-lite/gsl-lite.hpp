@@ -4090,12 +4090,19 @@ struct calculate_subspan_type
                         : ( Extent != dynamic_extent ? Extent - Offset : Extent ) > type;
 };
 
-template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
-struct calculate_recast_span_type
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE Extent, bool StaticExtent >
+struct calculate_recast_span_type_0
 {
-    typedef span< U, Extent != dynamic_extent
-                        ? Extent * sizeof( T ) / sizeof( U )
-                        : dynamic_extent > type;
+    typedef span< U, dynamic_extent > type;
+};
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
+struct calculate_recast_span_type_0< T, U, Extent, true >
+{
+    typedef span< U, Extent * sizeof( T ) / sizeof( U ) > type;
+};
+template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
+struct calculate_recast_span_type : calculate_recast_span_type_0< T, U, Extent, Extent != dynamic_extent >
+{
 };
 
 } // namespace detail
