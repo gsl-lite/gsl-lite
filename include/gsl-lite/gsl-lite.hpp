@@ -3269,7 +3269,7 @@ namespace no_adl {
 template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr auto as_nullable( T && p )
 gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
--> typename detail::as_nullable_helper<typename ::gsl_lite::std20::remove_cvref<T>::type>::type
+-> typename detail::as_nullable_helper<typename std20::remove_cvref<T>::type>::type
 {
     return std::move( p );
 }
@@ -4577,10 +4577,11 @@ private:
         template< class OtherExtentType >
         gsl_api gsl_constexpr storage_type( known_not_null data, OtherExtentType ext )
             : ExtentType( ext ), data_( data.p )
-        {}
+        {
+        }
 
         template< class OtherExtentType >
-        gsl_api gsl_constexpr storage_type( pointer data, OtherExtentType ext )
+        gsl_api gsl_constexpr14 storage_type( pointer data, OtherExtentType ext )
             : ExtentType( ext ), data_( data )
         {
             gsl_Expects( data || ExtentType::size() == 0 );
