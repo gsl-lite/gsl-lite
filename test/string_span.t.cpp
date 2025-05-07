@@ -821,20 +821,6 @@ CASE( "string_span: Allows to observe an element via array indexing" )
     }
 }
 
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-CASE( "string_span: Allows to observe an element via call indexing" )
-{
-    char hello[] = "hello";
-    string_span a( hello );
-
-    for ( index_type i = 0; i < a.size(); ++i )
-    {
-        EXPECT(  a(i) ==  hello[i] );
-        EXPECT( &a(i) == &hello[i] );
-    }
-}
-# endif // deprecate
-
 CASE( "string_span: Allows to observe an element via front() and back()" )
 {
     char hello[] = "hello";
@@ -870,18 +856,6 @@ CASE( "string_span: Allows to change an element via array indexing" )
 
     EXPECT( hello[1] == '7' );
 }
-
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-CASE( "string_span: Allows to change an element via call indexing" )
-{
-    char hello[] = "hello";
-    string_span a( hello );
-
-    a(1) = '7';
-
-    EXPECT( hello[1] == '7' );
-}
-# endif // deprecate
 
 CASE( "string_span: Allows to change an element via front() and back()" )
 {

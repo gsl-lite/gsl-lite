@@ -4746,15 +4746,6 @@ as_writable_bytes( span< T, Extent > spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
-
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
-gsl_DEPRECATED_MSG("use as_writable_bytes() (different spelling) instead")
-gsl_api inline span< byte > as_writeable_bytes( span< T, Extent > spn ) gsl_noexcept
-{
-    return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
-}
-# endif // deprecate
 #endif // gsl_FEATURE( BYTE )
 
 #if gsl_FEATURE_TO_STD( MAKE_SPAN )
@@ -5194,14 +5185,6 @@ public:
     {
         return span_[idx];
     }
-
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-    gsl_DEPRECATED_MSG("use subscript indexing instead")
-    gsl_api gsl_constexpr14 reference operator()( index_type idx ) const
-    {
-        return span_[idx];
-    }
-# endif // deprecate
 
     gsl_NODISCARD gsl_api gsl_constexpr14 reference
     front() const
