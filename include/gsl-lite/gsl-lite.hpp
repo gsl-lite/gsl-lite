@@ -3136,15 +3136,15 @@ gsl_is_delete_access:
 #endif
 
 #if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
-    template <typename... Ts>
+    template< class... Ts >
     gsl_api gsl_constexpr14 auto
-    operator()(Ts&&... args) const
+    operator()( Ts&&... args ) const
 # if ! gsl_COMPILER_NVCC_VERSION
         // NVCC thinks that Substitution Failure Is An Error here
-        -> decltype(data_.ptr_(std::forward<Ts>(args)...))
+        -> decltype( data_.ptr_( std::forward<Ts>( args )... ) )
 # endif // ! gsl_COMPILER_NVCC_VERSION
     {
-        return accessor::get_checked( *this )(std::forward<Ts>(args)...);
+        return accessor::get_checked( *this )( std::forward<Ts>( args )... );
     }
 #endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
 
