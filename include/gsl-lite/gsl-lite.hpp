@@ -1244,6 +1244,11 @@
 # else
 #  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl_lite::detail::enabler >::type
 # endif
+//# if !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
+#  define gsl_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
+//# else
+//#  define gsl_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::gsl_lite::detail::enabler >::type
+//# endif
 #else
 # define  gsl_ENABLE_IF_(VA)
 #endif
