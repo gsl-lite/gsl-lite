@@ -4836,27 +4836,27 @@ make_span( T * first, T * last )
     return span<T>( first, last );
 }
 
-template< class T, size_t N >
-gsl_NODISCARD inline gsl_constexpr span<T, N>
+template< class T, std::size_t N >
+gsl_NODISCARD inline gsl_constexpr span<T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>
 make_span( T (&arr)[N] )
 {
-    return span<T, N>( arr );
+    return span<T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>( arr );
 }
 
 # if gsl_HAVE( ARRAY )
 
-template< class T, size_t N >
-gsl_NODISCARD inline gsl_constexpr span<T, N>
-make_span( std::array<T,N> & arr )
+template< class T, std::size_t N >
+gsl_NODISCARD inline gsl_constexpr span<T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>
+make_span( std::array<T, N> & arr )
 {
-    return span<T, N>( arr );
+    return span<T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>( arr );
 }
 
-template< class T, size_t N >
-gsl_NODISCARD inline gsl_constexpr span<const T, N>
-make_span( std::array<T,N> const & arr )
+template< class T, std::size_t N >
+gsl_NODISCARD inline gsl_constexpr span<const T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>
+make_span( std::array<T, N> const & arr )
 {
-    return span<const T, N>( arr );
+    return span<const T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>( arr );
 }
 # endif
 
