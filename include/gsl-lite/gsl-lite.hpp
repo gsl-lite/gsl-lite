@@ -1245,12 +1245,14 @@
 #endif // gsl_HAVE( TYPE_TRAITS )
 
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# define  gsl_ENABLE_IF_NTTP_(VA)   , typename std::enable_if< ( VA ), int >::type = 0
 # if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) // VS 2013 seems to have trouble with SFINAE for default non-type arguments
 #  define gsl_ENABLE_IF_(VA)        , typename std::enable_if< ( VA ), int >::type = 0
 # else
 #  define gsl_ENABLE_IF_(VA)        , typename = typename std::enable_if< ( VA ), ::gsl_lite::detail::enabler >::type
 # endif
 #else
+# define  gsl_ENABLE_IF_NTTP_(VA)
 # define  gsl_ENABLE_IF_(VA)
 #endif
 
@@ -2852,7 +2854,7 @@ public:
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && is_nullable<U>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<T, U>::value && is_nullable<U>::value ))
 #  endif
     >
     gsl_api gsl_constexpr14 explicit not_null( U other )
@@ -2864,7 +2866,7 @@ public:
     // Define the non-explicit constructors for non-nullable arguments only if the explicit constructor has a SFINAE constraint.
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && std::is_function<U>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<T, U>::value && std::is_function<U>::value ))
     >
     gsl_api gsl_constexpr14 /*implicit*/ not_null( U const & other )
     : data_( T( other ) )
@@ -2872,7 +2874,7 @@ public:
     }
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && ! std::is_function<U>::value  && ! is_nullable<U>::value), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<T, U>::value && ! std::is_function<U>::value && ! is_nullable<U>::value ))
     >
     gsl_api gsl_constexpr14 /*implicit*/ not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -2895,7 +2897,7 @@ public:
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr14 explicit not_null( U other )
     : data_( T( std::move( other ) ) )
@@ -2905,7 +2907,7 @@ public:
 
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr14 not_null( U other )
     : data_( std::move( other ) )
@@ -2937,7 +2939,7 @@ public:
 # if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<T, U>::value && !std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr14 explicit not_null( not_null<U> other )
     : data_( T( detail::not_null_accessor<U>::get_checked( std::move( other ) ) ) )
@@ -2946,7 +2948,7 @@ public:
 
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_convertible<U, T>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_convertible<U, T>::value ))
     >
     gsl_api gsl_constexpr14 not_null( not_null<U> other )
     : data_( T( detail::not_null_accessor<U>::get_checked( std::move( other ) ) ) )
@@ -3031,7 +3033,7 @@ public:
 
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() const
@@ -3044,7 +3046,7 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() &&
@@ -3056,7 +3058,7 @@ public:
     // implicit conversion operator
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const
@@ -3069,7 +3071,7 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        , typename std::enable_if< ( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ), int >::type = 0
+        gsl_ENABLE_IF_NTTP_(( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() &&
@@ -4135,7 +4137,8 @@ public:
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( detail::is_allowed_extent_conversion< 0, MyExtent >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( detail::is_allowed_extent_conversion< 0, MyExtent >::value ))
     >
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     gsl_api gsl_constexpr span() gsl_noexcept
@@ -4146,7 +4149,8 @@ public:
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent != dynamic_extent ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent ))
     >
     gsl_api gsl_constexpr14 gsl_explicit span( pointer ptr, size_type count )
         : storage_( ptr, count )
@@ -4155,7 +4159,8 @@ public:
     }
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent == dynamic_extent ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent ))
     >
     gsl_api gsl_constexpr14 span( pointer ptr, size_type count )
         : storage_( ptr, count )
@@ -4164,7 +4169,8 @@ public:
 
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent != dynamic_extent ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent ))
     >
     gsl_api gsl_constexpr14 gsl_explicit span( pointer firstElem, pointer lastElem )
         : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
@@ -4174,7 +4180,8 @@ public:
     }
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent == dynamic_extent ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent ))
     >
     gsl_api gsl_constexpr14 span( pointer firstElem, pointer lastElem )
         : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
@@ -4228,16 +4235,18 @@ public:
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent != dynamic_extent &&
-                         detail::is_compatible_container< Container, element_type >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent &&
+                              detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr gsl_explicit span( Container & cont ) gsl_noexcept
         : storage_( std17::data( cont ), std17::size( cont ) )
     {
     }
     template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent == dynamic_extent &&
-                         detail::is_compatible_container< Container, element_type >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent &&
+                              detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
         : storage_( std17::data( cont ), std17::size( cont ) )
@@ -4245,18 +4254,20 @@ public:
     }
 
     template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent != dynamic_extent &&
-                         std::is_const< element_type >::value &&
-                         detail::is_compatible_container< Container, element_type >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent &&
+                              std::is_const< element_type >::value &&
+                              detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr gsl_explicit span( Container const & cont ) gsl_noexcept
         : storage_( std17::data( cont ), std17::size( cont ) )
     {
     }
     template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent == dynamic_extent &&
-                         std::is_const< element_type >::value &&
-                         detail::is_compatible_container< Container, element_type >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent &&
+                              std::is_const< element_type >::value &&
+                              detail::is_compatible_container< Container, element_type >::value ))
     >
     gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
         : storage_( std17::data( cont ), std17::size( cont ) )
@@ -4319,9 +4330,9 @@ public:
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     template<
         class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( ( MyExtent == dynamic_extent || MyExtent == OtherExtent ) &&
-                         //!( OtherExtent == MyExtent && std::is_same< OtherElementType, element_type >::value ) &&
-                         detail::is_allowed_element_type_conversion< OtherElementType, element_type >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( ( MyExtent == dynamic_extent || MyExtent == OtherExtent ) &&
+                              detail::is_allowed_element_type_conversion< OtherElementType, element_type >::value ))
     >
     gsl_api gsl_constexpr span( span< OtherElementType, OtherExtent > const & other ) gsl_noexcept
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
@@ -4329,9 +4340,9 @@ public:
     }
     template<
         class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
-        gsl_ENABLE_IF_(( MyExtent != dynamic_extent && OtherExtent == dynamic_extent &&
-                         //!( OtherExtent == MyExtent && std::is_same< OtherElementType, element_type >::value ) &&
-                         detail::is_allowed_element_type_conversion< OtherElementType, element_type >::value ))
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent && OtherExtent == dynamic_extent &&
+                              detail::is_allowed_element_type_conversion< OtherElementType, element_type >::value ))
     >
     gsl_api gsl_constexpr gsl_explicit span( span< OtherElementType, OtherExtent > const & other ) gsl_noexcept
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
@@ -4383,7 +4394,8 @@ public:
             Extent == dynamic_extent || ( Extent >= Offset && ( Count == dynamic_extent ||
                                                                 Count <= Extent - Offset ) ),
             "subspan() cannot extract more elements from a span than it contains.");
-        gsl_Expects( static_cast<std::size_t>( size() ) >= static_cast<std::size_t>( Offset ) && ( Count == dynamic_extent || static_cast<std::size_t>( Count ) <= static_cast<std::size_t>( size() ) - static_cast<std::size_t>( Offset ) ) );
+        gsl_Expects( static_cast<std::size_t>( size() ) >= static_cast<std::size_t>( Offset ) &&
+                     ( Count == dynamic_extent || static_cast<std::size_t>( Count ) <= static_cast<std::size_t>( size() ) - static_cast<std::size_t>( Offset ) ) );
         typedef typename detail::calculate_subspan_type< T, Extent, Offset, Count >::type type;
         return type( data() + Offset, Count == dynamic_extent ? size() - Offset : Count );
     }
@@ -5920,6 +5932,7 @@ gsl_RESTORE_MSVC_WARNINGS()
 // #undef internal macros
 #undef gsl_STATIC_ASSERT_
 #undef gsl_ENABLE_IF_R_
+#undef gsl_ENABLE_IF_NTTP_
 #undef gsl_ENABLE_IF_
 #undef gsl_TRAILING_RETURN_TYPE_
 #undef gsl_RETURN_DECLTYPE_
