@@ -18,7 +18,12 @@ struct Widget
 
     void work() { non_owned_ptr = use( make_not_null( owned_ptr ) ); }
 
+#if gsl_HAVE( ALIAS_TEMPLATE )
     owner<int *> owned_ptr;	// if alias template support
+#else // ! gsl_HAVE( ALIAS_TEMPLATE )
+    int * owned_ptr;	// otherwise
+#endif // gsl_HAVE( ALIAS_TEMPLATE )
+
     int * non_owned_ptr;
 };
 
