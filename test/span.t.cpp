@@ -398,7 +398,7 @@ CASE( "span<>: Allows to construct from a const C-array with size via decay to p
 
 CASE( "span<>: Allows to construct from a std::initializer_list<> (C++11)" )
 {
-#if gsl_HAVE( INITIALIZER_LIST )
+#if gsl_HAVE( INITIALIZER_LIST ) && ( gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR ) )
     auto il = { 1, 2, 3, 4, 5, };
 
     span<int const> v( il );
@@ -1927,7 +1927,7 @@ CASE( "make_span(): Allows to build from a const C-array" )
 
 CASE( "make_span(): Allows building from a std::initializer_list<> (C++11)" )
 {
-#if gsl_HAVE( INITIALIZER_LIST )
+#if gsl_HAVE( INITIALIZER_LIST ) && ( gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR ) )
     auto il = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<int const> v = make_span( il );

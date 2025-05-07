@@ -44,7 +44,7 @@ before_build:
     - cmake -A %platform% -G "%generator%" -DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON ..
 
 build_script:
-    - cmake --build . --config %configuration% -- -verbosity:normal
+    - cmake --build . --config %configuration% -- -verbosity:minimal
 
 test_script:
     - ctest --output-on-failure -C %configuration%

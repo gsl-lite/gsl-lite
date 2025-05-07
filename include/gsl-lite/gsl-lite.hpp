@@ -1678,12 +1678,14 @@ data( C const & cont ) -> decltype( cont.data() )
     return cont.data();
 }
 
+# if gsl_HAVE( INITIALIZER_LIST )
 template< class E >
 gsl_NODISCARD inline gsl_constexpr E const *
 data( std::initializer_list<E> il ) gsl_noexcept
 {
     return il.begin();
 }
+# endif // gsl_HAVE( INITIALIZER_LIST )
 
 #endif // gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
@@ -2583,7 +2585,6 @@ at( Container const & cont, size_t pos )
 }
 
 #if gsl_HAVE( INITIALIZER_LIST )
-
 template< class T >
 gsl_NODISCARD gsl_api inline const gsl_constexpr14 T
 at( std::initializer_list<T> cont, size_t pos )
@@ -4143,7 +4144,7 @@ public:
     {
     }
 
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
@@ -4185,7 +4186,7 @@ public:
     {
         gsl_Expects( firstElem <= lastElem );
     }
-#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) )
+#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) )
     gsl_api gsl_constexpr14 span( pointer ptr, size_type count )
         : storage_( ptr, count )
     {
@@ -4197,7 +4198,7 @@ public:
         gsl_Expects( firstElem <= lastElem );
         gsl_Expects( Extent == dynamic_extent || lastElem - firstElem == static_cast< difference_type >( Extent ) );
     }
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 
     template<
         class U, std::size_t N
@@ -4231,6 +4232,7 @@ public:
 #endif // gsl_HAVE( ARRAY )
 
 #if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+# if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent &&
@@ -4270,37 +4272,47 @@ public:
         : storage_( std17::data( cont ), std17::size( cont ) )
     {
     }
-
+# else // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+    template< class Container
+        gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
+    >
+    gsl_api gsl_constexpr span( Container & cont ) gsl_noexcept
+        : storage_( std17::data( cont ), std17::size( cont ) )
+    {
+    }
+    template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        gsl_ENABLE_IF_(( std::is_const< element_type >::value &&
+                         detail::is_compatible_container< Container, element_type >::value ))
+    >
+    gsl_api gsl_constexpr span( Container const & cont ) gsl_noexcept
+        : storage_( std17::data( cont ), std17::size( cont ) )
+    {
+    }
+# endif // ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 #elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
-
     template< class Container >
     gsl_constexpr span( Container & cont )
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
     {
     }
-
     template< class Container >
     gsl_constexpr span( Container const & cont )
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
     {
     }
-
 #endif
 
 #if gsl_FEATURE_TO_STD( WITH_CONTAINER )
-
     template< class Container >
     gsl_constexpr span( with_container_t, Container & cont )
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
     {
     }
-
     template< class Container >
     gsl_constexpr span( with_container_t, Container const & cont )
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
     {
     }
-
 #endif
 
 #if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
@@ -4324,7 +4336,7 @@ public:
     }
 #endif
 
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template<
         class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
@@ -4345,7 +4357,7 @@ public:
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
     {
     }
-#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) )
+#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) )
     template< class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent >
     gsl_api gsl_constexpr14 span( span< OtherElementType, OtherExtent > const & other )
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
@@ -4355,7 +4367,7 @@ public:
             "attempting copy-construction from incompatible span" );
         gsl_Expects( Extent == dynamic_extent || other.size() == Extent );
     }
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 
     // [span.sub], span subviews
 

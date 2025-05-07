@@ -108,8 +108,12 @@ CASE( "not_null<>: Layout is compatible to underlying type" )
 {
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( sizeof( not_null< int* > ) == sizeof( int* ), "static assertion failed" );
+# if gsl_HAVE( UNIQUE_PTR )
     static_assert( sizeof( not_null< unique_ptr< int > > ) == sizeof( unique_ptr< int > ), "static assertion failed" );
+# endif // gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( SHARED_PTR )
     static_assert( sizeof( not_null< shared_ptr< int > > ) == sizeof( shared_ptr< int > ), "static assertion failed" );
+# endif // gsl_HAVE( SHARED_PTR )
 #endif
 }
 
@@ -1771,10 +1775,14 @@ CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
     int i = 42;
     not_null< const int* > raw_pointer = make_not_null( &i );
     EXPECT( std::hash< not_null< const int* > >()(raw_pointer) == std::hash< const int* >()( as_nullable( raw_pointer ) ) );
+# if gsl_HAVE( UNIQUE_PTR )
     not_null< std::unique_ptr< int > > unique_pointer = make_not_null( my_make_unique< int >(43) );
     EXPECT( std::hash< not_null< std::unique_ptr< int > > >()(unique_pointer) == std::hash< std::unique_ptr< int > >()( as_nullable( unique_pointer) ) );
+# endif // gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( SHARED_PTR )
     not_null< std::shared_ptr< int > > shared_pointer = make_not_null( std::make_shared< int >(43) );
     EXPECT( std::hash< not_null< std::shared_ptr< int > > >()(shared_pointer) == std::hash< std::shared_ptr< int > >()( as_nullable( shared_pointer) ) );
+# endif // gsl_HAVE( SHARED_PTR )
 }
 
 CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers" )
