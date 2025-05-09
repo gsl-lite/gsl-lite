@@ -1,4 +1,4 @@
-﻿# *gsl-lite*: defensive programming utilities for C++98, C++11 up
+﻿# *gsl-lite*: ISO C++ Core Guidelines Library implementation for C++98, C++11, and later
 
 
 | metadata | build  | packages | try online |
@@ -25,7 +25,7 @@ float mean( gsl_lite::span<float const> values )  // contiguous range with bound
     return gsl_lite::narrow_failfast<float>( result );  // checked numeric cast
 }
 
-class Resource { };
+class Resource { ... };
 
 gsl_lite::not_null<std::unique_ptr<Resource>>  // type-encoded postcondition
 acquireResource()
@@ -66,8 +66,8 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 Although the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) only contain a (loose) specification
 of the Guidelines Support Library and acknowledge there could be different implementations, [Microsoft GSL](https://github.com/microsoft/gsl)
-is the *de facto* default implementation of the Guidelines Support Library. Therefore, if you are looking for an implementation of the
-C++ Core Guidelines support library, you may want to use Microsoft GSL.
+is the *de facto* default implementation of the Guidelines Support Library. Therefore, if you are just looking for a conforming
+implementation of the C++ Core Guidelines support library, you may want to consider Microsoft GSL.
 
 That said, *gsl-lite* differs from Microsoft GSL in the following ways:
 
@@ -75,16 +75,21 @@ That said, *gsl-lite* differs from Microsoft GSL in the following ways:
 - *gsl-lite* supports CUDA, and many of its features can be used in CUDA kernel code.
 - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
   [configurable](doc/Features.md#contract-checking-configuration-macros).
-- [`not_null<>`](doc/Features.md#not_null) disallows implicit conversion construction (like `strict_not_null<>` in Microsoft GSL).
-- In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore has a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state).
-  In Microsoft GSL, `not_null<P>` is not movable if `P` is movable but not copyable.
+- Several differences exist in [`not_null<>`](doc/Features.md#not_null):
+    - In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state)
+      which needs to be checked for in accessors such as `not_null<>::get` and `not_null<>::operator*`.
+      Such a moved-from state is is [expressly disallowed](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632) in Microsoft GSL.
+      As a consequence, `not_null<std::unique_ptr<T>>` is movable in *gsl-lite* but not in Microsoft GSL.
+    - *gsl-lite*'s `not_null<>` also supports function pointers and nullable function objects such as [`std::function<>`](https://en.cppreference.com/w/cpp/utility/functional/function).
+    - In *gsl-lite*, `not_null<>` disallows implicit conversion from nullable types, and thus behaves like `strict_not_null<>` in Microsoft GSL.
+      `not_null_ic<>` is a variant of `not_null<>` that allows such implicit conversions and is more like `not_null<>` in Microsoft GSL.
 - *gsl-lite* defines some [feature testing macros](doc/Features.md#feature-checking-macros) and [polyfills](doc/Features.md#polyfills) useful for targeting multiple versions of C++.
 - *gsl-lite* comes as a single-header library.
 
 
 ## Features
 
-See the [Reference documentation](Features.md) for a detailed explanation of the features provided by *gsl-lite*, and
+See the [Reference documentation](doc/Features.md) for a detailed explanation of the features provided by *gsl-lite*. and  
 Section&nbsp;[GSL: Guidelines support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines.
 
 Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
@@ -122,9 +127,7 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`narrow_cast<>()`](doc/Features.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions;<br> equivalent to `static_cast<>()` |
 [`narrow<>()`](doc/Features.md#narrowt-u)                               | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
 [`narrow_failfast<>()`](doc/Features.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
-[**Feature checking macros:**](doc/Features.md#feature-checking-macros) | &nbsp;      | &nbsp;        | &nbsp;             | &nbsp; |
-`gsl_CPPxx_OR_GREATER`                                                  | -           | -             | ✓                 | Whether C++xx language features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
-`gsl_COMPILER_xx_VERSION`                                               | -           | -             | ✓                 | Evaluates to version number when compiled with `xx`, or 0 otherwise<br>(substitute `GNUC`, `CLANG`, `MSVC`, `APPLECLANG`, `NVCC`, `ARMCC`) |
+[**Feature checking macros**](doc/Features.md#feature-checking-macros)  | &nbsp;      | &nbsp;        | &nbsp;             | &nbsp; |
 [**Polyfills**](doc/Features.md#polyfills)                              | &nbsp;      | &nbsp;        | &nbsp;             | &nbsp; |
 
 ¹: C++11 or newer required
@@ -137,11 +140,12 @@ The recommended way to consume *gsl-lite* in your CMake project is to use `find_
 ```CMake
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
-find_package( gsl-lite 1.0 REQUIRED )
-
 project( my-program LANGUAGES CXX )
 
+find_package( gsl-lite 1.0 REQUIRED )
+
 add_executable( my-program main.cpp )
+target_compile_features( my-program PRIVATE cxx_std_17 )
 target_link_libraries( my-program PRIVATE gsl-lite::gsl-lite )
 ```
 
@@ -225,9 +229,8 @@ ARMCC                |                 | ARM       | 5 and newer       | |
 
 ## Version semantics
 
-*gsl-lite* strives to follow [Semantic Versioning](https://semver.org/) guidelines. We strive to maintain
-[API](https://en.wikipedia.org/wiki/Application_programming_interface) and [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) compatibility
-and avoid breaking changes in minor and patch releases.
+*gsl-lite* follows [Semantic Versioning](https://semver.org/) guidelines. We maintain [API](https://en.wikipedia.org/wiki/Application_programming_interface) and
+[ABI](https://en.wikipedia.org/wiki/Application_binary_interface) compatibility and avoid breaking changes in minor and patch releases.
 
 Development of *gsl-lite* happens in the `master` branch. Versioning semantics apply only to tagged releases: there is no stability guarantee between individual
 commits in the `master` branch, that is, anything added since the last tagged release may be renamed, removed, or have the semantics changed without further notice.
