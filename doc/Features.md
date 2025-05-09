@@ -487,6 +487,8 @@ auto at(Container& c, index i)
 
 (Feature checking macros are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
+The following preprocessor macros can be used to identify features of the C++ build environment:
+
 Name                                    | Notes           |
 ---------------------------------------:|:----------------|
 **Language and library support:**       | &nbsp;          |
@@ -525,12 +527,7 @@ macro:                                  | determines availability of:           
 `gsl_HAVE( DEDUCTION_GUIDES )`          | [`class template argument deduction`](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction) guides (C++17) |
 `gsl_HAVE( NODISCARD )`                 | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute (C++17) |
 `gsl_HAVE( MAYBE_UNUSED )`              | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute (C++17) |
-`gsl_HAVE( CONSTEXPR_11 )`              | C++11 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
-`gsl_HAVE( CONSTEXPR_14 )`              | C++14 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
-`gsl_HAVE( CONSTEXPR_17 )`              | C++17 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
-`gsl_HAVE( CONSTEXPR_20 )`              | C++20 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
-`gsl_HAVE( CONSTEXPR_23 )`              | C++23 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
-`gsl_HAVE( CONSTEXPR_26 )`              | C++26 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+`gsl_HAVE( CONSTEXPR_xx )`              | C++xx [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features (substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 **Standard library features:**          | &nbsp;          |
 macro:                                  | determines availability of:                    |
 `gsl_HAVE( ADDRESSOF )`                 | [`std::addressof()`](https://en.cppreference.com/w/cpp/memory/addressof) (C++11) |
@@ -557,7 +554,15 @@ macro:                                  | determines availability of:           
 
 (Polyfills are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
-### Macros
+*gsl-lite* defines some macros, types, and functions for use with earlier versions of C++:
+
+- [Keyword and attribute macros](#keyword-and-attribute-macros)
+- [Code generation macros](#code-generation-macros)
+- [Types and functions](#types-and-functions)
+
+### Keyword and attribute macros
+
+The keyword and attribute macros allow to conditionally take advantage of newer language features if available:
 
 Name                        | Notes           |
 ---------------------------:|:----------------|
@@ -575,16 +580,46 @@ Name                        | Notes           |
 `gsl_NODISCARD`             | Expands to `[[nodiscard]]` attribute in C++17 and higher, to nothing otherwise |
 `gsl_MAYBE_UNUSED`          | Expands to `[[maybe_unused]]` attribute in C++17 and higher, or to nothing otherwise |
 `gsl_MAYBE_UNUSED_MEMBER`   | Expands to `[[maybe_unused]]` attribute in C++17 and higher for compilers other than GNU GCC, or to nothing otherwise |
-`gsl_NO_UNIQUE_ADDRESS` <nobr>(≥ C++20)</nobr> | expands to `[[msvc::no_unique_address]]` for MSVC, to `[[no_unique_address]]` otherwise |
-`gsl_DEFINE_ENUM_BITMASK_OPERATORS( e )` | Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the enum type `e` |
-`gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( e )` | Defines relational operators (`<=>` in C++20 and newer, `<`, `>`, `<=`, and `>=` otherwise) for the enum type `e` |
+`gsl_NO_UNIQUE_ADDRESS` (≥ C++20) | expands to `[[msvc::no_unique_address]]` for MSVC, to `[[no_unique_address]]` otherwise |
+
+### Code generation macros
+
+The following macros automate some boilerplate tasks when writing code:
+
+- `gsl_DEFINE_ENUM_BITMASK_OPERATORS( e )`:  
+  Defines bitmask operators `\|`, `&`, `^`, `~`, `\|=`, `&=`, and `^=` for the enum type `e`.  
+  Example:  
+  ```c++
+  enum class Vegetables
+  {
+      tomato   = 0b001,
+      onion    = 0b010,
+      eggplant = 0b100
+  };
+  gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
+  ```
+
+- `gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( e )`:  
+  Defines relational operators (`<=>` in C++20 and newer, `<`, `>`, `<=`, and `>=` otherwise) for the enum type `e`.  
+  Example:  
+  ```c++
+  enum class OperatorPrecedence
+  {
+      additive = 0,
+      multiplicative = 1,
+      power = 2
+  };
+  gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
+  ```
 
 ### Types and functions
+
+The following types and functions implement some functionality added only in later C++ standards:
 
 Name                                    | C++ feature     |
 ---------------------------------------:|:----------------|
 `std11::add_const<>`                    | [`std::add_const<>`](https://en.cppreference.com/w/cpp/types/add_cv) (C++11) |
-`std11::remove_const<>`<br>`std11::remove_volatile<>`<br>`std11::remove_cv<> | [`std::remove_const<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_volatile<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_cv<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11) |
+`std11::remove_const<>`<br>`std11::remove_volatile<>`<br>`std11::remove_cv<>` | [`std::remove_const<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_volatile<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_cv<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11) |
 `std11::remove_reference<>`             | [`std::remove_reference<>`](https://en.cppreference.com/w/cpp/types/remove_reference) (C++11) |
 `std11::integral_constant<>`<br>`std11::true_type`<br>`std11::false_type`<br>`std17::bool_constant<>`| [`std::integral_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::true_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::false_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::bool_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++17) |
 `std14::make_unique<>()`                | [`std::make_unique<>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) (C++14) |
@@ -594,7 +629,7 @@ Name                                    | C++ feature     |
 `std17::disjunction<>` (≥ C\+\+11)      | [`std::disjunction<>`](https://en.cppreference.com/w/cpp/types/disjunction) (C++17) |
 `std17::void_t<>` (≥ C\+\+11)           | [`std::void_t<>`](https://en.cppreference.com/w/cpp/types/void_t) (C++17) |
 `std17::size()`<br>`std20::ssize()`     | [`std::size()`](https://en.cppreference.com/w/cpp/iterator/size) (C++17)<br>[`std::ssize()`](https://en.cppreference.com/w/cpp/iterator/size) (C++20) |
-`std17::data()                          | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
+`std17::data()`                         | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
 `std20::endian`                         | [`std::endian`](https://en.cppreference.com/w/cpp/types/endian) (C++20) |
 `std20::type_identity<>`                | [`std::type_identity<>`](https://en.cppreference.com/w/cpp/types/type_identity) (C++20) |
 `std20::identity`                       | [`std::identity`](https://en.cppreference.com/w/cpp/utility/functional/identity) (C++20) |

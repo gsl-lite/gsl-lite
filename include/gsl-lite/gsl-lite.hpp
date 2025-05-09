@@ -6,7 +6,7 @@
 //
 // Copyright (c) 2015-2019 Martin Moene
 // Copyright (c) 2019-2025 Moritz Beutel
-// Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
+// Copyright (c) 2015-2025 Microsoft Corporation. All rights reserved.
 //
 // This code is licensed under the MIT License (MIT).
 //
@@ -1209,7 +1209,7 @@
 #define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
 
     //
-    // Defines relational operators `<`, `>`, `<=`, `>=` for the given enum type.
+    // Defines relational operators `<=>`, `<`, `>`, `<=`, `>=` for the given enum type.
     //
     //     enum class OperatorPrecedence { additive = 0, multiplicative = 1, power = 2 };
     //     gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )

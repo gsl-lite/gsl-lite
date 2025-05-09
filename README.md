@@ -97,14 +97,14 @@ See also Section&nbsp;[GSL: Guidelines support library](https://github.com/isocp
 Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 ------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:------|
 [**Views:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views) | &nbsp;  | &nbsp;  | &nbsp;       | &nbsp;|
-[`owner<>`](doc/Features.md#owner-c11-and-higher)                       | ✓          | ✓             | ✓<br><nobr>(≥ C\+\+11)</nobr> | Annotate a raw pointer that carries ownership |
-[`not_null<>`](doc/Features.md#not_null)                                | ✓          | ✓             | ✓             | Annotate a (smart) pointer that must not be `nullptr`<br>Enforces non-nullability at runtime<br>(cf. `strict_not_null<>` in Microsoft GSL) |
+[`owner<>`](doc/Features.md#owner-c11-and-higher)                       | ✓          | ✓             | ✓¹                 | Annotate a raw pointer that carries ownership |
+[`not_null<>`](doc/Features.md#not_null)                                | ✓          | ✓             | ✓                  | Annotate a (smart) pointer that must not be `nullptr`<br>Enforces non-nullability at runtime<br>(cf. `strict_not_null<>` in Microsoft GSL) |
 [`not_null_ic<>`](doc/Features.md#not_null_ic)                          | -           | ✓             | ✓                  | Like `not_null<>` but allows implicit construction from nullable pointers<br>(cf. `not_null<>` in Microsoft GSL) |
 [`make_unique<>()`](doc/Features.md#not_null)                           | -           | -             | ✓                  | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
 [`make_shared<>()`](doc/Features.md#not_null)                           | -           | -             | ✓                  | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
 [`span<>`](doc/Features.md#safe-contiguous-ranges)                      | ✓          | ✓             | ✓                  | Like [`std::span<>`](https://en.cppreference.com/w/cpp/container/span) but with bounds-checking |
-[`zstring`<br>`czstring`](doc/Features.md#semantic-string-type-aliases)   | ✓        | ✓             | ✓                  | Aliases for `char&nbsp;*` and `char&nbsp;const&nbsp;*` to be used for 0-terminated strings (C-style strings) |
-[`wzstring`<br>`wczstring`](doc/Features.md#semantic-string-type-aliases) | -        | ✓             | ✓                  | Aliases for `wchar_t&nbsp;*` and `wchar_t&nbsp;const&nbsp;*` to be used for 0-terminated strings (C-style strings) |
+[`zstring`<br>`czstring`](doc/Features.md#semantic-string-type-aliases)   | ✓        | ✓             | ✓                  | Aliases for `char *` and `char const *` to be used for 0-terminated strings (C-style strings) |
+[`wzstring`<br>`wczstring`](doc/Features.md#semantic-string-type-aliases) | -        | ✓             | ✓                  | Aliases for `wchar_t *` and `wchar_t const *` to be used for 0-terminated strings (C-style strings) |
 [**Assertions:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslassert-assertions) | &nbsp; | &nbsp; | &nbsp; | &nbsp;|
 [`Expects()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
 [`Ensures()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
@@ -118,9 +118,9 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`gsl_AssertDebug()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_AssertAudit()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp;        | &nbsp;            | &nbsp;|
-[`finally()`](doc/Features.md#ad-hoc-raii-c11-and-higher)               | ✓          | ✓             | ✓<br><nobr>(≥ C\+\+11)</nobr> | Returns an object that executes a given action in its destructor; use for ad-hoc [RAII](https://en.cppreference.com/w/cpp/language/raii) |
-[`on_return()`](doc/Features.md#ad-hoc-raii-c11-and-higher)             | -           | -             | (✓)<br><nobr>(≥ C\+\+11)</nobr> | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
-[`on_error()`](doc/Features.md#ad-hoc-raii-c11-and-higher)              | -           | -             | (✓)<br><nobr>(≥ C\+\+11)</nobr> | Creates an object that executes a given action in its destructor if an exception was thrown<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
+[`finally()`](doc/Features.md#ad-hoc-raii-c11-and-higher)               | ✓          | ✓             | ✓¹                 | Returns an object that executes a given action in its destructor; use for ad-hoc [RAII](https://en.cppreference.com/w/cpp/language/raii) |
+[`on_return()`](doc/Features.md#ad-hoc-raii-c11-and-higher)             | -           | -             | (✓¹)                | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
+[`on_error()`](doc/Features.md#ad-hoc-raii-c11-and-higher)              | -           | -             | (✓¹)                | Creates an object that executes a given action in its destructor if an exception was thrown<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
 [`at()`](doc/Features.md#bounds-checked-element-access)                 | ✓          | ✓             | ✓                 | Bounds-checked element access for C-style arrays and containers with random access |
 [`index`](doc/Features.md#emantic-integer-type-aliases)                 | ✓          | ✓             | ✓                 | Signed integer type for indexes and subscripts |
 [`dim`](doc/Features.md#emantic-integer-type-aliases)                   | -           | -             | ✓                 | Signed integer type for sizes |
@@ -133,6 +133,8 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 `gsl_CPPxx_OR_GREATER`                                                  | -           | -             | ✓                 | Whether C++xx language features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 `gsl_COMPILER_xx_VERSION`                                               | -           | -             | ✓                 | Evaluates to version number when compiled with `xx`, or 0 otherwise<br>(substitute `GNUC`, `CLANG`, `MSVC`, `APPLECLANG`, `NVCC`, `ARMCC`) |
 [**Polyfills**](doc/Features.md#polyfills)                              | &nbsp;      | &nbsp;        | &nbsp;             | &nbsp; |
+
+¹: C++11 or newer required
 
 
 ## Dependencies
