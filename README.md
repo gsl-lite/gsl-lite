@@ -50,26 +50,15 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Documentation
 
-- [Why *gsl-lite*?](#why-gsl-lite):
-- [Installation and use](doc/Installation-and-use.md):
-    - [Getting started](doc/Installation-and-use.md#getting-started)
-    - [Migration guide](doc/Installation-and-use.md#migration-guide)
-    - [Reported to work with](doc/Installation-and-use.md#reported-to-work-with)
-    - [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
-- [Features](doc/Features.md)
-<!--    - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
-    - [Pointer annotations](doc/Features.md#pointer-annotations): `owner<P>`, `not_null<P>`, and `not_null_ic<P>`
-    - [Numeric type conversions](doc/Features.md#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
-    - [Safe contiguous ranges](doc/Features.md#safe-contiguous-ranges): `span<T, Extent>`
-    - [Bounds-checked element access](doc/Features.md#bounds-checked-element-access): `at()`
-    - [Semantic integer types](doc/Features.md#semantic-integer-types): `index`, `dim`, `stride`, `diff`
-    - [Ad-hoc RAII (C++11 and higher)](doc/Features.md#ad-hoc-raii-c11-and-higher): `finally()`, `on_return()`, and `on_error()`
-    - [Feature checking macros](doc/Features.md#feature-checking-macros)
-    - [Polyfills](doc/Features.md#polyfills)
-    - [Configuration options and switches](doc/Features.md#configuration-options-and-switches)
-    - [Configuration changes, deprecated and removed features](doc/Features.md#configuration-changes-deprecated-and-removed-features)-->
+- [Why *gsl-lite*?](#why-gsl-lite)
+- [Installation and use](#installation-and-use)
+- [Features](#features)
+- [Migration guide](doc/Migration-guide.md)
+- [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
 - [Dependencies](#dependencies)
+- [Reported to work with](doc/Installation-and-use.md#reported-to-work-with)
 - [Version semantics](#version-semantics)
+- [Contributing](#contributing)
 - [License](#license)
 
 
@@ -95,7 +84,8 @@ That said, *gsl-lite* differs from Microsoft GSL in the following ways:
 
 ## Features
 
-See also Section&nbsp;[GSL: Guidelines support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines.
+See the [Reference documentation](Features.md) for a detailed explanation of the features provided by *gsl-lite*, and
+Section&nbsp;[GSL: Guidelines support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines.
 
 Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 ------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:------|
@@ -112,14 +102,14 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`Expects()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
 [`Ensures()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
 [`gsl_Expects()`](doc/Features.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks precondition at runtime |
-[`gsl_ExpectsDebug()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
-[`gsl_ExpectsAudit()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
+[`gsl_ExpectsDebug()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
+[`gsl_ExpectsAudit()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime<br>if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
 [`gsl_Ensures()`](doc/Features.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks postcondition at runtime |
-[`gsl_EnsuresDebug()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
-[`gsl_EnsuresAudit()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
+[`gsl_EnsuresDebug()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
+[`gsl_EnsuresAudit()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
 [`gsl_Assert()`](doc/Features.md#contract-and-assertion-checks)         | -           | -             | ✓                   | Checks invariant at runtime |
-[`gsl_AssertDebug()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
-[`gsl_AssertAudit()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
+[`gsl_AssertDebug()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
+[`gsl_AssertAudit()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp;        | &nbsp;            | &nbsp;|
 [`finally()`](doc/Features.md#ad-hoc-raii-c11-and-higher)               | ✓          | ✓             | ✓¹                 | Returns an object that executes a given action in its destructor; use for ad-hoc [RAII](https://en.cppreference.com/w/cpp/language/raii) |
 [`on_return()`](doc/Features.md#ad-hoc-raii-c11-and-higher)             | -           | -             | (✓¹)                | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
@@ -140,9 +130,97 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 ¹: C++11 or newer required
 
 
+## Installation and use
+
+The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` and `target_link_libraries()`:
+
+```CMake
+cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
+
+find_package( gsl-lite 1.0 REQUIRED )
+
+project( my-program LANGUAGES CXX )
+
+add_executable( my-program main.cpp )
+target_link_libraries( my-program PRIVATE gsl-lite::gsl-lite )
+```
+
+*gsl-lite* is available via [Vcpkg](https://vcpkg.io/en/package/gsl-lite), [Conan](https://conan.io/center/recipes/gsl-lite),
+and possibly other package managers. It may also be obtained with [CPM](https://github.com/cpm-cmake/CPM.cmake):
+```cmake
+CPMAddPackage( NAME gsl-lite VERSION 1.0.0 GITHUB_REPOSITORY gsl-lite/gsl-lite )
+```
+See the directories [example/with-CPM](example/with-CPM) and [example/with-Vcpkg](example/with-Vcpkg) for example projects
+that use CPM and Vcpkg, respectively, to obtain *gsl-lite*.
+
+Once the build system is set up, include the `<gsl-lite/gsl-lite.hpp>` header file to use *gsl-lite*:
+
+```c++
+// main.cpp
+
+#include <iostream>
+
+#include <gsl-lite/gsl-lite.hpp>
+
+void printArgs( gsl_lite::span<gsl_lite::zstring const> args )
+{
+    for ( auto arg : args )
+    {
+        std::cout << arg << "\n";
+    }
+}
+
+int main( int argc, char* argv[] )
+{
+    gsl_Expects( argc > 0 );
+
+    auto args = gsl_lite::span( argv, argc );
+    auto argsWithoutExeName = args.subspan( 1 );
+    printArgs( argsWithoutExeName );
+}
+```
+
+
+## Using *gsl-lite* in libraries
+
+Many features of *gsl-lite* are very useful for defining library interfaces, for instance spans, contract checks, or `not_null<>`.
+
+*gsl-lite* can coexist with Microsoft GSL. However, the GSL compatibility mode of *gsl-lite* may cause interference with Microsoft GSL.
+Also, *gsl-lite* is customizable through a large number of configuration options and switches. These configuration macros may affect the API and
+ABI of *gsl-lite* in ways that renders it incompatible with other code. How *gsl-lite* is configured should be the prerogative of the consumer,
+not the author, of a library.
+
+Therefore, when using *gsl-lite* in a library, please mind the following suggestions:
+
+- Do not define, or rely on, any of *gsl-lite*'s configuration options or switches when using *gsl-lite* in a library.
+- In particular, do not enable the GSL compatibility mode.
+- Do not use the legacy header file `<gsl/gsl-lite.hpp>`, which implicitly enables the GSL compatibility mode; use the header `<gsl-lite/gsl-lite.hpp>` instead.
+- Use namespace `gsl_lite` rather than namespace `gsl`; if desired, define a `namespace gsl = ::gsl_lite;` alias in your own namespace.
+- Use the prefixed contract checking macros `gsl_Expects()` and `gsl_Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()`.
+
+
 ## Dependencies
 
 *gsl-lite* has no dependencies other than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
+
+
+## Reported to work with
+
+The table below mentions the compiler versions and platforms *gsl-lite* is reported to work with.
+
+Compiler             | OS              | Platforms | Versions          | CI |
+--------------------:|:----------------|-----------|------------------:|----|
+GCC                  | Linux           | x64       | 4.7 and newer     | [9, 10, 11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
+GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
+GCC                  | MacOS           | x64       | 6 and newer       | [11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [11, 12, 13, 14, 15, 16, 17, 18, 19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang with libstdc++ | Linux           | x64       | 11 and newer      | [19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Windows         | x64       | version shipped with VS | VS [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [12.8](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+ARMCC                |                 | ARM       | 5 and newer       | |
 
 
 ## Version semantics
@@ -157,6 +235,14 @@ commits in the `master` branch, that is, anything added since the last tagged re
 A minor-version release will be compatible (in both ABI and API) with the previous minor-version release. Thus, once a change is released, it becomes part of the API.
 
 Some of the [configuration options](doc/Features.md#configuration-options-and-switches) may affect the API and ABI of *gsl-lite*.
+
+
+## Contributing
+
+Contributions to *gsl-lite* through [pull requests](https://github.com/gsl-lite/gsl-lite/pulls) or [issues](https://github.com/gsl-lite/gsl-lite/issues) are welcome.
+
+*gsl-lite* comes with a test suite that uses an included, slightly modified copy of the [*lest* test framework](https://github.com/martinmoene/lest).
+To build *gsl-lite* with the test suite, enable the CMake build option `GSL_LITE_OPT_BUILD_TESTS` when configuring the project.
 
 
 ## License
