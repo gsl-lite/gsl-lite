@@ -401,7 +401,7 @@ Explicit conversions are needed only when converting a nullable to a non-nullabl
 more and more of a code base is converted to `not_null<>`, fewer explicit conversions need to be used.
 
 However, in some code bases it may not be feasible to insert explicit not-null checks at every invocation
-site. In this case, `gsl_lite::_not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
+site. In this case, `gsl_lite::not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
 but defines an unconditionally implicit conversion constructor:
 
 ```c++
@@ -769,7 +769,7 @@ The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NON
 #### `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`
 Define this macro to 0 to make `not_null<>`'s constructor implicit. **Default is 1.**
 
-Preferably, rather than defining this macro to 0, use the `not_null<>`-derived class [`not_null_ic<>`](#not_null_ic) if you desire implicit construction.
+Preferably, rather than defining this macro to 0, use [`not_null_ic<>`](#not_null_ic) if you desire implicit construction.
 
 #### `gsl_CONFIG_TRANSPARENT_NOT_NULL=1`
 If this macro is defined to 1, `not_null<>` supports typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks.
