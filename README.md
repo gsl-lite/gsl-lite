@@ -52,13 +52,14 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Documentation
 
+- [Why *gsl-lite*?](#why-gsl-lite):
 - [Installation and use](doc/Installation-and-use.md):
     - [Getting started](doc/Installation-and-use.md#getting-started)
     - [Migration guide](doc/Installation-and-use.md#migration-guide)
     - [Reported to work with](doc/Installation-and-use.md#reported-to-work-with)
     - [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
-- [Features](doc/Features.md):
-    - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
+- [Features](doc/Features.md)
+<!--    - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
     - [Pointer annotations](doc/Features.md#pointer-annotations): `owner<P>`, `not_null<P>`, and `not_null_ic<P>`
     - [Numeric type conversions](doc/Features.md#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
     - [Safe contiguous ranges](doc/Features.md#safe-contiguous-ranges): `span<T, Extent>`
@@ -68,10 +69,58 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
     - [Feature checking macros](doc/Features.md#feature-checking-macros)
     - [Polyfills](doc/Features.md#polyfills)
     - [Configuration options and switches](doc/Features.md#configuration-options-and-switches)
-    - [Configuration changes, deprecated and removed features](doc/Features.md#configuration-changes-deprecated-and-removed-features)
+    - [Configuration changes, deprecated and removed features](doc/Features.md#configuration-changes-deprecated-and-removed-features)-->
 - [Dependencies](#dependencies)
 - [Version semantics](#version-semantics)
 - [License](#license)
+
+
+## Why *gsl-lite*?
+
+*gsl-lite* differs from Microsoft GSL in the following ways:
+
+- *gsl-lite* supports C++98, C++03, C++11, and older compilers.
+- *gsl-lite* supports CUDA, and many of its features can be used in CUDA kernel code.
+- [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
+  [configurable](doc/Features.md#contract-checking-configuration-macros).
+- `not_null<>` disallows implicit conversion construction (like `strict_not_null<>` in Microsoft GSL).
+- In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore has a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state).
+  In Microsoft GSL, `not_null<P>` is not movable if `P` is movable but not copyable.
+- *gsl-lite* defines some [feature testing macros](doc/Features.md#feature-checking-macros) and [polyfills](doc/Features.md#polyfills) which are useful when targeting multiple versions of C++.
+- *gsl-lite* comes as a single-header library.
+
+
+## Features
+
+See also Section&nbsp;[GSL: Guidelines support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines.
+
+Feature \\ library                                                      | GSL spec    | Microsoft GSL | *gsl-lite*          | Notes |
+------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:------|
+[**Views:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views) | &nbsp;  | &nbsp;  | &nbsp;       | &nbsp;|
+[`owner<>`](doc/Features.md#owner-c11-and-higher)                       | ✓          | ✓             | ✓ (≥\nbsp;C\+\+11) | Annotate a raw pointer that carries ownership |
+[`not_null<>`](doc/Features.md#not_null)                                | ✓          | `strict_not_null<>` | ✓             | Annotate a (smart) pointer that must not be `nullptr`;<br> enforces non-nullability at runtime |
+[`not_null_ic<>`](doc/Features.md#not_null_ic)                          | -           | `not_null<>`   | ✓                  | Like `not_null<>`, but allows implicit construction from nullable pointers |
+[`make_unique<>()`](doc/Features.md#not_null)                           | -           | -             | ✓                  | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
+[`make_shared<>()`](doc/Features.md#not_null)                           | -           | -             | ✓                  | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
+[`span<>`](doc/Features.md#safe-contiguous-ranges)                      | ✓          | ✓             | ✓                | A view of contiguous elements like [`std::span<>`](https://en.cppreference.com/w/cpp/container/span) but with bounds-checking |
+[`zstring`, `czstring`](doc/Features.md#semantic-string-type-aliases)   | ✓          | ✓             | ✓                | Aliases for `char *` and `char const *` to be used for 0-terminated strings (C-style strings) |
+[`wzstring`, `wczstring`](doc/Features.md#semantic-string-type-aliases) | -           | ✓             | ✓                | Aliases for `wchar_t *` and `wchar_t const *` to be used for 0-terminated strings (C-style strings) |
+[**Assertions:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslassert-assertions) | &nbsp;  | &nbsp;        | &nbsp;            | &nbsp;|
+[Precondition checks](doc/Features.md#contract-and-assertion-checks)    | `Expects()` | `Expects()`    | `gsl_Expects()`<br>`gsl_ExpectsDebug()`<br>`gsl_ExpectsAudit()` | Checks preconditions at runtime |
+[Postcondition checks](doc/Features.md#contract-and-assertion-checks)   | `Ensures()` | `Ensures()`    | `gsl_Ensures()`<br>`gsl_EnsuresDebug()`<br>`gsl_EnsuresAudit()` | Checks postconditions at runtime |
+[Assertions](doc/Features.md#contract-and-assertion-checks)             | -           | -              | `gsl_Assert()`<br>`gsl_AssertDebug()`<br>`gsl_AssertAudit()`    | Checks invariants at runtime |
+[**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp;        | &nbsp;            | &nbsp;|
+[`finally()`](doc/Features.md#ad-hoc-raii-c11-and-higher)               | ✓          | ✓             | ✓ (≥\nbsp;C\+\+11) | Returns an object that executes a given action in its destructor; use for ad-hoc [RAII](https://en.cppreference.com/w/cpp/language/raii) |
+[`on_return()`](doc/Features.md#ad-hoc-raii-c11-and-higher)             | -           | -             | (✓) (≥\nbsp;C\+\+11) | Creates an object that executes a given action in its destructor if no exception occurred;<br> define `gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1` to enable the feature |
+[`on_error()`](doc/Features.md#ad-hoc-raii-c11-and-higher)              | -           | -             | (✓) (≥\nbsp;C\+\+11) | Creates an object that executes a given action in its destructor if an exception was thrown;<br> define `gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=1` to enable the feature |
+[`at()`](doc/Features.md#bounds-checked-element-access)                 | ✓          | ✓             | ✓                 | Bounds-checked element access for C-style arrays and containers with random access |
+[`index`](doc/Features.md#emantic-integer-type-aliases)                 | ✓          | ✓             | ✓                 | Signed integer type for indexes and subscripts |
+[`dim`](doc/Features.md#emantic-integer-type-aliases)                   | -           | -             | ✓                 | Signed integer type for sizes |
+[`stride`](doc/Features.md#emantic-integer-type-aliases)                | -           | -             | ✓                 | Signed integer type for index strides |
+[`diff`](doc/Features.md#emantic-integer-type-aliases)                  | -           | -             | ✓                 | Signed integer type for index differences |
+[`narrow_cast<>()`](doc/Features.md#narrow_casttu)                      | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions;<br> equivalent to `static_cast<>()` |
+[`narrow<>()`](doc/Features.md#narrowtu)                                | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
+[`narrow_failfast<>()`](doc/Features.md#narrow_failfasttu)              | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
 
 
 ## Dependencies

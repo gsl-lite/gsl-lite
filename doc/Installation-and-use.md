@@ -109,14 +109,15 @@ namespace gsl = ::gsl_lite;
 #define Ensures( x )  gsl_Ensures( x )
 ```
 
-The GSL compatibility mode precludes the use of *gsl-lite* and Microsoft GSL in the same translation unit. Therefore, when making
-use of *gsl-lite* in a public header file of a library, the GSL compatibility mode should not be enabled.
+The GSL compatibility mode precludes the use of *gsl-lite* and Microsoft GSL in the same translation unit. Therefore, do not use
+the GSL compatibility mode when using *gsl-lite* in a public header file of a library. (Cf. the notes on
+[using *gsl-lite* in libraries](#using-gsl-lite-in-libraries) below.)
 
 The GSL compatibility mode causes no link-time interference between *gsl-lite* and as Microsoft GSL. Both libraries may be used in
 the same project as long as no translation unit includes both at the same time.
 
 The legacy header file `<gsl/gsl-lite.hpp>` now forwards to `<gsl-lite/gsl-lite.hpp>` and implicitly enables the GSL compatibility mode.
-When the legacy header is included, it emits a warning message which urges to either migrate to header `<gsl-lite/gsl-lite.hpp>`,
+When the legacy header is included, it emits a warning message that urges to either migrate to header `<gsl-lite/gsl-lite.hpp>`,
 namespace `gsl_lite` and the prefixed contract checking macros `gsl_Expects()` and `gsl_Ensures()`, or to explicitly request GSL
 compatibility by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
 
@@ -144,14 +145,18 @@ ARMCC                |                 | ARM       | 5 and newer       | |
 
 Many features of *gsl-lite* are very useful for defining library interfaces, for instance spans, contract checks, or `not_null<>`.
 
-*gsl-lite* can coexist with Microsoft GSL. However, the GSL compatibility mode of *gsl-lite* may cause interference with Microsoft GSL. Therefore,
-make sure not to use the legacy header file `<gsl/gsl-lite.hpp>`, which implicitly enables the GSL compatibility mode. Be sure to migrate your code
-to use namespace `gsl_lite` rather than namespace `gsl` (or define a `namespace gsl = ::gsl_lite;` alias in your own namespace)
-and the prefixed contract checking macros `gsl__Expects()` and `gsl__Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()`.
+*gsl-lite* can coexist with Microsoft GSL. However, the GSL compatibility mode of *gsl-lite* may cause interference with Microsoft GSL.
+Also, *gsl-lite* is customizable through a large number of configuration options and switches. These configuration macros may affect the API and
+ABI of *gsl-lite* in ways that renders it incompatible with other code. How *gsl-lite* is configured should be the prerogative of the consumer,
+not the author, of a library.
 
-*gsl-lite* is customizable through a large number of configuration options and switches.
-The configuration macros may affect the API and ABI of *gsl-lite* in ways that renders it incompatible with other code.
-Therefore, as a general rule, **do not define, or rely on, any of *gsl-lite*'s configuration options or switches when using *gsl-lite* in a library**.
+Therefore, when using *gsl-lite* in a library, please mind the following suggestions:
+
+- Do not define, or rely on, any of *gsl-lite*'s configuration options or switches when using *gsl-lite* in a library.
+- In particular, do not enable the GSL compatibility mode.
+- Do not use the legacy header file `<gsl/gsl-lite.hpp>`, which implicitly enables the GSL compatibility mode; use the header `<gsl-lite/gsl-lite.hpp>` instead.
+- Use namespace `gsl_lite` rather than namespace `gsl`; if desired, define a `namespace gsl = ::gsl_lite;` alias in your own namespace.
+- Use the prefixed contract checking macros `gsl_Expects()` and `gsl_Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()`.
 
 
 ## Contributing
@@ -160,4 +165,3 @@ Contributions to *gsl-lite* through [pull requests](https://github.com/gsl-lite/
 
 *gsl-lite* comes with a test suite that uses an included, slightly modified copy of the [*lest* test framework](https://github.com/martinmoene/lest).
 To build *gsl-lite* with the test suite, enable the CMake build option `GSL_LITE_OPT_BUILD_TESTS` when configuring the project.
-When submitting a PR, please add tests that cover your proposed changes, and make sure that all other tests still succeed.

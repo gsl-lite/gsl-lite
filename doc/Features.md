@@ -6,7 +6,8 @@
 - [Numeric type conversions](#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
 - [Safe contiguous ranges](#safe-contiguous-ranges): `span<T, Extent>`
 - [Bounds-checked element access](#bounds-checked-element-access): `at()`
-- [Semantic integer types](#semantic-integer-types): `index`, `dim`, `stride`, `diff`
+- [Semantic integer type aliases](#semantic-integer-type-aliases): `index`, `dim`, `stride`, `diff`
+- [Semantic string type aliases](#semantic-string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`
 - [Ad-hoc RAII (C++11 and higher)](#ad-hoc-raii-c11-and-higher): `finally()`, `on_return()`, and `on_error()`
 - [Feature checking macros](#feature-checking-macros)
 - [Polyfills](#polyfills)
@@ -17,9 +18,6 @@
 ## Contract and assertion checks
 
 (Core Guidelines reference: [GSL.assert: Assertions](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#SS-assertions))
-
-*gsl-lite* provides contract violation response control as originally suggested in proposal [N4415](http://wg21.link/n4415), with
-some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
 
 There are several macros for expressing preconditions, postconditions, and invariants:
 
@@ -34,7 +32,23 @@ There are several macros for expressing preconditions, postconditions, and invar
 - `gsl_EnsuresAudit( cond )` for postconditions that are expensive or include potentially opaque function calls
 - `gsl_AssertAudit( cond )` for assertions that are expensive or include potentially opaque function calls
 
-The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
+**Example:**
+```c++
+template< class RandomIt >
+auto median( RandomIt first, RandomIt last )
+{
+    gsl_Expects( first != last );
+
+        // Verifying that a range of elements is sorted is an expensive operation that changes the computational complexity
+        // of the function `median()` from 𝒪(1) to 𝒪(n). Therefore, we express it as an audit-level contract check.
+    gsl_ExpectsAudit( std::is_sorted( first, last ) );
+
+    auto count = last - first;
+    return count % 2 != 0
+        ? first[ count / 2 ]
+        : std::midpoint( first[ count / 2 ], first[ count / 2 + 1 ] );
+}
+```
 
 The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of [configuration macros](#contract-checking-configuration-macros):
 
@@ -94,23 +108,27 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
-*gsl-lite* defines the two pointer type annotations `owner<P>` and `not_null<P>` which let the user signify additional intent:
+*gsl-lite* defines the three pointer type annotations `owner<P>`, `not_null<P>`, and `not_null_ic<P>` which let the user signify additional intent:
 
-- `owner<P>` indicates that a pointer `P` carries ownership of the object it points to, and is thus responsible for managing its lifetime.
-- `not_null<P>` indicates that a pointer `P` must not be `nullptr`.
+- `owner<P>` indicates that a raw pointer `P` carries ownership of the object it points to, and is thus responsible for managing its lifetime.
+- `not_null<P>` and `not_null_ic<P>` indicate that a pointer `P` must not be `nullptr`.
 
 ### `owner<>` (C++11 and higher)
 
 `gsl_lite::owner<P>` is a type alias that solely serves the purpose of expressing intent:
 ```c++
 template< class P >
-requires (std::is_pointer_v<P>)
+requires ( std::is_pointer_v<P> )
 using owner = P;
 ```
 (*Note:* The actual definition uses a SFINAE constraint to support C++11 to C++17).
 
 As far as the type system and the runtime behavior is concerned, `owner<P>` is exactly equivalent to `P`. However, the annotation
 conveys intent to a reader, and static analysis tools may use the annotation impose semantic checks based on the assumption of ownership.
+
+If possible, a smart pointer with automatic lifetime management such as [`std::unique_ptr<>`](https://en.cppreference.com/w/cpp/memory/unique_ptr)
+or [`std::shared_ptr<>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) should be used instead. `owner<>` is meant to annotate raw
+pointers which cannot currently be replaced with a smart pointer.
 
 
 ### `not_null<>`
@@ -120,6 +138,8 @@ conveys intent to a reader, and static analysis tools may use the annotation imp
 `not_null<P>` has no default constructor, and its unary constructors use [`gsl_Expects()`](#contract-and-assertion-checking-macros) to check
 that their argument is not `nullptr`. Therefore, when attempting to construct a `not_null<P>` from a null pointer, a runtime contract violation is triggered:
 ```c++
+using gsl_lite::not_null;
+
 int i = 42;
 int * pi = &i;
 int * pn = nullptr;
@@ -133,11 +153,11 @@ not_null<int *> npn = not_null( pn );  // explicit conversion: runtime null chec
 
 #### Motivation
 
-C++ knows two kinds of indirections: pointers and references. A pointer can refer to a special value known as `nullptr`,
+<!--C++ knows two kinds of indirections: pointers and references. A pointer can refer to a special value known as `nullptr`,
 which indicates it does not point to any object, and can be subsequently reassigned. In contrast, references must always
-refer to a valid object, and they can be assigned only once, as part of their initialization.
+refer to a valid object, and they can be assigned only once, as part of their initialization.-->
 
-When defining function signatures, it is therefore customary to use pointers and references to indicate whether an object
+When defining function signatures, it is customary to use pointers and references to indicate whether an object
 reference is required or optional:
 ```c++
 void lock( Mutex & m );  // requires a valid object reference
@@ -148,7 +168,7 @@ struct ListNode
     ListNode* next;
     int payload;
 };
-void remove( ListNode * x );  // also accepts a `nullptr`
+bool tryRemove( ListNode * x );  // also accepts a `nullptr`
 ```
 
 But this convention does not apply to every situation. For example, accepting a pointer argument can also emphasize the fact
@@ -194,11 +214,11 @@ Writing all the precondition checks against `nullptr` quickly becomes tedious. A
 for C++20, precondition checks expressed with `gsl_Expects()` are not part of the function signature, which therefore does
 not convey that it cannot handle `nullptr` input.
 
-This is where `gsl_lite::not_null<>` comes in.  With `not_null<>`, the precondition can be "lifted" into the type system,
+This is where `not_null<>` comes in.  With `not_null<>`, the precondition can be "lifted" into the type system,
 and thus into the function signature:
 
 ```c++
-void remove( gsl_lite::not_null<ListNode*> x )
+void remove( not_null<ListNode*> x )
 {
     if ( x->prev != nullptr ) x->prev->next = x->next;
     delete x;
@@ -210,13 +230,13 @@ that their arguments will never be `nullptr`, and the explicit precondition chec
 
 `not_null<>` can also be used with smart pointers, so the signature of the function `insertAfter()` could be changed to
 ```c++
-void insertAfter( gsl_lite::not_null<ListNode*> x, gsl_lite::not_null<std::unique_ptr<ListNode>> newNode );
+void insertAfter( not_null<ListNode*> x, not_null<std::unique_ptr<ListNode>> newNode );
 ```
 
 
 #### Usage
 
-`not_null<P>` attempts to behave like the underlying type `P` as transparently as reasonably possible:
+`not_null<P>` strives to behave like the underlying type `P` as transparently as reasonably possible:
 
 - There is no runtime size overhead: `sizeof( not_null<P> ) == sizeof( P )`.
 - `not_null<P>` implicitly converts to `Q` if `P` implicitly converts to `Q`.  
@@ -267,13 +287,13 @@ pointer increment or decrement operators, or pointer addition or subtraction ope
 
 To extract the nullable object wrapped by a `not_null<>` object, call `gsl_lite::as_nullable()`:
 ```c++
-auto npi = gsl_lite::make_unique<int>( 42 );  // gsl_lite::not_null<std::unique_ptr<int>>
+auto npi = gsl_lite::make_unique<int>( 42 );  // not_null<std::unique_ptr<int>>
 auto pi = gsl_lite::as_nullable( std::move( npi ) );  // std::unique_ptr<int>
 ```
 
 This is useful when accessing operations of `P` not forwarded by `not_null<P>`:
 ```c++
-void insertAfter( gsl_lite::not_null<ListNode*> x, gsl_lite::not_null<std::unique_ptr<ListNode>> newNode )
+void insertAfter( not_null<ListNode*> x, not_null<std::unique_ptr<ListNode>> newNode )
 {
     newNode->prev = x;
     newNode->next = x->next;
@@ -287,7 +307,7 @@ void insertAfter( gsl_lite::not_null<ListNode*> x, gsl_lite::not_null<std::uniqu
 Because `not_null<P>` retains the copyability and movability of `P`, a `not_null<P>` object may have a *moved-from state* if the
 underlying pointer `P` has one. Therefore, a `not_null<P>` object may in fact be `nullptr` after it has been moved from:
 ```c++
-auto x = gsl_lite::make_unique<int>( 42 );  // gsl_lite::not_null<std::unique_ptr<int>>()
+auto x = gsl_lite::make_unique<int>( 42 );  // not_null<std::unique_ptr<int>>()
 auto y = std::move( x );  // x is now nullptr
 *x = 43;  // dereferencing a nullptr ⇒ runtime contract violation
 ```
@@ -320,13 +340,13 @@ public:
 
 In this class, null checks can be introduced simply by changing the definition of `FilePtr` to
 ```c++
-using FilePtr = gsl_lite::not_null<std::unique_ptr<std::FILE, FileCloser>>;
+using FilePtr = not_null<std::unique_ptr<std::FILE, FileCloser>>;
 ```
 Any code constructing a `FileHandle` will then have to make an explicit `not_null()` check:
 ```c++
 std::FILE* rawFile = std::fopen( ... );
 if ( rawFile == nullptr ) throw std::runtime_error( ... );
-auto file = FileHandle( gsl_lite::not_null( rawFile ) );
+auto file = FileHandle( not_null( rawFile ) );
 ```
 But any function accepting a `FileHandle` can now be sure that the handle is not `nullptr`:
 ```c++
@@ -339,7 +359,7 @@ readLines( FileHandle file )
 ```
 Again, one could say that `not_null<>` "lifts" the precondition of non-nullability into the type system.
 
-Technically, non-nullability is not necessarily an invariant of `gsl_lite::not_null<>`, and thus our redefinition of
+Technically, non-nullability is not necessarily an invariant of `not_null<>`, and thus our redefinition of
 `FilePtr` does not add a non-nullability invariant to `FileHandle`.
 However, because a `nullptr` can appear only in the *moved-from state*, a nullability contract violation
 can occur only if a moved-from object is being used. Because *use-after-move* errors can often be detected by static
@@ -370,7 +390,7 @@ if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
 
 `not_null<>` does not allow implicit conversion from nullable types:
 ```c++
-void use( gsl_lite::not_null<int *> p );
+void use( not_null<int *> p );
 int i;
 //use( &i );  // compile error: no implicit conversion
 use( not_null( &i ) );  // runtime check
@@ -381,16 +401,19 @@ Explicit conversions are needed only when converting a nullable to a non-nullabl
 more and more of a code base is converted to `not_null<>`, fewer explicit conversions need to be used.
 
 However, in some code bases it may not be feasible to insert explicit not-null checks at every invocation
-site. In this case, `not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
+site. In this case, `gsl_lite::_not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
 but defines an unconditionally implicit conversion constructor:
 
 ```c++
-void use( gsl_lite::not_null_ic<int *> p );
+void use( not_null_ic<int *> p );
 int i;
 use( &i );  // runtime check
 ```
 
 `not_null_ic<P>` provides all the run-time checks and guarantees of `not_null<P>`.
+
+(Compatibility note: Microsoft GSL defines the classes `not_null<>` and `strict_not_null<>` which behave
+like *gsl-lite*'s `not_null_ic<>` and `not_null<>`, respectively.)
 
 
 ## Numeric type conversions
@@ -442,9 +465,14 @@ auto at(Container& c, index i)
 ```
 
 
-## Semantic integer types
+## Semantic integer type aliases
 
 `index`, `dim`, `stride`, `diff`
+
+
+## Semantic string type aliases
+
+`zstring`, `czstring`, `wzstring`, `cwzstring`
 
 
 ## Ad-hoc RAII (C++11 and higher)
@@ -484,6 +512,9 @@ Therefore, as a general rule, **do not define, or rely on, any of *gsl-lite*'s c
 
 With the configuration macros described in the following sections, the user can exert fine-grained control over the runtime behavior
 of contract checks expressed with [`gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()` and other contract checking macros](#contract-and-assertion-checks).
+The configuration options for contract violation response follow the suggestions originally suggested in proposal [N4415](http://wg21.link/n4415),
+with some refinements inspired by [P1710](http://wg21.link/P1710)/[P1730](http://wg21.link/P1730).
+
 
 #### Runtime enforcement
 
@@ -627,7 +658,7 @@ contract checks if `NDEBUG` is defined.
   `gsl_Ensures()`, and `gsl_Assert()` should only be used for simple comparisons of scalar values, for simple inlineable getters,
   and for comparisons of class objects with trivially inlineable comparison operators.  
     
-  Example:  
+  Revisiting the [example given above](##contract-and-assertion-checks):  
   ```c++
   template< class RandomIt >
   auto median( RandomIt first, RandomIt last )
@@ -637,9 +668,9 @@ contract checks if `NDEBUG` is defined.
           // of side-effects, and hence generate no code in `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` mode.
       gsl_Expects( first != last );
   
-          // Verifying that a range of elements is sorted may be an expensive operation, and we
-          // cannot trust the compiler to understand that it is free of side-effects, so we use an
-          // audit-level contract check.
+          // If we cannot trust the compiler to understand that this function call is free of side-effects,
+          // we should use `gsl_ExpectsDebug()` or `gsl_ExpectsAudit()`. This particular function call is
+          // expensive, so we use an audit-level contract check.
       gsl_ExpectsAudit( std::is_sorted( first, last ) );
   
       auto count = last - first;

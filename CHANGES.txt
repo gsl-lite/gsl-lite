@@ -57,7 +57,7 @@ The GSL compatibility mode causes no link-time interference between gsl-lite and
 the same project as long as no translation unit includes both at the same time.
 
 The legacy header file `<gsl/gsl-lite.hpp>` now forwards to `<gsl-lite/gsl-lite.hpp>` and implicitly enables the GSL
-compatibility mode. When the legacy header is included, it emits a warning message which urges to either migrate to header
+compatibility mode. When the legacy header is included, it emits a warning message that urges to either migrate to header
 `<gsl-lite/gsl-lite.hpp>`, namespace `gsl_lite` and the prefixed contract checking macros `gsl_Expects()` and `gsl_Ensures()`,
 or to explicitly request GSL compatibility by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
 
