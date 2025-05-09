@@ -90,7 +90,7 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
     - [Motivation](#motivation)
     - [Usage](#usage)
     - [Nullability and the moved-from state](#nullability-and-the-moved-from-state)
-- [`not_null_ic<>`](#not_null__ic)
+- [`not_null_ic<>`](#not_null_ic)
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
@@ -709,7 +709,7 @@ Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to incl
 Define this to 1 to explicitly acknowledge that you are using *gsl-lite* with a non-standard ABI and that you control the build flags of all components linked into your target.
 **Default is 0.**
 
-### `gsl_api`
+#### `gsl_api`
 
 Functions in *gsl-lite* are decorated with `gsl_api` where appropriate. **By default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform.**
 Define this macro to specify your own function decoration. 
@@ -717,7 +717,7 @@ Define this macro to specify your own function decoration.
 **NOTE:** When a custom `gsl_api` macro is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
-### `gsl_CPLUSPLUS`
+#### `gsl_CPLUSPLUS`
 Define this macro to override the auto-detection of the supported C++ standard if your compiler does not set the `__cplusplus` macro correctly.
 
 #### `gsl_CONFIG_DEPRECATE_TO_LEVEL=9`

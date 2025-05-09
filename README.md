@@ -52,10 +52,10 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Documentation
 
-- [Installation and use](doc/Getting-started.md)
-    - [Getting started](doc/Getting-started.md#getting-started)
-    - [Migration guide](doc/Getting-started.md#migration-guide)
-    - [Reported to work with](doc/Getting-started.md#reported-to-work-with)
+- [Installation and use](doc/Installation-and-use.md):
+    - [Getting started](doc/Installation-and-use.md#getting-started)
+    - [Migration guide](doc/Installation-and-use.md#migration-guide)
+    - [Reported to work with](doc/Installation-and-use.md#reported-to-work-with)
     - [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
 - [Features](doc/Features.md):
     - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
