@@ -20,8 +20,6 @@ project(
 )
 message( STATUS "Project '${PROJECT_NAME}', version: '${${PROJECT_NAME}_VERSION}'" )
 
-list( APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" )
-
 # Define build options.
 # Do not build tests or examples by default.
 option( GSL_LITE_OPT_BUILD_TESTS                 "Build and perform gsl-lite tests"                 OFF )
@@ -49,7 +47,7 @@ if ( GSL_LITE_OPT_BUILD_EXAMPLES )
 endif()
 
 # Install.
-include( InstallBasicPackageFiles )
+include( cmake/InstallBasicPackageFiles.cmake )
 install_basic_package_files( gsl-lite
     COMPATIBILITY SameMajorVersion
     ARCH_INDEPENDENT
