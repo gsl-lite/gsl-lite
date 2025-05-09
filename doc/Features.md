@@ -39,8 +39,9 @@ auto median( RandomIt first, RandomIt last )
 {
     gsl_Expects( first != last );
 
-        // Verifying that a range of elements is sorted is an expensive operation that changes the computational complexity
-        // of the function `median()` from 𝒪(1) to 𝒪(n). Therefore, we express it as an audit-level contract check.
+        // Verifying that a range of elements is sorted is an expensive operation that changes the
+        // computational complexity of the function `median()` from 𝒪(1) to 𝒪(n). Therefore, we
+        // express it as an audit-level contract check.
     gsl_ExpectsAudit( std::is_sorted( first, last ) );
 
     auto count = last - first;
@@ -486,10 +487,118 @@ auto at(Container& c, index i)
 
 (Feature checking macros are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
+Name                                    | Notes           |
+---------------------------------------:|:----------------|
+**Language and library support:**       | &nbsp;          |
+`gsl_CPPxx_OR_GREATER`                  | Whether C++xx language features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
+`gsl_STDLIB_CPPXX_OR_GREATER`           | Whether C++xx standard library features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
+**Compiler version detection:**       | &nbsp;          |
+`gsl_BETWEEN( V, L, H )`                | V ≥ L and V < H |
+`gsl_COMPILER_GNUC_VERSION`             | Evaluates to version number when compiled with GNU GCC, or 0 otherwise |
+`gsl_COMPILER_CLANG_VERSION`            | Evaluates to version number when compiled with Clang, or 0 otherwise |
+`gsl_COMPILER_MSVC_VERSION`             | Evaluates to version number when compiled with Microsoft Visual C++, or 0 otherwise |
+`gsl_COMPILER_APPLECLANG_VERSION`       | Evaluates to version number when compiled with Apple Clang, or 0 otherwise |
+`gsl_COMPILER_NVCC_VERSION`             | Evaluates to version number when compiled with NVIDIA NVCC, or 0 otherwise |
+`gsl_COMPILER_ARMCC_VERSION`            | Evaluates to version number when compiled with ARMCC, or 0 otherwise |
+`gsl_DEVICE_CODE`                       | Whether CUDA device code is being compiled |
+`gsl_HAVE( xx )`                        | Whether C++ language or library feature `xx` is available |
+**Language features:**                  | &nbsp;          |
+macro:                                  | determines availability of:                    |
+`gsl_HAVE( C99_PREPROCESSOR )`          | C99-compatible [preprocessor](https://en.cppreference.com/w/c/preprocessor) |
+`gsl_HAVE( AUTO )`                      | [`auto`](https://en.cppreference.com/w/cpp/language/auto) (C++11) |
+`gsl_HAVE( RVALUE_REFERENCE )`          | [rvalue references](https://en.cppreference.com/w/cpp/language/reference) (C++11) |
+`gsl_HAVE( FUNCTION_REF_QUALIFIER )`    | [ref-qualified member functions](https://en.cppreference.com/w/cpp/language/member_functions) (C++11) |
+`gsl_HAVE( ENUM_CLASS )`                | [`enum class`](https://en.cppreference.com/w/cpp/language/enum) (C++11) |
+`gsl_HAVE( ALIAS_TEMPLATE )`            | [alias templates](https://en.cppreference.com/w/cpp/language/type_alias) (C++11) |
+`gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )` | [default template arguments for function templates](https://en.cppreference.com/w/cpp/language/function_template) (C++11) |
+`gsl_HAVE( EXPLICIT )`                  | [`explicit`](https://en.cppreference.com/w/cpp/language/explicit) specifier (C++11) |
+`gsl_HAVE( VARIADIC_TEMPLATE )`         | [variadic templates](https://en.cppreference.com/w/cpp/language/pack) (C++11) |
+`gsl_HAVE( IS_DELETE )`                 | [deleted functions](https://en.cppreference.com/w/cpp/keyword/delete) (C++11) |
+`gsl_HAVE( IS_DEFAULT )`                | [explicitly defaulted functions](https://en.cppreference.com/w/cpp/keyword/default) (C++11) |
+`gsl_HAVE( NOEXCEPT )`                  | [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) specifier and [`noexcept()`](https://en.cppreference.com/w/cpp/language/noexcept) operator (C++11) |
+`gsl_HAVE( NORETURN )`                  | [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute (C++11) |
+`gsl_HAVE( EXPRESSION_SFINAE )`         | [expression SFINAE](https://en.cppreference.com/w/cpp/language/sfinae) |
+`gsl_HAVE( OVERRIDE_FINAL )`            | [`override`](https://en.cppreference.com/w/cpp/language/override) and [`final`](https://en.cppreference.com/w/cpp/language/final) specifiers (C++11) |
+`gsl_HAVE( DECLTYPE_AUTO )`             | [`decltype(auto)`](https://en.cppreference.com/w/cpp/language/decltype) (C++11) |
+`gsl_HAVE( DEPRECATED )`                | [`[[deprecated]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute (C++11) |
+`gsl_HAVE( ENUM_CLASS_CONSTRUCTION_FROM_UNDERLYING_TYPE )` | constructing `enum class` from the underlying type (C++17) |
+`gsl_HAVE( DEDUCTION_GUIDES )`          | [`class template argument deduction`](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction) guides (C++17) |
+`gsl_HAVE( NODISCARD )`                 | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute (C++17) |
+`gsl_HAVE( MAYBE_UNUSED )`              | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute (C++17) |
+`gsl_HAVE( CONSTEXPR_11 )`              | C++11 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+`gsl_HAVE( CONSTEXPR_14 )`              | C++14 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+`gsl_HAVE( CONSTEXPR_17 )`              | C++17 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+`gsl_HAVE( CONSTEXPR_20 )`              | C++20 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+`gsl_HAVE( CONSTEXPR_23 )`              | C++23 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+`gsl_HAVE( CONSTEXPR_26 )`              | C++26 [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features |
+**Standard library features:**          | &nbsp;          |
+macro:                                  | determines availability of:                    |
+`gsl_HAVE( ADDRESSOF )`                 | [`std::addressof()`](https://en.cppreference.com/w/cpp/memory/addressof) (C++11) |
+`gsl_HAVE( ARRAY )`                     | [`std::array<>`](https://en.cppreference.com/w/cpp/container/array) (C++11) |
+`gsl_HAVE( TYPE_TRAITS )`               | [`<type_traits>`](https://en.cppreference.com/w/cpp/header/type_traits) header (C++11) |
+`gsl_HAVE( TR1_TYPE_TRAITS )`           | `<tr1/type_traits>` header |
+`gsl_HAVE( CONTAINER_DATA_METHOD )`     | `data()` member function on containers |
+`gsl_HAVE( STD_DATA )`                  | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
+`gsl_HAVE( STD_SSIZE )`                 | [`std::ssize()`](https://en.cppreference.com/w/cpp/iterator/size) (C++20) |
+`gsl_HAVE( HASH )`                      | [`std::hash<>`](https://en.cppreference.com/w/cpp/utility/hash) (C++11) |
+`gsl_HAVE( SIZED_TYPES )`               | [sized integer type aliases]() (C++11) |
+`gsl_HAVE( SHARED_PTR )`                | [`std::shared_ptr<>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) (C++11) |
+`gsl_HAVE( UNIQUE_PTR )`                | [`std::unique_ptr<>`](https://en.cppreference.com/w/cpp/memory/unique_ptr) (C++11) |
+`gsl_HAVE( MAKE_SHARED )`               | [`std::make_shared<>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) (C++11) |
+`gsl_HAVE( MAKE_UNIQUE )`               | [`std::make_unique<>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) (C++14) |
+`gsl_HAVE( MOVE_FORWARD )`              | [`std::move()`](https://en.cppreference.com/w/cpp/utility/move) and [`std::forward<>()`](https://en.cppreference.com/w/cpp/utility/forward) (C++11) |
+`gsl_HAVE( NULLPTR )`                   | [`nullptr`](https://en.cppreference.com/w/cpp/language/nullptr) keyword (C++11) |
+`gsl_HAVE( UNCAUGHT_EXCEPTIONS )`       | [`std::uncaught_exceptions()`](https://en.cppreference.com/w/cpp/error/uncaught_exception) (C++17) |
+`gsl_HAVE( INITIALIZER_LIST )`          | [`std::initializer_list<>`](https://en.cppreference.com/w/cpp/utility/initializer_list) (C++11) |
+`gsl_HAVE( REMOVE_CVREF )`              | [`std::remove_cvref<>`](https://en.cppreference.com/w/cpp/types/remove_cvref) (C++20) |
+
 
 ## Polyfills
 
 (Polyfills are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+
+### Macros
+
+Name                        | Notes           |
+---------------------------:|:----------------|
+`gsl_constexpr`             | Expands to `constexpr` in C++11 and higher, to nothing otherwise |
+`gsl_constexprXX`           | Expands to `constexpr` in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
+`gsl_explicit`              | Expands to `explicit` in C++11 and higher, to nothing otherwise |
+`gsl_is_delete`             | Expands to `= delete` in C++11 and higher, to nothing otherwise |
+`gsl_is_delete_access`      | Expands to `public` in C++11 and higher, to `private` otherwise |
+`gsl_noexcept`              | Expands to `noexcept` specifier in C++11 and higher, to nothing otherwise |
+`gsl_noexcept_if( expr )`   | Expands to `noexcept( expr )` operator in C++11 and higher, to nothing otherwise |
+`gsl_nullptr`               | Expands to `nullptr` in C++11 and higher, to `NULL` otherwise |
+`gsl_NORETURN`              | Expands to `[[noreturn]]` attribute in C++11 and higher, to a compiler-specific attribute if available, or to nothing otherwise |
+`gsl_DEPRECATED`            | Expands to `[[deprecated]]` attribute in C++14 and higher, to nothing otherwise |
+`gsl_DEPRECATED_MSG( msg )` | Expands to `[[deprecated( msg )]]` attribute in C++14 and higher, to nothing otherwise |
+`gsl_NODISCARD`             | Expands to `[[nodiscard]]` attribute in C++17 and higher, to nothing otherwise |
+`gsl_MAYBE_UNUSED`          | Expands to `[[maybe_unused]]` attribute in C++17 and higher, or to nothing otherwise |
+`gsl_MAYBE_UNUSED_MEMBER`   | Expands to `[[maybe_unused]]` attribute in C++17 and higher for compilers other than GNU GCC, or to nothing otherwise |
+`gsl_NO_UNIQUE_ADDRESS` <nobr>(≥ C++20)</nobr> | expands to `[[msvc::no_unique_address]]` for MSVC, to `[[no_unique_address]]` otherwise |
+`gsl_DEFINE_ENUM_BITMASK_OPERATORS( e )` | Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the enum type `e` |
+`gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( e )` | Defines relational operators (`<=>` in C++20 and newer, `<`, `>`, `<=`, and `>=` otherwise) for the enum type `e` |
+
+### Types and functions
+
+Name                                    | C++ feature     |
+---------------------------------------:|:----------------|
+`std11::add_const<>`                    | [`std::add_const<>`](https://en.cppreference.com/w/cpp/types/add_cv) (C++11) |
+`std11::remove_const<>`<br>`std11::remove_volatile<>`<br>`std11::remove_cv<> | [`std::remove_const<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_volatile<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_cv<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11) |
+`std11::remove_reference<>`             | [`std::remove_reference<>`](https://en.cppreference.com/w/cpp/types/remove_reference) (C++11) |
+`std11::integral_constant<>`<br>`std11::true_type`<br>`std11::false_type`<br>`std17::bool_constant<>`| [`std::integral_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::true_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::false_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::bool_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++17) |
+`std14::make_unique<>()`                | [`std::make_unique<>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) (C++14) |
+`std11::uncaught_exceptions()` (sic)    | [`std::uncaught_exceptions()`](https://en.cppreference.com/w/cpp/error/uncaught_exception) (C++17) |
+`std17::negation<>`                     | [`std::negation<>`](https://en.cppreference.com/w/cpp/types/negation) (C++17) |
+`std17::conjunction<>` (≥ C\+\+11)      | [`std::conjunction<>`](https://en.cppreference.com/w/cpp/types/conjunction) (C++17) |
+`std17::disjunction<>` (≥ C\+\+11)      | [`std::disjunction<>`](https://en.cppreference.com/w/cpp/types/disjunction) (C++17) |
+`std17::void_t<>` (≥ C\+\+11)           | [`std::void_t<>`](https://en.cppreference.com/w/cpp/types/void_t) (C++17) |
+`std17::size()`<br>`std20::ssize()`     | [`std::size()`](https://en.cppreference.com/w/cpp/iterator/size) (C++17)<br>[`std::ssize()`](https://en.cppreference.com/w/cpp/iterator/size) (C++20) |
+`std17::data()                          | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
+`std20::endian`                         | [`std::endian`](https://en.cppreference.com/w/cpp/types/endian) (C++20) |
+`std20::type_identity<>`                | [`std::type_identity<>`](https://en.cppreference.com/w/cpp/types/type_identity) (C++20) |
+`std20::identity`                       | [`std::identity`](https://en.cppreference.com/w/cpp/utility/functional/identity) (C++20) |
+`std20::remove_cvref<>`                 | [`std::remove_cvref<>`](https://en.cppreference.com/w/cpp/types/remove_cvref) (C++20) |
 
 
 ## Configuration options and switches
@@ -664,13 +773,13 @@ contract checks if `NDEBUG` is defined.
   auto median( RandomIt first, RandomIt last )
   {
           // Comparing iterators for equality boils down to a comparison of pointers. An optimizing
-          // compiler will inline the comparison operator and understand that the comparison is free
-          // of side-effects, and hence generate no code in `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` mode.
+          // compiler will inline the comparison operator and understand that the comparison is free of
+          // side-effects, and hence generate no code in `gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME` mode.
       gsl_Expects( first != last );
   
-          // If we cannot trust the compiler to understand that this function call is free of side-effects,
-          // we should use `gsl_ExpectsDebug()` or `gsl_ExpectsAudit()`. This particular function call is
-          // expensive, so we use an audit-level contract check.
+          // If we cannot trust the compiler to understand that this function call is free of
+          // side-effects, we should use `gsl_ExpectsDebug()` or `gsl_ExpectsAudit()`. This particular
+          // function call is expensive, so we use an audit-level contract check.
       gsl_ExpectsAudit( std::is_sorted( first, last ) );
   
       auto count = last - first;
