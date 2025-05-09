@@ -8,7 +8,7 @@
 
 ***gsl-lite*** is a portable, single-file, header-only library for defensive programming based on the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) specification.
 
-**Example:**
+**Example code:**
 ```c++
 #include <memory>
 #include <utility>
@@ -42,10 +42,8 @@ consumeResource(
 *gsl-lite* strives to implement the [Guidelines Support Library specification](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) of the C++ Core Guidelines
 maintained by the [Standard C++ Foundation](https://isocpp.org/).
 The library is originally based on [Microsoft GSL](https://github.com/microsoft/gsl) and was adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20, or C++23.
-*gsl-lite* does not interfere with Microsoft GSL since both libraries live in different namespaces (`gsl_lite` vs. `gsl`) and employ different macro prefixes (`gsl_` vs. `GSL_`).
 
-We take care to support older compiler versions (see: [Reported to work with](#reported-to-work-with)) and older revisions of the C++ standard,
-which makes *gsl-lite* useful in modernizing and hardening legacy codebases.
+*gsl-lite* does not interfere with Microsoft GSL since both libraries live in different namespaces (`gsl_lite` vs. `gsl`) and employ different macro prefixes (`gsl_` vs. `GSL_`).
 
 *gsl-lite* recognizes when it is compiled for the CUDA platform and decorates some functions with `__host__` and `__device__` accordingly.
 
@@ -54,21 +52,21 @@ which makes *gsl-lite* useful in modernizing and hardening legacy codebases.
 
 ## Documentation
 
-- [Installation and use](doc/Installation and use.md)
-    - [Getting started](doc/Installation and use.md#getting-started)
-    - [Migration guide](doc/Installation and use.md#migration-guide)
-    - [Reported to work with](doc/Installation and use.md#reported-to-work-with)
+- [Installation and use](doc/Getting-started.md)
+    - [Getting started](doc/Getting-started.md#getting-started)
+    - [Migration guide](doc/Getting-started.md#migration-guide)
+    - [Reported to work with](doc/Getting-started.md#reported-to-work-with)
     - [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
 - [Features](doc/Features.md):
     - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
-    - [Pointer annotations](doc/Features.md#pointer-annotations): `not_null<P>` and `owner<P>`
+    - [Pointer annotations](doc/Features.md#pointer-annotations): `owner<P>`, `not_null<P>`, and `not_null_ic<P>`
     - [Numeric type conversions](doc/Features.md#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
     - [Safe contiguous ranges](doc/Features.md#safe-contiguous-ranges): `span<T, Extent>`
     - [Bounds-checked element access](doc/Features.md#bounds-checked-element-access): `at()`
     - [Semantic integer types](doc/Features.md#semantic-integer-types): `index`, `dim`, `stride`, `diff`
-    - [Ad-hoc RAII](doc/Features.md#ad-hoc-raii): `finally()`, `on_return()`, and `on_error()`
-    - [**Feature checking macros**](doc/Features.md#feature-checking-macros)
-    - [**Polyfills**](doc/Features.md#polyfills)
+    - [Ad-hoc RAII (C++11 and higher)](doc/Features.md#ad-hoc-raii-c11-and-higher): `finally()`, `on_return()`, and `on_error()`
+    - [Feature checking macros](doc/Features.md#feature-checking-macros)
+    - [Polyfills](doc/Features.md#polyfills)
     - [Configuration options and switches](doc/Features.md#configuration-options-and-switches)
     - [Configuration changes, deprecated and removed features](doc/Features.md#configuration-changes-deprecated-and-removed-features)
 - [Dependencies](#dependencies)
@@ -92,7 +90,7 @@ commits in the `master` branch, that is, anything added since the last tagged re
 
 A minor-version release will be compatible (in both ABI and API) with the previous minor-version release. Thus, once a change is released, it becomes part of the API.
 
-Some of the [configuration options](#configuration-options) may affect the API and ABI of *gsl-lite*.
+Some of the [configuration options](doc/Features.md#configuration-options-and-switches) may affect the API and ABI of *gsl-lite*.
 
 
 ## License

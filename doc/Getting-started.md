@@ -67,7 +67,7 @@ Starting with v1.0, *gsl-lite* now lives in the single header file `<gsl-lite/gs
 `gsl_lite`. By default, *gsl-lite* no longer defines a namespace `gsl` or the unprefixed `Expects()` and `Ensures()` macros for
 precondition and postcondition checking.
 
-This change enables coexistence with [Microsoft GSL](https://github.com/microsoft/GSL) or other GSL implementations. (#194)
+This change enables coexistence with [Microsoft GSL](https://github.com/microsoft/GSL) or other GSL implementations. (https://github.com/gsl-lite/gsl-lite/issues/194)
 
 ### Adapting your code
 

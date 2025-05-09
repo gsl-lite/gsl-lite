@@ -2,14 +2,14 @@
 
 **Contents:**  
 - [Contract and assertion checks](#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
-- [Pointer annotations](#pointer-annotations): `not_null<P>` and `owner<P>`
+- [Pointer annotations](#pointer-annotations): `owner<P>`, `not_null<P>`, and `not_null_ic<P>`
 - [Numeric type conversions](#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
 - [Safe contiguous ranges](#safe-contiguous-ranges): `span<T, Extent>`
 - [Bounds-checked element access](#bounds-checked-element-access): `at()`
 - [Semantic integer types](#semantic-integer-types): `index`, `dim`, `stride`, `diff`
-- [Ad-hoc RAII](#ad-hoc-raii): `finally()`, `on_return()`, and `on_error()`
-- [**Feature checking macros**](#feature-checking-macros)
-- [**Polyfills**](#polyfills)
+- [Ad-hoc RAII (C++11 and higher)](#ad-hoc-raii-c11-and-higher): `finally()`, `on_return()`, and `on_error()`
+- [Feature checking macros](#feature-checking-macros)
+- [Polyfills](#polyfills)
 - [Configuration options and switches](#configuration-options-and-switches)
 - [Configuration changes, deprecated and removed features](#configuration-changes-deprecated-and-removed-features)
 
@@ -36,7 +36,7 @@ There are several macros for expressing preconditions, postconditions, and invar
 
 The macros `Expects()` and `Ensures()` are also provided as aliases for `gsl_Expects()` and `gsl_Ensures()`.
 
-The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of configuration macros:
+The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of [configuration macros](#contract-checking-configuration-macros):
 
 - The macros **`gsl_Expects()`**, **`gsl_Ensures()`**, and **`gsl_Assert()`** are compiled to runtime checks unless contract
   checking is disabled with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
@@ -85,11 +85,12 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 
 ## Pointer annotations
 
-- [`owner<>` (C++11 and higher)](#TODO)
+- [`owner<>` (C++11 and higher)](#owner-c11-and-higher)
 - [`not_null<>`](#not_null)
     - [Motivation](#motivation)
     - [Usage](#usage)
     - [Nullability and the moved-from state](#nullability-and-the-moved-from-state)
+- [`not_null_ic<>`](#not_null__ic)
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
@@ -106,7 +107,7 @@ template< class P >
 requires (std::is_pointer_v<P>)
 using owner = P;
 ```
-(NOTE: The actual definition uses a SFINAE constraint to support C++11 to C++17).
+(*Note:* The actual definition uses a SFINAE constraint to support C++11 to C++17).
 
 As far as the type system and the runtime behavior is concerned, `owner<P>` is exactly equivalent to `P`. However, the annotation
 conveys intent to a reader, and static analysis tools may use the annotation impose semantic checks based on the assumption of ownership.
@@ -286,13 +287,13 @@ void insertAfter( gsl_lite::not_null<ListNode*> x, gsl_lite::not_null<std::uniqu
 Because `not_null<P>` retains the copyability and movability of `P`, a `not_null<P>` object may have a *moved-from state* if the
 underlying pointer `P` has one. Therefore, a `not_null<P>` object may in fact be `nullptr` after it has been moved from:
 ```c++
-auto x = gsl_lite::make_unique<int>( 42 );  // gsl::not_null<std::unique_ptr<int>>()
+auto x = gsl_lite::make_unique<int>( 42 );  // gsl_lite::not_null<std::unique_ptr<int>>()
 auto y = std::move( x );  // x is now nullptr
 *x = 43;  // dereferencing a nullptr ⇒ runtime contract violation
 ```
 This is where *gsl-lite*'s implementation of `not_null<>` differs from the implementation of Microsoft GSL, which ensures that
 its `not_null<P>` cannot ever become `nullptr`, rendering its `not_null<std::unique_ptr<T>>` immovable (cf. [microsoft/GSL#1022](https://github.com/microsoft/GSL/issues/1022)).
-While this choice would prevent the error above, it inhibits many interesting use cases for the existence of a moved-from state.
+While this choice would prevent the error above, it inhibits many interesting use cases for `not_null<>`.
 For example, consider the following resource handle class:
 
 ```c++
@@ -342,11 +343,12 @@ Technically, non-nullability is not necessarily an invariant of `gsl_lite::not_n
 `FilePtr` does not add a non-nullability invariant to `FileHandle`.
 However, because a `nullptr` can appear only in the *moved-from state*, a nullability contract violation
 can occur only if a moved-from object is being used. Because *use-after-move* errors can often be detected by static
-analysis tools, this may be considered "safe enough" for practical purposes. Also, `not_null<>` enforces a
-runtime contract check on every access to a movable `not_null<>` object. Therefore, when calling the `getc()`
-member function on a moved-from `FileHandle` object, a runtime contract violation would be triggered on the
-`file_.get()` call. This means that, through adopting `not_null<>`, `FileHandle::getc()` gets the implicit
-precondition that the object be not in the moved-from state.
+analysis tools, this may be considered "safe enough" for practical purposes.
+
+It should be noted that, for movable types `P`, `not_null<P>` enforces a runtime contract check on every access.
+Therefore, when calling the `getc()` member function on a moved-from `FileHandle` object, a runtime contract violation
+would be triggered on the `file_.get()` call. This means that, through adopting `not_null<>`, `FileHandle::getc()`
+adopts the implicit precondition that the object be not in the moved-from state.
 
 (Recommended further reading: Herb Sutter's article ["Move, simply"](https://herbsutter.com/2020/02/17/move-simply/),
 which argues that objects that have a special moved-from state in which most of their operations may not be used
@@ -358,7 +360,7 @@ If you have to check for the moved-from state, use the `gsl_lite::is_valid()` pr
 auto npi = gsl_lite::make_unique<int>( 42 );
 // ...
 //if (npi == nullptr) { ... }  // compile error
-if ( !gsl_lite::is_valid( npi) ) { ... }  // ok
+if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
 ```
 
 
@@ -374,7 +376,7 @@ int i;
 use( not_null( &i ) );  // runtime check
 ```
 
-This choice has the generally desirable consequence that it encourages promulgation of non-nullability.
+This choice has the generally desirable consequence that it encourages propagation of non-nullability.
 Explicit conversions are needed only when converting a nullable to a non-nullable pointer; therefore, as
 more and more of a code base is converted to `not_null<>`, fewer explicit conversions need to be used.
 
@@ -395,9 +397,9 @@ use( &i );  // runtime check
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-- [`narrow<T>(U)`](#narrow-t-u)
-- [`narrow_failfast<T>(U)`](#narrow_failfast-t-u)
-- [`narrow_cast<T>(U)`](#narrow_cast-t-u)
+- [`narrow<T>(U)`](#narrowtu)
+- [`narrow_failfast<T>(U)`](#narrow_failfasttu)
+- [`narrow_cast<T>(U)`](#narrow_casttu)
 
 ### `narrow<T>(U)`
 
@@ -417,7 +419,7 @@ use( &i );  // runtime check
 
 *gsl-lite* defines a class `span<T, Extent>` that represents a contiguous sequence of objects. The interface
 of `span<>` is identical to that of [`std::span<>`](https://en.cppreference.com/w/cpp/container/span),
-but all operations in *gsl-lite*'s `span<>` use [`gsl_Expects()`](#contract-and-assertion-checking-macros) to
+but all operations in *gsl-lite*'s `span<>` use [`gsl_Expects()`](#contract-and-assertion-checks) to
 check their preconditions at runtime. `span<>::iterator` also verifies the preconditions of all its operations
 with `gsl_ExpectsDebug()`.
 
@@ -445,7 +447,7 @@ auto at(Container& c, index i)
 `index`, `dim`, `stride`, `diff`
 
 
-## Ad-hoc RAII
+## Ad-hoc RAII (C++11 and higher)
 
 (cf. [RAII](https://en.cppreference.com/w/cpp/language/raii))
 
@@ -481,9 +483,9 @@ Therefore, as a general rule, **do not define, or rely on, any of *gsl-lite*'s c
 ### Contract checking configuration macros
 
 With the configuration macros described in the following sections, the user can exert fine-grained control over the runtime behavior
-of contract checks expressed with [`gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()` and other contract checking macros](Contract and assertion checks).
+of contract checks expressed with [`gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()` and other contract checking macros](#contract-and-assertion-checks).
 
-#### Configuring runtime enforcement
+#### Runtime enforcement
 
 The following macros control whether contracts are checked at runtime:
 
@@ -525,7 +527,7 @@ The following macros can be used to selectively disable checking for a particula
   Define this macro to disable runtime checking of assertions expressed with `gsl_Assert()`, `gsl_AssertDebug()`, and `gsl_AssertAudit()`.
 
 
-#### Configuring contract violation handling
+#### Contract violation handling
 
 The following macros control the handling of runtime contract violations:
 
@@ -553,14 +555,14 @@ The following macros control the handling of runtime contract violations:
   catastrophic failure and may be difficult to diagnose for some platforms.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_THROWS`**  
-  Define this macro to throw a `std::runtime_error`-derived exception `gsl::fail_fast` on contract violation.  
+  Define this macro to throw a `std::runtime_error`-derived exception `gsl_lite::fail_fast` on contract violation.  
   Handling contract violations with exceptions can be desirable when executing in an interactive programming environment, or if
   there are other reasons why process termination must be avoided.  
     
   This setting is also useful for writing unit tests that exercise contract checks.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
-  Define this macro to call a user-defined handler function `gsl::fail_fast_assert_handler()` on a contract violation.
+  Define this macro to call a user-defined handler function `gsl_lite::fail_fast_assert_handler()` on a contract violation.
   The user must provide a definition of the following function:
   ```c++
   namespace gsl_lite_ {
@@ -582,7 +584,7 @@ The following macros control the handling of runtime contract violations:
   - `gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER` → `gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER`
 
 
-#### Configuring unenforced contract checks
+#### Unenforced contract checks
 
 The following macros control what happens with individual contract checks which are not enforced at runtime. Note that these
 macros do not disable runtime contract checking; they only configure what happens to contracts which are not checked as a result
@@ -657,7 +659,7 @@ contract checks if `NDEBUG` is defined.
 #### `gsl_FEATURE_GSL_COMPATIBILITY_MODE=0`
 
 To minimize the impact of the breaking changes, *gsl-lite* introduces an optional *GSL compatibility mode* controlled by the new configuration switch
-[`gsl_FEATURE_GSL_COMPATIBILITY_MODE`](TODO), which is is disabled by default and can be enabled by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
+`gsl_FEATURE_GSL_COMPATIBILITY_MODE`, which is is disabled by default and can be enabled by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
 **Default is 0.**
 
 If the GSL compatibility mode is enabled, *gsl-lite* additionally makes the following global definitions:
@@ -719,7 +721,7 @@ The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NON
 Define this macro to override the auto-detection of the supported C++ standard if your compiler does not set the `__cplusplus` macro correctly.
 
 #### `gsl_CONFIG_DEPRECATE_TO_LEVEL=9`
-Define this to and including the level you want deprecation; see table [Deprecation](#deprecation) below. **Default is 9.**
+Define this to and including the level you want deprecation; see table [Deprecated features](#deprecated-features) below. **Default is 9.**
 
 #### `gsl_CONFIG_SPAN_INDEX_TYPE=std::size_t`
 Define this macro to the type to use for indices in `span<>` and `basic_string_span<>`. **Default is `std::size_t`.**
@@ -728,7 +730,7 @@ Define this macro to the type to use for indices in `span<>` and `basic_string_s
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_INDEX_TYPE=std::ptrdiff_t`
-Define this macro to the type to use for `gsl::index`. **Default is `std::ptrdiff_t`.**
+Define this macro to the type to use for `gsl_lite_::index`. **Default is `std::ptrdiff_t`.**
 
 **NOTE:** When a custom index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
@@ -755,7 +757,7 @@ Define this macro to 1 to support equality comparison and relational comparison 
 #### `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=0`
 Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. **Default is 0.**
 
-Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl::with_container, cont)`.
+Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite_::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=1`
 If this macro is 1, `narrow<>()` always throws a `narrowing_error` exception if the narrowing conversion loses information due to truncation.
@@ -796,7 +798,7 @@ Define this macro to 1 to experience the by-design compile-time errors of the GS
   - [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type):  
     Version-1 default: `std::ptrdiff_t`  
     Version-0 default: `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`)  
-    Reason: the GSL specifies `gsl::index` to be a signed type.
+    Reason: the GSL specifies `gsl_lite::index` to be a signed type.
 
   - [`gsl_CONFIG_ALLOWS_SPAN_COMPARISON`](#gsl_config_allows_span_comparison0):  
     Version-1 default: `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=0`  
@@ -832,10 +834,9 @@ The following features are deprecated since the indicated version. See macro [`g
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
  1.0.0  |   9   | `span<>::as_span<>()` (unsafe) |
-0.41.0  |   7   | `basic_string_span<>`, `basic_zstring_span<>` and related aliases |
-0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY` |
-&nbsp;  |&nbsp; | Use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` |
-0.7.0   | `gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR`<br>(use `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR` instead,<br>or consider `span(with_container, cont)`) |
+0.41.0  |   7   | `basic_string_span<>`, `basic_zstring_span<>` and related aliases<br>(no longer part of the C++ Core Guidelines specification) |
+0.35.0  |   -   | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY`<br>(use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, &nbs;`gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` instead) |
+0.7.0   |   -   | `gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR`<br>(use `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR` instead,<br>or consider `span(with_container, cont)`) |
 
 
 ### Removed features
@@ -848,7 +849,7 @@ Version | Feature / Notes |
 &nbsp;  | `Owner()` and `implicit` macros |
 &nbsp;  | `basic_string_span<>`, `basic_zstring_span<>` and related aliases |
 &nbsp;  | `as_writeable_bytes()`, call indexing for spans, and `span::at()` |
-&nbsp;  | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY`<br>(use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, &nbs;`gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` instead) |
+&nbsp;  | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY`<br>(use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` instead) |
 &nbsp;  | `span( std::nullptr_t, index_type )`<br>(`span( pointer, index_type )` is called instead) |
 &nbsp;  | `span( U *, index_type )`<br>(`span( pointer, index_type )` is called instead) |
 &nbsp;  | `span( std::shared_ptr<T> const & p )` |
