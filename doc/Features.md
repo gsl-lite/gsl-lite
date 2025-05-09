@@ -421,20 +421,52 @@ like *gsl-lite*'s `not_null_ic<>` and `not_null<>`, respectively.)
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-- [`narrow<T>(U)`](#narrowtu)
-- [`narrow_failfast<T>(U)`](#narrow_failfasttu)
-- [`narrow_cast<T>(U)`](#narrow_casttu)
+- [`narrow<T>( U )`](#narrowt-u)
+- [`narrow_failfast<T>( U )`](#narrow_failfastt-u)
+- [`narrow_cast<T>( U )`](#narrow_castt-u)
 
-### `narrow<T>(U)`
+### `narrow<T>( U )`
+
+**Example:**
+```c++
+float sum( gsl_lite::span<float const> values )
+{
+    gsl_Expects( !values.empty() );
+
+    double result = std::accumulate( values.begin(), values.end(), 0. );
+    return gsl_lite::narrow<float>( result );
+}
+```
 
 
+### `narrow_failfast<T>( U )`
 
-### `narrow_failfast<T>(U)`
+(`narrow_failfast<T>( U )` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
-(`narrow_failfast<T>(U)` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+**Example:**
+```c++
+float mean( gsl_lite::span<float const> values )
+{
+    gsl_Expects( !values.empty() );
+
+    double sum = std::accumulate( values.begin(), values.end(), 0. );
+    double result = sum / std::ssize( values );
+    return gsl_lite::narrow_failfast<float>( result );
+}
+```
 
 
-### `narrow_cast<T>(U)`
+### `narrow_cast<T>( U )`
+
+**Example:**
+```c++
+int floor( float val )
+{
+    gsl_Expects( val >= std::numeric_limits<int>::lowest() && val <= std::numeric_limits<int>::max() );
+
+    return gsl_lite::narrow_cast<int>( val );
+}
+```
 
 
 ## Safe contiguous ranges
@@ -566,21 +598,21 @@ The keyword and attribute macros allow to conditionally take advantage of newer 
 
 Name                        | Notes           |
 ---------------------------:|:----------------|
-`gsl_constexpr`             | Expands to `constexpr` in C++11 and higher, to nothing otherwise |
-`gsl_constexprXX`           | Expands to `constexpr` in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
-`gsl_explicit`              | Expands to `explicit` in C++11 and higher, to nothing otherwise |
+`gsl_constexpr`             | Expands to [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++11 and higher, to nothing otherwise |
+`gsl_constexprXX`           | Expands to [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
+`gsl_explicit`              | Expands to [`explicit`](https://en.cppreference.com/w/cpp/language/explicit) specifier in C++11 and higher, to nothing otherwise |
 `gsl_is_delete`             | Expands to `= delete` in C++11 and higher, to nothing otherwise |
 `gsl_is_delete_access`      | Expands to `public` in C++11 and higher, to `private` otherwise |
-`gsl_noexcept`              | Expands to `noexcept` specifier in C++11 and higher, to nothing otherwise |
-`gsl_noexcept_if( expr )`   | Expands to `noexcept( expr )` operator in C++11 and higher, to nothing otherwise |
+`gsl_noexcept`              | Expands to [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) specifier in C++11 and higher, to nothing otherwise |
+`gsl_noexcept_if( expr )`   | Expands to [`noexcept( expr )`](https://en.cppreference.com/w/cpp/language/noexcept) operator in C++11 and higher, to nothing otherwise |
 `gsl_nullptr`               | Expands to `nullptr` in C++11 and higher, to `NULL` otherwise |
-`gsl_NORETURN`              | Expands to `[[noreturn]]` attribute in C++11 and higher, to a compiler-specific attribute if available, or to nothing otherwise |
-`gsl_DEPRECATED`            | Expands to `[[deprecated]]` attribute in C++14 and higher, to nothing otherwise |
-`gsl_DEPRECATED_MSG( msg )` | Expands to `[[deprecated( msg )]]` attribute in C++14 and higher, to nothing otherwise |
-`gsl_NODISCARD`             | Expands to `[[nodiscard]]` attribute in C++17 and higher, to nothing otherwise |
-`gsl_MAYBE_UNUSED`          | Expands to `[[maybe_unused]]` attribute in C++17 and higher, or to nothing otherwise |
-`gsl_MAYBE_UNUSED_MEMBER`   | Expands to `[[maybe_unused]]` attribute in C++17 and higher for compilers other than GNU GCC, or to nothing otherwise |
-`gsl_NO_UNIQUE_ADDRESS` (≥ C++20) | expands to `[[msvc::no_unique_address]]` for MSVC, to `[[no_unique_address]]` otherwise |
+`gsl_NORETURN`              | Expands to [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute in C++11 and higher, to a compiler-specific attribute if available, or to nothing otherwise |
+`gsl_DEPRECATED`            | Expands to [`[[deprecated]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
+`gsl_DEPRECATED_MSG( msg )` | Expands to [`[[deprecated( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
+`gsl_NODISCARD`             | Expands to [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute in C++17 and higher, to nothing otherwise |
+`gsl_MAYBE_UNUSED`          | Expands to [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher, or to nothing otherwise |
+`gsl_MAYBE_UNUSED_MEMBER`   | Expands to [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher for compilers other than GNU GCC, or to nothing otherwise |
+`gsl_NO_UNIQUE_ADDRESS`<br>(≥ C++20) | expands to [`[[msvc::no_unique_address]]`](https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/) for MSVC, to [`[[no_unique_address]]`](https://en.cppreference.com/w/cpp/language/attributes/no_unique_address) otherwise |
 
 ### Code generation macros
 

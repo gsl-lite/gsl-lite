@@ -16,8 +16,7 @@
 
 #include <gsl-lite/gsl-lite.hpp>
 
-float
-mean( gsl_lite::span<float const> values )  // contiguous range with bounds checks
+float mean( gsl_lite::span<float const> values )  // contiguous range with bounds checks
 {
     gsl_Expects( !values.empty() );  // precondition check
 
@@ -34,8 +33,7 @@ acquireResource()
     return gsl_lite::make_unique<Resource>();  // `make_unique<>()` with non-nullable result
 }
 
-void
-consumeResource(
+void consumeResource(
     gsl_lite::not_null<std::unique_ptr<Resource>> resource );  // type-encoded precondition
 ```
 
@@ -77,16 +75,21 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Why *gsl-lite*?
 
-*gsl-lite* differs from Microsoft GSL in the following ways:
+Although the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) only contain a (loose) specification
+of the Guidelines Support Library and acknowledge there could be different implementations, [Microsoft GSL](https://github.com/microsoft/gsl)
+is the *de facto* default implementation of the Guidelines Support Library. Therefore, if you are looking for an implementation of the
+C++ Core Guidelines support library, you may want to use Microsoft GSL.
+
+That said, *gsl-lite* differs from Microsoft GSL in the following ways:
 
 - *gsl-lite* supports C++98, C++03, C++11, and older compilers.
 - *gsl-lite* supports CUDA, and many of its features can be used in CUDA kernel code.
 - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
   [configurable](doc/Features.md#contract-checking-configuration-macros).
-- `not_null<>` disallows implicit conversion construction (like `strict_not_null<>` in Microsoft GSL).
+- [`not_null<>`](doc/Features.md#not_null) disallows implicit conversion construction (like `strict_not_null<>` in Microsoft GSL).
 - In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore has a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state).
   In Microsoft GSL, `not_null<P>` is not movable if `P` is movable but not copyable.
-- *gsl-lite* defines some [feature testing macros](doc/Features.md#feature-checking-macros) and [polyfills](doc/Features.md#polyfills) which are useful when targeting multiple versions of C++.
+- *gsl-lite* defines some [feature testing macros](doc/Features.md#feature-checking-macros) and [polyfills](doc/Features.md#polyfills) useful for targeting multiple versions of C++.
 - *gsl-lite* comes as a single-header library.
 
 
@@ -126,9 +129,9 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`dim`](doc/Features.md#emantic-integer-type-aliases)                   | -           | -             | ✓                 | Signed integer type for sizes |
 [`stride`](doc/Features.md#emantic-integer-type-aliases)                | -           | -             | ✓                 | Signed integer type for index strides |
 [`diff`](doc/Features.md#emantic-integer-type-aliases)                  | -           | -             | ✓                 | Signed integer type for index differences |
-[`narrow_cast<>()`](doc/Features.md#narrow_casttu)                      | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions;<br> equivalent to `static_cast<>()` |
-[`narrow<>()`](doc/Features.md#narrowtu)                                | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
-[`narrow_failfast<>()`](doc/Features.md#narrow_failfasttu)              | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
+[`narrow_cast<>()`](doc/Features.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions;<br> equivalent to `static_cast<>()` |
+[`narrow<>()`](doc/Features.md#narrowt-u)                               | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
+[`narrow_failfast<>()`](doc/Features.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
 [**Feature checking macros:**](doc/Features.md#feature-checking-macros) | &nbsp;      | &nbsp;        | &nbsp;             | &nbsp; |
 `gsl_CPPxx_OR_GREATER`                                                  | -           | -             | ✓                 | Whether C++xx language features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 `gsl_COMPILER_xx_VERSION`                                               | -           | -             | ✓                 | Evaluates to version number when compiled with `xx`, or 0 otherwise<br>(substitute `GNUC`, `CLANG`, `MSVC`, `APPLECLANG`, `NVCC`, `ARMCC`) |
