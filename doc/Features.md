@@ -6,8 +6,8 @@
 - [Numeric type conversions](#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
 - [Safe contiguous ranges](#safe-contiguous-ranges): `span<T, Extent>`
 - [Bounds-checked element access](#bounds-checked-element-access): `at()`
-- [Semantic integer type aliases](#semantic-integer-type-aliases): `index`, `dim`, `stride`, `diff`
-- [Semantic string type aliases](#semantic-string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`
+- [Integer type aliases](#integer-type-aliases): `index`, `dim`, `stride`, `diff`
+- [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`
 - [Ad-hoc RAII (C++11 and higher)](#ad-hoc-raii-c11-and-higher): `finally()`, `on_return()`, and `on_error()`
 - [Feature checking macros](#feature-checking-macros)
 - [Polyfills](#polyfills)
@@ -122,7 +122,7 @@ template< class P >
 requires ( std::is_pointer_v<P> )
 using owner = P;
 ```
-(*Note:* The actual definition uses a SFINAE constraint to support C++11 to C++17).
+(*Note:* The actual definition uses a SFINAE constraint to support C\+\+11 to C\+\+17).
 
 As far as the type system and the runtime behavior is concerned, `owner<P>` is exactly equivalent to `P`. However, the annotation
 conveys intent to a reader, and static analysis tools may use the annotation impose semantic checks based on the assumption of ownership.
@@ -421,50 +421,66 @@ like *gsl-lite*'s `not_null_ic<>` and `not_null<>`, respectively.)
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-- [`narrow<T>( U )`](#narrowt-u)
-- [`narrow_failfast<T>( U )`](#narrow_failfastt-u)
-- [`narrow_cast<T>( U )`](#narrow_castt-u)
+- [`narrow<T>( U )`](#narrowt-u), a checked numeric cast
+- [`narrow_failfast<T>( U )`](#narrow_failfastt-u), a checked numeric cast
+- [`narrow_cast<T>( U )`](#narrow_castt-u), an unchecked numeric cast
 
 ### `narrow<T>( U )`
 
+`narrow<T>( U )` is a numeric cast that is not meant to be lossy. If narrowing leads to a change of sign or
+loss of information, an exception of type `gsl_lite::narrowing_error` is thrown.
+
 **Example:**
 ```c++
-float sum( gsl_lite::span<float const> values )
-{
-    gsl_Expects( !values.empty() );
-
-    double result = std::accumulate( values.begin(), values.end(), 0. );
-    return gsl_lite::narrow<float>( result );
-}
+double volume = ...;  // (m³)
+double bucketCapacity = ...;  // (m³)
+double numBucketsF = std::ceil( volume/bucketCapacity );
+auto numBuckets = gsl::narrow<gsl::dim>( numBucketsF );
 ```
+
+In this example, an exception will be thrown if `numBucketsF` is not an integer (for instance, `std::ceil(-INFINITY)` will return `-INFINITY`),
+or if the value cannot be represented by the integer type `gsl::dim`.
 
 
 ### `narrow_failfast<T>( U )`
 
 (`narrow_failfast<T>( U )` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
+`narrow_failfast<T>( U )` is a numeric cast that is not meant to be lossy, which is verified with [`gsl_Assert()`](#contract-and-assertion-checks).
+If narrowing leads to a change of sign or loss of information, an assertion violation is triggered.
+
+The `narrow<T>( U )` function specified by the C++ Core Guidelines throws an exception, thereby indicating exceptional circumstances
+(for instance, "input data too large"). The exception may be caught and dealt with at runtime. Contrariwise, the purpose of
+`narrow_failfast<T>( U )` is to detect and prevent programming errors which the user of the program cannot do anything about.
+
 **Example:**
 ```c++
-float mean( gsl_lite::span<float const> values )
-{
-    gsl_Expects( !values.empty() );
-
-    double sum = std::accumulate( values.begin(), values.end(), 0. );
-    double result = sum / std::ssize( values );
-    return gsl_lite::narrow_failfast<float>( result );
-}
+auto vec = std::vector{ ... };
+auto elem = ...;
+auto pos = std::find( vec.begin(), vec.end(), elem );  // let us assume `pos < vec.end()`
+auto diff = pos - vec.end();  // <-- bug: we accidentally swapped `pos` and `vec.end()`
+auto size = gsl::narrow<std::size_t>( diff );  // assertion violation: `diff` is negative
+auto part = std::vector( size );
 ```
 
 
 ### `narrow_cast<T>( U )`
 
-**Example:**
+`narrow_cast<T>( U )` is a numeric cast in which loss of information is acceptable. It is exactly equivalent to `static_cast<T>( U )`, the
+only difference is that `narrow_cast<>()` conveys the intent that truncation or sign change is expressly acceptable.
+
+**Example 1:**
 ```c++
+auto allBitsSet = gsl::narrow_cast<std::uint32_t>( -1 );  // sign change to 0xFFFFFFFF
+```
+
+**Example 2:**
+```
 int floor( float val )
 {
     gsl_Expects( val >= std::numeric_limits<int>::lowest() && val <= std::numeric_limits<int>::max() );
 
-    return gsl_lite::narrow_cast<int>( val );
+    return gsl_lite::narrow_cast<int>( val );  // truncation is acceptable here
 }
 ```
 
@@ -498,12 +514,12 @@ auto at(Container& c, index i)
 ```
 
 
-## Semantic integer type aliases
+## Integer type aliases
 
 `index`, `dim`, `stride`, `diff`
 
 
-## Semantic string type aliases
+## String type aliases
 
 `zstring`, `czstring`, `wzstring`, `cwzstring`
 
@@ -528,16 +544,26 @@ Name                                    | Notes           |
 `gsl_STDLIB_CPPXX_OR_GREATER`           | Whether C++xx standard library features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 **Compiler version detection:**       | &nbsp;          |
 `gsl_BETWEEN( V, L, H )`                | V ≥ L and V < H |
-`gsl_COMPILER_GNUC_VERSION`             | Evaluates to version number when compiled with GNU GCC, or 0 otherwise |
-`gsl_COMPILER_CLANG_VERSION`            | Evaluates to version number when compiled with Clang, or 0 otherwise |
-`gsl_COMPILER_MSVC_VERSION`             | Evaluates to version number when compiled with Microsoft Visual C++, or 0 otherwise |
-`gsl_COMPILER_APPLECLANG_VERSION`       | Evaluates to version number when compiled with Apple Clang, or 0 otherwise |
-`gsl_COMPILER_NVCC_VERSION`             | Evaluates to version number when compiled with NVIDIA NVCC, or 0 otherwise |
-`gsl_COMPILER_ARMCC_VERSION`            | Evaluates to version number when compiled with ARMCC, or 0 otherwise |
+`gsl_COMPILER_GNUC_VERSION`             | Evaluates to version number when compiled with GNU GCC, 0 otherwise |
+`gsl_COMPILER_CLANG_VERSION`            | Evaluates to version number when compiled with Clang, 0 otherwise |
+`gsl_COMPILER_MSVC_VERSION`             | Evaluates to version number when compiled with Microsoft Visual C++, 0 otherwise |
+`gsl_COMPILER_APPLECLANG_VERSION`       | Evaluates to version number when compiled with Apple Clang, 0 otherwise |
+`gsl_COMPILER_NVCC_VERSION`             | Evaluates to version number when compiled with NVIDIA NVCC, 0 otherwise |
+`gsl_COMPILER_ARMCC_VERSION`            | Evaluates to version number when compiled with ARMCC, 0 otherwise |
 `gsl_DEVICE_CODE`                       | Whether CUDA device code is being compiled |
-`gsl_HAVE( xx )`                        | Whether C++ language or library feature `xx` is available |
-**Language features:**                  | &nbsp;          |
-macro:                                  | determines availability of:                    |
+`gsl_HAVE( EXCEPTIONS )`                | Evaluates to 1 if exceptions are available, 0 when compiling with exceptions disabled |
+`gsl_HAVE( WCHAR )`                     | Evaluates to 1 if `wchar_t` type is available, 0 otherwise |
+
+When a new revision of the C++ language is standardized, features often become available gradually in compilers and standard libraries.
+C\+\+20 introduces a set of preprocessor macros to check for the availability of [language features](https://en.cppreference.com/w/cpp/feature_test)
+and [standard library features](https://en.cppreference.com/w/cpp/feature_test#Library_features); but such macros are not necessarily available in
+implementations predating C\+\+20. For this purpose, *gsl-lite* defines a limited set of feature checking macros.
+They all follow the pattern `gsl_HAVE( xx )`, where `xx` is to be replaced by a token representing a given language feature. `gsl_HAVE( xx )` evaluates
+to 1 if the corresponding language or library feature is available, 0 otherwise.
+
+Name                                    | Notes           |
+---------------------------------------:|:----------------|
+**Language features:**<br>macro:        | &nbsp;<br>determines availability of:                    |
 `gsl_HAVE( C99_PREPROCESSOR )`          | C99-compatible [preprocessor](https://en.cppreference.com/w/c/preprocessor) |
 `gsl_HAVE( AUTO )`                      | [`auto`](https://en.cppreference.com/w/cpp/language/auto) (C++11) |
 `gsl_HAVE( RVALUE_REFERENCE )`          | [rvalue references](https://en.cppreference.com/w/cpp/language/reference) (C++11) |
@@ -560,12 +586,10 @@ macro:                                  | determines availability of:           
 `gsl_HAVE( NODISCARD )`                 | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute (C++17) |
 `gsl_HAVE( MAYBE_UNUSED )`              | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute (C++17) |
 `gsl_HAVE( CONSTEXPR_xx )`              | C++xx [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features (substitute `11`, `14`, `17`, `20`, `23`, `26`) |
-**Standard library features:**          | &nbsp;          |
-macro:                                  | determines availability of:                    |
+**Standard library features:**<br>macro: | &nbsp;<br>determines availability of:                    |
 `gsl_HAVE( ADDRESSOF )`                 | [`std::addressof()`](https://en.cppreference.com/w/cpp/memory/addressof) (C++11) |
 `gsl_HAVE( ARRAY )`                     | [`std::array<>`](https://en.cppreference.com/w/cpp/container/array) (C++11) |
 `gsl_HAVE( TYPE_TRAITS )`               | [`<type_traits>`](https://en.cppreference.com/w/cpp/header/type_traits) header (C++11) |
-`gsl_HAVE( TR1_TYPE_TRAITS )`           | `<tr1/type_traits>` header |
 `gsl_HAVE( CONTAINER_DATA_METHOD )`     | `data()` member function on containers |
 `gsl_HAVE( STD_DATA )`                  | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
 `gsl_HAVE( STD_SSIZE )`                 | [`std::ssize()`](https://en.cppreference.com/w/cpp/iterator/size) (C++20) |
@@ -616,7 +640,7 @@ Name                        | Notes           |
 
 ### Code generation macros
 
-The following macros automate some boilerplate tasks when writing code:
+The following macros help avoid writing repetitive code:
 
 - `gsl_DEFINE_ENUM_BITMASK_OPERATORS( e )`:  
   Defines bitmask operators `\|`, `&`, `^`, `~`, `\|=`, `&=`, and `^=` for the enum type `e`.  
@@ -678,8 +702,8 @@ Name                                    | C++ feature     |
 - [Other configuration macros](#other-configuration-macros)
 
 *gsl-lite* is customizable through a large number of configuration options and switches.
-The configuration of contract checks may be useful for various purposes (performance, unit testing, fail-safe environments),
-but the main purpose of the other configuration options is backward compatibility.
+The configuration of contract checks may be useful for various purposes (performance, unit testing, fail-safe environments).
+The main purpose of the other configuration options is backward compatibility.
 
 The configuration macros may affect the API and ABI of *gsl-lite* in ways that renders it incompatible with other code.
 Therefore, as a general rule, **do not define, or rely on, any of *gsl-lite*'s configuration options or switches when using *gsl-lite* in a library**.

@@ -16,21 +16,27 @@
 
 #include <gsl-lite/gsl-lite.hpp>
 
-float mean( gsl_lite::span<float const> values )  // contiguous range with bounds checks
+
+double mean( gsl_lite::span<double const> values )  // contiguous range with bounds checks
 {
     gsl_Expects( !values.empty() );  // precondition check
 
     double sum = std::accumulate( values.begin(), values.end(), 0. );
-    double result = sum / std::ssize( values );
-    return gsl_lite::narrow_failfast<float>( result );  // checked numeric cast
+    return sum / std::ssize( values );
 }
 
-class Resource { ... };
+class Resource
+{
+    ...
+public:
+    Resource( std::size_t size );
+};
 
 gsl_lite::not_null<std::unique_ptr<Resource>>  // type-encoded postcondition
-acquireResource()
+acquireResource( gsl::dim size )  // signed size type
 {
-    return gsl_lite::make_unique<Resource>();  // `make_unique<>()` with non-nullable result
+    return gsl_lite::make_unique<Resource>(  // `make_unique<>()` with non-nullable result
+        gsl_lite::narrow_failfast<gsl::dim>( size ));  // checked numeric cast
 }
 
 void consumeResource(
@@ -64,22 +70,18 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Why *gsl-lite*?
 
-Although the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) only contain a (loose) specification
-of the Guidelines Support Library and acknowledge there could be different implementations, [Microsoft GSL](https://github.com/microsoft/gsl)
-is the *de facto* default implementation of the Guidelines Support Library. Therefore, if you are just looking for a conforming
-implementation of the C++ Core Guidelines support library, you may want to consider Microsoft GSL.
-
-That said, *gsl-lite* differs from Microsoft GSL in the following ways:
+The default implementation of the [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) is
+[Microsoft GSL](https://github.com/microsoft/gsl). *gsl-lite* differs from Microsoft GSL in the following ways:
 
 - *gsl-lite* supports C++98, C++03, C++11, and older compilers.
 - *gsl-lite* supports CUDA, and many of its features can be used in CUDA kernel code.
 - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
   [configurable](doc/Features.md#contract-checking-configuration-macros).
 - Several differences exist in [`not_null<>`](doc/Features.md#not_null):
-    - In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state)
-      which needs to be checked for in accessors such as `not_null<>::get` and `not_null<>::operator*`.
+    - In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state).
       Such a moved-from state is is [expressly disallowed](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632) in Microsoft GSL.
       As a consequence, `not_null<std::unique_ptr<T>>` is movable in *gsl-lite* but not in Microsoft GSL.
+      <!--This comes at the expense of additional runtime null checks in accessors, but it means that every non-nullable use of `unique_ptr<T>` can be changed into a `not_null<unique_ptr<T>>`.-->
     - *gsl-lite*'s `not_null<>` also supports function pointers and nullable function objects such as [`std::function<>`](https://en.cppreference.com/w/cpp/utility/functional/function).
     - In *gsl-lite*, `not_null<>` disallows implicit conversion from nullable types, and thus behaves like `strict_not_null<>` in Microsoft GSL.
       `not_null_ic<>` is a variant of `not_null<>` that allows such implicit conversions and is more like `not_null<>` in Microsoft GSL.
@@ -93,19 +95,19 @@ See the [Reference documentation](doc/Features.md) for a detailed explanation of
 Section&nbsp;[GSL: Guidelines support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines.
 
 Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
-------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:------|
-[**Views:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views) | &nbsp;  | &nbsp;  | &nbsp;       | &nbsp;|
+------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:-------|
+[**Views:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views) | &nbsp;  | &nbsp;  | &nbsp;       | &nbsp; |
 [`owner<>`](doc/Features.md#owner-c11-and-higher)                       | ✓          | ✓             | ✓¹                 | Annotate a raw pointer that carries ownership |
 [`not_null<>`](doc/Features.md#not_null)                                | ✓          | ✓             | ✓                  | Annotate a (smart) pointer that must not be `nullptr`<br>Enforces non-nullability at runtime<br>(cf. `strict_not_null<>` in Microsoft GSL) |
 [`not_null_ic<>`](doc/Features.md#not_null_ic)                          | -           | ✓             | ✓                  | Like `not_null<>` but allows implicit construction from nullable pointers<br>(cf. `not_null<>` in Microsoft GSL) |
-[`make_unique<>()`](doc/Features.md#not_null)                           | -           | -             | ✓                  | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
-[`make_shared<>()`](doc/Features.md#not_null)                           | -           | -             | ✓                  | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
+[`make_unique<>()`](doc/Features.md#not_null)                           | -           | -             | ✓¹                 | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
+[`make_shared<>()`](doc/Features.md#not_null)                           | -           | -             | ✓¹                 | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
 [`span<>`](doc/Features.md#safe-contiguous-ranges)                      | ✓          | ✓             | ✓                  | Like [`std::span<>`](https://en.cppreference.com/w/cpp/container/span) but with bounds-checking |
-[`zstring`<br>`czstring`](doc/Features.md#semantic-string-type-aliases)   | ✓        | ✓             | ✓                  | Aliases for `char *` and `char const *` to be used for 0-terminated strings (C-style strings) |
-[`wzstring`<br>`wczstring`](doc/Features.md#semantic-string-type-aliases) | -        | ✓             | ✓                  | Aliases for `wchar_t *` and `wchar_t const *` to be used for 0-terminated strings (C-style strings) |
+[`zstring`<br>`czstring`](doc/Features.md#string-type-aliases)          | ✓          | ✓             | ✓                  | Aliases for `char *` and `char const *` to be used for 0-terminated strings (C-style strings) |
+[`wzstring`<br>`wczstring`](doc/Features.md#string-type-aliases)        | -           | ✓             | ✓                  | Aliases for `wchar_t *` and `wchar_t const *` to be used for 0-terminated strings (C-style strings) |
 [**Assertions:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslassert-assertions) | &nbsp; | &nbsp; | &nbsp; | &nbsp;|
-[`Expects()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
-[`Ensures()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
+[`Expects()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only defined in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
+[`Ensures()`](doc/Features.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only defined in [GSL compatibility mode](doc/Features.md#gsl_feature_gsl_compatibility_mode0)) |
 [`gsl_Expects()`](doc/Features.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks precondition at runtime |
 [`gsl_ExpectsDebug()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_ExpectsAudit()`](doc/Features.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime<br>if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
@@ -115,15 +117,15 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`gsl_Assert()`](doc/Features.md#contract-and-assertion-checks)         | -           | -             | ✓                   | Checks invariant at runtime |
 [`gsl_AssertDebug()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_AssertAudit()`](doc/Features.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Features.md#runtime-enforcement) is enabled |
-[**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp;        | &nbsp;            | &nbsp;|
+[**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp; | &nbsp; | &nbsp; |
 [`finally()`](doc/Features.md#ad-hoc-raii-c11-and-higher)               | ✓          | ✓             | ✓¹                 | Returns an object that executes a given action in its destructor; use for ad-hoc [RAII](https://en.cppreference.com/w/cpp/language/raii) |
 [`on_return()`](doc/Features.md#ad-hoc-raii-c11-and-higher)             | -           | -             | (✓¹)                | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
 [`on_error()`](doc/Features.md#ad-hoc-raii-c11-and-higher)              | -           | -             | (✓¹)                | Creates an object that executes a given action in its destructor if an exception was thrown<br>([opt-in](doc/Features.md#gsl_feature_experimental_return_guard0) feature) |
 [`at()`](doc/Features.md#bounds-checked-element-access)                 | ✓          | ✓             | ✓                 | Bounds-checked element access for C-style arrays and containers with random access |
-[`index`](doc/Features.md#emantic-integer-type-aliases)                 | ✓          | ✓             | ✓                 | Signed integer type for indexes and subscripts |
-[`dim`](doc/Features.md#emantic-integer-type-aliases)                   | -           | -             | ✓                 | Signed integer type for sizes |
-[`stride`](doc/Features.md#emantic-integer-type-aliases)                | -           | -             | ✓                 | Signed integer type for index strides |
-[`diff`](doc/Features.md#emantic-integer-type-aliases)                  | -           | -             | ✓                 | Signed integer type for index differences |
+[`index`](doc/Features.md#integer-type-aliases)                         | ✓          | ✓             | ✓                 | Signed integer type for indexes and subscripts |
+[`dim`](doc/Features.md#integer-type-aliases)                           | -           | -             | ✓                 | Signed integer type for sizes |
+[`stride`](doc/Features.md#integer-type-aliases)                        | -           | -             | ✓                 | Signed integer type for index strides |
+[`diff`](doc/Features.md#integer-type-aliases)                          | -           | -             | ✓                 | Signed integer type for index differences |
 [`narrow_cast<>()`](doc/Features.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions;<br> equivalent to `static_cast<>()` |
 [`narrow<>()`](doc/Features.md#narrowt-u)                               | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
 [`narrow_failfast<>()`](doc/Features.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
@@ -166,9 +168,12 @@ Once the build system is set up, include the `<gsl-lite/gsl-lite.hpp>` header fi
 
 #include <gsl-lite/gsl-lite.hpp>
 
-void printArgs( gsl_lite::span<gsl_lite::zstring const> args )
+void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs )
 {
-    for ( auto arg : args )
+    gsl_Expects( !cmdArgs.empty() );
+
+    auto argsWithoutExeName = cmdArgs.subspan( 1 );
+    for ( auto arg : argsWithoutExeName )
     {
         std::cout << arg << "\n";
     }
@@ -176,11 +181,9 @@ void printArgs( gsl_lite::span<gsl_lite::zstring const> args )
 
 int main( int argc, char* argv[] )
 {
-    gsl_Expects( argc > 0 );
-
-    auto args = gsl_lite::span( argv, argc );
-    auto argsWithoutExeName = args.subspan( 1 );
-    printArgs( argsWithoutExeName );
+    auto numArgs = gsl_lite::narrow_failfast<std::size_t>( argc );
+    auto cmdArgs = gsl_lite::span( argv, numArgs );
+    printCmdArgs( cmdArgs );
 }
 ```
 

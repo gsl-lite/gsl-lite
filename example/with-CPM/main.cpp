@@ -3,9 +3,12 @@
 
 #include <gsl-lite/gsl-lite.hpp>
 
-void printArgs( gsl_lite::span<gsl_lite::zstring const> args )
+void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs )
 {
-    for ( auto arg : args )
+    gsl_Expects( !cmdArgs.empty() );
+
+    auto argsWithoutExeName = cmdArgs.subspan( 1 );
+    for ( auto arg : argsWithoutExeName )
     {
         std::cout << arg << "\n";
     }
@@ -13,9 +16,7 @@ void printArgs( gsl_lite::span<gsl_lite::zstring const> args )
 
 int main( int argc, char* argv[] )
 {
-    gsl_Expects( argc > 0 );
-
-    auto args = gsl_lite::span( argv, argc );
-    auto argsWithoutExeName = args.subspan( 1 );
-    printArgs( argsWithoutExeName );
+    auto numArgs = gsl_lite::narrow_failfast<std::size_t>( argc );
+    auto cmdArgs = gsl_lite::span( argv, numArgs );
+    printCmdArgs( cmdArgs );
 }
