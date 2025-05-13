@@ -2212,9 +2212,8 @@ public:
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action() gsl_noexcept
     {
-# if ! gsl_CPP17_OR_GREATER
+            // Let the optimizer figure out that this check is redundant.
         if ( invoke_ )
-# endif
         {
             action_();
         }
@@ -2265,14 +2264,9 @@ public:
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_return() gsl_noexcept
     {
-#  if ! gsl_CPP17_OR_GREATER
-        if ( exception_count_ != -1 )  // abuse member as special "no-invoke" marker
-#  endif
+        if ( std11::uncaught_exceptions() == exception_count_ )  // always false if `exception_count_ == -1`
         {
-            if ( std11::uncaught_exceptions() == exception_count_ )
-            {
-                action_();
-            }
+            action_();
         }
     }
 
@@ -2311,9 +2305,7 @@ public:
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_error() gsl_noexcept
     {
-#  if ! gsl_CPP17_OR_GREATER
         if ( exception_count_ != -1 )  // abuse member as special "no-invoke" marker
-#  endif
         {
             if ( std11::uncaught_exceptions() != exception_count_ )
             {
