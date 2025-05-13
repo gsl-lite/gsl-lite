@@ -36,30 +36,36 @@
 #include <gsl-lite/gsl-lite.hpp>
 
 
-double mean( gsl_lite::span<double const> values )  // contiguous range with bounds checks
-{
-    gsl_Expects( !values.empty() );  // precondition check
+namespace my_lib {
 
-    double sum = std::accumulate( values.begin(), values.end(), 0. );
-    return sum / std::ssize( values );
-}
+    namespace gsl = ::gsl_lite;  // define this in your own namespace
 
-class Resource
-{
-    ...
-public:
-    Resource( std::size_t size );
-};
+    double mean( gsl::span<double const> values )  // contiguous range with bounds checks
+    {
+        gsl_Expects( !values.empty() );  // precondition check
+    
+        double sum = std::accumulate( values.begin(), values.end(), 0. );
+        return sum / std::ssize( values );
+    }
 
-gsl_lite::not_null<std::unique_ptr<Resource>>  // type-encoded postcondition
-acquireResource( gsl::dim size )  // signed size type
-{
-    return gsl_lite::make_unique<Resource>(  // `make_unique<>()` with non-nullable result
-        gsl_lite::narrow_failfast<gsl::dim>( size ));  // checked numeric cast
-}
+    class Resource
+    {
+        ...
+    public:
+        Resource( std::size_t size );
+    };
 
-void consumeResource(
-    gsl_lite::not_null<std::unique_ptr<Resource>> resource );  // type-encoded precondition
+    gsl::not_null<std::unique_ptr<Resource>>  // type-encoded postcondition
+    acquireResource( gsl::dim size )  // signed size type
+    {
+        return gsl::make_unique<Resource>(  // `make_unique<>()` with non-nullable result
+            gsl::narrow_failfast<gsl::dim>( size ));  // checked numeric cast
+    }
+
+    void consumeResource(
+        gsl::not_null<std::unique_ptr<Resource>> resource );  // type-encoded precondition
+
+} // namespace my_lib
 ```
 
 
@@ -86,7 +92,8 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Installation and use
 
-The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` and `target_link_libraries()`:
+The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` to locate the package `gsl-lite`
+and `target_link_libraries()` to link to the imported target `gsl-lite::gsl-lite`:
 
 ```CMake
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
@@ -143,15 +150,15 @@ int main( int argc, char* argv[] )
 *gsl-lite* is different from [Microsoft GSL](https://github.com/microsoft/gsl), the default implementation of the
 [C++ Core Guidelines support library (GSL)](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines), in the following ways:
 
-- *gsl-lite* supports older versions of C++ (C++98, C++03, C++11) and older compilers.  
+- *gsl-lite* maintains support for older versions of C++ (C++98, C++03, C++11) and older compilers.  
   (see: [Reported to work with](#reported-to-work-with))
 - *gsl-lite* supports [CUDA](https://developer.nvidia.com/cuda-toolkit), and many of its features can be used in CUDA kernel code.
 - [Contract and assertion checks](doc/Reference.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
   [configurable](doc/Reference.md#contract-checking-configuration-macros).
 - In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Reference.md#nullability-and-the-moved-from-state),
-  which is [expressly disallowed](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632) in Microsoft GSL.
+  which Microsoft GSL [expressly disallows](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632).
   As a consequence, `not_null<std::unique_ptr<T>>` is movable in *gsl-lite* but not in Microsoft GSL.
-- *gsl-lite* defines [feature testing macros](doc/Reference.md#feature-checking-macros) and [polyfills](doc/Reference.md#polyfills) which are useful for targeting multiple versions of C++.
+- *gsl-lite* defines [feature testing macros](doc/Reference.md#feature-checking-macros) and [polyfills](doc/Reference.md#polyfills) useful for targeting multiple versions of C++.
 - *gsl-lite* comes as a single-header library.
 
 
@@ -194,22 +201,20 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`dim`](doc/Reference.md#integer-type-aliases)                           | -           | -             | ✓                 | Signed integer type for sizes |
 [`stride`](doc/Reference.md#integer-type-aliases)                        | -           | -             | ✓                 | Signed integer type for index strides |
 [`diff`](doc/Reference.md#integer-type-aliases)                          | -           | -             | ✓                 | Signed integer type for index differences |
-[`narrow_cast<>()`](doc/Reference.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions; equivalent to `static_cast<>()` |
-[`narrow<>()`](doc/Reference.md#narrowt-u)                               | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
-[`narrow_failfast<>()`](doc/Reference.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails assertion check if cast is lossy |
+[`narrow_cast<>()`](doc/Reference.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | Narrowing cast which tolerates lossy conversions; equivalent to `static_cast<>()` |
+[`narrow<>()`](doc/Reference.md#narrowt-u)                               | ✓          | ✓             | ✓                 | Checked narrowing cast; throws `narrowing_error` if cast is lossy |
+[`narrow_failfast<>()`](doc/Reference.md#narrow_failfastt-u)             | -           | -             | ✓                 | Checked narrowing cast; fails assertion check if cast is lossy |
 
 ¹: C++11 or newer required
 
 
 ## Migration guide
 
-Starting with v1.0, *gsl-lite* now lives in the single header file `<gsl-lite/gsl-lite.hpp>`, and all its symbols reside in namespace
+Starting with v1.0, *gsl-lite* lives in the single header file `<gsl-lite/gsl-lite.hpp>`, and all its symbols reside in namespace
 `gsl_lite`. By default, *gsl-lite* no longer defines a namespace `gsl` or the unprefixed `Expects()` and `Ensures()` macros for
 precondition and postcondition checking.
 
-This change enables coexistence with [Microsoft GSL](https://github.com/microsoft/GSL) or other GSL implementations ([#194](https://github.com/gsl-lite/gsl-lite/issues/194)).
-
-When upgrading to *gsl-lite* v1, either [adapt your code](#adapting-your-code) or [enable the GSL compatibility mode](#using-the-gsl-compatibility-mode).
+This change enables coexistence with [Microsoft GSL](https://github.com/microsoft/GSL) ([#194](https://github.com/gsl-lite/gsl-lite/issues/194)).
 
 ### Adapting your code
 
@@ -217,9 +222,12 @@ If you are migrating from *gsl-lite* v0.\*, adapt your code by referencing names
 using the prefixed macros `gsl_Expects()` and `gsl_Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()` for
 precondition and postcondition checking.
 
-To avoid any code changes, you may enable [GSL compatibility mode](#using-the-gsl-compatibility-mode) instead.
+Note that *gsl-lite* v1 also changed the defaults for many of *gsl-lite*'s configuration options. See the
+[v1.0 release notes](https://github.com/gsl-lite/gsl-lite/releases/tag/v1.0.0) for a comprehensive list of changes.
+This should not affect you if you had already opted in to version-1 defaults by setting `gsl_CONFIG_DEFAULTS_VERSION=1`
+or by linking to the `gsl::gsl-lite-v1` target in CMake.
 
-To minimize the pervasiveness code changes, it can be useful to define a namespace alias *inside your own namespace*:
+To reduce the pervasiveness of required changes, it can be useful to define a namespace alias inside your own namespace:
 
 ```c++
 // my-lib.hpp
@@ -227,7 +235,8 @@ To minimize the pervasiveness code changes, it can be useful to define a namespa
 #include <gsl-lite/gsl-lite.hpp>  // instead of <gsl/gsl-lite.hpp>
 
 namespace my_lib {
-namespace gsl = ::gsl_lite;  // convenience alias
+
+    namespace gsl = ::gsl_lite;  // convenience alias
 
     inline double median( gsl::span<double const> elements )
     {

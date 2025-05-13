@@ -406,7 +406,7 @@ This choice has the generally desirable consequence that it encourages propagati
 Explicit conversions are needed only when converting a nullable to a non-nullable pointer; therefore, as
 more and more of a code base is converted to `not_null<>`, fewer explicit conversions need to be used.
 
-However, in some code bases it may not be feasible to insert explicit not-null checks at every invocation
+However, in some codebases it may not be feasible to insert explicit not-null checks at every invocation
 site. In such a situation, `gsl_lite::not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
 but additionally allows implicit construction from nullable types:
 
@@ -455,7 +455,7 @@ assertion violation is triggered.
 
 The `narrow<T>( u )` function specified by the C++ Core Guidelines throws an exception, thereby indicating exceptional circumstances
 (for instance, "input data too large"). The exception may be caught and dealt with at runtime. Contrariwise, the purpose of
-`narrow_failfast<T>( u )` is to detect and prevent programming errors which the user of the program cannot do anything about.
+`narrow_failfast<T>( u )` is to detect programming errors which the user of the program cannot do anything about.
 
 **Example:**
 ```c++
@@ -470,8 +470,8 @@ auto part = std::vector( size );
 
 ### `narrow_cast<T>( u )`
 
-`narrow_cast<T>( u )` is a numeric cast in which loss of information is acceptable. It is exactly equivalent to `static_cast<T>( u )`, the
-only difference is that `narrow_cast<>()` conveys the intent that truncation or sign change is expressly acceptable.
+`narrow_cast<T>( u )` is a numeric cast in which loss of information is acceptable. It is exactly equivalent to `static_cast<T>( u )`,
+the only difference being that `narrow_cast<>()` conveys the intent that truncation or sign change is expressly acceptable.
 
 **Example 1:**
 ```c++
@@ -499,15 +499,16 @@ but all operations in *gsl-lite*'s `span<>` use [`gsl_Expects()`](#contract-and-
 check their preconditions at runtime. `span<>::iterator` also verifies the preconditions of all its operations
 with `gsl_ExpectsDebug()`.
 
-For C++14 and older, where [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
-is not available, *gsl-lite* defines a set of helper functions `make_span()` for explicitly constructing `span<>` objects.
+*gsl-lite* also defines a set of helper functions `make_span()` for explicitly constructing `span<>` objects. This is useful
+for type inference in C++14 and older where [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
+is not available.
 
 
 ## Bounds-checked element access
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-The `gsl_lite::at()` function offers bounds-checked element access for all sized containers with random access.
+The `gsl_lite::at( container, index )` function offers bounds-checked element access for all sized containers with random access.
 Exposition-only definition:
 
 ```c++
@@ -601,7 +602,21 @@ std::vector<std::string> readLines( char const * filename )
 }
 ```
 This code is not exception-safe: if the (omitted) implementation throws an exception, `fclose()` is never called on the `file` handle.
-The problem of exception safety is typically addressed by defining a [resource handle type for `FILE`](#nullability-and-the-moved-from-state).
+The problem of exception safety is typically addressed by defining a resource handle type for `FILE`
+(see the [`FileHandle` example above](#nullability-and-the-moved-from-state)):
+```c++
+struct FileCloser { void operator ()(std::FILE* file) const { std::fclose( file ); } };
+using FilePtr = std::unique_ptr<std::FILE, FileCloser>;
+
+std::vector<std::string> readLines( char const * filename )
+{
+    auto file = FilePtr( std::fopen( filename, "r" ) );
+    if ( !file ) throw std::runtime_error( ... );
+    std::vector<std::string> result;
+    ...  // implementation omitted
+    return result;
+}
+```
 
 Alternatively, we can fix the problem by using `gsl_lite::finally()`:
 ```c++
@@ -820,7 +835,8 @@ The following macros control whether contracts are checked at runtime:
 - **`gsl_CONFIG_CONTRACT_CHECKING_ON` (default)**  
   Define this macro to have contracts expressed with `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and `gsl_FailFast()`
   checked at runtime, Contracts expressed with `gsl_ExpectsDebug()`, `gsl_EnsuresDebug()`, and `gsl_AssertDebug()` are also
-  checked at runtime (unless `NDEBUG` is defined and `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` is not). **This is the default.**
+  checked at runtime (unless `NDEBUG` is defined and `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` is not).  
+  **This is the default.**
  
 - **`NDEBUG`**
   This macro traditionally disables runtime checks for the [`assert()`](https://en.cppreference.com/w/c/error/assert) macro from
@@ -858,7 +874,8 @@ The following macros control the handling of runtime contract violations:
 - **`gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` (default)**  
   If this macro is defined, and if the `assert()` macro is available for runtime checks (that is, if `NDEBUG` is not defined),
   contract checking macros are implemented in terms of `assert()`. If `assert()` is unavailable (i.e. if `NDEBUG` was defined),
-  `std::abort()` is called directly when a contract is violated. **This is the default.**  
+  `std::abort()` is called directly when a contract is violated.  
+  **This is the default.**  
     
   This option may be preferable over `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` because `assert()` prints diagnostic information
   (such as the current source file, a line number, and the function name), and because vendor-specific extensions of `assert()`
@@ -868,9 +885,7 @@ The following macros control the handling of runtime contract violations:
   Note that `gsl_FailFast()` will call `std::abort()` if `assert()` continues execution.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`**  
-  Define this macro to call `std::terminate()` on a contract violation.  
-    
-  Termination on contract violation is the behavior specified by the Core Guidelines for GSL contract checks.
+  Define this macro to call `std::terminate()` on a contract violation.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TRAPS`**  
   Define this macro to execute a trap instruction on a contract violation.  
@@ -889,7 +904,7 @@ The following macros control the handling of runtime contract violations:
   Define this macro to call a user-defined handler function `gsl_lite::fail_fast_assert_handler()` on a contract violation.
   The user must provide a definition of the following function:
   ```c++
-  namespace gsl_lite_ {
+  namespace gsl_lite {
       gsl_api void fail_fast_assert_handler(
           char const * expression, char const * message,
           char const * file, int line );
@@ -916,12 +931,13 @@ of configuration, e.g. for any contract check if `gsl_CONFIG_CONTRACT_CHECKING_O
 contract checks if `NDEBUG` is defined.
 
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE` (default)**  
-  Contract checks disabled by configuration will be discarded. **This is the default.**  
+  Contract checks disabled by configuration will be discarded.  
+  **This is the default.**  
     
   Note that `gsl_FailFast()` calls are never discarded.
   
   Even for discarded contract checks, *gsl-lite* will by default still verify that the contract check forms a valid Boolean
-  expression by using the C++11 features `decltype()` and `static_assert()`. This may lead to problems if the contract check
+  expression using the C++11 features `decltype()` and `static_assert()`. This may lead to problems if the contract check
   expression cannot be used in an unevaluated context, for instance, when using a lambda expression in C++11/14/17.
   
   The compile-time verification of contract check expressions is controlled by the configuration macro
@@ -982,8 +998,8 @@ contract checks if `NDEBUG` is defined.
 
 #### `gsl_FEATURE_GSL_COMPATIBILITY_MODE=0`
 
-To minimize the impact of the breaking changes, *gsl-lite* introduces an optional *GSL compatibility mode* controlled by the new configuration switch
-`gsl_FEATURE_GSL_COMPATIBILITY_MODE`, which is is disabled by default and can be enabled by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
+To minimize the impact of the breaking changes, *gsl-lite* v1.0 introduces an optional *GSL compatibility mode* controlled by the new configuration switch
+`gsl_FEATURE_GSL_COMPATIBILITY_MODE`, which is is disabled by default and can be enabled by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.  
 **Default is 0.**
 
 If the GSL compatibility mode is enabled, *gsl-lite* additionally makes the following global definitions:
@@ -1004,95 +1020,121 @@ header is included, it emits a warning message which urges to either migrate to 
 contract checking macros `gsl_Expects()` and `gsl_Ensures()`, or to explicitly request GSL compatibility by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
 
 #### `gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD=0`
-Provide experimental types `final_action_return<>` and `final_action_error<>` and convenience functions `on_return()` and `on_error()`. **Default is 0.**
+Provide experimental resource management helper functions [`on_return()` and `on_error()`](#ad-hoc-resource-management-c11-and-higher).  
+**Default is 0.**
 
 #### `gsl_FEATURE_STRING_SPAN=0`
 String spans and related functionality are no longer part of the GSL specification. If the macro `gsl_FEATURE_STRING_SPAN` is set to 1, *gsl-lite*
 continues to provide an implementation of the class `basic_string_span<>` along with the aliases `string_span`, `cstring_span`, `wstring_span`, `cwstring_span`,
 the deprecated class `basic_zstring_span<>` with the aliases `zstring_span`, `czstring_span`, `wzstring_span`, `cwzstring_span`, and related classes and
-functions such as `to_string()`, and `ensure_z()`. **Default is 0.**
+functions such as `to_string()`, and `ensure_z()`.  
+**Default is 0.**
 
 #### `gsl_FEATURE_BYTE=0`
 The `byte` type has been superseded by [`std::byte`](https://en.cppreference.com/w/cpp/types/byte) in C++17 and thus is no longer part of the GSL specification.
 If the macro `gsl_FEATURE_BYTE` is set to 1, *gsl-lite* continues to provide an implementation of `byte` and related functions such as `as_bytes()`, `to_byte()`,
-`as_bytes()`, and `as_writable_bytes()`. **Default is 0.**
+`as_bytes()`, and `as_writable_bytes()`.  
+**Default is 0.**
 
 #### `gsl_FEATURE_WITH_CONTAINER_TO_STD=0`
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`, or 0 to disable the feature. **Default is 0.**
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include tagged-construction via `with_container`, or 0 to disable the feature.  
+**Default is 0.**
 
 #### `gsl_FEATURE_MAKE_SPAN_TO_STD=99`
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` creator functions, or 0 to disable the feature. **Default is 99 for inclusion with any standard.**
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `make_span()` creator functions, or 0 to disable the feature.  
+**Default is 99 for inclusion with any standard.**
 
 #### `gsl_FEATURE_BYTE_SPAN_TO_STD=99`
-Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions, or 0 to disable the feature. **Default is 99 for inclusion with any standard.**
+Define this to the highest C++ standard (98, 3, 11, 14, 17, 20) you want to include `byte_span()` creator functions, or 0 to disable the feature.  
+**Default is 99 for inclusion with any standard.**
 
 
 ### Other configuration macros
 
 #### `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=0`
-Define this to 1 to explicitly acknowledge that you are using *gsl-lite* with a non-standard ABI and that you control the build flags of all components linked into your target.
+Define this to 1 to explicitly acknowledge that you are using *gsl-lite* with a non-standard ABI and that you control the build flags of all components linked into your target.  
 **Default is 0.**
 
 #### `gsl_api`
 
-Functions in *gsl-lite* are decorated with `gsl_api` where appropriate. **By default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform.**
-Define this macro to specify your own function decoration. 
+Functions in *gsl-lite* are decorated with `gsl_api` where appropriate. Define this macro to specify your own function decoration.  
+**By default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform.**
 
 **NOTE:** When a custom `gsl_api` macro is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
+The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
+
+#### `gsl_CONFIG_DEFAULTS_VERSION=1`
+Define this macro to 0 to revert the default configuration to that of *gsl-lite* v0.\*. Cf. [Configuration changes](#configuration-changes) for a comprehensive list of configuration
+values affected by this switch.  
+**Default is 1 for version-1 defaults.**
+
+**NOTE:** Defining `gsl_CONFIG_DEFAULTS_VERSION=0` changes the default value of [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typestdptrdiff_t).
+This makes *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CPLUSPLUS`
 Define this macro to override the auto-detection of the supported C++ standard if your compiler does not set the `__cplusplus` macro correctly.
 
 #### `gsl_CONFIG_DEPRECATE_TO_LEVEL=9`
-Define this to and including the level you want deprecation; see table [Deprecated features](#deprecated-features) below. **Default is 9.**
+Define this to and including the level you want deprecation; see table [Deprecated features](#deprecated-features) below.  
+**Default is 9.**
 
 #### `gsl_CONFIG_SPAN_INDEX_TYPE=std::size_t`
-Define this macro to the type to use for indices in `span<>` and `basic_string_span<>`. **Default is `std::size_t`.**
+Define this macro to the type to use for indices in `span<>` and `basic_string_span<>`.  
+**Default is `std::size_t`.**
 
 **NOTE:** When a custom span index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_INDEX_TYPE=std::ptrdiff_t`
-Define this macro to the type to use for `gsl_lite::index`. **Default is `std::ptrdiff_t`.**
+Define this macro to the type to use for `gsl_lite::index`, `gsl_lite::dim`, `gsl_lite::stride`, and `gsl_lite::diff`.  
+**Default is `std::ptrdiff_t`.**
 
 **NOTE:** When a custom index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`
-Define this macro to 0 to make `not_null<>`'s constructor implicit. **Default is 1.**
+Define this macro to 0 to make `not_null<>`'s constructor implicit.  
+**Default is 1.**
 
 Preferably, rather than defining this macro to 0, use [`not_null_ic<>`](#not_null_icp) if you desire implicit construction.
 
 #### `gsl_CONFIG_TRANSPARENT_NOT_NULL=1`
 If this macro is defined to 1, `not_null<>` supports typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks.
-This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself. **Default is 1.**
+This is conformant behavior but may be incompatible with older code which expects that `not_null<>::get()` returns the underlying pointer itself.  
+**Default is 1.**
 
 #### `gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF=0`
 Define this macro to 1 to have the legacy non-transparent version of `not_null<>::get()` return `T const &` instead of `T`. This may improve performance with types that have an expensive copy-constructor.
-This macro must not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1. **Default is 0 for `T`.**
+This macro must not be defined if `gsl_CONFIG_TRANSPARENT_NOT_NULL` is 1.  
+**Default is 0 for `T`.**
 
 #### `gsl_CONFIG_ALLOWS_SPAN_COMPARISON=0`
-Define this macro to 1 to support equality comparison and relational comparison of spans. C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear. **Default is 0.**
+Define this macro to 1 to support equality comparison and relational comparison of spans. C++20 `std::span<>` does not support comparison because semantics (deep vs. shallow) are unclear.  
+**Default is 0.**
 
 #### `gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON=0`
-Define this macro to 1 to support equality comparison and relational comparison of spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available. **Default is 0.**
+Define this macro to 1 to support equality comparison and relational comparison of spans of different types, e.g. of different const-volatile-ness. To be able to compare a string_span with a cstring_span, non-strict span comparison must be available.  
+**Default is 0.**
 
 #### `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=0`
-Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. **Default is 0.**
+Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors.  
+**Default is 0.**
 
-Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite::with_container, cont)`.
+**NOTE:** An alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=1`
 If this macro is 1, `narrow<>()` always throws a `narrowing_error` exception if the narrowing conversion loses information due to truncation.
 If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLATION_THROWS` is not defined, `narrow<>()` instead terminates on
-information loss (using `std::terminate()` if available and a trap instruction otherwise, e.g. for CUDA device code). **Default is 1.**
+information loss (using `std::terminate()` if available and a trap instruction otherwise, e.g. for CUDA device code).  
+**Default is 1.**
 
 **NOTE:** When `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is defined as 0, *gsl-lite* emits a warning to notify the programmer that this may lead to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
-Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite. **Default is 0.**
+Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite.  
+**Default is 0.**
 
 
 ## Configuration changes, deprecated and removed features
@@ -1132,7 +1174,8 @@ Define this macro to 1 to experience the by-design compile-time errors of the GS
   - [`gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR`](#gsl_config_not_null_explicit_ctor1):  
     Version-1 default: `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`  
     Version-0 default: `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=0`  
-    Reason: see [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395). (Note that `not_null<>` in Microsoft GSL has an implicit constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699).)
+    Reason: see [M-GSL/#395](https://github.com/Microsoft/GSL/issues/395). (Note that `not_null<>` in Microsoft GSL has an implicit
+    constructor, cf. [M-GSL/#699](https://github.com/Microsoft/GSL/issues/699).)
 
   - [`gsl_CONFIG_TRANSPARENT_NOT_NULL`](#gsl_config_transparent_not_null1):  
     Version-1 default: `gsl_CONFIG_TRANSPARENT_NOT_NULL=1`  
@@ -1153,7 +1196,7 @@ Define this macro to 1 to experience the by-design compile-time errors of the GS
 
 ### Deprecated features
 
-The following features are deprecated since the indicated version. See macro [`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#other-configuration-macros) on how to control deprecation using the indicated level.
+The following features are deprecated since the indicated version. See macro [`gsl_CONFIG_DEPRECATE_TO_LEVEL`](#gsl_config_deprecate_to_level9) on how to control deprecation using the indicated level.
 
 Version | Level | Feature / Notes |
 -------:|:-----:|:----------------|
@@ -1173,11 +1216,10 @@ Version | Feature / Notes |
 &nbsp;  | `Owner()` and `implicit` macros |
 &nbsp;  | `basic_string_span<>`, `basic_zstring_span<>` and related aliases |
 &nbsp;  | `as_writeable_bytes()`, call indexing for spans, and `span::at()` |
-&nbsp;  | `gsl_CONFIG_CONTRACT_LEVEL_ON`, `gsl_CONFIG_CONTRACT_LEVEL_OFF`, `gsl_CONFIG_CONTRACT_LEVEL_EXPECTS_ONLY` and `gsl_CONFIG_CONTRACT_LEVEL_ENSURES_ONLY`<br>(use `gsl_CONFIG_CONTRACT_CHECKING_ON`, `gsl_CONFIG_CONTRACT_CHECKING_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF`, `gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF` instead) |
 &nbsp;  | `span( std::nullptr_t, index_type )`<br>(`span( pointer, index_type )` is called instead) |
 &nbsp;  | `span( U *, index_type )`<br>(`span( pointer, index_type )` is called instead) |
 &nbsp;  | `span( std::shared_ptr<T> const & p )` |
 &nbsp;  | `span( std::unique_ptr<T> const & p )` |
 &nbsp;  | `span<>::length()`<br>(use `span<>::size()` instead) |
 &nbsp;  | `span<>::length_bytes()`<br>(use `span<>::size_bytes()` instead) |
-&nbsp;  | member `span<>::as_bytes()`, `span<>::as_writeable_bytes()` |
+&nbsp;  | `span<>::as_bytes()`, `span<>::as_writeable_bytes()` |
