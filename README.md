@@ -201,7 +201,7 @@ If you are migrating from *gsl-lite* v0.\*, adapt your code by referencing names
 using the prefixed macros `gsl_Expects()` and `gsl_Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()` for
 precondition and postcondition checking.
 
-To avoid any code changes, you may enable [GSL compatibility mode](#using-gsl-compatibility-mode) instead.
+To avoid any code changes, you may enable [GSL compatibility mode](#using-the-gsl-compatibility-mode) instead.
 
 To minimize the pervasiveness code changes, it can be useful to define a namespace alias *inside your own namespace*:
 
