@@ -1,4 +1,4 @@
-﻿# *gsl-lite*: Features
+﻿# *gsl-lite*: Reference documentation
 
 **Contents:**  
 - [Contract and assertion checks](#contract-and-assertion-checks): `gsl_Expects( pred )`, `gsl_Ensures( pred )`, `gsl_Assert( pred )`, and more
