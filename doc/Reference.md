@@ -132,7 +132,7 @@ or [`std::shared_ptr<>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) sh
 pointers which cannot currently be replaced with a smart pointer.
 
 
-### `not_null<>`
+### `not_null<P>`
 
 `gsl_lite::not_null<P>` is a class template that wraps a pointer type `P` while enforcing non-nullability.
 
@@ -318,7 +318,13 @@ While this choice would prevent the error above, it inhibits many interesting us
 For example, consider the following resource handle class:
 
 ```c++
-struct FileCloser { void operator ()(std::FILE* file) const { std::fclose( file ); } };
+struct FileCloser
+{
+    void operator ()(std::FILE* file) const
+    {
+        std::fclose( file );
+    }
+};
 using FilePtr = std::unique_ptr<std::FILE, FileCloser>;
 
 class FileHandle  // movable
@@ -424,9 +430,9 @@ like *gsl-lite*'s `not_null_ic<>` and `not_null<>`, respectively.)
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-- [`narrow<T>( u )`](#narrowt-u), a checked numeric cast
-- [`narrow_failfast<T>( u )`](#narrow_failfastt-u), a checked numeric cast
-- [`narrow_cast<T>( u )`](#narrow_castt-u), an unchecked numeric cast
+- [`narrow<T>( u )`](#narrowt-u-), a checked numeric cast
+- [`narrow_failfast<T>( u )`](#narrow_failfastt-u-), a checked numeric cast
+- [`narrow_cast<T>( u )`](#narrow_castt-u-), an unchecked numeric cast
 
 ### `narrow<T>( u )`
 
@@ -508,7 +514,7 @@ is not available.
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-The `gsl_lite::at( container, index )` function offers bounds-checked element access for all sized containers with random access.
+The function `gsl_lite::at( container, index )` offers bounds-checked element access for all sized containers with random access.
 Exposition-only definition:
 
 ```c++
@@ -531,14 +537,14 @@ auto at( Container& c, index i )
 "Don't use `unsigned` for subscripts, prefer `gsl::index`," giving several good reasons for preferring a signed over an unsigned
 type for indexing. For this purpose, the GSL defines `index` as a type alias for `std::ptrdiff_t`.
 
-*gsl-lite* defines the `gsl_lite::index` type alias along with a few other aliases:
+*gsl-lite* defines the type alias `gsl_lite::index` along with the aliases `gsl_lite::dim`, `gsl_lite::stride`, and `gsl_lite::diff`:
 
-Type alias           | Purpose |
---------------------:|:----------------|
-`gsl_lite::index`    | Signed integer type for indexes and subscripts |
-`gsl_lite::dim`      | Signed integer type for sizes |
-`gsl_lite::stride`   | Signed integer type for index strides |
-`gsl_lite::diff`     | Signed integer type for index differences |
+Type alias | Purpose                                        |
+----------:|:-----------------------------------------------|
+`index`    | Signed integer type for indexes and subscripts |
+`dim`      | Signed integer type for sizes                  |
+`stride`   | Signed integer type for index strides          |
+`diff`     | Signed integer type for index differences      |
 
 **Example:**
 ```c++
@@ -552,7 +558,7 @@ for ( gsl_lite::index i = 0; i < n - 1; ++i )
 ```
 
 `index`, `dim`, `stride`, and `diff` are all aliases for `std::ptrdiff_t` unless the [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typestdptrdiff_t)
-configuration macro is set to a different type (not recommended).
+configuration macro is set to a different type (which is not recommended).
 
 
 ## String type aliases
@@ -561,14 +567,15 @@ configuration macro is set to a different type (not recommended).
 
 (*Note:* `wzstring` and `cwzstring` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
 
-*gsl-lite* defines the following aliases for C-style strings (that is, a zero-terminated sequence of characters or a `nullptr`):
+*gsl-lite* defines the aliases `gsl_lite::zstring`, `gsl_lite::czstring`, `gsl_lite::wzstring`, and `gsl_lite::cwzstring` for
+C-style strings (where a C-style string is understood to be either a zero-terminated sequence of characters or a `nullptr`):
 
-Type alias  | Type              | Purpose                                       |
------------:|:------------------|-----------------------------------------------|
-`zstring`   | `char *`          | 0-terminated `char` string                    |
-`czstring`  | `char const *`    | `const` view of 0-terminated `char` string    |
-`wzstring`  | `wchar_t *`       | 0-terminated `wchar_t` string                 |
-`cwzstring` | `wchar_t const *` | `const` view of 0-terminated `wchar_t` string |
+Type alias  | Type              |
+-----------:|:------------------|
+`zstring`   | `char *`          |
+`czstring`  | `char const *`    |
+`wzstring`  | `wchar_t *`       |
+`cwzstring` | `wchar_t const *` |
 
 
 ## Ad hoc resource management (C++11 and higher)
@@ -605,7 +612,13 @@ This code is not exception-safe: if the (omitted) implementation throws an excep
 The problem of exception safety is typically addressed by defining a resource handle type for `FILE`
 (see the [`FileHandle` example above](#nullability-and-the-moved-from-state)):
 ```c++
-struct FileCloser { void operator ()(std::FILE* file) const { std::fclose( file ); } };
+struct FileCloser
+{
+    void operator ()(std::FILE* file) const
+    {
+        std::fclose( file );
+    }
+};
 using FilePtr = std::unique_ptr<std::FILE, FileCloser>;
 
 std::vector<std::string> readLines( char const * filename )
@@ -1060,7 +1073,7 @@ Define this to 1 to explicitly acknowledge that you are using *gsl-lite* with a 
 Functions in *gsl-lite* are decorated with `gsl_api` where appropriate. Define this macro to specify your own function decoration.  
 **By default `gsl_api` is defined empty for non-CUDA platforms and `__host__ __device__` for the CUDA platform.**
 
-**NOTE:** When a custom `gsl_api` macro is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
+*Note:* When a custom `gsl_api` macro is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_DEFAULTS_VERSION=1`
@@ -1068,8 +1081,8 @@ Define this macro to 0 to revert the default configuration to that of *gsl-lite*
 values affected by this switch.  
 **Default is 1 for version-1 defaults.**
 
-**NOTE:** Defining `gsl_CONFIG_DEFAULTS_VERSION=0` changes the default value of [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typestdptrdiff_t).
-This makes *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
+*Note:* Defining `gsl_CONFIG_DEFAULTS_VERSION=0` changes the default value of [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typestdptrdiff_t).
+This makes *gsl-lite* emit a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CPLUSPLUS`
@@ -1083,14 +1096,14 @@ Define this to and including the level you want deprecation; see table [Deprecat
 Define this macro to the type to use for indices in `span<>` and `basic_string_span<>`.  
 **Default is `std::size_t`.**
 
-**NOTE:** When a custom span index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
+*Note:* When a custom span index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_INDEX_TYPE=std::ptrdiff_t`
 Define this macro to the type to use for `gsl_lite::index`, `gsl_lite::dim`, `gsl_lite::stride`, and `gsl_lite::diff`.  
 **Default is `std::ptrdiff_t`.**
 
-**NOTE:** When a custom index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
+*Note:* When a custom index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`
@@ -1121,7 +1134,7 @@ Define this macro to 1 to support equality comparison and relational comparison 
 Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors.  
 **Default is 0.**
 
-**NOTE:** An alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite::with_container, cont)`.
+*Note:* An alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=1`
 If this macro is 1, `narrow<>()` always throws a `narrowing_error` exception if the narrowing conversion loses information due to truncation.
@@ -1129,7 +1142,7 @@ If `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is 0 and `gsl_CONFIG_CONTRACT_VIOLAT
 information loss (using `std::terminate()` if available and a trap instruction otherwise, e.g. for CUDA device code).  
 **Default is 1.**
 
-**NOTE:** When `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is defined as 0, *gsl-lite* emits a warning to notify the programmer that this may lead to possible ODR violations.
+*Note:* When `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION` is defined as 0, *gsl-lite* emits a warning to notify the programmer that this may lead to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`

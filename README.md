@@ -172,11 +172,11 @@ for the specification of the Guidelines support library.
 Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 ------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:-------|
 [**Views:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views) | &nbsp;  | &nbsp;  | &nbsp;       | &nbsp; |
-[`owner<>`](doc/Reference.md#ownerp-c11-and-higher)                      | ✓          | ✓             | ✓¹                 | Annotate a raw pointer that carries ownership |
+[`owner<>`](doc/Reference.md#ownerp-c11-and-higher)                      | ✓          | ✓             | ✓¹¹                | Annotate a raw pointer that carries ownership |
 [`not_null<>`](doc/Reference.md#not_nullp)                               | ✓          | ✓             | ✓                  | Annotate a (smart) pointer that must not be `nullptr`; enforces non-nullability at runtime<br>(cf. `strict_not_null<>` in Microsoft GSL) |
 [`not_null_ic<>`](doc/Reference.md#not_null_icp)                         | -           | ✓             | ✓                  | Like `not_null<>` but allows implicit construction from nullable pointers<br>(cf. `not_null<>` in Microsoft GSL) |
-[`make_unique<>()`](doc/Reference.md#not_nullp)                          | -           | -             | ✓¹                 | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
-[`make_shared<>()`](doc/Reference.md#not_nullp)                          | -           | -             | ✓¹                 | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
+[`make_unique<>()`](doc/Reference.md#not_nullp)                          | -           | -             | ✓¹¹                | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
+[`make_shared<>()`](doc/Reference.md#not_nullp)                          | -           | -             | ✓¹¹                | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
 [`span<>`](doc/Reference.md#safe-contiguous-ranges)                      | ✓          | ✓             | ✓                  | Like [`std::span<>`](https://en.cppreference.com/w/cpp/container/span) but with bounds-checking |
 [`zstring`<br>`czstring`](doc/Reference.md#string-type-aliases)          | ✓          | ✓             | ✓                  | Aliases for `char *` and `char const *` to be used for 0-terminated strings (C-style strings) |
 [`wzstring`<br>`wczstring`](doc/Reference.md#string-type-aliases)        | -           | ✓             | ✓                  | Aliases for `wchar_t *` and `wchar_t const *` to be used for 0-terminated strings (C-style strings) |
@@ -193,19 +193,19 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`gsl_AssertDebug()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_AssertAudit()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp; | &nbsp; | &nbsp; |
-[`finally()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | ✓         | ✓             | ✓¹                 | Returns an object that executes a given action in its destructor; use for ad hoc resource cleanup |
-[`on_return()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -        | -             | (✓¹)                | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |
-[`on_error()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -         | -             | (✓¹)                | Creates an object that executes a given action in its destructor if an exception was thrown<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |
+[`finally()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | ✓         | ✓             | ✓¹¹                | Returns an object that executes a given action in its destructor; use for ad hoc resource cleanup |
+[`on_return()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -        | -             | (✓¹¹)               | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |
+[`on_error()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -         | -             | (✓¹¹)               | Creates an object that executes a given action in its destructor if an exception was thrown<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |
 [`at()`](doc/Reference.md#bounds-checked-element-access)                 | ✓          | ✓             | ✓                 | Bounds-checked element access for C-style arrays and containers with random access |
 [`index`](doc/Reference.md#integer-type-aliases)                         | ✓          | ✓             | ✓                 | Signed integer type for indexes and subscripts |
 [`dim`](doc/Reference.md#integer-type-aliases)                           | -           | -             | ✓                 | Signed integer type for sizes |
 [`stride`](doc/Reference.md#integer-type-aliases)                        | -           | -             | ✓                 | Signed integer type for index strides |
 [`diff`](doc/Reference.md#integer-type-aliases)                          | -           | -             | ✓                 | Signed integer type for index differences |
-[`narrow_cast<>()`](doc/Reference.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | Narrowing cast which tolerates lossy conversions; equivalent to `static_cast<>()` |
-[`narrow<>()`](doc/Reference.md#narrowt-u)                               | ✓          | ✓             | ✓                 | Checked narrowing cast; throws `narrowing_error` if cast is lossy |
-[`narrow_failfast<>()`](doc/Reference.md#narrow_failfastt-u)             | -           | -             | ✓                 | Checked narrowing cast; fails assertion check if cast is lossy |
+[`narrow_cast<>()`](doc/Reference.md#narrow_castt-u-)                    | ✓          | ✓             | ✓                 | Narrowing cast which tolerates lossy conversions; equivalent to `static_cast<>()` |
+[`narrow<>()`](doc/Reference.md#narrowt-u-)                              | ✓          | ✓             | ✓                 | Checked narrowing cast; throws `narrowing_error` if cast is lossy |
+[`narrow_failfast<>()`](doc/Reference.md#narrow_failfastt-u-)            | -           | -             | ✓                 | Checked narrowing cast; fails assertion check if cast is lossy |
 
-¹: C++11 or newer required
+¹¹: C++11 or newer required
 
 
 ## Migration guide
