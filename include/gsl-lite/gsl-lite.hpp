@@ -86,7 +86,7 @@
 #else
 # define gsl_CONFIG_DEFAULTS_VERSION  gsl_lite_MAJOR  // default
 #endif
-# define gsl_CONFIG_DEFAULTS_VERSION_()  gsl_CONFIG_DEFAULTS_VERSION
+#define  gsl_CONFIG_DEFAULTS_VERSION_()  gsl_CONFIG_DEFAULTS_VERSION
 
 #if defined( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_SPAN_CONTAINER_CTOR )
@@ -163,7 +163,7 @@
 #else
 # define gsl_FEATURE_GSL_COMPATIBILITY_MODE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
-#define gsl_FEATURE_GSL_COMPATIBILITY_MODE_()  gsl_FEATURE_GSL_COMPATIBILITY_MODE
+#define  gsl_FEATURE_GSL_COMPATIBILITY_MODE_()  gsl_FEATURE_GSL_COMPATIBILITY_MODE
 
 #if defined( gsl_FEATURE_WITH_CONTAINER_TO_STD )
 # if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_WITH_CONTAINER_TO_STD )
@@ -185,7 +185,7 @@
 #else
 # define gsl_FEATURE_MAKE_SPAN_TO_STD  99  // default
 #endif
-#define gsl_FEATURE_MAKE_SPAN_TO_STD_()  gsl_FEATURE_MAKE_SPAN_TO_STD
+#define  gsl_FEATURE_MAKE_SPAN_TO_STD_()  gsl_FEATURE_MAKE_SPAN_TO_STD
 
 #if defined( gsl_FEATURE_BYTE_SPAN_TO_STD )
 # if ! gsl_CHECK_CFG_STD_VALUE_( gsl_FEATURE_BYTE_SPAN_TO_STD )
@@ -194,7 +194,7 @@
 #else
 # define gsl_FEATURE_BYTE_SPAN_TO_STD  99  // default
 #endif
-#define gsl_FEATURE_BYTE_SPAN_TO_STD_()  gsl_FEATURE_BYTE_SPAN_TO_STD
+#define  gsl_FEATURE_BYTE_SPAN_TO_STD_()  gsl_FEATURE_BYTE_SPAN_TO_STD
 
 #if defined( gsl_FEATURE_IMPLICIT_MACRO )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_IMPLICIT_MACRO )
@@ -206,7 +206,7 @@
 #else
 # define gsl_FEATURE_IMPLICIT_MACRO  0
 #endif
-#define gsl_FEATURE_IMPLICIT_MACRO_()  gsl_FEATURE_IMPLICIT_MACRO
+#define  gsl_FEATURE_IMPLICIT_MACRO_()  gsl_FEATURE_IMPLICIT_MACRO
 
 #if defined( gsl_FEATURE_OWNER_MACRO )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_OWNER_MACRO )
@@ -218,7 +218,7 @@
 #else
 # define gsl_FEATURE_OWNER_MACRO  0
 #endif
-#define gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
+#define  gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
 #if defined( gsl_FEATURE_STRING_SPAN )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
@@ -227,7 +227,7 @@
 #else
 # define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
-#define gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
+#define  gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
 
 #if defined( gsl_FEATURE_BYTE )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_BYTE )
@@ -236,7 +236,7 @@
 #else
 # define gsl_FEATURE_BYTE  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
-#define gsl_FEATURE_BYTE_()  gsl_FEATURE_BYTE
+#define  gsl_FEATURE_BYTE_()  gsl_FEATURE_BYTE
 
 #if defined( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD )
@@ -245,7 +245,7 @@
 #else
 # define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD  0 // default
 #endif
-# define gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD_()  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
+#define  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD_()  gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD
 
 #if defined( gsl_FEATURE_GSL_LITE_NAMESPACE )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_GSL_LITE_NAMESPACE )
@@ -257,7 +257,7 @@
 #else
 # define gsl_FEATURE_GSL_LITE_NAMESPACE  1
 #endif
-#define gsl_FEATURE_GSL_LITE_NAMESPACE_()  gsl_FEATURE_GSL_LITE_NAMESPACE
+#define  gsl_FEATURE_GSL_LITE_NAMESPACE_()  gsl_FEATURE_GSL_LITE_NAMESPACE
 
 // Configuration: Other
 
@@ -271,7 +271,7 @@
 #else
 # define gsl_CONFIG_TRANSPARENT_NOT_NULL  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
 #endif
-# define gsl_CONFIG_TRANSPARENT_NOT_NULL_()  gsl_CONFIG_TRANSPARENT_NOT_NULL
+#define  gsl_CONFIG_TRANSPARENT_NOT_NULL_()  gsl_CONFIG_TRANSPARENT_NOT_NULL
 
 #if ! defined( gsl_CONFIG_DEPRECATE_TO_LEVEL )
 # if gsl_CONFIG_DEFAULTS_VERSION >= 1
@@ -288,7 +288,7 @@
 #else // ! defined( gsl_CONFIG_SPAN_INDEX_TYPE )
 # define gsl_CONFIG_SPAN_INDEX_TYPE  std::size_t
 #endif
-# define gsl_CONFIG_SPAN_INDEX_TYPE_()  gsl_CONFIG_SPAN_INDEX_TYPE
+#define  gsl_CONFIG_SPAN_INDEX_TYPE_()  gsl_CONFIG_SPAN_INDEX_TYPE
 
 #if defined( gsl_CONFIG_INDEX_TYPE )
 # if ! defined( gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI )
@@ -305,7 +305,7 @@
 #  define gsl_CONFIG_INDEX_TYPE  gsl_CONFIG_SPAN_INDEX_TYPE
 # endif
 #endif
-# define gsl_CONFIG_INDEX_TYPE_()  gsl_CONFIG_INDEX_TYPE
+#define   gsl_CONFIG_INDEX_TYPE_()  gsl_CONFIG_INDEX_TYPE
 
 #if defined( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR )
@@ -314,7 +314,7 @@
 #else
 # define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR  (gsl_CONFIG_DEFAULTS_VERSION >= 1)  // default
 #endif
-#define gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR_()  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
+#define  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR_()  gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR
 
 #if defined( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF )
@@ -323,7 +323,7 @@
 #else
 # define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF  0  // default
 #endif
-#define gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF_()  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
+#define  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF_()  gsl_CONFIG_NOT_NULL_GET_BY_CONST_REF
 
 #if defined( gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS )
@@ -332,7 +332,7 @@
 #else
 # define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS  0  // default
 #endif
-#define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS_()  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
+#define  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS_()  gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS
 
 #if defined( gsl_CONFIG_ALLOWS_SPAN_COMPARISON )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_SPAN_COMPARISON )
@@ -341,7 +341,7 @@
 #else
 # define gsl_CONFIG_ALLOWS_SPAN_COMPARISON  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
 #endif
-#define gsl_CONFIG_ALLOWS_SPAN_COMPARISON_()  gsl_CONFIG_ALLOWS_SPAN_COMPARISON
+#define  gsl_CONFIG_ALLOWS_SPAN_COMPARISON_()  gsl_CONFIG_ALLOWS_SPAN_COMPARISON
 
 #if defined( gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON )
@@ -350,7 +350,7 @@
 #else
 # define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON  1  // default
 #endif
-#define gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON_()  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
+#define  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON_()  gsl_CONFIG_ALLOWS_NONSTRICT_SPAN_COMPARISON
 
 #if defined( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR )
@@ -359,7 +359,7 @@
 #else
 # define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR  0  // default
 #endif
-#define gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR_()  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
+#define  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR_()  gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR
 
 #if defined( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION )
@@ -374,7 +374,7 @@
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: with version-0 defaults, gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION defaults to 0, which changes the ABI of gsl-lite and may lead to ODR violations and undefined behavior; use version-1 defaults or define the macro gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI to explicitly acknowledge that you are using gsl-lite with a non-standard ABI and that you control the build flags of all components linked into your target")
 # endif
 #endif
-#define gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_()  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
+#define  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION_()  gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION
 
 #if defined( gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS )
@@ -383,7 +383,7 @@
 #else
 # define gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS  1  // default
 #endif
-#define gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS_()  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS
+#define  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS_()  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
@@ -713,9 +713,9 @@
 // Presence of wide character support:
 
 #if defined(__DJGPP__) || (defined(_LIBCPP_VERSION) && defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS))
-# define gsl_HAVE_WCHAR 0
+# define gsl_HAVE_WCHAR  0
 #else
-# define gsl_HAVE_WCHAR 1
+# define gsl_HAVE_WCHAR  1
 #endif
 #define gsl_HAVE_WCHAR_()  gsl_HAVE_WCHAR
 
@@ -769,15 +769,15 @@
 # endif // __GNUC__ < 5
 #elif gsl_COMPILER_MSVC_VERSION
 # ifdef _CPPUNWIND
-#  define gsl_HAVE_EXCEPTIONS  1
+#  define  gsl_HAVE_EXCEPTIONS  1
 # else
-#  define gsl_HAVE_EXCEPTIONS  0
+#  define  gsl_HAVE_EXCEPTIONS  0
 # endif // _CPPUNWIND
 #else
 // For all other compilers, assume exceptions are always enabled.
-# define  gsl_HAVE_EXCEPTIONS  1
+# define   gsl_HAVE_EXCEPTIONS  1
 #endif
-#define gsl_HAVE_EXCEPTIONS_()  gsl_HAVE_EXCEPTIONS
+#define    gsl_HAVE_EXCEPTIONS_()  gsl_HAVE_EXCEPTIONS
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) && ! gsl_HAVE( EXCEPTIONS )
 # error Cannot use gsl_CONFIG_CONTRACT_VIOLATION_THROWS if exceptions are disabled.
@@ -1318,9 +1318,9 @@
 
 #if ! defined( gsl_api )
 # ifdef   __CUDACC__
-#  define gsl_api __host__ __device__
+#  define gsl_api  __host__ __device__
 # else
-#  define gsl_api /*gsl_api*/
+#  define gsl_api  /*gsl_api*/
 # endif
 #endif
 
