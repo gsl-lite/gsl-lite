@@ -51,4 +51,17 @@ include( cmake/InstallBasicPackageFiles.cmake )
 install_basic_package_files( gsl-lite
     COMPATIBILITY SameMajorVersion
     ARCH_INDEPENDENT
+    INCLUDE_CONTENT
+"
+# Define legacy aliases for imported targets.
+if( NOT TARGET gsl::gsl-lite )
+    add_library( gsl::gsl-lite ALIAS gsl-lite::gsl-lite )
+endif()
+if( NOT TARGET gsl::gsl-lite-v0 )
+    add_library( gsl::gsl-lite-v0 ALIAS gsl-lite::gsl-lite-v0 )
+endif()
+if( NOT TARGET gsl::gsl-lite-v1 )
+    add_library( gsl::gsl-lite-v1 ALIAS gsl-lite::gsl-lite-v1 )
+endif()
+"
 )

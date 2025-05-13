@@ -65,13 +65,3 @@ install(
     EXPORT       gsl-lite
     INCLUDES
 )
-install(
-    EXPORT       gsl-lite
-    NAMESPACE    gsl::
-    DESTINATION  "cmake/gsl-lite"
-)
-install(
-    EXPORT       gsl-lite
-    NAMESPACE    gsl-lite::
-    DESTINATION  "cmake/gsl-lite"
-)
