@@ -8,7 +8,7 @@
 - [Bounds-checked element access](#bounds-checked-element-access): `at( container, index )`
 - [Integer type aliases](#integer-type-aliases): `index`, `dim`, `stride`, `diff`
 - [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`
-- [Ad-hoc resource management (C++11 and higher)](#ad-hoc-resource-management-c11-and-higher): `finally( action )`, `on_return( action )`, and `on_error( action )`
+- [Ad hoc resource management (C++11 and higher)](#ad-hoc-resource-management-c11-and-higher): `finally( action )`, `on_return( action )`, and `on_error( action )`
 - [Feature checking macros](#feature-checking-macros)
 - [Polyfills](#polyfills)
 - [Configuration options and switches](#configuration-options-and-switches)
@@ -570,13 +570,13 @@ Type alias  | Type              | Purpose                                       
 `cwzstring` | `wchar_t const *` | `const` view of 0-terminated `wchar_t` string |
 
 
-## Ad-hoc resource management (C++11 and higher)
+## Ad hoc resource management (C++11 and higher)
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
 (*Note:* `on_return()` and `on_error()` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
 
-*gsl-lite* defines the following helpers for ad-hoc resource management:
+*gsl-lite* defines the following helpers for ad hoc resource management:
 
 - `gsl_lite::finally( action )` constructs and returns an object which invokes `action` upon destruction.
 - `gsl_lite::on_return( action )` constructs and returns an object which invokes `action` upon destruction only if no exception was thrown.
