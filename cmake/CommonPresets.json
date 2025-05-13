@@ -1,7 +1,8 @@
-﻿// Collection of generally useful CMake configuration presets.
-// The contents of this file are in the public domain.
-// (Moritz Beutel, 2025)
-{
+﻿{
+    // Collection of generally useful CMake configuration presets.
+    // Version 0.1.0β
+    // The contents of this file are in the public domain.
+    // (Moritz Beutel, 2025)
     "version": 7,
     "configurePresets": [
         {
@@ -14,10 +15,13 @@
             "name": "compiler presets",
             "hidden": true,
             "environment": {
-                "_CFLAGS": "$penv{CFLAGS} $env{_PRESET_CFLAGS} $env{_USE_PRESET_WARN} $env{_USE_PRESET_WARNERR} $env{_USE_PRESET_ASAN} $env{_USE_PRESET_UBSAN} $env{_USE_PRESET_TSAN} $env{_USE_PRESET_STDLIB}",
-                "_CXXFLAGS": "$penv{CXXFLAGS} $env{_PRESET_CXXFLAGS} $env{_USE_PRESET_WARN} $env{_USE_PRESET_WARNERR} $env{_USE_PRESET_ASAN} $env{_USE_PRESET_UBSAN} $env{_USE_PRESET_TSAN} $env{_USE_PRESET_STDLIB} $env{_USE_PRESET_DEBUGCHECKS}",
+                "_CFLAGS": "$penv{CFLAGS} $env{_PRESET_CFLAGS} $env{_USE_PRESET_ASAN} $env{_USE_PRESET_UBSAN} $env{_USE_PRESET_TSAN} $env{_USE_PRESET_STDLIB}",
+                "_CXXFLAGS": "$penv{CXXFLAGS} $env{_PRESET_CXXFLAGS} $env{_USE_PRESET_ASAN} $env{_USE_PRESET_UBSAN} $env{_USE_PRESET_TSAN} $env{_USE_PRESET_STDLIB} $env{_USE_PRESET_DEBUGCHECKS}",
+                "_CUDAFLAGS": "$penv{CUDAFLAGS} $env{_PRESET_CUDAFLAGS} $env{_CUDA_USE_PRESET_STDLIB} $env{_USE_PRESET_DEBUGCHECKS}",
                 "CFLAGS": "$env{_CFLAGS}",
-                "CXXFLAGS": "$env{_CXXFLAGS}"
+                "CXXFLAGS": "$env{_CXXFLAGS}",
+                "CUDAFLAGS": "$env{_CUDAFLAGS}",
+                "MY_COMPILE_OPTIONS": "$env{_USE_PRESET_WARN};$env{_USE_PRESET_WARNERR}"
             }
         },
 
@@ -42,10 +46,11 @@
             "hidden": true,
             "inherits": "compiler presets",
             "environment": {
-                "_PRESET_CFLAGS": "/utf-8 /permissive-",
-                "_PRESET_CXXFLAGS": "/utf-8 /permissive-",
-                "_PRESET_WARN": "/W4 /w44062 /w44242 /w44254 /w44265",
-                "_PRESET_WARNERR": "/WX",
+                "_PRESET_CFLAGS": "/utf-8",
+                "_PRESET_CXXFLAGS": "/utf-8",
+                "_PRESET_CUDAFLAGS": "-Xcompiler /utf-8",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/WX>",
                 "_PRESET_ASAN": "/fsanitize=address",
                 "_PRESET_UBSAN": "/fsanitize=undefined", // not currently supported
                 "_PRESET_TSAN": "/fsanitize=thread", // not currently supported
@@ -63,10 +68,11 @@
             "hidden": true,
             "inherits": "compiler presets",
             "environment": {
-                "_PRESET_CFLAGS": "/utf-8 /permissive-",
-                "_PRESET_CXXFLAGS": "/utf-8 /permissive-",
-                "_PRESET_WARN": "/W4 /w44062 /w44242 /w44254 /w44265",
-                "_PRESET_WARNERR": "/WX",
+                "_PRESET_CFLAGS": "/utf-8",
+                "_PRESET_CXXFLAGS": "/utf-8",
+                "_PRESET_CUDAFLAGS": "-Xcompiler /utf-8",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/WX>",
                 "_PRESET_ASAN": "/fsanitize=address",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
                 "_PRESET_TSAN": "-fsanitize=thread", // not currently supported
@@ -86,8 +92,9 @@
             "environment": {
                 "_PRESET_CFLAGS": "",
                 "_PRESET_CXXFLAGS": "",
-                "_PRESET_WARN": "-Wall -Wextra -pedantic",
-                "_PRESET_WARNERR": "-Werror",
+                "_PRESET_CUDAFLAGS": "",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Wall,-Wextra,-pedantic>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Werror>",
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-undefined-trap-on-error",
                 "_PRESET_TSAN": "-fsanitize=thread",
@@ -102,8 +109,9 @@
             "environment": {
                 "_PRESET_CFLAGS": "",
                 "_PRESET_CXXFLAGS": "",
-                "_PRESET_WARN": "-Wall -Wextra -pedantic",
-                "_PRESET_WARNERR": "-Werror",
+                "_PRESET_CUDAFLAGS": "",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Wall,-Wextra,-pedantic>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Werror>",
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
                 "_PRESET_TSAN": "-fsanitize=thread",
@@ -167,6 +175,7 @@
             "inherits": "compiler presets",
             "environment": {
                 "_USE_PRESET_STDLIB": "-stdlib=libstdc++",
+                "_CUDA_USE_PRESET_STDLIB": "-Xcompiler -stdlib=libstdc++",
                 "_PRESET_DEBUGCHECKS2": "-D_GLIBCXX_DEBUG"
             }
         },
@@ -174,7 +183,7 @@
         {
             "name": "force MSVC",
             "hidden": true,
-            "inherits":  "MSVC presets",
+            "inherits": "MSVC presets",
             "environment": {
                 "CC": "cl",
                 "CXX": "cl"
