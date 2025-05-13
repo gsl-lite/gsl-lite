@@ -1,9 +1,9 @@
-﻿# *gsl-lite*: ISO C++ Core Guidelines Library implementation for C++98, C++11, and later
+﻿# *gsl-lite*
 
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.io/en/package/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/6frqr8PsK) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/OIU7oseCTLsiNQ8A)   |
+| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.io/en/package/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl-lite/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/6frqr8PsK) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/OIU7oseCTLsiNQ8A)   |
 
 
 ***gsl-lite*** is a portable, single-file, header-only library for defensive programming based on the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) specification.
@@ -18,6 +18,7 @@
 - [Installation and use](#installation-and-use)
 - [Why *gsl-lite*?](#why-gsl-lite)
 - [Features](#features)
+- [Reference documentation](doc/Features.md)
 - [Migration guide](#migration-guide)
 - [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
 - [Reported to work with](#reported-to-work-with)
@@ -158,8 +159,8 @@ int main( int argc, char* argv[] )
 
 ## Features
 
-See the [Reference documentation](doc/Features.md) for a detailed explanation of the features provided by *gsl-lite*, and
-Section&nbsp;[GSL: Guidelines support library](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#S-gsl) of the C++ Core Guidelines
+See the [reference documentation](doc/Features.md) for a detailed explanation of the features provided by *gsl-lite*, and
+Section&nbsp;[GSL: Guidelines support library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) of the C++ Core Guidelines
 for the specification of the Guidelines support library.
 
 
@@ -167,7 +168,7 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 ------------------------------------------------------------------------|:-----------:|:-------------:|:-------------------:|:-------|
 [**Views:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views) | &nbsp;  | &nbsp;  | &nbsp;       | &nbsp; |
 [`owner<>`](doc/Features.md#ownerp-c11-and-higher)                      | ✓          | ✓             | ✓¹                 | Annotate a raw pointer that carries ownership |
-[`not_null<>`](doc/Features.md#not_nullp)                               | ✓          | ✓             | ✓                  | Annotate a (smart) pointer that must not be `nullptr`<br>Enforces non-nullability at runtime<br>(cf. `strict_not_null<>` in Microsoft GSL) |
+[`not_null<>`](doc/Features.md#not_nullp)                               | ✓          | ✓             | ✓                  | Annotate a (smart) pointer that must not be `nullptr`; enforces non-nullability at runtime<br>(cf. `strict_not_null<>` in Microsoft GSL) |
 [`not_null_ic<>`](doc/Features.md#not_null_icp)                         | -           | ✓             | ✓                  | Like `not_null<>` but allows implicit construction from nullable pointers<br>(cf. `not_null<>` in Microsoft GSL) |
 [`make_unique<>()`](doc/Features.md#not_nullp)                          | -           | -             | ✓¹                 | Like [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) but returns `not_null<std::unique_ptr<T>>` |
 [`make_shared<>()`](doc/Features.md#not_nullp)                          | -           | -             | ✓¹                 | Like [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but returns `not_null<std::shared_ptr<T>>` |
@@ -195,9 +196,9 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`dim`](doc/Features.md#integer-type-aliases)                           | -           | -             | ✓                 | Signed integer type for sizes |
 [`stride`](doc/Features.md#integer-type-aliases)                        | -           | -             | ✓                 | Signed integer type for index strides |
 [`diff`](doc/Features.md#integer-type-aliases)                          | -           | -             | ✓                 | Signed integer type for index differences |
-[`narrow_cast<>()`](doc/Features.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions;<br> equivalent to `static_cast<>()` |
+[`narrow_cast<>()`](doc/Features.md#narrow_castt-u)                     | ✓          | ✓             | ✓                 | A narrowing cast which tolerates lossy conversions; equivalent to `static_cast<>()` |
 [`narrow<>()`](doc/Features.md#narrowt-u)                               | ✓          | ✓             | ✓                 | A checked narrowing cast; throws `narrowing_error` if cast is lossy |
-[`narrow_failfast<>()`](doc/Features.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
+[`narrow_failfast<>()`](doc/Features.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails assertion check if cast is lossy |
 
 ¹: C++11 or newer required
 
@@ -208,7 +209,7 @@ Starting with v1.0, *gsl-lite* now lives in the single header file `<gsl-lite/gs
 `gsl_lite`. By default, *gsl-lite* no longer defines a namespace `gsl` or the unprefixed `Expects()` and `Ensures()` macros for
 precondition and postcondition checking.
 
-This change enables coexistence with [Microsoft GSL](https://github.com/microsoft/GSL) or other GSL implementations. (https://github.com/gsl-lite/gsl-lite/issues/194)
+This change enables coexistence with [Microsoft GSL](https://github.com/microsoft/GSL) or other GSL implementations ([#194](https://github.com/gsl-lite/gsl-lite/issues/194)).
 
 When upgrading to *gsl-lite* v1, either [adapt your code](#adapting-your-code) or [enable the GSL compatibility mode](#using-the-gsl-compatibility-mode).
 
