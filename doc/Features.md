@@ -1,14 +1,14 @@
 ﻿# Features
 
 **Contents:**  
-- [Contract and assertion checks](#contract-and-assertion-checks): `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, and more
+- [Contract and assertion checks](#contract-and-assertion-checks): `gsl_Expects( pred )`, `gsl_Ensures( pred )`, `gsl_Assert( pred )`, and more
 - [Pointer annotations](#pointer-annotations): `owner<P>`, `not_null<P>`, and `not_null_ic<P>`
-- [Numeric type conversions](#numeric-type-conversions): `narrow<T>(U)`, `narrow_failfast<T>(U)`, and `narrow_cast<T>(U)`
+- [Numeric type conversions](#numeric-type-conversions): `narrow<T>( u )`, `narrow_failfast<T>( u )`, and `narrow_cast<T>( u )`
 - [Safe contiguous ranges](#safe-contiguous-ranges): `span<T, Extent>`
-- [Bounds-checked element access](#bounds-checked-element-access): `at()`
+- [Bounds-checked element access](#bounds-checked-element-access): `at( container, index )`
 - [Integer type aliases](#integer-type-aliases): `index`, `dim`, `stride`, `diff`
 - [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`
-- [Ad-hoc RAII (C++11 and higher)](#ad-hoc-raii-c11-and-higher): `finally()`, `on_return()`, and `on_error()`
+- [Ad-hoc resource management (C++11 and higher)](#ad-hoc-resource-management-c11-and-higher): `finally( action )`, `on_return( action )`, and `on_error( action )`
 - [Feature checking macros](#feature-checking-macros)
 - [Polyfills](#polyfills)
 - [Configuration options and switches](#configuration-options-and-switches)
@@ -100,12 +100,12 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 
 ## Pointer annotations
 
-- [`owner<>` (C++11 and higher)](#owner-c11-and-higher)
-- [`not_null<>`](#not_null)
+- [`owner<P>` (C++11 and higher)](#ownerp-c11-and-higher)
+- [`not_null<P>`](#not_nullp)
     - [Motivation](#motivation)
     - [Usage](#usage)
     - [Nullability and the moved-from state](#nullability-and-the-moved-from-state)
-- [`not_null_ic<>`](#not_null_ic)
+- [`not_null_ic<P>`](#not_null_icp)
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
@@ -114,7 +114,7 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 - `owner<P>` indicates that a raw pointer `P` carries ownership of the object it points to, and is thus responsible for managing its lifetime.
 - `not_null<P>` and `not_null_ic<P>` indicate that a pointer `P` must not be `nullptr`.
 
-### `owner<>` (C++11 and higher)
+### `owner<P>` (C++11 and higher)
 
 `gsl_lite::owner<P>` is a type alias that solely serves the purpose of expressing intent:
 ```c++
@@ -371,9 +371,9 @@ Therefore, when calling the `getc()` member function on a moved-from `FileHandle
 would be triggered on the `file_.get()` call. This means that, through adopting `not_null<>`, `FileHandle::getc()`
 adopts the implicit precondition that the object be not in the moved-from state.
 
-(Recommended further reading: Herb Sutter's article ["Move, simply"](https://herbsutter.com/2020/02/17/move-simply/),
+<!--(Recommended further reading: Herb Sutter's article ["Move, simply"](https://herbsutter.com/2020/02/17/move-simply/),
 which argues that objects that have a special moved-from state in which most of their operations may not be used
-are buggy, and [Sean Parent's rebuttal](https://herbsutter.com/2020/02/17/move-simply/#comment-41129) in the comments below.)
+are buggy, and [Sean Parent's rebuttal](https://herbsutter.com/2020/02/17/move-simply/#comment-41129) in the comments below.)-->
 
 A `not_null<P>` cannot be directly compared to a `nullptr` because it is not meant to be nullable.
 If you have to check for the moved-from state, use the `gsl_lite::is_valid()` predicate:
@@ -385,9 +385,14 @@ if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
 ```
 
 
-### `not_null_ic<>`
+### `not_null_ic<P>`
 
-(`not_null_ic<>` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+(*Note:* `not_null_ic<>` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+
+`gsl_lite::not_null_ic<P>` is a class template that wraps a pointer type `P` while enforcing non-nullability.
+It provides all the guarantees and run-time checks of [`not_null<P>`](#not_nullp) but relaxes the requirements
+of its conversion constructors: implicit conversion from `U` to `not_null_ic<P>` is allowed if `U` implicitly
+converts to `P`.
 
 `not_null<>` does not allow implicit conversion from nullable types:
 ```c++
@@ -402,16 +407,14 @@ Explicit conversions are needed only when converting a nullable to a non-nullabl
 more and more of a code base is converted to `not_null<>`, fewer explicit conversions need to be used.
 
 However, in some code bases it may not be feasible to insert explicit not-null checks at every invocation
-site. In this case, `gsl_lite::not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
-but defines an unconditionally implicit conversion constructor:
+site. In such a situation, `gsl_lite::not_null_ic<P>` can be used instead. `not_null_ic<P>` derives from `not_null<P>`
+but additionally allows implicit construction from nullable types:
 
 ```c++
 void use( not_null_ic<int *> p );
 int i;
 use( &i );  // runtime check
 ```
-
-`not_null_ic<P>` provides all the run-time checks and guarantees of `not_null<P>`.
 
 (Compatibility note: Microsoft GSL defines the classes `not_null<>` and `strict_not_null<>` which behave
 like *gsl-lite*'s `not_null_ic<>` and `not_null<>`, respectively.)
@@ -421,13 +424,13 @@ like *gsl-lite*'s `not_null_ic<>` and `not_null<>`, respectively.)
 
 (Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-- [`narrow<T>( U )`](#narrowt-u), a checked numeric cast
-- [`narrow_failfast<T>( U )`](#narrow_failfastt-u), a checked numeric cast
-- [`narrow_cast<T>( U )`](#narrow_castt-u), an unchecked numeric cast
+- [`narrow<T>( u )`](#narrowt-u), a checked numeric cast
+- [`narrow_failfast<T>( u )`](#narrow_failfastt-u), a checked numeric cast
+- [`narrow_cast<T>( u )`](#narrow_castt-u), an unchecked numeric cast
 
-### `narrow<T>( U )`
+### `narrow<T>( u )`
 
-`narrow<T>( U )` is a numeric cast that is not meant to be lossy. If narrowing leads to a change of sign or
+`gsl_lite::narrow<T>( u )` is a numeric cast that is not meant to be lossy. If narrowing leads to a change of sign or
 loss of information, an exception of type `gsl_lite::narrowing_error` is thrown.
 
 **Example:**
@@ -442,16 +445,17 @@ In this example, an exception will be thrown if `numBucketsF` is not an integer 
 or if the value cannot be represented by the integer type `gsl::dim`.
 
 
-### `narrow_failfast<T>( U )`
+### `narrow_failfast<T>( u )`
 
-(`narrow_failfast<T>( U )` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+(*Note:* `narrow_failfast<T>( u )` is a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
-`narrow_failfast<T>( U )` is a numeric cast that is not meant to be lossy, which is verified with [`gsl_Assert()`](#contract-and-assertion-checks).
-If narrowing leads to a change of sign or loss of information, an assertion violation is triggered.
+`gsl_lite::narrow_failfast<T>( u )` is a numeric cast that is not meant to be lossy, which is verified with
+[`gsl_Assert()`](#contract-and-assertion-checks). If narrowing leads to a change of sign or loss of information, an
+assertion violation is triggered.
 
-The `narrow<T>( U )` function specified by the C++ Core Guidelines throws an exception, thereby indicating exceptional circumstances
+The `narrow<T>( u )` function specified by the C++ Core Guidelines throws an exception, thereby indicating exceptional circumstances
 (for instance, "input data too large"). The exception may be caught and dealt with at runtime. Contrariwise, the purpose of
-`narrow_failfast<T>( U )` is to detect and prevent programming errors which the user of the program cannot do anything about.
+`narrow_failfast<T>( u )` is to detect and prevent programming errors which the user of the program cannot do anything about.
 
 **Example:**
 ```c++
@@ -464,9 +468,9 @@ auto part = std::vector( size );
 ```
 
 
-### `narrow_cast<T>( U )`
+### `narrow_cast<T>( u )`
 
-`narrow_cast<T>( U )` is a numeric cast in which loss of information is acceptable. It is exactly equivalent to `static_cast<T>( U )`, the
+`narrow_cast<T>( u )` is a numeric cast in which loss of information is acceptable. It is exactly equivalent to `static_cast<T>( u )`, the
 only difference is that `narrow_cast<>()` conveys the intent that truncation or sign change is expressly acceptable.
 
 **Example 1:**
@@ -475,7 +479,7 @@ auto allBitsSet = gsl::narrow_cast<std::uint32_t>( -1 );  // sign change to 0xFF
 ```
 
 **Example 2:**
-```
+```c++
 int floor( float val )
 {
     gsl_Expects( val >= std::numeric_limits<int>::lowest() && val <= std::numeric_limits<int>::max() );
@@ -489,7 +493,7 @@ int floor( float val )
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
-*gsl-lite* defines a class `span<T, Extent>` that represents a contiguous sequence of objects. The interface
+*gsl-lite* defines a class `gsl_lite::span<T, Extent>` that represents a contiguous sequence of objects. The interface
 of `span<>` is identical to that of [`std::span<>`](https://en.cppreference.com/w/cpp/container/span),
 but all operations in *gsl-lite*'s `span<>` use [`gsl_Expects()`](#contract-and-assertion-checks) to
 check their preconditions at runtime. `span<>::iterator` also verifies the preconditions of all its operations
@@ -501,39 +505,123 @@ is not available, *gsl-lite* defines a set of helper functions `make_span()` for
 
 ## Bounds-checked element access
 
-The `at()` function offers bounds-checked element access for all sized containers with random access.
+(Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
+
+The `gsl_lite::at()` function offers bounds-checked element access for all sized containers with random access.
 Exposition-only definition:
 
 ```c++
 template< class Container >
-auto at(Container& c, index i)
+auto at( Container& c, index i )
 {
     gsl_Expects( i >= 0 && i < std::ssize( c ) );
-    return c[i];
+    return c[ i ];
 }
 ```
 
 
 ## Integer type aliases
 
-`index`, `dim`, `stride`, `diff`
+(Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
+
+(*Note:* `dim`, `stride`, and `diff` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
+
+[Rule ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Res-subscripts) of the C++ Core Guidelines suggests
+"Don't use `unsigned` for subscripts, prefer `gsl::index`", giving several good reasons for preferring a signed over an unsigned
+type for indexing. For this purpose, the GSL defines `index` as a type alias for `std::ptrdiff_t`.
+
+*gsl-lite* defines the `gsl_lite::index` type alias along with a few other aliases:
+
+Type alias           | Purpose |
+--------------------:|:----------------|
+`gsl_lite::index`    | Signed integer type for indexes and subscripts |
+`gsl_lite::dim`      | Signed integer type for sizes |
+`gsl_lite::stride`   | Signed integer type for index strides |
+`gsl_lite::diff`     | Signed integer type for index differences |
+
+**Example:**
+```c++
+auto x = std::vector{ ... };
+auto dx = std::vector( x.size() - 1 );
+gsl_lite::dim n = std::ssize( x );
+for ( gsl_lite::index i = 0; i < n - 1; ++i )
+{
+    y[ i ] = x[ i ] - x[ i - 1 ];
+}
+```
+
+`index`, `dim`, `stride`, and `diff` are all aliases for `std::ptrdiff_t` unless the [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typestdptrdiff_t)
+configuration macro is set to a different type (not recommended).
 
 
 ## String type aliases
 
-`zstring`, `czstring`, `wzstring`, `cwzstring`
+(Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
+
+(*Note:* `wzstring` and `cwzstring` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
+
+*gsl-lite* defines the following aliases for C-style strings (that is, a zero-terminated sequence of characters or a `nullptr`):
+
+Type alias  | Type              | Purpose                                       |
+-----------:|:------------------|-----------------------------------------------|
+`zstring`   | `char *`          | 0-terminated `char` string                    |
+`czstring`  | `char const *`    | `const` view of 0-terminated `char` string    |
+`wzstring`  | `wchar_t *`       | 0-terminated `wchar_t` string                 |
+`cwzstring` | `wchar_t const *` | `const` view of 0-terminated `wchar_t` string |
 
 
-## Ad-hoc RAII (C++11 and higher)
+## Ad-hoc resource management (C++11 and higher)
 
-(cf. [RAII](https://en.cppreference.com/w/cpp/language/raii))
+(Core Guidelines reference: [GSL.util: Utilities](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities))
 
-`finally()`, `on_return()`, and `on_error()`
+(*Note:* `on_return()` and `on_error()` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
+
+*gsl-lite* defines the following helpers for ad-hoc resource management:
+
+- `gsl_lite::finally( action )` constructs and returns an object which invokes `action` upon destruction.
+- `gsl_lite::on_return( action )` constructs and returns an object which invokes `action` upon destruction only if no exception was thrown.
+- `gsl_lite::on_error( action )` constructs and returns an object which invokes `action` upon destruction only if an exception was thrown.
+
+[Rule R.1](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#r1-manage-resources-automatically-using-resource-handles-and-raii-resource-acquisition-is-initialization)
+of the C++ Core Guidelines suggests: "Manage resources automatically using resource handles and [RAII](https://en.cppreference.com/w/cpp/language/raii)
+(Resource Acquisition Is Initialization)". While this advice is sound, it may sometimes be inconvenient to always define a resource handle type
+for every situation in which a resource needs to be cleaned up.
+
+For example, we might wish to modernize the following code which uses the [C standard library](https://en.cppreference.com/w/cpp/header/cstdio)
+to read from a file:
+```c++
+std::vector<std::string> readLines( char const * filename )
+{
+    std::FILE * file = std::fopen( filename, "r" );
+    if ( !file ) throw std::runtime_error(...);
+    std::vector<std::string> result;
+    ...  // implementation omitted
+    std::fclose( file );
+    return result;
+}
+```
+This code is not exception-safe: if the (omitted) implementation throws an exception, `fclose()` is never called on the `file` handle.
+The problem of exception safety is typically addressed by defining a [resource handle type for `FILE`](#nullability-and-the-moved-from-state).
+
+Alternatively, we can fix the problem by using `gsl_lite::finally()`:
+```c++
+std::vector<std::string> readLines( char const * filename )
+{
+    std::FILE * file = std::fopen( filename, "r" );
+    if ( !file ) throw std::runtime_error(...);
+    auto _ = gsl_lite::finally( [&] { std::fclose( file ); } );
+    std::vector<std::string> result;
+    ...  // implementation omitted
+    return result;
+}
+```
+The destructor of the local object `_` will call `std::fclose( file )`, regardless of whether the function returns normally or whether
+it was interrupted by an exception. This ensures that the `file` handle does not leak.
 
 
 ## Feature checking macros
 
-(Feature checking macros are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+(*Note:* Feature checking macros are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
 The following preprocessor macros can be used to identify features of the C++ build environment:
 
@@ -608,7 +696,7 @@ Name                                    | Notes           |
 
 ## Polyfills
 
-(Polyfills are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
+(*Note:* Polyfills are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
 *gsl-lite* defines some macros, types, and functions for use with earlier versions of C++:
 
@@ -961,7 +1049,7 @@ Define this macro to the type to use for indices in `span<>` and `basic_string_s
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
 
 #### `gsl_CONFIG_INDEX_TYPE=std::ptrdiff_t`
-Define this macro to the type to use for `gsl_lite_::index`. **Default is `std::ptrdiff_t`.**
+Define this macro to the type to use for `gsl_lite::index`. **Default is `std::ptrdiff_t`.**
 
 **NOTE:** When a custom index type is defined, *gsl-lite* emits a warning to notify the programmer that this alters the binary interface of *gsl-lite*, leading to possible ODR violations.
 The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1`.
@@ -969,7 +1057,7 @@ The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NON
 #### `gsl_CONFIG_NOT_NULL_EXPLICIT_CTOR=1`
 Define this macro to 0 to make `not_null<>`'s constructor implicit. **Default is 1.**
 
-Preferably, rather than defining this macro to 0, use [`not_null_ic<>`](#not_null_ic) if you desire implicit construction.
+Preferably, rather than defining this macro to 0, use [`not_null_ic<>`](#not_null_icp) if you desire implicit construction.
 
 #### `gsl_CONFIG_TRANSPARENT_NOT_NULL=1`
 If this macro is defined to 1, `not_null<>` supports typical member functions of the underlying smart pointer transparently (currently `get()`), while adding precondition checks.
@@ -988,7 +1076,7 @@ Define this macro to 1 to support equality comparison and relational comparison 
 #### `gsl_CONFIG_ALLOWS_UNCONSTRAINED_SPAN_CONTAINER_CTOR=0`
 Define this macro to 1 to add the unconstrained span constructor for containers for pre-C++11 compilers that cannot constrain the constructor. This constructor may prove too greedy and interfere with other constructors. **Default is 0.**
 
-Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite_::with_container, cont)`.
+Note: an alternative is to use the constructor tagged `with_container`: `span<V> s(gsl_lite::with_container, cont)`.
 
 #### `gsl_CONFIG_NARROW_THROWS_ON_TRUNCATION=1`
 If this macro is 1, `narrow<>()` always throws a `narrowing_error` exception if the narrowing conversion loses information due to truncation.
@@ -1026,7 +1114,7 @@ Define this macro to 1 to experience the by-design compile-time errors of the GS
     Version-1 default: `gsl_CONFIG_DEPRECATE_TO_LEVEL=9`
     Version-0 default: `gsl_CONFIG_DEPRECATE_TO_LEVEL=0`  
 
-  - [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typegsl_config_span_index_type):  
+  - [`gsl_CONFIG_INDEX_TYPE`](#gsl_config_index_typestdptrdiff_t):  
     Version-1 default: `std::ptrdiff_t`  
     Version-0 default: `gsl_CONFIG_SPAN_INDEX_TYPE` (defaults to `std::size_t`)  
     Reason: the GSL specifies `gsl_lite::index` to be a signed type.
