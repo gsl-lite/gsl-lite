@@ -8,7 +8,25 @@
 
 ***gsl-lite*** is a portable, single-file, header-only library for defensive programming based on the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) specification.
 
-**Example code:**
+
+## Contents
+
+- [Example usage](#example-usage)
+- [In a nutshell](#in-a-nutshell)
+- [License](#license)
+- [Dependencies](#dependencies)
+- [Installation and use](#installation-and-use)
+- [Why *gsl-lite*?](#why-gsl-lite)
+- [Features](#features)
+- [Migration guide](#migration-guide)
+- [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
+- [Reported to work with](#reported-to-work-with)
+- [Version semantics](#version-semantics)
+- [Contributing](#contributing)
+
+
+## Example usage
+
 ```c++
 #include <memory>
 #include <utility>
@@ -43,6 +61,9 @@ void consumeResource(
     gsl_lite::not_null<std::unique_ptr<Resource>> resource );  // type-encoded precondition
 ```
 
+
+## In a nutshell
+
 *gsl-lite* strives to implement the [Guidelines Support Library specification](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) of the C++ Core Guidelines
 maintained by the [Standard C++ Foundation](https://isocpp.org/).
 The library is originally based on [Microsoft GSL](https://github.com/microsoft/gsl) and was adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20, or C++23.
@@ -54,18 +75,68 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 *gsl-lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
 
 
-## Documentation
+## License
 
-- [Why *gsl-lite*?](#why-gsl-lite)
-- [Features](#features)
-- [Installation and use](#installation-and-use)
-- [Migration guide](#migration-guide)
-- [Using *gsl-lite* in libraries](#using-gsl-lite-in-libraries)
-- [Dependencies](#dependencies)
-- [Reported to work with](#reported-to-work-with)
-- [Version semantics](#version-semantics)
-- [Contributing](#contributing)
-- [License](#license)
+*gsl-lite* uses the [MIT](LICENSE) license.
+
+
+## Dependencies
+
+*gsl-lite* has no dependencies other than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
+
+
+## Installation and use
+
+The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` and `target_link_libraries()`:
+
+```CMake
+cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
+
+project( my-program LANGUAGES CXX )
+
+find_package( gsl-lite 1.0 REQUIRED )
+
+add_executable( my-program main.cpp )
+target_compile_features( my-program PRIVATE cxx_std_17 )
+target_link_libraries( my-program PRIVATE gsl-lite::gsl-lite )
+```
+
+*gsl-lite* is available via [Vcpkg](https://vcpkg.io/en/package/gsl-lite), [Conan](https://conan.io/center/recipes/gsl-lite),
+and possibly other package managers. It may also be obtained with [CPM](https://github.com/cpm-cmake/CPM.cmake):
+```cmake
+CPMAddPackage( NAME gsl-lite VERSION 1.0.0 GITHUB_REPOSITORY gsl-lite/gsl-lite )
+```
+See the directories [example/with-CPM](https://github.com/gsl-lite/gsl-lite/tree/mater/example/with-CPM) and
+[example/with-Vcpkg](https://github.com/gsl-lite/gsl-lite/tree/mater/example/with-Vcpkg) for example projects
+that use CPM and Vcpkg, respectively, to obtain *gsl-lite*.
+
+Once the build system is set up, include the `<gsl-lite/gsl-lite.hpp>` header file to use *gsl-lite*:
+
+```c++
+// main.cpp
+
+#include <iostream>
+
+#include <gsl-lite/gsl-lite.hpp>
+
+void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs )
+{
+    gsl_Expects( !cmdArgs.empty() );
+
+    auto argsWithoutExeName = cmdArgs.subspan( 1 );
+    for ( auto arg : argsWithoutExeName )
+    {
+        std::cout << arg << "\n";
+    }
+}
+
+int main( int argc, char* argv[] )
+{
+    auto numArgs = gsl_lite::narrow_failfast<std::size_t>( argc );
+    auto cmdArgs = gsl_lite::span( argv, numArgs );
+    printCmdArgs( cmdArgs );
+}
+```
 
 
 ## Why *gsl-lite*?
@@ -129,60 +200,6 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`narrow_failfast<>()`](doc/Features.md#narrow_failfastt-u)             | -           | -             | ✓                 | A checked narrowing cast; fails runtime contract check if cast is lossy |
 
 ¹: C++11 or newer required
-
-
-## Installation and use
-
-The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` and `target_link_libraries()`:
-
-```CMake
-cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
-
-project( my-program LANGUAGES CXX )
-
-find_package( gsl-lite 1.0 REQUIRED )
-
-add_executable( my-program main.cpp )
-target_compile_features( my-program PRIVATE cxx_std_17 )
-target_link_libraries( my-program PRIVATE gsl-lite::gsl-lite )
-```
-
-*gsl-lite* is available via [Vcpkg](https://vcpkg.io/en/package/gsl-lite), [Conan](https://conan.io/center/recipes/gsl-lite),
-and possibly other package managers. It may also be obtained with [CPM](https://github.com/cpm-cmake/CPM.cmake):
-```cmake
-CPMAddPackage( NAME gsl-lite VERSION 1.0.0 GITHUB_REPOSITORY gsl-lite/gsl-lite )
-```
-See the directories [example/with-CPM](https://github.com/gsl-lite/gsl-lite/tree/mater/example/with-CPM) and
-[example/with-Vcpkg](https://github.com/gsl-lite/gsl-lite/tree/mater/example/with-Vcpkg) for example projects
-that use CPM and Vcpkg, respectively, to obtain *gsl-lite*.
-
-Once the build system is set up, include the `<gsl-lite/gsl-lite.hpp>` header file to use *gsl-lite*:
-
-```c++
-// main.cpp
-
-#include <iostream>
-
-#include <gsl-lite/gsl-lite.hpp>
-
-void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs )
-{
-    gsl_Expects( !cmdArgs.empty() );
-
-    auto argsWithoutExeName = cmdArgs.subspan( 1 );
-    for ( auto arg : argsWithoutExeName )
-    {
-        std::cout << arg << "\n";
-    }
-}
-
-int main( int argc, char* argv[] )
-{
-    auto numArgs = gsl_lite::narrow_failfast<std::size_t>( argc );
-    auto cmdArgs = gsl_lite::span( argv, numArgs );
-    printCmdArgs( cmdArgs );
-}
-```
 
 
 ## Migration guide
@@ -266,11 +283,6 @@ Therefore, when using *gsl-lite* in a library, please mind the following suggest
 - Use the prefixed contract checking macros `gsl_Expects()` and `gsl_Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()`.
 
 
-## Dependencies
-
-*gsl-lite* has no dependencies other than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
-
-
 ## Reported to work with
 
 The table below mentions the compiler versions and platforms *gsl-lite* is reported to work with.
@@ -309,8 +321,3 @@ Contributions to *gsl-lite* through [pull requests](https://github.com/gsl-lite/
 
 *gsl-lite* comes with a test suite that uses an included, slightly modified copy of the [*lest* test framework](https://github.com/martinmoene/lest).
 To build *gsl-lite* with the test suite, enable the CMake build option `GSL_LITE_OPT_BUILD_TESTS` when configuring the project.
-
-
-## License
-
-*gsl-lite* uses the [MIT](LICENSE) license.
