@@ -526,8 +526,8 @@ auto at( Container& c, index i )
 
 (*Note:* `dim`, `stride`, and `diff` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
 
-[Rule ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Res-subscripts) of the C++ Core Guidelines suggests
-"Don't use `unsigned` for subscripts, prefer `gsl::index`", giving several good reasons for preferring a signed over an unsigned
+[Rule ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Res-subscripts) of the C++ Core Guidelines suggests,
+"Don't use `unsigned` for subscripts, prefer `gsl::index`," giving several good reasons for preferring a signed over an unsigned
 type for indexing. For this purpose, the GSL defines `index` as a type alias for `std::ptrdiff_t`.
 
 *gsl-lite* defines the `gsl_lite::index` type alias along with a few other aliases:
@@ -593,7 +593,7 @@ to read from a file:
 std::vector<std::string> readLines( char const * filename )
 {
     std::FILE * file = std::fopen( filename, "r" );
-    if ( !file ) throw std::runtime_error(...);
+    if ( !file ) throw std::runtime_error( ... );
     std::vector<std::string> result;
     ...  // implementation omitted
     std::fclose( file );
@@ -608,15 +608,15 @@ Alternatively, we can fix the problem by using `gsl_lite::finally()`:
 std::vector<std::string> readLines( char const * filename )
 {
     std::FILE * file = std::fopen( filename, "r" );
-    if ( !file ) throw std::runtime_error(...);
+    if ( !file ) throw std::runtime_error( ... );
     auto _ = gsl_lite::finally( [&] { std::fclose( file ); } );
     std::vector<std::string> result;
     ...  // implementation omitted
     return result;
 }
 ```
-The destructor of the local object `_` will call `std::fclose( file )`, regardless of whether the function returns normally or whether
-it was interrupted by an exception. This ensures that the `file` handle does not leak.
+The destructor of the local object `_` will call `std::fclose( file )`, regardless of whether the function returns normally or was
+interrupted by an exception. This ensures that the `file` handle does not leak.
 
 
 ## Feature checking macros
@@ -651,7 +651,7 @@ to 1 if the corresponding language or library feature is available, 0 otherwise.
 
 Name                                    | Notes           |
 ---------------------------------------:|:----------------|
-**Language features:**<br>macro:        | &nbsp;<br>determines availability of:                    |
+**Language features:**                  | &nbsp;          |
 `gsl_HAVE( C99_PREPROCESSOR )`          | C99-compatible [preprocessor](https://en.cppreference.com/w/c/preprocessor) |
 `gsl_HAVE( AUTO )`                      | [`auto`](https://en.cppreference.com/w/cpp/language/auto) (C++11) |
 `gsl_HAVE( RVALUE_REFERENCE )`          | [rvalue references](https://en.cppreference.com/w/cpp/language/reference) (C++11) |
@@ -674,7 +674,7 @@ Name                                    | Notes           |
 `gsl_HAVE( NODISCARD )`                 | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute (C++17) |
 `gsl_HAVE( MAYBE_UNUSED )`              | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute (C++17) |
 `gsl_HAVE( CONSTEXPR_xx )`              | C++xx [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) features (substitute `11`, `14`, `17`, `20`, `23`, `26`) |
-**Standard library features:**<br>macro: | &nbsp;<br>determines availability of:                    |
+**Standard library features:**          |  &nbsp;         |
 `gsl_HAVE( ADDRESSOF )`                 | [`std::addressof()`](https://en.cppreference.com/w/cpp/memory/addressof) (C++11) |
 `gsl_HAVE( ARRAY )`                     | [`std::array<>`](https://en.cppreference.com/w/cpp/container/array) (C++11) |
 `gsl_HAVE( TYPE_TRAITS )`               | [`<type_traits>`](https://en.cppreference.com/w/cpp/header/type_traits) header (C++11) |

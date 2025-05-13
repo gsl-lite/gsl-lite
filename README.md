@@ -47,7 +47,7 @@ void consumeResource(
 maintained by the [Standard C++ Foundation](https://isocpp.org/).
 The library is originally based on [Microsoft GSL](https://github.com/microsoft/gsl) and was adapted for C++98, C++03. It also works when compiled as C++11, C++14, C++17, C++20, or C++23.
 
-*gsl-lite* does not interfere with Microsoft GSL since both libraries live in different namespaces (`gsl_lite` vs. `gsl`) and employ different macro prefixes (`gsl_` vs. `GSL_`).
+*gsl-lite* does not interfere with Microsoft GSL since both libraries live in different namespaces (`gsl_lite` vs. `gsl`).
 
 *gsl-lite* recognizes when it is compiled for the CUDA platform and decorates some functions with `__host__` and `__device__` accordingly.
 
@@ -70,20 +70,17 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 ## Why *gsl-lite*?
 
-[Microsoft GSL](https://github.com/microsoft/gsl) is the default implementation of the [C++ Core Guidelines support library (GSL)](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
-*gsl-lite* is different from Microsoft GSL in the following ways:
+*gsl-lite* is different from [Microsoft GSL](https://github.com/microsoft/gsl), the default implementation of the
+[C++ Core Guidelines support library (GSL)](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines), in the following ways:
 
-- *gsl-lite* supports older versions of C++ (C++98, C++03, C++11) and older compilers (see: [Reported to work with](#reported-to-work-with)).
+- *gsl-lite* supports older versions of C++ (C++98, C++03, C++11) and older compilers.  
+  (see: [Reported to work with](#reported-to-work-with))
 - *gsl-lite* supports [CUDA](https://developer.nvidia.com/cuda-toolkit), and many of its features can be used in CUDA kernel code.
 - [Contract and assertion checks](doc/Features.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
   [configurable](doc/Features.md#contract-checking-configuration-macros).
-- In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state).
-  Such a moved-from state is is [expressly disallowed](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632) in Microsoft GSL.
+- In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Features.md#nullability-and-the-moved-from-state),
+  which is [expressly disallowed](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632) in Microsoft GSL.
   As a consequence, `not_null<std::unique_ptr<T>>` is movable in *gsl-lite* but not in Microsoft GSL.
-  <!--This comes at the expense of additional runtime null checks in accessors, but it means that every non-nullable use of `unique_ptr<T>` can be changed into a `not_null<unique_ptr<T>>`.-->
-  <!--- *gsl-lite*'s `not_null<>` also supports function pointers and nullable function objects such as [`std::function<>`](https://en.cppreference.com/w/cpp/utility/functional/function).-->
-  <!--- In *gsl-lite*, `not_null<>` disallows implicit conversion from nullable types, and thus behaves like `strict_not_null<>` in Microsoft GSL.
-      `not_null_ic<>` is a variant of `not_null<>` that allows such implicit conversions and is more like `not_null<>` in Microsoft GSL.-->
 - *gsl-lite* defines [feature testing macros](doc/Features.md#feature-checking-macros) and [polyfills](doc/Features.md#polyfills) which are useful for targeting multiple versions of C++.
 - *gsl-lite* comes as a single-header library.
 
