@@ -743,6 +743,7 @@ The keyword and attribute macros allow to conditionally take advantage of newer 
 
 Name                        | Notes           |
 ---------------------------:|:----------------|
+`gsl_DIMENSION_OF( a )`     | Expands to `( sizeof( a ) / sizeof( 0[ a ] ) )`, which is the number of elements in a C-style array `a` |
 `gsl_constexpr`             | Expands to [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++11 and higher, to nothing otherwise |
 `gsl_constexprXX`           | Expands to [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
 `gsl_explicit`              | Expands to [`explicit`](https://en.cppreference.com/w/cpp/language/explicit) specifier in C++11 and higher, to nothing otherwise |
