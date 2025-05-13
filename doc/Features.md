@@ -631,7 +631,7 @@ Name                                    | Notes           |
 `gsl_lite_MAJOR`                        | Major version number of *gsl-lite* |
 `gsl_lite_MINOR`                        | Minor version number of *gsl-lite* |
 `gsl_lite_PATCH`                        | Patch version number of *gsl-lite* |
-`gsl_lite_VERSION`                      | A string holding the semantic version number (\<major\>.\<minor\>.\<patch\>) of *gsl-lite* (e.g. `"1.0.0"`) |
+`gsl_lite_VERSION`                      | A string holding the semantic version number \<major\>.\<minor\>.\<patch\> of *gsl-lite* (e.g. `"1.0.0"`) |
 **Language and library support:**       | &nbsp;          |
 `gsl_CPPxx_OR_GREATER`                  | Whether C++xx language features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 `gsl_STDLIB_CPPXX_OR_GREATER`           | Whether C++xx standard library features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
