@@ -717,7 +717,7 @@
 #else
 # define gsl_HAVE_WCHAR  1
 #endif
-#define gsl_HAVE_WCHAR_()  gsl_HAVE_WCHAR
+#define  gsl_HAVE_WCHAR_()  gsl_HAVE_WCHAR
 
 // Compiling device code:
 
