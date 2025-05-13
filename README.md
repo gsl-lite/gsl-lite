@@ -73,8 +73,6 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 
 *gsl-lite* recognizes when it is compiled for the CUDA platform and decorates some functions with `__host__` and `__device__` accordingly.
 
-*gsl-lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
-
 
 ## License
 
