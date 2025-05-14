@@ -103,7 +103,7 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 - [`owner<P>` (C++11 and higher)](#ownerp-c11-and-higher)
 - [`not_null<P>`](#not_nullp)
     - [Motivation](#motivation)
-    - [Usage](#usage)
+    - [Reference](#reference)
     - [Nullability and the moved-from state](#nullability-and-the-moved-from-state)
 - [`not_null_ic<P>`](#not_null_icp)
 
@@ -124,12 +124,12 @@ using owner = P;
 ```
 (*Note:* The actual definition uses a SFINAE constraint to support C\+\+11 to C\+\+17).
 
-As far as the type system and the runtime behavior is concerned, `owner<P>` is exactly equivalent to `P`. However, the annotation
-conveys intent to a reader, and static analysis tools may use the annotation impose semantic checks based on the assumption of ownership.
+As far as the type system and the runtime behavior is concerned, `owner<P>` is exactly equivalent to `P`. However, the annotation conveys
+intent to a reader, and static analysis tools may use the annotation to impose semantic checks based on the assumption of ownership.
 
 If possible, a smart pointer with automatic lifetime management such as [`std::unique_ptr<>`](https://en.cppreference.com/w/cpp/memory/unique_ptr)
-or [`std::shared_ptr<>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) should be used instead. `owner<>` is meant to annotate raw
-pointers which cannot currently be replaced with a smart pointer.
+or [`std::shared_ptr<>`](https://en.cppreference.com/w/cpp/memory/shared_ptr) should be used instead. The purpose of `owner<>` is annotation of
+raw pointers which cannot currently be replaced with a smart pointer.
 
 
 ### `not_null<P>`
@@ -187,27 +187,14 @@ The function would be less awkward if it accepted pointers.
 
 To make sure a pointer argument is not `nullptr`, we can add a precondition check to the function:
 ```c++
-void remove( ListNode * x )
-{
-    gsl_Expects( x != nullptr );
-
-    if ( x->prev != nullptr ) x->prev->next = x->next;
-    if ( x->next != nullptr ) x->next->prev = x->prev;
-    delete x;
-}
-```
-
-There are other situations when an object cannot be passed by reference, but a `nullptr` may still be unwanted. The most
-familiar case is passing ownership, best expressed with a smart pointer:
-```c++
-void insertAfter( ListNode * x, std::unique_ptr<ListNode> newNode )
+void insertAfter( ListNode * x, ListNode * newNode )
 {
     gsl_Expects( x != nullptr );
     gsl_Expects( newNode != nullptr );
 
     newNode->prev = x;
     newNode->next = x->next;
-    x->next = newNode.release();
+    x->next = newNode;
 }
 ```
 
@@ -219,23 +206,63 @@ This is where `not_null<>` comes in.  With `not_null<>`, the precondition can be
 and thus into the function signature:
 
 ```c++
-void remove( not_null<ListNode*> x )
+void insertAfter( not_null<ListNode *> x, not_null<ListNode *> newNode )
 {
-    if ( x->prev != nullptr ) x->prev->next = x->next;
-    delete x;
+    newNode->prev = x;
+    newNode->next = x->next;
+    x->next = newNode;
 }
 ```
 
 All `not_null<>` constructors check their arguments for `nullptr` with `gsl_Expects()`, so the functions above can already assume
 that their arguments will never be `nullptr`, and the explicit precondition checks can be omitted.
 
-`not_null<>` can also be used with smart pointers, so the signature of the function `insertAfter()` could be changed to
+When calling the function `insertAfter()`, it is understood that the caller passes ownership of the node `newNode`.
+Transfer of ownership is best expressed with a smart pointer such as `std::unique_ptr<>`, which can also be used as an
+argument to `not_null<>`:
+
 ```c++
-void insertAfter( not_null<ListNode*> x, not_null<std::unique_ptr<ListNode>> newNode );
+void insertAfter( not_null<ListNode *> x, not_null<std::unique_ptr<ListNode>> newNode );
+```
+
+A `not_null<std::unique_ptr<>>` can be passed around just like a `std::unique_ptr<>`:
+```c++
+void insertAfterEnd( not_null<ListNode *> lastNode, not_null<std::unique_ptr<ListNode>> newNode )
+{
+    gsl_Expects( lastNode->next == nullptr );
+
+    insertAfter( lastNode, std::move( newNode ) );
+}
+```
+
+Because `newNode` is non-nullable, releasing the pointer it holds is not straightforward:
+
+```c++
+void insertAfter( not_null<ListNode *> x, not_null<std::unique_ptr<ListNode>> newNode )
+{
+    newNode->prev = x;
+    newNode->next = x->next;
+    x->next = newNode.release();  // error: `not_null<>` has no member function `release()`
+}
+```
+
+To extract the raw pointer, we first have to extract a nullable `unique_ptr<>`:
+
+```c++
+    std::unique_ptr<ListNode> rawNewNode = std::move( newNode );
+    x->next = rawNewNode.release();
+}
+```
+
+This can be written as a one-liner with `gsl_lite::as_nullable()`:
+
+```c++
+    x->next = gsl_lite::as_nullable( std::move( newNode ) ).release();
+}
 ```
 
 
-#### Usage
+#### Reference
 
 `not_null<P>` strives to behave like the underlying type `P` as transparently as reasonably possible:
 
@@ -294,7 +321,7 @@ auto pi = gsl_lite::as_nullable( std::move( npi ) );  // std::unique_ptr<int>
 
 This is useful when accessing operations of `P` not forwarded by `not_null<P>`:
 ```c++
-void insertAfter( not_null<ListNode*> x, not_null<std::unique_ptr<ListNode>> newNode )
+void insertAfter( not_null<ListNode *> x, not_null<std::unique_ptr<ListNode>> newNode )
 {
     newNode->prev = x;
     newNode->next = x->next;
@@ -327,12 +354,15 @@ struct FileCloser
 };
 using FilePtr = std::unique_ptr<std::FILE, FileCloser>;
 
-class FileHandle  // movable
+class FileHandle
 {
 private:
     FilePtr file_;
 
 public:
+    FileHandle( FileHandle & rhs ) = default;
+    FileHandle & operator =( FileHandle & rhs ) = default;
+
     explicit FileHandle( FilePtr _file )
         : file_( std::move( _file ) )
     {
@@ -345,17 +375,77 @@ public:
 };
 ```
 
-In this class, null checks can be introduced simply by changing the definition of `FilePtr` to
+To make `FileHandle` null-safe, we can add explicit precondition checks:
+
 ```c++
-using FilePtr = not_null<std::unique_ptr<std::FILE, FileCloser>>;
+class FileHandle  // movable
+{
+private:
+    FilePtr file_;
+
+public:
+    FileHandle( FileHandle & rhs )
+        : file_( std::move( rhs.file_ ) )
+    {
+        gsl_Expects( file_ != nullptr );
+    }
+    FileHandle & operator =( FileHandle & rhs )
+    {
+        gsl_Expects( rhs.file_ != nullptr );
+        file_ = std::move(rhs.file_);
+        return *this;
+    }
+
+    explicit FileHandle( FilePtr _file )
+        : file_( std::move( _file ) )
+    {
+        gsl_Expects( file_ != nullptr );
+    }
+    int getc()
+    {
+        gsl_Expects( file_ != nullptr );
+        return std::fgetc( file_.get() );
+    }
+    ...
+};
 ```
-Any code constructing a `FileHandle` will then have to make an explicit `not_null()` check:
+
+This is very tedious, not least because we have to define move constructor and move assignment operator manually.
+
+By using `not_null<>`, we can instead "lift" these precondition checks to the type system and have all the
+precondition checks be generated automatically:
+
 ```c++
-std::FILE* rawFile = std::fopen( ... );
-if ( rawFile == nullptr ) throw std::runtime_error( ... );
-auto file = FileHandle( not_null( rawFile ) );
+class FileHandle  // still movable
+{
+private:
+    not_null<FilePtr> file_;  // <--
+
+public:
+    FileHandle( FileHandle & rhs ) = default;  // implicit precondition check `rhs.file_ != nullptr`
+    FileHandle & operator =( FileHandle & rhs ) = default;  // implicit precondition check `rhs.file_ != nullptr`
+
+    explicit FileHandle( not_null<FilePtr> _file )  // <--
+        : file_( std::move( _file ) )
+    {
+        // implicit precondition check `_file != nullptr`
+    }
+    int getc()
+    {
+        // implicit precondition check `file_ != nullptr`
+        return std::fgetc( file_.get() );
+    }
+    ...
+};
 ```
-But any function accepting a `FileHandle` can now be sure that the handle is not `nullptr`:
+
+Any code constructing a `FileHandle` will now have to explicitly declare the pointer `not_null`:
+```c++
+auto filePtr = FilePtr( std::fopen( ... ) );
+if ( filePtr == nullptr ) throw std::runtime_error( ... );
+auto file = FileHandle( not_null( std::move( filePtr ) ) );
+```
+But any function accepting a `FileHandle` can now be sure that the object holds a valid pointer:
 ```c++
 std::vector<std::string>
 readLines( FileHandle file )
@@ -364,18 +454,13 @@ readLines( FileHandle file )
     ...
 }
 ```
-Again, one could say that `not_null<>` "lifts" the precondition of non-nullability into the type system.
 
-Technically, non-nullability is not necessarily an invariant of `not_null<>`, and thus our redefinition of
-`FilePtr` does not add a non-nullability invariant to `FileHandle`.
-However, because a `nullptr` can appear only in the *moved-from state*, a nullability contract violation
-can occur only if a moved-from object is being used. Because *use-after-move* errors can often be detected by static
-analysis tools, this may be considered "safe enough" for practical purposes.
-
-It should be noted that, for movable types `P`, `not_null<P>` enforces a runtime contract check on every access.
-Therefore, when calling the `getc()` member function on a moved-from `FileHandle` object, a runtime contract violation
-would be triggered on the `file_.get()` call. This means that, through adopting `not_null<>`, `FileHandle::getc()`
-adopts the implicit precondition that the object be not in the moved-from state.
+Although `not_null<>` can be used to inject preconditions and postconditions, it does not add new invariants.
+After being moved from, a `FileHandle` indeed holds a `nullptr` in its `file_` pointer.
+Therefore, non-nullability of the `file_` pointer is not an invariant of the `FileHandle` class.
+However, a `FileHandle` is still safe to use because of the implicit precondition checks injected by `not_null<>`.
+Also, *use-after-move* errors can often be detected by static analysis tools, so this may be considered
+"safe enough" for practical purposes.
 
 <!--(Recommended further reading: Herb Sutter's article ["Move, simply"](https://herbsutter.com/2020/02/17/move-simply/),
 which argues that objects that have a special moved-from state in which most of their operations may not be used
@@ -388,6 +473,16 @@ auto npi = gsl_lite::make_unique<int>( 42 );
 // ...
 //if (npi == nullptr) { ... }  // compile error
 if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
+```
+
+*gsl-lite* also defines a set of helper functions `make_not_null()` for explicitly constructing `not_null<>`
+objects. This is useful for type inference in C++14 and older where
+[class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
+is not available. Example:
+```c++
+auto filePtr = FilePtr( std::fopen( ... ) );
+if ( filePtr == nullptr ) throw std::runtime_error( ... );
+auto file = FileHandle( make_not_null( std::move( filePtr ) ) );
 ```
 
 
@@ -444,11 +539,11 @@ loss of information, an exception of type `gsl_lite::narrowing_error` is thrown.
 double volume = ...;  // (m³)
 double bucketCapacity = ...;  // (m³)
 double numBucketsF = std::ceil( volume/bucketCapacity );
-auto numBuckets = gsl::narrow<gsl::dim>( numBucketsF );
+auto numBuckets = gsl_lite::narrow<int>( numBucketsF );
 ```
 
 In this example, an exception will be thrown if `numBucketsF` is not an integer (for instance, `std::ceil(-INFINITY)` will return `-INFINITY`),
-or if the value cannot be represented by the integer type `gsl::dim`.
+or if the value cannot be represented by `int`.
 
 
 ### `narrow_failfast<T>( u )`
@@ -463,25 +558,37 @@ The `narrow<T>( u )` function specified by the C++ Core Guidelines throws an exc
 (for instance, "input data too large"). The exception may be caught and dealt with at runtime. Contrariwise, the purpose of
 `narrow_failfast<T>( u )` is to detect programming errors which the user of the program cannot do anything about.
 
-**Example:**
+**Example 1:**
 ```c++
-auto vec = std::vector{ ... };
-auto elem = ...;
-auto pos = std::find( vec.begin(), vec.end(), elem );  // let us assume `pos < vec.end()`
-auto diff = pos - vec.end();  // <-- bug: we accidentally swapped `pos` and `vec.end()`
-auto size = gsl::narrow<std::size_t>( diff );  // assertion violation: `diff` is negative
-auto part = std::vector( size );
+void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs );
+
+int main( int argc, char * argv[] )
+{
+    auto args = gsl_lite::span(
+        argv, gsl_lite::narrow_failfast<std::size_t>( argc ) );
+    printCmdArgs( args );
+}
+```
+
+**Example 2:**
+```c++
+auto vec = std::vector{ 1, 2, 3 };
+int elem = 2;
+auto pos = std::find( vec.begin(), vec.end(), elem );
+auto delta = pos - vec.end();  // <-- bug: we accidentally swapped `pos` and `vec.end()`
+auto subrangeSize = gsl_lite::narrow_failfast<std::size_t>( delta );  // assertion violation: `delta` is negative
+auto subrange = std::vector<int>( subrangeSize );
 ```
 
 
 ### `narrow_cast<T>( u )`
 
 `narrow_cast<T>( u )` is a numeric cast in which loss of information is acceptable. It is exactly equivalent to `static_cast<T>( u )`,
-the only difference being that `narrow_cast<>()` conveys the intent that truncation or sign change is expressly acceptable.
+the only difference being that `narrow_cast<>()` conveys the intent that truncation or sign change is acceptable or even desired.
 
 **Example 1:**
 ```c++
-auto allBitsSet = gsl::narrow_cast<std::uint32_t>( -1 );  // sign change to 0xFFFFFFFF
+auto allBitsSet = gsl_lite::narrow_cast<std::uint32_t>( -1 );  // sign change to 0xFFFFFFFF
 ```
 
 **Example 2:**
@@ -490,7 +597,7 @@ int floor( float val )
 {
     gsl_Expects( val >= std::numeric_limits<int>::lowest() && val <= std::numeric_limits<int>::max() );
 
-    return gsl_lite::narrow_cast<int>( val );  // truncation is acceptable here
+    return gsl_lite::narrow_cast<int>( val );  // truncation is desired here
 }
 ```
 
@@ -507,8 +614,17 @@ with `gsl_ExpectsDebug()`.
 
 *gsl-lite* also defines a set of helper functions `make_span()` for explicitly constructing `span<>` objects. This is useful
 for type inference in C++14 and older where [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
-is not available.
+is not available. Example:
+```c++
+void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs );
 
+int main( int argc, char * argv[] )
+{
+    auto args = gsl_lite::span(
+        argv, gsl_lite::narrow_failfast<std::size_t>( argc ) );
+    printCmdArgs( args );
+}
+```
 
 ## Bounds-checked element access
 
@@ -548,12 +664,12 @@ Type alias | Purpose                                        |
 
 **Example:**
 ```c++
-auto x = std::vector{ ... };
-auto dx = std::vector( x.size() - 1 );
+auto x = std::vector<double>{ ... };
+auto dx = std::vector<double>( x.size() - 1 );
 gsl_lite::dim n = std::ssize( x );
 for ( gsl_lite::index i = 0; i < n - 1; ++i )
 {
-    y[ i ] = x[ i ] - x[ i - 1 ];
+    dx[ i ] = x[ i + 1 ] - x[ i ];
 }
 ```
 
@@ -765,7 +881,7 @@ Name                        | Notes           |
 The following macros help avoid writing repetitive code:
 
 - `gsl_DEFINE_ENUM_BITMASK_OPERATORS( e )`:  
-  Defines bitmask operators `\|`, `&`, `^`, `~`, `\|=`, `&=`, and `^=` for the enum type `e`.  
+  Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the enum type `e`.  
   Example:  
   ```c++
   enum class Vegetables

@@ -38,11 +38,14 @@
 
 namespace my_lib {
 
-    namespace gsl = ::gsl_lite;  // define this in your own namespace
+        // Define this in your own namespace.
+    namespace gsl = ::gsl_lite;
 
-    double mean( gsl::span<double const> values )  // contiguous range with bounds checks
+        // `span<T[, Extent]>`: contiguous range with bounds checks
+    double mean( gsl::span<double const> values )
     {
-        gsl_Expects( !values.empty() );  // precondition check
+            // `gsl_Expects( cond )`: precondition check
+        gsl_Expects( !values.empty() );
     
         double sum = std::accumulate( values.begin(), values.end(), 0. );
         return sum / std::ssize( values );
@@ -55,15 +58,16 @@ namespace my_lib {
         Resource( std::size_t size );
     };
 
-    gsl::not_null<std::unique_ptr<Resource>>  // type-encoded postcondition
-    acquireResource( gsl::dim size )  // signed size type
-    {
-        return gsl::make_unique<Resource>(  // `make_unique<>()` with non-nullable result
-            gsl::narrow_failfast<gsl::dim>( size ));  // checked numeric cast
-    }
+        // Type-encoded precondition with `not_null<P>`
+    void consumeResource( gsl::not_null<std::unique_ptr<Resource>> resource );
 
-    void consumeResource(
-        gsl::not_null<std::unique_ptr<Resource>> resource );  // type-encoded precondition
+        // Type-encoded postcondition with `not_null<P>`
+    gsl::not_null<std::unique_ptr<Resource>> acquireResource( int size )
+    {
+            // A flavor of `make_unique<T>()` which returns `not_null<std::unique_ptr<T>>`
+        return gsl::make_unique<Resource>(
+            gsl::narrow_failfast<std::size_t>( size ));  // A checked numeric cast.
+    }
 
 } // namespace my_lib
 ```
