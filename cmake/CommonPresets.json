@@ -48,9 +48,9 @@
             "environment": {
                 "_PRESET_CFLAGS": "/utf-8",
                 "_PRESET_CXXFLAGS": "/utf-8",
-                "_PRESET_CUDAFLAGS": "-Xcompiler /utf-8",
-                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
-                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/WX>",
+                "_PRESET_CUDAFLAGS": "-Xcompiler=/utf-8",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/WX>",
                 "_PRESET_ASAN": "/fsanitize=address",
                 "_PRESET_UBSAN": "/fsanitize=undefined", // not currently supported
                 "_PRESET_TSAN": "/fsanitize=thread", // not currently supported
@@ -70,9 +70,9 @@
             "environment": {
                 "_PRESET_CFLAGS": "/utf-8",
                 "_PRESET_CXXFLAGS": "/utf-8",
-                "_PRESET_CUDAFLAGS": "-Xcompiler /utf-8",
-                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
-                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;/WX>",
+                "_PRESET_CUDAFLAGS": "-Xcompiler=/utf-8",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/WX>",
                 "_PRESET_ASAN": "/fsanitize=address",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
                 "_PRESET_TSAN": "-fsanitize=thread", // not currently supported
@@ -93,8 +93,8 @@
                 "_PRESET_CFLAGS": "",
                 "_PRESET_CXXFLAGS": "",
                 "_PRESET_CUDAFLAGS": "",
-                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Wall,-Wextra,-pedantic>",
-                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Werror>",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wall,-Wextra,-pedantic>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>",  // avoid -Werror for CUDA host compilers for now
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-undefined-trap-on-error",
                 "_PRESET_TSAN": "-fsanitize=thread",
@@ -110,8 +110,8 @@
                 "_PRESET_CFLAGS": "",
                 "_PRESET_CXXFLAGS": "",
                 "_PRESET_CUDAFLAGS": "",
-                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Wall,-Wextra,-pedantic>",
-                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler;-Werror>",
+                "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wall,-Wextra,-pedantic>",
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>",  // avoid -Werror for CUDA host compilers for now
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
                 "_PRESET_TSAN": "-fsanitize=thread",
@@ -175,7 +175,7 @@
             "inherits": "compiler presets",
             "environment": {
                 "_USE_PRESET_STDLIB": "-stdlib=libstdc++",
-                "_CUDA_USE_PRESET_STDLIB": "-Xcompiler -stdlib=libstdc++",
+                "_CUDA_USE_PRESET_STDLIB": "-Xcompiler=-stdlib=libstdc++",
                 "_PRESET_DEBUGCHECKS2": "-D_GLIBCXX_DEBUG"
             }
         },
