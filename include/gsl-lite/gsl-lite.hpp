@@ -1416,7 +1416,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 // - C26473: gsl::t.1   : don't cast between pointer types where the source type and the target type are the same
 // - C26481: gsl::b.1   : don't use pointer arithmetic. Use span instead
 // - C26482: gsl::b.2   : only index into arrays using constant expressions
-// - C26446: gdl::b.4   : prefer to use gsl_lite::at() instead of unchecked subscript operator
+// - C26446: gsl::b.4   : prefer to use gsl_lite::at() instead of unchecked subscript operator
 // - C26490: gsl::t.1   : don't use reinterpret_cast
 // - C26487: gsl::l.4   : don't return a pointer '(<some number>'s result)' that may be invalid
 // - C26434: gsl::c.128 : function 'symbol_1' hides a non-virtual function 'symbol_2' (false positive for compiler-generated functions such as constructors)
@@ -1976,7 +1976,7 @@ using std::shared_ptr;
 #  define  gsl_FAILFAST_()                ( gsl_TRAP_() )
 # elif defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl_lite::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::fail_fast_assert_handler( "", "gsl-lite: failure", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
 # else // defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS ) [default]
 #  if ! defined( NDEBUG )
 #   define gsl_CONTRACT_CHECK_( str, x )  assert( str && ( x ) )
@@ -2008,18 +2008,18 @@ using std::shared_ptr;
 #  endif
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl_lite::fail_fast_assert_handler( "", "GSL: failure", __FILE__, __LINE__ ), ::gsl_lite::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::fail_fast_assert_handler( "", "gsl-lite: failure", __FILE__, __LINE__ ), ::gsl_lite::detail::fail_fast_terminate() ) /* do not let the custom assertion handler continue execution */
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 #  if ! defined( NDEBUG )
 #   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( str && ( x ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#   define gsl_FAILFAST_()                ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( ! "GSL: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_, ::gsl_lite::detail::fail_fast_abort() )
+#   define gsl_FAILFAST_()                ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ assert( ! "gsl-lite: failure" ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_, ::gsl_lite::detail::fail_fast_abort() )
 #  else
 #   define gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_abort() gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
 #   define gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_abort() )
 #  endif
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( str ": '" #x "' at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
-#  define  gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_throw( "GSL: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
+#  define  gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_throw( "gsl-lite: failure at " __FILE__ ":" gsl_STRINGIFY(__LINE__) ) )
 # else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
 #  define  gsl_CONTRACT_CHECK_( str, x )  ( gsl_SUPPRESS_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ ( ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_terminate() ) gsl_RESTORE_NVHPC_CONTROLLING_EXPRESSION_IS_CONSTANT_ )
 #  define  gsl_FAILFAST_()                ( ::gsl_lite::detail::fail_fast_terminate() )
@@ -2045,49 +2045,49 @@ using std::shared_ptr;
 #endif
 
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "GSL: Precondition failure", x )
+# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "gsl-lite: Precondition failure", x )
 #else
 # define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (debug)", x )
+# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "gsl-lite: Precondition failure (debug)", x )
 #else
 # define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Precondition failure (audit)", x )
+# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "gsl-lite: Precondition failure (audit)", x )
 #else
 # define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #endif
 
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "GSL: Postcondition failure", x )
+# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "gsl-lite: Postcondition failure", x )
 #else
 # define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (debug)", x )
+# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "gsl-lite: Postcondition failure (debug)", x )
 #else
 # define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Postcondition failure (audit)", x )
+# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "gsl-lite: Postcondition failure (audit)", x )
 #else
 # define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #endif
 
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "GSL: Assertion failure", x )
+# define  gsl_Assert( x )       gsl_CONTRACT_CHECK_( "gsl-lite: Assertion failure", x )
 #else
 # define  gsl_Assert( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertDebug( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (debug)", x )
+# define  gsl_AssertDebug( x )  gsl_CONTRACT_CHECK_( "gsl-lite: Assertion failure (debug)", x )
 #else
 # define  gsl_AssertDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "GSL: Assertion failure (audit)", x )
+# define  gsl_AssertAudit( x )  gsl_CONTRACT_CHECK_( "gsl-lite: Assertion failure (audit)", x )
 #else
 # define  gsl_AssertAudit( x )  gsl_ELIDE_( x )
 #endif
