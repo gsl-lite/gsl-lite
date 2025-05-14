@@ -1,0 +1,15 @@
+﻿{
+    "version": 9,
+    "configurePresets": [
+        {
+            "name": "default",
+            "displayName": "default",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": "Windows"
+                }
+            }
+        }
+    ]
+}

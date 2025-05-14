@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,7 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 
-using namespace gsl;
+using namespace gsl_lite;
 
 CASE( "at(): Terminates access to non-existing C-array elements" )
 {
@@ -63,7 +63,7 @@ CASE( "at(): Terminates access to non-existing std::initializer_list elements (C
 #endif
 }
 
-CASE( "at(): Terminates access to non-existing gsl::span elements" )
+CASE( "at(): Terminates access to non-existing gsl_lite::span elements" )
 {
     int arr[] = { 1, 2, 3, 4 };
     span<int> a( arr );
@@ -144,7 +144,7 @@ CASE( "at(): Allows to access std::initializer_list elements (C++11)" )
 #endif
 }
 
-CASE( "at(): Allows to access gsl::span elements" )
+CASE( "at(): Allows to access gsl_lite::span elements" )
 {
     size_t        arr[] = { 1, 2, 3, 4 };
     size_t const carr[] = { 1, 2, 3, 4 };

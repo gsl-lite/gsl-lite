@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,6 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 #include <cstddef>
+#include <complex>
 #include <functional>
 
 #if gsl_STDLIB_CPP11_OR_GREATER
@@ -27,7 +28,7 @@
 
 #define gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL ( gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VERSION >= 110 )
 
-using namespace gsl;
+using namespace gsl_lite;
 
 CASE( "finally: Allows to run lambda on leaving scope" )
 {
@@ -75,85 +76,8 @@ CASE( "finally: Allows to run function (pointer) on leaving scope" )
         EXPECT( g_i == 0 );
     }
     EXPECT( g_i == 1 );
-#else
-    g_i = 0;
-    {
-        final_action _ = finally( &F::incr );
-        EXPECT( g_i == 0 );
-    }
-    EXPECT( g_i == 1 );
 #endif
 }
-
-#if gsl_CONFIG_DEFAULTS_VERSION < 1
-CASE( "finally: Allows to move final_action" )
-{
-#if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
-    struct F { static void incr( int & i ) { i += 1; } };
-
-    int i = 0;
-    {
-        auto _1 = finally( [&]() { F::incr( i ); } );
-        {
-            auto _2 = std::move( _1 );
-            EXPECT( i == 0 );
-        }
-        EXPECT( i == 1 );
-        {
-            auto _2 = std::move( _1 );
-            EXPECT( i == 1 );
-        }
-        EXPECT( i == 1 );
-    }
-    EXPECT( i == 1 );
-#else
-    struct F { static void incr() { g_i += 1; } };
-
-    g_i = 0;
-    {
-        final_action _1 = finally( &F::incr );
-        {
-            final_action _2 = _1;
-            EXPECT( g_i == 0 );
-        }
-        EXPECT( g_i == 1 );
-        {
-            final_action _2 = _1;
-            EXPECT( g_i == 1 );
-        }
-        EXPECT( g_i == 1 );
-    }
-    EXPECT( g_i == 1 );
-#endif
-}
-
-CASE( "finally: Allows moving final_action to throw" "[.]")
-{
-#if gsl_HAVE( EXCEPTIONS )
-# if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
-    struct action
-    {
-        int & i_;
-        void operator()(){ i_ += 1; }
-        action( int & i ) : i_( i ) {}
-        action( action && other ) : i_( other.i_) { throw std::runtime_error("action move-ctor"); }
-    };
-
-    int i = 0;
-    {
-        {
-            EXPECT_THROWS( (void) finally( action( i ) ) );
-        }
-        EXPECT( i == 1 );
-    }
-
-    // ... 
-# else
-    EXPECT( !!"lambda is not available (no C++11)" );
-# endif
-#endif // gsl_HAVE( EXCEPTIONS )
-}
-#endif // gsl_CONFIG_DEFAULTS_VERSION < 1
 
 CASE( "on_return: Allows to perform action on leaving scope without exception (gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" )
 {
@@ -165,19 +89,13 @@ CASE( "on_return: Allows to perform action on leaving scope without exception (g
         static void pass() { try { auto _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
         static void fail() { try { auto _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
     };
-#  else
-    struct F { 
-        static void incr() { g_i += 1; }
-        static void pass() { try { final_action_return _ = on_return( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
-        static void fail() { try { final_action_return _ = on_return( &F::incr );   throw std::exception();   } catch (...) {} }
-    };
-#  endif
     struct G {
         ~G() { F::pass(); }
     };
     { g_i = 0; F::pass(); EXPECT( g_i == 1 ); }
     { g_i = 0; F::fail(); EXPECT( g_i == 0 ); }
     { g_i = 0; try { G g; throw std::exception(); } catch (...) {}; EXPECT( g_i == 1 ); }
+#  endif
 # else
     EXPECT( !!"on_return not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
 # endif
@@ -194,19 +112,13 @@ CASE( "on_error: Allows to perform action on leaving scope via an exception (gsl
         static void pass() { try { auto _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
         static void fail() { try { auto _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
     };
-#  else
-    struct F { 
-        static void incr() { g_i += 1; }
-        static void pass() { try { final_action_error _ = on_error( &F::incr ); /*throw std::exception();*/ } catch (...) {} }
-        static void fail() { try { final_action_error _ = on_error( &F::incr );   throw std::exception();   } catch (...) {} }
-    };
-#  endif
     struct G {
         ~G() { F::pass(); }
     };
     { g_i = 0; F::pass(); EXPECT( g_i == 0 ); }
     { g_i = 0; F::fail(); EXPECT( g_i == 1 ); }
     { g_i = 0; try { G g; throw std::exception(); } catch (...) {}; EXPECT( g_i == 0 ); }
+#  endif
 # else
     EXPECT( !!"on_error not available (no gsl_FEATURE_EXPERIMENTAL_RETURN_GUARD)" );
 # endif
@@ -267,6 +179,15 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
 #endif // gsl_HAVE( EXCEPTIONS )
 }
 
+CASE( "narrow<>(): Allows narrowing unordered type without precision loss" )
+{
+#if gsl_HAVE( EXCEPTIONS ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    std::complex<float> cf;
+    EXPECT_NO_THROW( cf = narrow<std::complex<float>>( std::complex<double>( 4, 2 ) ) );
+    EXPECT( narrow<std::complex<float>>( std::complex<double>( 4, 2 ) ) == std::complex<float>( 4, 2 ) );
+#endif // gsl_HAVE( EXCEPTIONS ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+}
+
 CASE( "narrow<>(): Throws when narrowing with value loss" )
 {
 #if gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -304,6 +225,13 @@ CASE( "narrow<>(): Throws when narrowing with sign loss" )
 #endif // gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 }
 
+CASE( "narrow<>(): Throws when narrowing unordered type with precision loss" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    EXPECT_THROWS_AS( (void) narrow<std::complex<float>>( std::complex<double>( 4.2 ) ), narrowing_error );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+}
+
 CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 {
     EXPECT( narrow_failfast<char>( 120 ) == 120 );
@@ -337,6 +265,15 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
+CASE( "narrow_failfast<>(): Allows narrowing unordered type without precision loss" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    std::complex<float> cf;
+    EXPECT_NO_THROW( cf = narrow_failfast<std::complex<float>>( std::complex<double>( 4, 2 ) ) );
+    EXPECT( narrow_failfast<std::complex<float>>( std::complex<double>( 4, 2 ) ) == std::complex<float>( 4, 2 ) );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+}
+
 CASE( "narrow_failfast<>(): Fails when narrowing with value loss" )
 {
     EXPECT_THROWS_AS( (void) narrow_failfast<char>( 300 ), fail_fast );
@@ -368,6 +305,13 @@ CASE( "narrow_failfast<>(): Fails when narrowing with sign loss" )
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t( i8n) ), fail_fast );
     EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
 #endif // gsl_STDLIB_CPP11_OR_GREATER
+}
+
+CASE( "narrow_failfast<>(): Fails when narrowing unordered type with precision loss" )
+{
+#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::complex<float>>( std::complex<double>( 4.2 ) ), fail_fast );
+#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 }
 
 #if gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 )

@@ -1,4 +1,4 @@
-# Copyright 2015-2019 by Martin Moene
+﻿# Copyright 2015-2019 by Martin Moene
 # Copyright 2019-2021 by Moritz Beutel
 #
 # gsl-lite is based on GSL: Guidelines Support Library,
@@ -306,14 +306,14 @@ function( make_test_target target )
 
     target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${localDefinitions} )
-    target_link_libraries( ${target} PRIVATE ${PACKAGE}-${SCOPE_DEFAULTS_VERSION} )
+    target_link_libraries( ${target} PRIVATE gsl-lite-${SCOPE_DEFAULTS_VERSION} )
 
     if( NOT SCOPE_NO_PCH
             AND NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5
             AND NOT ( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_SYSTEM_NAME MATCHES "Darwin" ) )  # and GCC on MacOS has trouble with addresses of some text segments in the PCH
         target_precompile_headers( ${target}
             PRIVATE
-                <gsl/gsl-lite.hpp>
+                <gsl-lite/gsl-lite.hpp>
                 <ostream>
                 <sstream>
                 <iostream>

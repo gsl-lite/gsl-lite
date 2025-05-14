@@ -1,11 +1,12 @@
-// Use span
+﻿// Use span
 
-#include "gsl/gsl-lite.hpp"
-#include <iostream>
 #include <array>
 #include <vector>
+#include <iostream>
 
-using namespace gsl;
+#include <gsl-lite/gsl-lite.hpp>
+
+using namespace gsl_lite;
 
 int line = 0;
 
@@ -62,8 +63,3 @@ int main()
     good( s.subspan( 1, 3 ) );          // 12. Fine
     good( s.subspan( 1, 5 ) );          // 13. Run-time error, terminate
 }
-
-#if 0
-cl -EHsc -I../include/gsl 02-span.cpp && 02-span.exe
-g++ -std=c++11 -Wall -I../include/gsl -o 02-span.exe 02-span.cpp && 02-span.exe
-#endif

@@ -1,50 +1,31 @@
-# Copyright 2015-2018 by Martin Moene
+﻿# Copyright 2015-2019 by Martin Moene
+# Copyright 2019-2025 by Moritz Beutel
 #
-# gsl-lite is based on GSL: Guidelines Support Library,
-# https://github.com/microsoft/gsl
+# https://github.com/gsl-lite/gsl-lite
 #
 # This code is licensed under the MIT License (MIT).
 
-if( NOT DEFINED CMAKE_MINIMUM_REQUIRED_VERSION )
-    cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
-endif()
 
-project( gsl-lite-example LANGUAGES CXX )
+cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
-set( unit_name "gsl" )
-set( PACKAGE   ${unit_name}-lite )
+project( gsl-lite-examples LANGUAGES CXX )
 
 message( STATUS "Subproject '${PROJECT_NAME}'")
 
-# Target default options and definitions:
-
-set( OPTIONS "" )
-set( DEFINITIONS "" )
-
-# Sources (.cpp) and their base names:
-
-set( SOURCES
-    01-basic.cpp
-    02-span.cpp
+add_executable( 01-basic
+    "01-basic.cpp"
+)
+target_compile_features( 01-basic PRIVATE cxx_std_11 )
+target_link_libraries( 01-basic
+    PRIVATE
+        gsl-lite::gsl-lite
 )
 
-string( REPLACE ".cpp" "" BASENAMES "${SOURCES}" )
-
-# Function to create a target:
-
-function( make_target source )
-    string( REPLACE ".cpp" "" target "${source}" )
-    add_executable            ( ${target} ${source}  )
-    target_link_libraries     ( ${target} PRIVATE ${PACKAGE} )
-    target_compile_options    ( ${target} PRIVATE ${OPTIONS} )
-    target_compile_definitions( ${target} PRIVATE ${DEFINITIONS} )
-    set_target_properties     ( ${target} PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO )
-endfunction()
-
-# Targets:
-
-foreach( target ${BASENAMES} )
-    make_target( ${target} )
-endforeach()
-
-# end of file
+add_executable( 02-span
+    "02-span.cpp"
+)
+target_compile_features( 02-span PRIVATE cxx_std_11 )
+target_link_libraries( 02-span
+    PRIVATE
+        gsl-lite::gsl-lite
+)

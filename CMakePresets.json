@@ -1,0 +1,85 @@
+﻿{
+    "version": 9,
+    "include": [ "cmake/CommonPresets.json" ],
+    "configurePresets": [
+        {
+            "name": "defaults",
+            "hidden": true,
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}"
+            }
+        },
+        {
+            "name": "CI settings",
+            "hidden": true,
+            "inherits": [ "defaults", "CI", "high warning level", "warnings as errors" ],
+            "cacheVariables": {
+                // Project-specific settings
+                "GSL_LITE_OPT_BUILD_TESTS": "ON",
+                "GSL_LITE_OPT_BUILD_EXAMPLES": "ON"
+            }
+        },
+        {
+            "name": "ci-msvc",
+            "displayName": "MSVC (for CI)",
+            "description": "Build with MSVC (for Continuous Integration).",
+            "inherits": [ "CI settings", "MSVC presets" ]
+        },
+        {
+            "name": "ci-msvc-sanitize",
+            "displayName": "MSVC & ASan (for CI)",
+            "description": "Build with MSVC and AddressSanitizer (for Continuous Integration).",
+            "inherits": [ "CI settings", "MSVC presets", "ASan" ]
+        },
+        {
+            "name": "ci-clang-cl",
+            "displayName": "clang-cl (for CI)",
+            "description": "Build with clang-cl (for Continuous Integration).",
+            "inherits": [ "CI settings", "clang-cl presets" ]
+        },
+        {
+            "name": "ci-clang-cl-sanitize",
+            "displayName": "clang-cl & UBSan (for CI)",
+            "description": "Build with clang-cl and UndefinedBehaviorSanitizer (for Continuous Integration).",
+            "inherits": [ "CI settings", "clang-cl presets", "UBSan" ]
+        },
+        {
+            "name": "ci-gcc",
+            "displayName": "GCC (for CI)",
+            "description": "Build with GCC (for Continuous Integration).",
+            "inherits": [ "CI settings", "GCC presets" ]
+        },
+        {
+            "name": "ci-gcc-sanitize",
+            "displayName": "GCC & ASan & UBSan & library debug checks (for CI)",
+            "description": "Build with GCC and AddressSanitizer and UndefinedBehaviorSanitizer and library debug checks (for Continuous Integration).",
+            "inherits": [ "CI settings", "GCC presets", "ASan", "UBSan", "library debug checks" ]
+        },
+        {
+            "name": "ci-clang",
+            "displayName": "Clang (for CI)",
+            "description": "Build with Clang (for Continuous Integration).",
+            "inherits": [ "CI settings", "Clang presets" ]
+        },
+        {
+            "name": "ci-clang-sanitize",
+            "displayName": "Clang & ASan & UBSan & library debug checks (for CI)",
+            "description": "Build with Clang and AddressSanitizer and UndefinedBehaviorSanitizer and library debug checks (for Continuous Integration).",
+            "inherits": [ "CI settings", "Clang presets", "ASan", "UBSan", "library debug checks" ]
+        },
+        {
+            "name": "ci-clang-libstdc++",
+            "displayName": "Clang & libstdc++ (for CI)",
+            "description": "Build with Clang (for Continuous Integration).",
+            "inherits": [ "CI settings", "Clang presets", "libstdc++ for Clang" ]
+        },
+        {
+            "name": "ci-clang-libstdc++-sanitize",
+            "displayName": "Clang & ASan & UBSan & libstdc++ & library debug checks (for CI)",
+            "description": "Build with Clang and AddressSanitizer and UndefinedBehaviorSanitizer and libstdc++ and library debug checks (for Continuous Integration).",
+            "inherits": [ "CI settings", "Clang presets", "libstdc++ for Clang", "ASan", "UBSan", "library debug checks" ]
+        }
+    ]
+}

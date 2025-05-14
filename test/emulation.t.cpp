@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -19,7 +19,7 @@
 
 #include "gsl-lite.t.hpp"
 
-using namespace gsl;
+using namespace gsl_lite;
 
 
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( VARIADIC_TEMPLATE )

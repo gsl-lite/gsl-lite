@@ -46,7 +46,7 @@ jobs:
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
-
+    
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [14]
@@ -84,7 +84,7 @@ jobs:
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v[0-1]-cpp20'
-
+    
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
@@ -94,7 +94,7 @@ jobs:
       cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
-
+    
     - os: Windows
       cxxCompiler: Clang
       cxxCompilerVersions: [VS2019, VS2022]
@@ -102,7 +102,7 @@ jobs:
       platforms: [x86, x64]
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
-
+    
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
@@ -188,7 +188,7 @@ jobs:
       cudaCompilerVersions: [11_8, 12_1]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-
+    
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2019, VS2022]

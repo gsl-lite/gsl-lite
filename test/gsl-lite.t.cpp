@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2019 Martin Moene
+﻿// Copyright (c) 2015-2019 Martin Moene
 // Copyright (c) 2019-2021 Moritz Beutel
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
 //
@@ -272,14 +272,14 @@ int main( int argc, char * argv[] )
 }
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-namespace gsl {
+namespace gsl_lite {
 
 gsl_api void fail_fast_assert_handler( char const * const expression, char const * const message, char const * const file, int line )
 {
     std::cerr << message << ": " << expression << " at " << file << ":" << line << "\n";
 }
 
-} // namespace gsl
+} // namespace gsl_lite
 #endif
 
 #if 0
