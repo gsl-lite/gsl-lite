@@ -61,13 +61,26 @@ CASE( "span<>: Disallows construction from a std::array of incompatible type (C+
 #endif
 }
 
-CASE( "span<>: Terminates construction with a mismatching size" )
+CASE( "span<>: Terminates construction from pointer with a mismatching size" )
 {
     struct F { static void blow() { int a[2]; span<int, 3> v( a, 2 ); (void) v.size(); } };
     struct G { static void blow() { int a[2]; span<int, 3> v( a, a + 2 ); (void) v.size(); } };
 
     EXPECT_THROWS( F::blow() );
     EXPECT_THROWS( G::blow() );
+}
+
+CASE( "span<>: Terminates construction from iterator with a mismatching size" )
+{
+    struct F { static void blow() { int a[2]; span<int> u(a);    span<int, 3> v( u.begin(), 2 ); (void) v.size(); } };
+    struct G { static void blow() { int a[2]; span<int> u(a);    span<int, 3> v( u.begin(), u.begin() + 2 ); (void) v.size(); } };
+    struct H { static void blow() { int a[2]; span<int, 2> u(a); span<int, 3> v( u.begin(), 2 ); (void) v.size(); } };
+    struct I { static void blow() { int a[2]; span<int, 2> u(a); span<int, 3> v( u.begin(), u.begin() + 2 ); (void) v.size(); } };
+
+    EXPECT_THROWS( F::blow() );
+    EXPECT_THROWS( G::blow() );
+    EXPECT_THROWS( H::blow() );
+    EXPECT_THROWS( I::blow() );
 }
 
 CASE( "span<>: Terminates construction from a nullptr and a non-zero size (C++11)" )
@@ -85,8 +98,17 @@ CASE( "span<>: Terminates construction from a nullptr and a non-zero size (C++11
 
 CASE( "span<>: Terminates construction from two pointers in the wrong order" )
 {
-    struct F { static void blow() { int a[2]; span<int> v( &a[1], &a[0] ); (void) v.size(); } };
-    struct G { static void blow() { int a[2]; span<int, 2> v( &a[1], &a[0] ); (void) v.size(); } };
+    struct F { static void blow() { int a[2]; span<int> v( &a[2], &a[0] ); (void) v.size(); } };
+    struct G { static void blow() { int a[2]; span<int, 2> v( &a[2], &a[0] ); (void) v.size(); } };
+
+    EXPECT_THROWS( F::blow() );
+    EXPECT_THROWS( G::blow() );
+}
+
+CASE( "span<>: Terminates construction from two iterators in the wrong order" )
+{
+    struct F { static void blow() { int a[2]; span<int> u( a ); span<int> v( u.begin() + 2, u.begin() ); (void) v.size(); } };
+    struct G { static void blow() { int a[2]; span<int> u( a ); span<int, 2> v( u.begin() + 2, u.begin() ); (void) v.size(); } };
 
     EXPECT_THROWS( F::blow() );
     EXPECT_THROWS( G::blow() );
@@ -96,6 +118,15 @@ CASE( "span<>: Terminates construction from a null pointer and a non-zero size" 
 {
     struct F { static void blow() { int * p = gsl_nullptr; span<int> v( p, 42 ); (void) v.size(); } };
     struct G { static void blow() { int * p = gsl_nullptr; span<int, 42> v( p, 42 ); (void) v.size(); } };
+
+    EXPECT_THROWS( F::blow() );
+    EXPECT_THROWS( G::blow() );
+}
+
+CASE( "span<>: Terminates construction from a default-constructed iterator and a non-zero size" )
+{
+    struct F { static void blow() { span<int>::iterator it; span<int> v( it, 42 ); (void) v.size(); } };
+    struct G { static void blow() { span<int>::iterator it; span<int, 42> v( it, 42 ); (void) v.size(); } };
 
     EXPECT_THROWS( F::blow() );
     EXPECT_THROWS( G::blow() );
@@ -235,6 +266,20 @@ CASE( "span<>: Allows to construct from a nullptr and a zero size (C++11)" )
 #endif
 }
 
+CASE( "span<>: Allows to construct from a default-constructed iterator and a zero size" )
+{
+    span<int>::iterator it;
+    span<      int>    v ( it, size_type( 0 ) );
+    span<const int>    cv( it, size_type( 0 ) );
+    span<      int, 0> w ( it, size_type( 0 ) );
+    span<const int, 0> cw( it, size_type( 0 ) );
+
+    EXPECT( v.size()  == size_type( 0 ) );
+    EXPECT( cv.size() == size_type( 0 ) );
+    EXPECT( w.size()  == size_type( 0 ) );
+    EXPECT( cw.size() == size_type( 0 ) );
+}
+
 CASE( "span<>: Allows to construct from two pointers" )
 {
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
@@ -243,6 +288,22 @@ CASE( "span<>: Allows to construct from two pointers" )
     span<const int>    cv( arr, arr + gsl_DIMENSION_OF( arr ) );
     span<      int, 9> w ( arr, arr + gsl_DIMENSION_OF( arr ) );
     span<const int, 9> cw( arr, arr + gsl_DIMENSION_OF( arr ) );
+
+    EXPECT( std::equal( v.begin(),  v.end(),  arr ) );
+    EXPECT( std::equal( cv.begin(), cv.end(), arr ) );
+    EXPECT( std::equal( w.begin(),  w.end(),  arr ) );
+    EXPECT( std::equal( cw.begin(), cw.end(), arr ) );
+}
+
+CASE( "span<>: Allows to construct from two iterators" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    span<int> u( arr );
+    span<      int>    v ( u.begin(), u.begin() + u.ssize() );
+    span<const int>    cv( u.begin(), u.begin() + u.ssize() );
+    span<      int, 9> w ( u.begin(), u.begin() + u.ssize() );
+    span<const int, 9> cw( u.begin(), u.begin() + u.ssize() );
 
     EXPECT( std::equal( v.begin(),  v.end(),  arr ) );
     EXPECT( std::equal( cv.begin(), cv.end(), arr ) );
@@ -276,12 +337,40 @@ CASE( "span<>: Allows to construct from a non-null pointer and a size" )
     EXPECT( std::equal( cw.begin(), cw.end(), arr ) );
 }
 
+CASE( "span<>: Allows to construct from an iterator and a size" )
+{
+    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    span<int> u( arr );
+    span<      int>    v ( u.begin(), u.size() );
+    span<const int>    cv( u.begin(), u.size() );
+    span<      int, 9> w ( u.begin(), u.size() );
+    span<const int, 9> cw( u.begin(), u.size() );
+
+    EXPECT( std::equal( v.begin(),  v.end(),  arr ) );
+    EXPECT( std::equal( cv.begin(), cv.end(), arr ) );
+    EXPECT( std::equal( w.begin(),  w.end(),  arr ) );
+    EXPECT( std::equal( cw.begin(), cw.end(), arr ) );
+}
+
 CASE( "span<>: Allows to construct from a non-null pointer to const and a size" )
 {
     const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
 
     span<const int>    cv( arr, gsl_DIMENSION_OF( arr ) );
     span<const int, 9> cw( arr, gsl_DIMENSION_OF( arr ) );
+
+    EXPECT( std::equal( cv.begin(), cv.end(), arr ) );
+    EXPECT( std::equal( cw.begin(), cw.end(), arr ) );
+}
+
+CASE( "span<>: Allows to construct from a const iterator and a size" )
+{
+    const int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+    span<const int> u( arr );
+    span<const int>    cv( u.begin(), u.size() );
+    span<const int, 9> cw( u.begin(), u.size() );
 
     EXPECT( std::equal( cv.begin(), cv.end(), arr ) );
     EXPECT( std::equal( cw.begin(), cw.end(), arr ) );
@@ -321,6 +410,21 @@ CASE( "span<>: Allows to construct from any pointer and a zero size" )
         }
         static void nonnull() {
             int i = 7; int * p = &i; span<int> v( p, size_type( 0 ) );
+        }
+    };
+
+    EXPECT_NO_THROW( F::null() );
+    EXPECT_NO_THROW( F::nonnull() );
+}
+
+CASE( "span<>: Allows to construct from any iterator and a zero size" )
+{
+    struct F {
+        static void null() {
+            span<int>::iterator it; span<int> v( it, size_type( 0 ) );
+        }
+        static void nonnull() {
+            int a[2]; span<int> u( a ); span<int> v( u.begin(), size_type( 0 ) );
         }
     };
 

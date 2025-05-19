@@ -4179,10 +4179,31 @@ public:
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent ))
     >
-    gsl_api gsl_constexpr14 gsl_explicit span( pointer firstElem, pointer lastElem )
-        : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
+    gsl_api gsl_constexpr14 gsl_explicit span( iterator it, size_type count )
+        : storage_( it.current_, count )
     {
-        gsl_Expects( firstElem <= lastElem );
+        gsl_Expects( count == Extent );
+        gsl_Expects( it.end_ - it.current_ == static_cast< difference_type >( Extent ) );
+    }
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 span( iterator it, size_type count )
+        : storage_( it.current_, count )
+    {
+        gsl_Expects( it.end_ - it.current_ >= static_cast< difference_type >( count ) );
+    }
+
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 gsl_explicit span( pointer firstElem, pointer lastElem )
+        : storage_( firstElem, gsl_lite::narrow_cast< size_type >( lastElem - firstElem ) )
+    {
         gsl_Expects( lastElem - firstElem == static_cast< difference_type >( Extent ) );
     }
     template<
@@ -4191,7 +4212,28 @@ public:
         gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent ))
     >
     gsl_api gsl_constexpr14 span( pointer firstElem, pointer lastElem )
-        : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
+        : storage_( firstElem, gsl_lite::narrow_cast< size_type >( lastElem - firstElem ) )
+    {
+        gsl_Expects( firstElem <= lastElem );
+    }
+
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 gsl_explicit span( iterator firstElem, iterator lastElem )
+        : storage_( firstElem.current_, gsl_lite::narrow_cast< size_type >( lastElem - firstElem ) )
+    {
+        gsl_Expects( lastElem - firstElem == static_cast< difference_type >( Extent ) );
+    }
+    template<
+        gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( MyExtent == dynamic_extent ))
+    >
+    gsl_api gsl_constexpr14 span( iterator firstElem, iterator lastElem )
+        : storage_( firstElem.current_, gsl_lite::narrow_cast< size_type >( lastElem - firstElem ) )
     {
         gsl_Expects( firstElem <= lastElem );
     }
@@ -4201,8 +4243,20 @@ public:
     {
         gsl_Expects( Extent == dynamic_extent || count == Extent );
     }
+    gsl_api gsl_constexpr14 span( iterator it, size_type count )
+        : storage_( it.current_, count )
+    {
+        gsl_Expects( Extent == dynamic_extent || count == Extent );
+        gsl_Expects( it.end_ - it.current_ >= static_cast< difference_type >( count ) );
+    }
     gsl_api gsl_constexpr14 span( pointer firstElem, pointer lastElem )
-        : storage_( firstElem, narrow_cast< size_type >( lastElem - firstElem ) )
+        : storage_( firstElem, gsl_lite::narrow_cast< size_type >( lastElem - firstElem ) )
+    {
+        gsl_Expects( firstElem <= lastElem );
+        gsl_Expects( Extent == dynamic_extent || lastElem - firstElem == static_cast< difference_type >( Extent ) );
+    }
+    gsl_api gsl_constexpr14 span( iterator firstElem, iterator lastElem )
+        : storage_( firstElem.current_, gsl_lite::narrow_cast< size_type >( lastElem - firstElem ) )
     {
         gsl_Expects( firstElem <= lastElem );
         gsl_Expects( Extent == dynamic_extent || lastElem - firstElem == static_cast< difference_type >( Extent ) );
@@ -4459,7 +4513,7 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr std::ptrdiff_t
     ssize() const gsl_noexcept
     {
-        return narrow_cast< std::ptrdiff_t >( storage_.size() );
+        return gsl_lite::narrow_cast< std::ptrdiff_t >( storage_.size() );
     }
 
     gsl_NODISCARD gsl_api gsl_constexpr size_type
@@ -5367,14 +5421,14 @@ private:
     gsl_NODISCARD static gsl_constexpr14 span_type
     remove_z( std::array<typename std11::remove_const<element_type>::type, N> & arr )
     {
-        return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
+        return remove_z( gsl_ADDRESSOF( arr[0] ), gsl_lite::narrow_cast< std::size_t >( N ) );
     }
 
     template< size_t N >
     gsl_NODISCARD static gsl_constexpr14 span_type
     remove_z( std::array<typename std11::remove_const<element_type>::type, N> const & arr )
     {
-        return remove_z( gsl_ADDRESSOF( arr[0] ), narrow_cast< std::size_t >( N ) );
+        return remove_z( gsl_ADDRESSOF( arr[0] ), gsl_lite::narrow_cast< std::size_t >( N ) );
     }
 # endif
 
