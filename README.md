@@ -3,7 +3,7 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.io/en/package/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl-lite/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/6frqr8PsK) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/OIU7oseCTLsiNQ8A)   |
+| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.io/en/package/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl-lite/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/dh8qzMTWa) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/O5jwinqcoVfVTtCr)   |
 
 
 ***gsl-lite*** is a portable, single-file, header-only library for defensive programming based on the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) specification.
@@ -48,7 +48,11 @@ namespace my_lib {
         gsl_Expects( !values.empty() );
     
         double sum = std::accumulate( values.begin(), values.end(), 0. );
-        return sum / std::ssize( values );
+
+            // `narrow_failfast<T>( u )`: checked numeric cast
+        double num = gsl::narrow_failfast<double>( std::ssize( values ) );
+
+        return sum / num;
     }
 
     class Resource
@@ -62,11 +66,10 @@ namespace my_lib {
     void consumeResource( gsl::not_null<std::unique_ptr<Resource>> resource );
 
         // Type-encoded postcondition with `not_null<P>`
-    gsl::not_null<std::unique_ptr<Resource>> acquireResource( int size )
+    gsl::not_null<std::unique_ptr<Resource>> acquireResource( std::size_t size )
     {
             // A flavor of `make_unique<T>()` which returns `not_null<std::unique_ptr<T>>`
-        return gsl::make_unique<Resource>(
-            gsl::narrow_failfast<std::size_t>( size ));  // A checked numeric cast.
+        return gsl::make_unique<Resource>( size );
     }
 
 } // namespace my_lib
