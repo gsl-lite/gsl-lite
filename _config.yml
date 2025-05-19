@@ -4,3 +4,6 @@ plugins:
   - jekyll-remote-theme
 minima:
   skin: auto
+  nav_pages:
+    - README.md
+    - doc\Reference.md
