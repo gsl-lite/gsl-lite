@@ -117,7 +117,7 @@ target_link_libraries( my-program PRIVATE gsl-lite::gsl-lite )
 *gsl-lite* is available via [Vcpkg](https://vcpkg.io/en/package/gsl-lite), [Conan](https://conan.io/center/recipes/gsl-lite),
 and possibly other package managers. It may also be obtained with [CPM](https://github.com/cpm-cmake/CPM.cmake):
 ```cmake
-CPMAddPackage( NAME gsl-lite VERSION 1.0.0 GITHUB_REPOSITORY gsl-lite/gsl-lite )
+CPMAddPackage( NAME gsl-lite VERSION 1.0.1 GITHUB_REPOSITORY gsl-lite/gsl-lite )
 ```
 See the directories [example/with-CPM](https://github.com/gsl-lite/gsl-lite/tree/master/example/with-CPM) and
 [example/with-Vcpkg](https://github.com/gsl-lite/gsl-lite/tree/master/example/with-Vcpkg) for example projects

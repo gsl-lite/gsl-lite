@@ -13,7 +13,7 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 project(
     gsl-lite
-    VERSION 1.0.0
+    VERSION 1.0.1
     DESCRIPTION "defensive programming utilities for C++98, C++11 up"
     HOMEPAGE_URL "https://github.com/gsl-lite/gsl-lite"
     LANGUAGES CXX
