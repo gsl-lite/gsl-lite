@@ -3,7 +3,7 @@
 
 | metadata | build  | packages | try online |
 | -------- | ------ | -------- | ---------- |
-| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/licenses/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.io/en/package/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl-lite/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/dh8qzMTWa) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/ZTwg9XJ9IEd4SptE)   |
+| [![Language](https://badgen.net/badge/C++/98,11+/blue)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) <br> [![License](https://badgen.net/github/license/gsl-lite/gsl-lite)](https://opensource.org/license/MIT) <br> [![Version](https://badgen.net/github/release/gsl-lite/gsl-lite)](https://github.com/gsl-lite/gsl-lite/releases)   |   [![Azure Pipelines build status](https://dev.azure.com/gsl-lite/gsl-lite/_apis/build/status/gsl-lite.gsl-lite?branchName=master)](https://dev.azure.com/gsl-lite/gsl-lite/_build/latest?definitionId=1&branchName=master) <br> [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/1v6eqy68m8g7tm06?svg=true)](https://ci.appveyor.com/project/gsl-lite/gsl-lite)   |   [![Vcpkg](https://badgen.net/badge/latest/on%20Vcpkg/blue)](https://vcpkg.io/en/package/gsl-lite) <br> [![single header](https://badgen.net/badge/latest/single%20header/blue)](https://raw.githubusercontent.com/gsl-lite/gsl-lite/master/include/gsl-lite/gsl-lite.hpp)   |   [![Try it on Compiler Explorer](https://badgen.net/badge/on/Compiler%20Explorer/blue)](https://gcc.godbolt.org/z/dh8qzMTWa) <br> [![Try it on Wandbox](https://badgen.net/badge/on/Wandbox/blue)](https://wandbox.org/permlink/ZTwg9XJ9IEd4SptE)   |
 
 
 ***gsl-lite*** is a portable, single-file, header-only library for defensive programming based on the [C++ Core Guidelines Support Library](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-gsl) specification.
@@ -230,7 +230,7 @@ using the prefixed macros `gsl_Expects()` and `gsl_Ensures()` rather than the un
 precondition and postcondition checking.
 
 Note that *gsl-lite* v1 also changed the defaults for many of *gsl-lite*'s configuration options. See the
-[v1.0 release notes](https://github.com/gsl-lite/gsl-lite/releases/tag/v1.0.0) for a comprehensive list of changes.
+[v1.0.0 release notes](https://github.com/gsl-lite/gsl-lite/releases/tag/v1.0.0) for a comprehensive list of changes.
 This should not affect you if you had already opted in to version-1 defaults by setting `gsl_CONFIG_DEFAULTS_VERSION=1`
 or by linking to the `gsl::gsl-lite-v1` target in CMake.
 
@@ -335,4 +335,4 @@ Some of the [configuration options](doc/Reference.md#configuration-options-and-s
 Contributions to *gsl-lite* through [pull requests](https://github.com/gsl-lite/gsl-lite/pulls) or [issues](https://github.com/gsl-lite/gsl-lite/issues) are welcome.
 
 *gsl-lite* comes with a test suite that uses an included, slightly modified copy of the [*lest* test framework](https://github.com/martinmoene/lest).
-To build *gsl-lite* with the test suite, enable the CMake build option `GSL_LITE_OPT_BUILD_TESTS` when configuring the project.
+To build *gsl-lite*'s test suite, enable the CMake build option `GSL_LITE_OPT_BUILD_TESTS` when configuring the project.

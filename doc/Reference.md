@@ -137,7 +137,7 @@ raw pointers which cannot currently be replaced with a smart pointer.
 
 `gsl_lite::not_null<P>` is a class template that wraps a pointer type `P` while enforcing non-nullability.
 
-`not_null<P>` has no default constructor, and its unary constructors use [`gsl_Expects()`](#contract-and-assertion-checking-macros) to check
+`not_null<P>` has no default constructor, and its unary constructors use [`gsl_Expects()`](#contract-and-assertion-checks) to check
 that their argument is not `nullptr`. Therefore, when attempting to construct a `not_null<P>` from a null pointer, a runtime contract violation is triggered:
 ```c++
 using gsl_lite::not_null;
@@ -1131,7 +1131,7 @@ contract checks if `NDEBUG` is defined.
   `gsl_Ensures()`, and `gsl_Assert()` should only be used for simple comparisons of scalar values, for simple inlineable getters,
   and for comparisons of class objects with trivially inlineable comparison operators.  
     
-  Revisiting the [example given above](##contract-and-assertion-checks):  
+  Revisiting the [example given above](#contract-and-assertion-checks):  
   ```c++
   template< class RandomIt >
   auto median( RandomIt first, RandomIt last )
