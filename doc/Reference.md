@@ -324,7 +324,7 @@ void insertAfter( not_null<ListNode *> x, not_null<std::unique_ptr<ListNode>> ne
 {
     newNode->prev = x;
     newNode->next = x->next;
-    x->next = gsl_lite::as_nullable( std::move( newNode ) ).release();  // no `release()` member function on `not_null<>`
+    x->next = gsl_lite::as_nullable( std::move( newNode ) ).release();  // no `not_null<>::release()` member function
 }
 ```
 

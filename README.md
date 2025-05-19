@@ -99,7 +99,7 @@ The library is originally based on [Microsoft GSL](https://github.com/microsoft/
 The recommended way to consume *gsl-lite* in your CMake project is to use `find_package()` to locate the package `gsl-lite`
 and `target_link_libraries()` to link to the imported target `gsl-lite::gsl-lite`:
 
-```CMake
+```cmake
 cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 project( my-program LANGUAGES CXX )
