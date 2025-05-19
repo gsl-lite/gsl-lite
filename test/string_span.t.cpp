@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -25,7 +25,7 @@
 # include <wchar.h> // wcslen()
 #endif
 
-using namespace gsl;
+using namespace gsl_lite;
 
 #if gsl_FEATURE( STRING_SPAN )
 
@@ -821,20 +821,6 @@ CASE( "string_span: Allows to observe an element via array indexing" )
     }
 }
 
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-CASE( "string_span: Allows to observe an element via call indexing" )
-{
-    char hello[] = "hello";
-    string_span a( hello );
-
-    for ( index_type i = 0; i < a.size(); ++i )
-    {
-        EXPECT(  a(i) ==  hello[i] );
-        EXPECT( &a(i) == &hello[i] );
-    }
-}
-# endif // deprecate
-
 CASE( "string_span: Allows to observe an element via front() and back()" )
 {
     char hello[] = "hello";
@@ -870,18 +856,6 @@ CASE( "string_span: Allows to change an element via array indexing" )
 
     EXPECT( hello[1] == '7' );
 }
-
-# if ! gsl_DEPRECATE_TO_LEVEL( 6 )
-CASE( "string_span: Allows to change an element via call indexing" )
-{
-    char hello[] = "hello";
-    string_span a( hello );
-
-    a(1) = '7';
-
-    EXPECT( hello[1] == '7' );
-}
-# endif // deprecate
 
 CASE( "string_span: Allows to change an element via front() and back()" )
 {
@@ -1108,7 +1082,7 @@ CASE( "string_span: Allows to view the elements as read-only bytes" )
     char const *    hello = "hello";
     cstring_span s( hello);
 
-    span<const gsl::byte> b = as_bytes( s );
+    span<const gsl_lite::byte> b = as_bytes( s );
 
     EXPECT( b[0] == to_byte( hello[0] ) );
     EXPECT( b[1] == to_byte( hello[1] ) );

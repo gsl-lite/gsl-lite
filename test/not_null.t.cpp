@@ -20,7 +20,7 @@
 #include <vector>
 #include <functional>
 
-using namespace gsl;
+using namespace gsl_lite;
 
 namespace {
 
@@ -108,8 +108,12 @@ CASE( "not_null<>: Layout is compatible to underlying type" )
 {
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( sizeof( not_null< int* > ) == sizeof( int* ), "static assertion failed" );
+# if gsl_HAVE( UNIQUE_PTR )
     static_assert( sizeof( not_null< unique_ptr< int > > ) == sizeof( unique_ptr< int > ), "static assertion failed" );
+# endif // gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( SHARED_PTR )
     static_assert( sizeof( not_null< shared_ptr< int > > ) == sizeof( shared_ptr< int > ), "static assertion failed" );
+# endif // gsl_HAVE( SHARED_PTR )
 #endif
 }
 
@@ -465,13 +469,13 @@ CASE( "not_null<>: Allows to check whether object is valid (raw pointer)" )
     int i = 12;
     not_null< int* > p( &i );
 
-    EXPECT( gsl::is_valid( p ) );
+    EXPECT( gsl_lite::is_valid( p ) );
 
 #if gsl_HAVE( MOVE_FORWARD )
     not_null< int* > q( std::move( p ) );
 
-    EXPECT( gsl::is_valid( p ) ); // for raw pointers, moving `not_null<>` just makes a copy
-    EXPECT( gsl::is_valid( q ) );
+    EXPECT( gsl_lite::is_valid( p ) ); // for raw pointers, moving `not_null<>` just makes a copy
+    EXPECT( gsl_lite::is_valid( q ) );
 #endif
 }
 
@@ -791,12 +795,12 @@ CASE( "not_null<>: Allows to check whether object is valid (shared_ptr)" )
     shared_ptr< int > pi = std::make_shared< int >(12);
     not_null< shared_ptr< int > > p( pi );
 
-    EXPECT( gsl::is_valid( p ) );
+    EXPECT( gsl_lite::is_valid( p ) );
 
     not_null< shared_ptr< int > > q( std::move( p ) );
 
-    EXPECT_NOT( gsl::is_valid( p ) );
-    EXPECT(     gsl::is_valid( q ) );
+    EXPECT_NOT( gsl_lite::is_valid( p ) );
+    EXPECT(     gsl_lite::is_valid( q ) );
 }
 
 #endif // gsl_HAVE( SHARED_PTR )
@@ -1164,12 +1168,12 @@ CASE( "not_null<>: Allows to check whether object is valid (unique_ptr)" )
     unique_ptr< int > pi = my_make_unique< int >( 12 );
     not_null< unique_ptr< int > > p( std::move(pi) );
 
-    EXPECT( gsl::is_valid( p ) );
+    EXPECT( gsl_lite::is_valid( p ) );
 
     not_null< unique_ptr< int > > q( std::move( p ) );
 
-    EXPECT_NOT( gsl::is_valid( p ) );
-    EXPECT(     gsl::is_valid( q ) );
+    EXPECT_NOT( gsl_lite::is_valid( p ) );
+    EXPECT(     gsl_lite::is_valid( q ) );
 }
 
 #endif // gsl_HAVE( UNIQUE_PTR )
@@ -1581,51 +1585,51 @@ struct is_same<T, T> { enum dummy { value = true }; };
 
 CASE( "not_null<>: Able to deduce element_type of raw pointers" )
 {
-    EXPECT(( is_same< gsl::not_null< int* >::element_type, int >::value ));
-    EXPECT(( is_same< gsl::not_null< const int* >::element_type, const int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< int* >::element_type, int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< const int* >::element_type, const int >::value ));
 }
 
 CASE( "not_null<>: Able to deduce element_type of unique_ptr" )
 {
 #if gsl_HAVE( UNIQUE_PTR )
-    EXPECT(( is_same< gsl::not_null< std::unique_ptr< int > >::element_type, int >::value ));
-    EXPECT(( is_same< gsl::not_null< std::unique_ptr< const int > >::element_type, const int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< std::unique_ptr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< std::unique_ptr< const int > >::element_type, const int >::value ));
 #endif
 }
 
 CASE( "not_null<>: Able to deduce element_type of shared_ptr" )
 {
 #if gsl_HAVE( SHARED_PTR )
-    EXPECT(( is_same< gsl::not_null< std::shared_ptr< int > >::element_type, int >::value ));
-    EXPECT(( is_same< gsl::not_null< std::shared_ptr< const int > >::element_type, const int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< std::shared_ptr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< std::shared_ptr< const int > >::element_type, const int >::value ));
 #endif
 }
 
 CASE( "not_null<>: Able to deduce element_type of normal user-defined smart pointers" )
 {
-    EXPECT(( is_same< gsl::not_null< NormalPtr< int > >::element_type, int >::value ));
-    EXPECT(( is_same< gsl::not_null< NormalPtr< const int > >::element_type, const int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< NormalPtr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< NormalPtr< const int > >::element_type, const int >::value ));
 }
 
 CASE( "not_null<>: Able to correctly deduce element_type of user-defined smart pointers even if typedef and result of dereferencing differs" )
 {
-    EXPECT(( is_same< gsl::not_null< WeirdPtr< int > >::element_type, int >::value ));
-    EXPECT(( is_same< gsl::not_null< WeirdPtr< const int > >::element_type, const int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< WeirdPtr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< WeirdPtr< const int > >::element_type, const int >::value ));
 }
 
 CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef" )
 {
 #if gsl_CPP11_OR_GREATER
-    EXPECT(( is_same< gsl::not_null< ETLessNormalPtr< int > >::element_type, int >::value ));
-    EXPECT(( is_same< gsl::not_null< ETLessNormalPtr< const int > >::element_type, const int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< ETLessNormalPtr< int > >::element_type, int >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< ETLessNormalPtr< const int > >::element_type, const int >::value ));
 #endif
 }
 
 CASE( "not_null<>: Able to deduce element_type of user-defined smart pointers even if they do not have an element_type typedef, and element_type differs from T" )
 {
 #if gsl_CPP11_OR_GREATER
-    EXPECT(( is_same< gsl::not_null< ETLessWeirdPtr< int > >::element_type, double >::value ));
-    EXPECT(( is_same< gsl::not_null< ETLessWeirdPtr< const int > >::element_type, double >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< ETLessWeirdPtr< int > >::element_type, double >::value ));
+    EXPECT(( is_same< gsl_lite::not_null< ETLessWeirdPtr< const int > >::element_type, double >::value ));
 #endif
 }
 
@@ -1635,31 +1639,31 @@ CASE( "not_null<>: Can handle void*" )
     void * vp = &i;
 
         // Direct construction
-    gsl::not_null< void * > nvp( vp );
+    gsl_lite::not_null< void * > nvp( vp );
     EXPECT( nvp == vp );
 
         // Indirect construction
-    nvp = gsl::make_not_null( vp );
+    nvp = gsl_lite::make_not_null( vp );
     EXPECT( nvp == vp );
 
         // Implicit conversion from `not_null<>` with typed pointer argument
-    gsl::not_null< int * > nip( &i );
+    gsl_lite::not_null< int * > nip( &i );
     EXPECT( nvp == nip );
-    gsl::not_null< void * > nvp2( nip );
+    gsl_lite::not_null< void * > nvp2( nip );
     EXPECT( nvp2 == nip );
 
         // Implicit conversion from typed pointer
     EXPECT( nvp == &i );
-    gsl::not_null< void * > nvp3( &i );
+    gsl_lite::not_null< void * > nvp3( &i );
     EXPECT( nvp3 == nip );
 
         // Extract underlying value
-    void * vp2 = gsl::as_nullable( nvp );
+    void * vp2 = gsl_lite::as_nullable( nvp );
     EXPECT( vp2 == vp );
 
         // Explicit conversion to typed pointer argument is not supported!
-    //gsl::not_null< int * > nip2 = static_cast< gsl::not_null< int * > >( nvp );
-    //gsl::not_null< int * > nip2 = gsl::not_null< int * >( nvp );
+    //gsl_lite::not_null< int * > nip2 = static_cast< gsl_lite::not_null< int * > >( nvp );
+    //gsl_lite::not_null< int * > nip2 = gsl_lite::not_null< int * >( nvp );
     //int * ip = static_cast< int * >( nvp );
 }
 
@@ -1677,14 +1681,14 @@ CASE( "not_null<>: Can handle unique_ptr<void, DeleterT>" )
     ( void ) p;
 
         // Direct construction
-    gsl::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp( std::move( vp ) );
+    gsl_lite::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp( std::move( vp ) );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp.get() == p );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
     vp = std::move( nvp );
 
         // Indirect construction
-    nvp = gsl::make_not_null( std::move( vp ) );
+    nvp = gsl_lite::make_not_null( std::move( vp ) );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp.get() == p );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
@@ -1693,11 +1697,11 @@ CASE( "not_null<>: Can handle unique_ptr<void, DeleterT>" )
     std::unique_ptr< int, void ( * )( void const * ) > tp2( new int( 42 ), int_const_deleter );
     int * pi2 = tp2.get();
     ( void ) pi2;
-    gsl::not_null< std::unique_ptr< int, void ( * )( void const * ) > > ntp2( std::move( tp2 ) );
+    gsl_lite::not_null< std::unique_ptr< int, void ( * )( void const * ) > > ntp2( std::move( tp2 ) );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( ntp2.get() == pi2 );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp2( std::move( ntp2 ) );
+    gsl_lite::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp2( std::move( ntp2 ) );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp2.get() == pi2 );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
@@ -1705,13 +1709,13 @@ CASE( "not_null<>: Can handle unique_ptr<void, DeleterT>" )
         // Implicit conversion from typed pointer
     std::unique_ptr< int, void ( * )( void const * ) > tp3( new int( 42 ), int_const_deleter );
     int * pi3 = tp3.get();
-    gsl::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp3( std::move( tp3 ) );
+    gsl_lite::not_null< std::unique_ptr< void, void ( * )( void const * ) > > nvp3( std::move( tp3 ) );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp3.get() == pi3 );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
 
         // Extract underlying value
-    std::unique_ptr< void, void ( * )( void const * ) > vp3 = gsl::as_nullable( std::move( nvp3 ) );
+    std::unique_ptr< void, void ( * )( void const * ) > vp3 = gsl_lite::as_nullable( std::move( nvp3 ) );
     EXPECT( vp3.get() == pi3 );
 
         // Explicit conversion to typed pointer argument is not supported!
@@ -1726,14 +1730,14 @@ CASE( "not_null<>: Can handle shared_ptr<void>" )
     ( void ) p;
 
         // Direct construction
-    gsl::not_null< std::shared_ptr< void > > nvp( vp );
+    gsl_lite::not_null< std::shared_ptr< void > > nvp( vp );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp.get() == p );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
     vp = std::move( nvp );
 
         // Indirect construction
-    nvp = gsl::make_not_null( vp );
+    nvp = gsl_lite::make_not_null( vp );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp.get() == p );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
@@ -1741,23 +1745,23 @@ CASE( "not_null<>: Can handle shared_ptr<void>" )
         // Implicit conversion from `not_null<>` with typed pointer argument
     std::shared_ptr< int > tp2 = std::make_shared<int>( 42 );
     int * pi2 = tp2.get();
-    gsl::not_null< std::shared_ptr< int > > ntp2( tp2 );
+    gsl_lite::not_null< std::shared_ptr< int > > ntp2( tp2 );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( ntp2.get() == pi2 );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
-    gsl::not_null< std::shared_ptr< void > > nvp2( ntp2 );
+    gsl_lite::not_null< std::shared_ptr< void > > nvp2( ntp2 );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp2.get() == pi2 );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
 
         // Implicit conversion from typed pointer
-    gsl::not_null< std::shared_ptr< void > > nvp2b( tp2 );
+    gsl_lite::not_null< std::shared_ptr< void > > nvp2b( tp2 );
 # if gsl_CONFIG( TRANSPARENT_NOT_NULL )
     EXPECT( nvp2b.get() == pi2 );
 # endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
 
         // Extract underlying value
-    std::shared_ptr< void > vp2 = gsl::as_nullable( nvp2 );
+    std::shared_ptr< void > vp2 = gsl_lite::as_nullable( nvp2 );
     EXPECT( vp2.get() == pi2 );
 
         // Explicit conversion to typed pointer argument is not supported!
@@ -1771,10 +1775,14 @@ CASE( "not_null<>: Hashes match the hashes of the wrapped pointer" )
     int i = 42;
     not_null< const int* > raw_pointer = make_not_null( &i );
     EXPECT( std::hash< not_null< const int* > >()(raw_pointer) == std::hash< const int* >()( as_nullable( raw_pointer ) ) );
+# if gsl_HAVE( UNIQUE_PTR )
     not_null< std::unique_ptr< int > > unique_pointer = make_not_null( my_make_unique< int >(43) );
     EXPECT( std::hash< not_null< std::unique_ptr< int > > >()(unique_pointer) == std::hash< std::unique_ptr< int > >()( as_nullable( unique_pointer) ) );
+# endif // gsl_HAVE( UNIQUE_PTR )
+# if gsl_HAVE( SHARED_PTR )
     not_null< std::shared_ptr< int > > shared_pointer = make_not_null( std::make_shared< int >(43) );
     EXPECT( std::hash< not_null< std::shared_ptr< int > > >()(shared_pointer) == std::hash< std::shared_ptr< int > >()( as_nullable( shared_pointer) ) );
+# endif // gsl_HAVE( SHARED_PTR )
 }
 
 CASE( "not_null<>: Hash functor disabled for non-hashable pointers and enabled for hashable pointers" )
@@ -1829,7 +1837,7 @@ CASE( "not_null<>: Supports std::function<> for construction, assignment, and in
     EXPECT( insp( i ) == 41 );
     auto insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
-    if ( ! gsl::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
+    if ( ! gsl_lite::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
     {
         EXPECT_THROWS( insp( i ) );
     }
@@ -1854,7 +1862,7 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     EXPECT( insp( i ) == 41 );
     auto insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
-    if ( ! gsl::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
+    if ( ! gsl_lite::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
     {
         EXPECT_THROWS( insp( i ) );
     }

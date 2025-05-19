@@ -1,4 +1,4 @@
-//
+﻿//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
@@ -18,7 +18,7 @@
 
 #include "gsl-lite.t.hpp"
 
-using namespace gsl;
+using namespace gsl_lite;
 
 CASE( "owner<>: Disallows construction from a non-pointer type (define gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS)" )
 {
@@ -61,29 +61,6 @@ CASE( "owner<>: Allows its use as the (pointer) type it stands for" )
 #endif
 #else
     EXPECT( !!"owner<> alias template is not available." );
-#endif
-}
-
-CASE( "Owner(): Allows its use as the (pointer) type it stands for" )
-{
-#if gsl_FEATURE( OWNER_MACRO )
-    struct F { static void incr( int * i ) { *i += 1; } };
-
-    Owner(int*) p = new int( 120 );
-
-    EXPECT( (p != NULL) );
-    EXPECT(  p != nullptr_void() );
-# if gsl_HAVE( NULLPTR )
-    EXPECT(  p != nullptr );
-# endif
-    EXPECT( *p == 120 );
-
-    F::incr( p );
-
-    EXPECT( *p == 121 );
-    delete p;
-#else
-    EXPECT( !!"Owner() macro is not available." );
 #endif
 }
 

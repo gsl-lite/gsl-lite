@@ -1,6 +1,7 @@
-#include "gsl/gsl-lite.hpp"
+﻿
+#include <gsl-lite/gsl-lite.hpp>
 
-using namespace gsl;
+using namespace gsl_lite;
 
 int * use( not_null<int *> p ) 
 {
@@ -12,13 +13,17 @@ int * use( not_null<int *> p )
 struct Widget
 {
     Widget() : owned_ptr( new int(42) ) {}
-    
+
     ~Widget() { delete owned_ptr; }
 
-    void work() { non_owned_ptr = use( owned_ptr ); }
-    
-//  owner<int *> owned_ptr;	// if alias template support
-    Owner(int *) owned_ptr;	// C++98 up
+    void work() { non_owned_ptr = use( make_not_null( owned_ptr ) ); }
+
+#if gsl_HAVE( ALIAS_TEMPLATE )
+    owner<int *> owned_ptr;	// if alias template support
+#else // ! gsl_HAVE( ALIAS_TEMPLATE )
+    int * owned_ptr;	// otherwise
+#endif // gsl_HAVE( ALIAS_TEMPLATE )
+
     int * non_owned_ptr;
 };
 
@@ -27,8 +32,3 @@ int main()
     Widget w;
     w.work();
 }
-
-#if 0
-cl -EHsc -I../include 01-basic.cpp && 01-basic.exe
-g++ -std=c++03 -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
-#endif 
