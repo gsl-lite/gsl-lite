@@ -1492,9 +1492,17 @@ struct remove_cv
 
 template< class T > struct remove_reference { typedef T type; };
 template< class T > struct remove_reference<T&> { typedef T type; };
-# if gsl_HAVE( RVALUE_REFERENCE )
+#if gsl_HAVE( RVALUE_REFERENCE )
 template< class T > struct remove_reference<T&&> { typedef T type; };
-# endif
+#endif
+
+#if gsl_HAVE( ALIAS_TEMPLATE )
+template< class T > using add_const_t = typename add_const<T>::type;
+template< class T > using remove_const_t = typename remove_const<T>::type;
+template< class T > using remove_volatile_t = typename remove_volatile<T>::type;
+template< class T > using remove_cv_t = typename remove_cv<T>::type;
+template< class T > using remove_reference_t = typename remove_reference<T>::type;
+#endif // gsl_HAVE( ALIAS_TEMPLATE )
 
 
 #if gsl_HAVE( INTEGRAL_CONSTANT )
@@ -1750,6 +1758,9 @@ ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
 #endif // gsl_HAVE( STD_SSIZE )
 
 template< class T > struct remove_cvref { typedef typename std11::remove_cv< typename std11::remove_reference< T >::type >::type type; };
+#if gsl_HAVE( ALIAS_TEMPLATE )
+template< class T > using remove_cvref_t = typename remove_cvref<T>::type;
+#endif // gsl_HAVE( ALIAS_TEMPLATE )
 
 } // namespace std20
 
