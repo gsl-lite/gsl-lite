@@ -251,14 +251,12 @@ To extract the raw pointer, we first have to extract a nullable `unique_ptr<>`:
 ```c++
     std::unique_ptr<ListNode> rawNewNode = std::move( newNode );
     x->next = rawNewNode.release();
-}
 ```
 
 This can be written as a one-liner with `gsl_lite::as_nullable()`:
 
 ```c++
     x->next = gsl_lite::as_nullable( std::move( newNode ) ).release();
-}
 ```
 
 
@@ -347,7 +345,7 @@ For example, consider the following resource handle class:
 ```c++
 struct FileCloser
 {
-    void operator ()(std::FILE* file) const
+    void operator ()(std::FILE* file) const noexcept
     {
         std::fclose( file );
     }
@@ -412,7 +410,7 @@ public:
 
 This is very tedious, not least because we have to define move constructor and move assignment operator manually.
 
-By using `not_null<>`, we can instead "lift" these precondition checks to the type system and have all the
+By using `not_null<>`, we can instead "lift" these preconditions to the type system and have all the
 precondition checks be generated automatically:
 
 ```c++
@@ -422,8 +420,11 @@ private:
     not_null<FilePtr> file_;  // <--
 
 public:
-    FileHandle( FileHandle & rhs ) = default;  // implicit precondition check `rhs.file_ != nullptr`
-    FileHandle & operator =( FileHandle & rhs ) = default;  // implicit precondition check `rhs.file_ != nullptr`
+        // implicit precondition check `rhs.file_ != nullptr`
+    FileHandle( FileHandle & rhs ) = default;
+
+        // implicit precondition check `rhs.file_ != nullptr`
+    FileHandle & operator =( FileHandle & rhs ) = default;
 
     explicit FileHandle( not_null<FilePtr> _file )  // <--
         : file_( std::move( _file ) )
@@ -439,7 +440,7 @@ public:
 };
 ```
 
-Any code constructing a `FileHandle` will now have to explicitly declare the pointer `not_null`:
+Any code constructing a `FileHandle` will now have to explicitly cast the pointer as `not_null`:
 ```c++
 auto filePtr = FilePtr( std::fopen( ... ) );
 if ( filePtr == nullptr ) throw std::runtime_error( ... );
@@ -455,8 +456,8 @@ readLines( FileHandle file )
 }
 ```
 
-Although `not_null<>` can be used to inject preconditions and postconditions, it does not add new invariants.
-After being moved from, a `FileHandle` indeed holds a `nullptr` in its `file_` pointer.
+Although `not_null<>` can be used to inject preconditions and postconditions, it does not inject new
+invariants. After being moved from, a `FileHandle` indeed holds a `nullptr` in its `file_` pointer.
 Therefore, non-nullability of the `file_` pointer is not an invariant of the `FileHandle` class.
 However, a `FileHandle` is still safe to use because of the implicit precondition checks injected by `not_null<>`.
 Also, *use-after-move* errors can often be detected by static analysis tools, so this may be considered
@@ -471,7 +472,7 @@ If you have to check for the moved-from state, use the `gsl_lite::is_valid()` pr
 ```c++
 auto npi = gsl_lite::make_unique<int>( 42 );
 // ...
-//if (npi == nullptr) { ... }  // compile error
+//if ( npi == nullptr ) { ... }  // compile error
 if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
 ```
 
@@ -539,7 +540,16 @@ loss of information, an exception of type `gsl_lite::narrowing_error` is thrown.
 double volume = ...;  // (m³)
 double bucketCapacity = ...;  // (m³)
 double numBucketsF = std::ceil( volume/bucketCapacity );
-auto numBuckets = gsl_lite::narrow<int>( numBucketsF );
+try
+{
+    auto numBuckets = gsl_lite::narrow<int>( numBucketsF );
+    std::cout << "Number of buckets required: " << numBuckets;
+    fillBuckets( numBuckets );
+}
+catch ( gsl_lite::narrowing_error const & )
+{
+    std::cerr << "This is more than I can handle.\n";
+}
 ```
 
 In this example, an exception will be thrown if `numBucketsF` is not an integer (for instance, `std::ceil(-INFINITY)` will return `-INFINITY`),
@@ -565,7 +575,9 @@ void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs );
 int main( int argc, char * argv[] )
 {
     auto args = gsl_lite::span(
-        argv, gsl_lite::narrow_failfast<std::size_t>( argc ) );
+        argv,
+            // Something is seriously wrong if this cast fails.
+        gsl_lite::narrow_failfast<std::size_t>( argc ) );
     printCmdArgs( args );
 }
 ```
@@ -575,8 +587,13 @@ int main( int argc, char * argv[] )
 auto vec = std::vector{ 1, 2, 3 };
 int elem = 2;
 auto pos = std::find( vec.begin(), vec.end(), elem );
-auto delta = pos - vec.end();  // <-- bug: we accidentally swapped `pos` and `vec.end()`
-auto subrangeSize = gsl_lite::narrow_failfast<std::size_t>( delta );  // assertion violation: `delta` is negative
+
+    // Bug: we accidentally swapped `pos` and `vec.end()`.
+auto delta = pos - vec.end();
+
+    // Assertion violation: `delta` is negative.
+auto subrangeSize = gsl_lite::narrow_failfast<std::size_t>( delta );
+
 auto subrange = std::vector<int>( subrangeSize );
 ```
 
@@ -588,14 +605,17 @@ the only difference being that `narrow_cast<>()` conveys the intent that truncat
 
 **Example 1:**
 ```c++
-auto allBitsSet = gsl_lite::narrow_cast<std::uint32_t>( -1 );  // sign change to 0xFFFFFFFF
+    // Sign change to 0xFFFFFFFF
+auto allBitsSet = gsl_lite::narrow_cast<std::uint32_t>( -1 );
 ```
 
 **Example 2:**
 ```c++
 int floor( float val )
 {
-    gsl_Expects( val >= std::numeric_limits<int>::lowest() && val <= std::numeric_limits<int>::max() );
+    gsl_Expects(
+        val >= std::numeric_limits<int>::lowest() &&
+        val <= std::numeric_limits<int>::max() );
 
     return gsl_lite::narrow_cast<int>( val );  // truncation is desired here
 }
@@ -620,7 +640,7 @@ void printCmdArgs( gsl_lite::span<gsl_lite::zstring const> cmdArgs );
 
 int main( int argc, char * argv[] )
 {
-    auto args = gsl_lite::span(
+    auto args = gsl_lite::make_span(
         argv, gsl_lite::narrow_failfast<std::size_t>( argc ) );
     printCmdArgs( args );
 }
@@ -730,7 +750,7 @@ The problem of exception safety is typically addressed by defining a resource ha
 ```c++
 struct FileCloser
 {
-    void operator ()(std::FILE* file) const
+    void operator ()(std::FILE* file) const noexcept
     {
         std::fclose( file );
     }

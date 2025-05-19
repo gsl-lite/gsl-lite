@@ -116,8 +116,8 @@ and possibly other package managers. It may also be obtained with [CPM](https://
 ```cmake
 CPMAddPackage( NAME gsl-lite VERSION 1.0.0 GITHUB_REPOSITORY gsl-lite/gsl-lite )
 ```
-See the directories [example/with-CPM](https://github.com/gsl-lite/gsl-lite/tree/mater/example/with-CPM) and
-[example/with-Vcpkg](https://github.com/gsl-lite/gsl-lite/tree/mater/example/with-Vcpkg) for example projects
+See the directories [example/with-CPM](https://github.com/gsl-lite/gsl-lite/tree/master/example/with-CPM) and
+[example/with-Vcpkg](https://github.com/gsl-lite/gsl-lite/tree/master/example/with-Vcpkg) for example projects
 that use CPM and Vcpkg, respectively, to obtain *gsl-lite*.
 
 Once the build system is set up, include the `<gsl-lite/gsl-lite.hpp>` header file to use *gsl-lite*:

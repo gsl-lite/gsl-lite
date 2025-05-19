@@ -14,17 +14,17 @@ To set up the project, open a command-line window, navigate to the directory con
 
 ## Configure
 ```
-cmake --config --preset default
+cmake --preset default
 ```
 
 
 ## Build
 ```
-cmake --build build/default
-./build/default/program
+cmake --build build/default --config Debug
 ```
 
 ## Run
-```
-./build/default/program
-```
+
+| Windows                          | Linux, MacOS                       |
+|----------------------------------|------------------------------------|
+| `build\default\Debug\my-program` | `./build/default/Debug/my-program` |
