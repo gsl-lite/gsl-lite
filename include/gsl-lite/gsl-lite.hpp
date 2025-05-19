@@ -1757,7 +1757,9 @@ template< class T > struct remove_cvref { typedef typename std11::remove_cv< typ
 using std20::ssize;
 #endif // gsl_HAVE( STD_SSIZE ) || gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
+#if gsl_CPP11_100
 using std20::identity;
+#endif // gsl_CPP11_100
 using std20::type_identity;
 #if gsl_HAVE( ALIAS_TEMPLATE )
 using std20::type_identity_t;
