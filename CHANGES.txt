@@ -1,72 +1,35 @@
 ﻿Changes in gsl-lite
 ===================
 
-version 1.0.0 2025-05-??
+version 1.0.1 2025-05-19
+
+Fixes:
+- Add `span<>` constructor overloads for `span<>::iterator` arguments.
+  This improves backward compatibility, since our iterator used to be a pointer in v0.*, which made
+  `span{ otherSpan.begin(), 0 }` work because we have constructor overloads that accept pointers.
+- Add missing alias templates for polyfills.
+
+
+version 1.0.0 2025-05-19
 
 Breaking changes:
------------------
+- gsl-lite now lives in the single header file `<gsl-lite/gsl-lite.hpp>`, and all its symbols reside in namespace `gsl_lite`.
+  By default, gsl-lite no longer defines a namespace `gsl` or the unprefixed `Expects()` and `Ensures()` macros for
+  precondition and postcondition checking.
+  This change enables coexistence with Microsoft GSL or other GSL implementations. (#194)
+  To minimize the impact of the breaking changes, gsl-lite introduces an optional GSL compatibility mode controlled by the
+  new configuration switch `gsl_FEATURE_GSL_COMPATIBILITY_MODE`, which is is disabled by default and can be enabled by
+  defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`. This should not be used in public header files of libraries which use
+  gsl-lite because it precludes the use of Microsoft GSL in the same translation unit.
+  The legacy header file `<gsl/gsl-lite.hpp>` now forwards to `<gsl-lite/gsl-lite.hpp>` and implicitly enables the GSL
+  compatibility mode. When the legacy header is included, it emits a warning message which urges to either migrate to header
+  `<gsl-lite/gsl-lite.hpp>`, namespace `gsl_lite`, and the prefixed contract checking macros `gsl_Expects()` and
+  `gsl_Ensures()`, or to explicitly request GSL compatibility by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
+  Please refer to the migration guide in the gsl-lite documentation for guidance on how to adapt your code.
 
-### namespace `gsl_lite` and `<gsl-lite/gsl-lite.hpp>`
-
-gsl-lite now lives in the single header file `<gsl-lite/gsl-lite.hpp>`, and all its symbols reside in namespace `gsl_lite`.
-By default, gsl-lite no longer defines a namespace `gsl` or the unprefixed `Expects()` and `Ensures()` macros for precondition
-and postcondition checking.
-
-This change enables coexistence with Microsoft GSL or other GSL implementations. (#194)
-
-To adapt your code, refer to namespace `gsl_lite` rather than namespace `gsl` and use the prefixed macros `gsl_Expects()` and
-`gsl_Ensures()` rather than the unprefixed macros `Expects()` and `Ensures()` for precondition and postcondition checking.
-Alternatively, enable GSL compatibility mode.
-
-To avoid pervasive code changes, it can be useful to define a namespace alias inside your own namespace:
-
-```c++
-// my-lib.hpp
-
-#include <gsl-lite/gsl-lite.hpp>  // instead of <gsl/gsl-lite.hpp>
-
-namespace my_lib {
-namespace gsl = ::gsl_lite;  // convenience alias
-
-    inline double median( gsl::span<double const> elements )
-    {
-        gsl_Expects( !elements.empty() );  // instead of Expects()
-        ...
-    }
-
-} // namespace my_lib
-```
-
-### GSL compatibility mode
-
-To minimize the impact of the breaking changes, gsl-lite introduces an optional *GSL compatibility mode* controlled by the new
-configuration switch `gsl_FEATURE_GSL_COMPATIBILITY_MODE`, which is is disabled by default and can be enabled by defining
-`gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
-
-If the GSL compatibility mode is enabled, gsl-lite additionally makes the following global definitions:
-```c++
-namespace gsl = ::gsl_lite;
-#define Expects( x )  gsl_Expects( x )
-#define Ensures( x )  gsl_Ensures( x )
-```
-
-The GSL compatibility mode precludes the use of gsl-lite and Microsoft GSL in the same translation unit. Therefore, when making
-use of gsl-lite in a public header file of a library, the GSL compatibility mode should not be enabled.
-
-The GSL compatibility mode causes no link-time interference between gsl-lite and as Microsoft GSL. Both libraries may be used in
-the same project as long as no translation unit includes both at the same time.
-
-The legacy header file `<gsl/gsl-lite.hpp>` now forwards to `<gsl-lite/gsl-lite.hpp>` and implicitly enables the GSL
-compatibility mode. When the legacy header is included, it emits a warning message that urges to either migrate to header
-`<gsl-lite/gsl-lite.hpp>`, namespace `gsl_lite` and the prefixed contract checking macros `gsl_Expects()` and `gsl_Ensures()`,
-or to explicitly request GSL compatibility by defining `gsl_FEATURE_GSL_COMPATIBILITY_MODE=1`.
-
-
-## Other changes
-
+Other changes:
 - `span<>` now implements static extents. This was achieved by adapting the `span<>` implementation from Microsoft GSL,
-back-porting it to support C++98 and older compilers. (#153)
-
+  back-porting it to support C++98 and older compilers. (#153)
 - gsl-lite v1 has different defaults for the numerous configuration options and switches:
   - `gsl_FEATURE_STRING_SPAN`:  
     Version-1 default: `gsl_FEATURE_STRING_SPAN=0`  
@@ -105,7 +68,6 @@ back-porting it to support C++98 and older compilers. (#153)
     Version-0 default: `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`  
     Reason: the mode enabled by `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` is consistent with the behavior of the `assert()` macro
     while retaining runtime contract checks even if `NDEBUG` is defined.
-
 - `narrow<>()` and `narrow_failfast<>()` now support non-totally-ordered types such as `std::complex<>`, borrowing from
   https://github.com/microsoft/GSL/pull/986. (#309)
 
@@ -115,15 +77,13 @@ back-porting it to support C++98 and older compilers. (#153)
 - For MSVC on Windows, gsl-lite now uses `#pragma detect_mismatch()` to diagnose ABI incompatibilities at link time.
 
 
-## Fixes
-
+Fixes:
 - In C++98 mode, the faulty definition of the internal function macro `gsl_STATIC_ASSERT_()` was corrected, fixing an unwanted
   predicate inversion for some internal compile-time checks.
 - Contract check macros now always expand to an expression or a statement, which avoids compiler warnings.
 
 
-## Deprecations and removals
-
+Deprecations and removals:
 - Deprecated unsafe `span<>` member function `as_span<>()`.
 - Removed `Owner()` and `implicit` macros, which already were disabled by default.
 - Removed `finally()`, `on_error()`, and `on_return()` implementation for C++98.
