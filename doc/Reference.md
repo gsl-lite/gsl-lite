@@ -1,6 +1,7 @@
-﻿# *gsl-lite*: Reference documentation
+﻿# Reference documentation
 
-**Contents:**  
+## Contents
+
 - [Contract and assertion checks](#contract-and-assertion-checks): `gsl_Expects( pred )`, `gsl_Ensures( pred )`, `gsl_Assert( pred )`, and more
 - [Pointer annotations](#pointer-annotations): `owner<P>`, `not_null<P>`, and `not_null_ic<P>`
 - [Numeric type conversions](#numeric-type-conversions): `narrow<T>( u )`, `narrow_failfast<T>( u )`, and `narrow_cast<T>( u )`

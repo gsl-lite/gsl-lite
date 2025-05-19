@@ -1,1 +1,7 @@
 $content-width: 1000px;
+
+$on-palm:          600px;
+$on-laptop:        1000px;
+
+$on-medium:        $on-palm;
+$on-large:         $on-laptop;
