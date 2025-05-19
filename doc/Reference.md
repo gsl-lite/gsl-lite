@@ -145,12 +145,24 @@ using gsl_lite::not_null;
 int i = 42;
 int * pi = &i;
 int * pn = nullptr;
-//not_null<int *> n;  // compile error: no default constructor
-//not_null<int *> npi = pi;  // compile error: no implicit conversion
-not_null<int *> npi = not_null( pi );  // explicit conversion: runtime null check
-//not_null<int *> nn = nullptr;  // compile error: no implicit conversion
-//not_null<int *> nn = not_null( nullptr );  // compile error: no explicit conversion
-not_null<int *> npn = not_null( pn );  // explicit conversion: runtime null check ⇒ runtime contract violation
+
+    // compile error: no default constructor
+//not_null<int *> n;
+
+    // compile error: no implicit conversion
+//not_null<int *> npi = pi;
+
+    // explicit conversion: runtime null check
+not_null<int *> npi = not_null( pi );
+
+    // compile error: no implicit conversion
+//not_null<int *> nn = nullptr;
+
+    // compile error: no explicit conversion
+//not_null<int *> nn = not_null( nullptr );
+
+    // explicit conversion: runtime null check ⇒ runtime contract violation
+not_null<int *> npn = not_null( pn );
 ```
 
 #### Motivation
@@ -324,7 +336,8 @@ void insertAfter( not_null<ListNode *> x, not_null<std::unique_ptr<ListNode>> ne
 {
     newNode->prev = x;
     newNode->next = x->next;
-    x->next = gsl_lite::as_nullable( std::move( newNode ) ).release();  // no `not_null<>::release()` member function
+        // no `not_null<>::release()` member function
+    x->next = gsl_lite::as_nullable( std::move( newNode ) ).release();
 }
 ```
 
