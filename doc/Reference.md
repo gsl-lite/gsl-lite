@@ -803,7 +803,7 @@ interrupted by an exception. This ensures that the `file` handle does not leak.
 
 The following preprocessor macros can be used to identify features of the C++ build environment:
 
-Name                                    | Notes           |
+Name                                    | Meaning         |
 ---------------------------------------:|:----------------|
 **Metadata:**                           | &nbsp;          |
 `gsl_lite_MAJOR`                        | Major version number of *gsl-lite* |
@@ -832,7 +832,7 @@ implementations predating C\+\+20. For this purpose, *gsl-lite* defines a limite
 They all follow the pattern `gsl_HAVE( xx )`, where `xx` is to be replaced by a token representing a given language feature. `gsl_HAVE( xx )` evaluates
 to 1 if the corresponding language or library feature is available, 0 otherwise.
 
-Name                                    | Notes           |
+Name                                    | Feature         |
 ---------------------------------------:|:----------------|
 **Language features:**                  | &nbsp;          |
 `gsl_HAVE( C99_PREPROCESSOR )`          | C99-compatible [preprocessor](https://en.cppreference.com/w/c/preprocessor) |
@@ -891,24 +891,24 @@ Name                                    | Notes           |
 
 The keyword and attribute macros allow to conditionally take advantage of newer language features if available:
 
-Name                        | Notes           |
+Name                        | Expands to      |
 ---------------------------:|:----------------|
-`gsl_DIMENSION_OF( a )`     | Expands to `( sizeof( a ) / sizeof( 0[ a ] ) )`, which is the number of elements in a C-style array `a` |
-`gsl_constexpr`             | Expands to [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++11 and higher, to nothing otherwise |
-`gsl_constexprXX`           | Expands to [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
-`gsl_explicit`              | Expands to [`explicit`](https://en.cppreference.com/w/cpp/language/explicit) specifier in C++11 and higher, to nothing otherwise |
-`gsl_is_delete`             | Expands to `= delete` in C++11 and higher, to nothing otherwise |
-`gsl_is_delete_access`      | Expands to `public` in C++11 and higher, to `private` otherwise |
-`gsl_noexcept`              | Expands to [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) specifier in C++11 and higher, to nothing otherwise |
-`gsl_noexcept_if( expr )`   | Expands to [`noexcept( expr )`](https://en.cppreference.com/w/cpp/language/noexcept) operator in C++11 and higher, to nothing otherwise |
-`gsl_nullptr`               | Expands to `nullptr` in C++11 and higher, to `NULL` otherwise |
-`gsl_NORETURN`              | Expands to [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute in C++11 and higher, to a compiler-specific attribute if available, or to nothing otherwise |
-`gsl_DEPRECATED`            | Expands to [`[[deprecated]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
-`gsl_DEPRECATED_MSG( msg )` | Expands to [`[[deprecated( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
-`gsl_NODISCARD`             | Expands to [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute in C++17 and higher, to nothing otherwise |
-`gsl_MAYBE_UNUSED`          | Expands to [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher, or to nothing otherwise |
-`gsl_MAYBE_UNUSED_MEMBER`   | Expands to [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher for compilers other than GNU GCC, or to nothing otherwise |
-`gsl_NO_UNIQUE_ADDRESS`<br>(≥ C++20) | expands to [`[[msvc::no_unique_address]]`](https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/) for MSVC, to [`[[no_unique_address]]`](https://en.cppreference.com/w/cpp/language/attributes/no_unique_address) otherwise |
+`gsl_DIMENSION_OF( a )`     | `( sizeof( a ) / sizeof( 0[ a ] ) )`, which is the number of elements in a C-style array `a` |
+`gsl_constexpr`             | [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++11 and higher, to nothing otherwise |
+`gsl_constexprXX`           | [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
+`gsl_explicit`              | [`explicit`](https://en.cppreference.com/w/cpp/language/explicit) specifier in C++11 and higher, to nothing otherwise |
+`gsl_is_delete`             | `= delete` in C++11 and higher, to nothing otherwise |
+`gsl_is_delete_access`      | `public` in C++11 and higher, to `private` otherwise |
+`gsl_noexcept`              | [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) specifier in C++11 and higher, to nothing otherwise |
+`gsl_noexcept_if( expr )`   | [`noexcept( expr )`](https://en.cppreference.com/w/cpp/language/noexcept) operator in C++11 and higher, to nothing otherwise |
+`gsl_nullptr`               | `nullptr` in C++11 and higher, to `NULL` otherwise |
+`gsl_NORETURN`              | [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute in C++11 and higher, to a compiler-specific attribute if available, or to nothing otherwise |
+`gsl_DEPRECATED`            | [`[[deprecated]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
+`gsl_DEPRECATED_MSG( msg )` | [`[[deprecated( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
+`gsl_NODISCARD`             | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute in C++17 and higher, to nothing otherwise |
+`gsl_MAYBE_UNUSED`          | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher, or to nothing otherwise |
+`gsl_MAYBE_UNUSED_MEMBER`   | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher if that attribute does not raise a warning when applied to class data members (as is the case for GNU GCC), or to nothing otherwise |
+`gsl_NO_UNIQUE_ADDRESS`<br>(≥ C++20) | [`[[msvc::no_unique_address]]`](https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/) for MSVC, to [`[[no_unique_address]]`](https://en.cppreference.com/w/cpp/language/attributes/no_unique_address) otherwise |
 
 ### Code generation macros
 
@@ -944,8 +944,8 @@ The following macros help avoid writing repetitive code:
 
 The following types and functions implement some functionality added only in later C++ standards:
 
-Name                                    | C++ feature     |
----------------------------------------:|:----------------|
+Name                                              | C++ feature     |
+-------------------------------------------------:|:----------------|
 `gsl_lite::std11::add_const<>`                    | [`std::add_const<>`](https://en.cppreference.com/w/cpp/types/add_cv) (C++11) |
 `gsl_lite::std11::remove_const<>`<br>`std11::remove_volatile<>`<br>`std11::remove_cv<>` | [`std::remove_const<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_volatile<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_cv<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11) |
 `gsl_lite::std11::remove_reference<>`             | [`std::remove_reference<>`](https://en.cppreference.com/w/cpp/types/remove_reference) (C++11) |
