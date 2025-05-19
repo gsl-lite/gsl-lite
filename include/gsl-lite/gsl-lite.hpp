@@ -1671,6 +1671,11 @@ data( std::initializer_list<E> il ) gsl_noexcept
 
 } // namespace std17
 
+#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+using std17::data;
+using std17::size;
+#endif // gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
 // C++20 emulation:
 
 namespace std20 {
@@ -1747,6 +1752,16 @@ ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
 template< class T > struct remove_cvref { typedef typename std11::remove_cv< typename std11::remove_reference< T >::type >::type type; };
 
 } // namespace std20
+
+#if gsl_HAVE( STD_SSIZE ) || gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+using std20::ssize;
+#endif // gsl_HAVE( STD_SSIZE ) || gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+
+using std20::identity;
+using std20::type_identity;
+#if gsl_HAVE( ALIAS_TEMPLATE )
+using std20::type_identity_t;
+#endif // gsl_HAVE( ALIAS_TEMPLATE )
 
 // C++23 emulation:
 
@@ -2134,7 +2149,7 @@ gsl_api void fail_fast_assert_handler( char const * expression, char const * mes
 
 // Add uncaught_exceptions() for pre-2017 MSVC, GCC and Clang
 
-namespace std11 {
+namespace std17 {
 
 #if gsl_HAVE( UNCAUGHT_EXCEPTIONS )
 
@@ -2159,6 +2174,15 @@ inline int uncaught_exceptions() gsl_noexcept
 }
 
 # endif
+#endif
+
+} // namespace std17
+
+namespace std11 {
+
+#if gsl_HAVE( UNCAUGHT_EXCEPTIONS ) || defined( _MSC_VER ) || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
+// Retain alias for backward compatibility
+using ::gsl_lite::std17::uncaught_exceptions;
 #endif
 
 } // namespace std11
@@ -2227,7 +2251,7 @@ final
 public:
     explicit final_action_return( F action ) gsl_noexcept
         : action_( std::move( action ) )
-        , exception_count_( std11::uncaught_exceptions() )
+        , exception_count_( std17::uncaught_exceptions() )
     {
     }
 
@@ -2244,7 +2268,7 @@ public:
     gsl_SUPPRESS_MSGSL_WARNING(f.6)
     ~final_action_return() gsl_noexcept
     {
-        if ( std11::uncaught_exceptions() == exception_count_ )  // always false if `exception_count_ == -1`
+        if ( std17::uncaught_exceptions() == exception_count_ )  // always false if `exception_count_ == -1`
         {
             action_();
         }
@@ -2268,7 +2292,7 @@ final
 public:
     explicit final_action_error( F action ) gsl_noexcept
         : action_( std::move( action ) )
-        , exception_count_( std11::uncaught_exceptions() )
+        , exception_count_( std17::uncaught_exceptions() )
     {
     }
 
@@ -2287,7 +2311,7 @@ public:
     {
         if ( exception_count_ != -1 )  // abuse member as special "no-invoke" marker
         {
-            if ( std11::uncaught_exceptions() != exception_count_ )
+            if ( std17::uncaught_exceptions() != exception_count_ )
             {
                 action_();
             }

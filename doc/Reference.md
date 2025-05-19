@@ -946,22 +946,22 @@ The following types and functions implement some functionality added only in lat
 
 Name                                    | C++ feature     |
 ---------------------------------------:|:----------------|
-`std11::add_const<>`                    | [`std::add_const<>`](https://en.cppreference.com/w/cpp/types/add_cv) (C++11) |
-`std11::remove_const<>`<br>`std11::remove_volatile<>`<br>`std11::remove_cv<>` | [`std::remove_const<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_volatile<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_cv<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11) |
-`std11::remove_reference<>`             | [`std::remove_reference<>`](https://en.cppreference.com/w/cpp/types/remove_reference) (C++11) |
-`std11::integral_constant<>`<br>`std11::true_type`<br>`std11::false_type`<br>`std17::bool_constant<>`| [`std::integral_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::true_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::false_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::bool_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++17) |
-`std14::make_unique<>()`                | [`std::make_unique<>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) (C++14) |
-`std11::uncaught_exceptions()` (sic)    | [`std::uncaught_exceptions()`](https://en.cppreference.com/w/cpp/error/uncaught_exception) (C++17) |
-`std17::negation<>`                     | [`std::negation<>`](https://en.cppreference.com/w/cpp/types/negation) (C++17) |
-`std17::conjunction<>` (≥ C\+\+11)      | [`std::conjunction<>`](https://en.cppreference.com/w/cpp/types/conjunction) (C++17) |
-`std17::disjunction<>` (≥ C\+\+11)      | [`std::disjunction<>`](https://en.cppreference.com/w/cpp/types/disjunction) (C++17) |
-`std17::void_t<>` (≥ C\+\+11)           | [`std::void_t<>`](https://en.cppreference.com/w/cpp/types/void_t) (C++17) |
-`std17::size()`<br>`std20::ssize()`     | [`std::size()`](https://en.cppreference.com/w/cpp/iterator/size) (C++17)<br>[`std::ssize()`](https://en.cppreference.com/w/cpp/iterator/size) (C++20) |
-`std17::data()`                         | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
-`std20::endian`                         | [`std::endian`](https://en.cppreference.com/w/cpp/types/endian) (C++20) |
-`std20::type_identity<>`                | [`std::type_identity<>`](https://en.cppreference.com/w/cpp/types/type_identity) (C++20) |
-`std20::identity`                       | [`std::identity`](https://en.cppreference.com/w/cpp/utility/functional/identity) (C++20) |
-`std20::remove_cvref<>`                 | [`std::remove_cvref<>`](https://en.cppreference.com/w/cpp/types/remove_cvref) (C++20) |
+`gsl_lite::std11::add_const<>`                    | [`std::add_const<>`](https://en.cppreference.com/w/cpp/types/add_cv) (C++11) |
+`gsl_lite::std11::remove_const<>`<br>`std11::remove_volatile<>`<br>`std11::remove_cv<>` | [`std::remove_const<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_volatile<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11)<br>[`std::remove_cv<>`](https://en.cppreference.com/w/cpp/types/remove_cv) (C++11) |
+`gsl_lite::std11::remove_reference<>`             | [`std::remove_reference<>`](https://en.cppreference.com/w/cpp/types/remove_reference) (C++11) |
+`gsl_lite::std11::integral_constant<>`<br>`gsl_lite::std11::true_type`<br>`gsl_lite::std11::false_type`<br>`gsl_lite::std17::bool_constant<>`| [`std::integral_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::true_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::false_type`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++11)<br>[`std::bool_constant<>`](https://en.cppreference.com/w/cpp/types/integral_constant) (C++17) |
+`gsl_lite::std14::make_unique<>()`                | [`std::make_unique<>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) (C++14) |
+`gsl_lite::std17::uncaught_exceptions()`          | [`std::uncaught_exceptions()`](https://en.cppreference.com/w/cpp/error/uncaught_exception) (C++17) |
+`gsl_lite::std17::negation<>`                     | [`std::negation<>`](https://en.cppreference.com/w/cpp/types/negation) (C++17) |
+`gsl_lite::std17::conjunction<>` (≥ C\+\+11)      | [`std::conjunction<>`](https://en.cppreference.com/w/cpp/types/conjunction) (C++17) |
+`gsl_lite::std17::disjunction<>` (≥ C\+\+11)      | [`std::disjunction<>`](https://en.cppreference.com/w/cpp/types/disjunction) (C++17) |
+`gsl_lite::std17::void_t<>` (≥ C\+\+11)           | [`std::void_t<>`](https://en.cppreference.com/w/cpp/types/void_t) (C++17) |
+`gsl_lite::size()`, `gsl_lite::std17::size()`<br>`gsl_lite::ssize()`, `gsl_lite::std20::ssize()` | [`std::size()`](https://en.cppreference.com/w/cpp/iterator/size) (C++17)<br>[`std::ssize()`](https://en.cppreference.com/w/cpp/iterator/size) (C++20) |
+`gsl_lite::data()`, `gsl_lite::std17::data()`   | [`std::data()`](https://en.cppreference.com/w/cpp/iterator/data) (C++17) |
+`gsl_lite::std20::endian`                         | [`std::endian`](https://en.cppreference.com/w/cpp/types/endian) (C++20) |
+`gsl_lite::type_identity<>`, `gsl_lite::std20::type_identity<>` | [`std::type_identity<>`](https://en.cppreference.com/w/cpp/types/type_identity) (C++20) |
+`gsl_lite::identity`, `gsl_lite::std20::identity` | [`std::identity`](https://en.cppreference.com/w/cpp/utility/functional/identity) (C++20) |
+`gsl_lite::std20::remove_cvref<>`                 | [`std::remove_cvref<>`](https://en.cppreference.com/w/cpp/types/remove_cvref) (C++20) |
 
 
 ## Configuration options and switches
