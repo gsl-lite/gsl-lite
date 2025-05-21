@@ -170,6 +170,15 @@
         },
 
         {
+            "name": "libc++ for Clang",
+            "hidden": true,
+            "inherits": "compiler presets",
+            "environment": {
+                "_USE_PRESET_STDLIB": "-stdlib=libc++",
+                "_CUDA_USE_PRESET_STDLIB": "-Xcompiler=-stdlib=libc++"
+            }
+        },
+        {
             "name": "libstdc++ for Clang",
             "hidden": true,
             "inherits": "compiler presets",

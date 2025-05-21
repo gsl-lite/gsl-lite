@@ -61,13 +61,13 @@
             "name": "ci-clang",
             "displayName": "Clang (for CI)",
             "description": "Build with Clang (for Continuous Integration).",
-            "inherits": [ "CI settings", "Clang presets" ]
+            "inherits": [ "CI settings", "Clang presets", "libc++ for Clang" ]
         },
         {
             "name": "ci-clang-sanitize",
             "displayName": "Clang & ASan & UBSan & library debug checks (for CI)",
             "description": "Build with Clang and AddressSanitizer and UndefinedBehaviorSanitizer and library debug checks (for Continuous Integration).",
-            "inherits": [ "CI settings", "Clang presets", "ASan", "UBSan", "library debug checks" ]
+            "inherits": [ "CI settings", "Clang presets", "libc++ for Clang", "ASan", "UBSan", "library debug checks" ]
         },
         {
             "name": "ci-clang-libstdc++",
