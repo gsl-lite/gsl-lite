@@ -11,10 +11,9 @@ cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 project( my-program LANGUAGES CXX )
 
 # Obtain source dependencies.
-set( CPM_USE_LOCAL_PACKAGES ON )  # pass-thru mode to support external package managers
 set( CPM_SOURCE_CACHE "${CMAKE_BINARY_DIR}/CPM-cache" )
 include( cmake/CPM.cmake )
-CPMAddPackage( NAME gsl-lite VERSION 1.0.0 GITHUB_REPOSITORY gsl-lite/gsl-lite )
+CPMFindPackage( NAME gsl-lite VERSION 1.0.1 GITHUB_REPOSITORY gsl-lite/gsl-lite )
 
 find_package( gsl-lite 1.0 REQUIRED )
 
