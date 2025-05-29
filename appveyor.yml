@@ -3,14 +3,14 @@
 shallow_clone: true
 
 image:
-    #- Visual Studio 2019
+    - Visual Studio 2019
     - Visual Studio 2017
     - Visual Studio 2015
 
 environment:
     matrix:
-        # VS 2019 and newer are tested with Azure Pipelines
-        #- generator: "Visual Studio 16 2019"
+        # VS 2022 and newer are tested with Azure Pipelines
+        - generator: "Visual Studio 16 2019"
         - generator: "Visual Studio 15 2017"
         - generator: "Visual Studio 14 2015"
         - generator: "Visual Studio 12 2013"

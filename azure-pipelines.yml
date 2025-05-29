@@ -100,7 +100,7 @@ jobs:
 
     - os: Windows
       cxxCompiler: Clang
-      cxxCompilerVersions: [VS2019, VS2022]
+      cxxCompilerVersions: [VS2022]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
       cmakeConfigPreset: 'ci-clang-cl'
@@ -187,20 +187,11 @@ jobs:
       cmakeConfigPreset: 'ci-gcc'
       cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
-    # VS 2010, 2012, 2013, 2015, and 2017 are tested with AppVeyor
+    # VS 2010, 2012, 2013, 2015, 2017, and 2019 are tested with AppVeyor
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [11_8, 12_1]
-      platforms: [x64]
-      cmakeConfigPreset: 'ci-msvc'
-      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019, VS2022]
+      cxxCompilerVersions: [VS2022]
       platforms: [x86, x64]
       cmakeConfigPreset: 'ci-msvc'
 
