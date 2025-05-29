@@ -14,7 +14,7 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 project(
     gsl-lite
     VERSION 1.0.1
-    DESCRIPTION "defensive programming utilities for C++98, C++11 up"
+    DESCRIPTION "ISO C++ Core Guidelines Library implementation for C++98, C++11 up"
     HOMEPAGE_URL "https://github.com/gsl-lite/gsl-lite"
     LANGUAGES CXX
 )
@@ -26,6 +26,7 @@ option( GSL_LITE_OPT_BUILD_TESTS                 "Build and perform gsl-lite tes
 option( GSL_LITE_OPT_BUILD_CUDA_TESTS            "Build and perform gsl-lite CUDA tests"            OFF )
 option( GSL_LITE_OPT_BUILD_EXAMPLES              "Build gsl-lite examples"                          OFF )
 option( GSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS "Build and perform gsl-lite static analysis demos" OFF )
+set(    GSL_LITE_COMPILE_OPTIONS "" CACHE STRING "Extra compile options which should not be passed on when building dependencies (e.g. warning flags)" )
 
 # Include target definitions.
 add_subdirectory( src )

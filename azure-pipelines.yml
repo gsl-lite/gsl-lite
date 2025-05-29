@@ -21,7 +21,6 @@ jobs:
   parameters:
     cache: False
     cmakeBuildConfigurations: [Debug]
-    cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
     cmakeTestArgs: '--exclude-regex cuda'  # do not run CUDA tests
 
     targets:
@@ -41,12 +40,13 @@ jobs:
           # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
           echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable,-AVX_Fast_Unaligned_Load"
         displayName: 'Install Valgrind'
+      cmakeConfigPreset: 'ci-gcc'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
-    
+
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [14]
@@ -54,6 +54,7 @@ jobs:
       cudaCompiler: NVCC
       cudaCompilerVersions: [12_8]
       platforms: [x64]
+      cmakeConfigPreset: 'ci-gcc'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     # CImakeshift doesn't currently support Clang-CUDA.
@@ -79,30 +80,33 @@ jobs:
           # (cf. https://sourceware.org/bugzilla/show_bug.cgi?id=22954, https://bugs.kde.org/show_bug.cgi?id=397083)
           echo "##vso[task.setvariable variable=GLIBC_TUNABLES]glibc.cpu.hwcaps=-AVX2_Usable,-AVX_Usable,-AVX_Fast_Unaligned_Load"
         displayName: 'Install Valgrind'
+      cmakeConfigPreset: 'ci-clang'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v[0-1]-cpp20'
-    
+
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cmakeGenerator: 'MSBuild'  # required for CppCoreCheck
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
+      cmakeConfigPreset: 'ci-msvc'
       cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
-    
+
     - os: Windows
       cxxCompiler: Clang
-      cxxCompilerVersions: [VS2019, VS2022]
+      cxxCompilerVersions: [VS2022]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
+      cmakeConfigPreset: 'ci-clang-cl'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
-    
+
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
@@ -110,13 +114,15 @@ jobs:
       cudaCompilerVersions: [12_8]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+      cmakeConfigPreset: 'ci-msvc'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     - os: MacOS
       cxxCompiler: AppleClang
       cxxCompilerVersions: [16]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
+      cmakeConfigPreset: 'ci-clang'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
 
@@ -125,11 +131,13 @@ jobs:
     #  cxxCompiler: GCC
     #  cxxCompilerVersions: [5]
     #  platforms: [x64]
+    #  cmakeConfigPreset: 'ci-gcc'
 
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [9, 10, 11, 12, 13]
       platforms: [x64]
+      cmakeConfigPreset: 'ci-gcc'
 
     - os: Linux
       cxxCompiler: GCC
@@ -138,7 +146,7 @@ jobs:
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
+      cmakeConfigPreset: 'ci-gcc'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v[0-1]-cpp17'
 
@@ -152,24 +160,23 @@ jobs:
       cxxCompiler: Clang
       cxxCompilerVersions: [11, 12, 13, 14, 15, 16, 17, 18]
       platforms: [x64]
+      cmakeConfigPreset: 'ci-clang'
 
     - os: Linux
       cxxCompiler: Clang
       cxxCompilerVersions: [19]
-      cxxStandardLibraryDebugMode: true
-      cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
+      cmakeConfigPreset: 'ci-clang-sanitize'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v[0-1]-cpp17'
 
     - os: Linux
       cxxCompiler: Clang
       cxxCompilerVersions: [19]
-      cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
+      cmakeConfigPreset: 'ci-clang-libstdc++'
 
     - os: Linux
       cxxCompiler: GCC
@@ -177,29 +184,25 @@ jobs:
       cudaCompiler: NVCC
       cudaCompilerVersions: [12_6]
       platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+      cmakeConfigPreset: 'ci-gcc'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
-    # VS 2010, 2012, 2013, 2015, and 2017 are tested with AppVeyor
+    # VS 2010, 2012, 2013, 2015, 2017, and 2019 are tested with AppVeyor
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019]
-      cudaCompiler: NVCC
-      cudaCompilerVersions: [11_8, 12_1]
-      platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-    
-    - os: Windows
-      cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019, VS2022]
+      cxxCompilerVersions: [VS2022]
       platforms: [x86, x64]
+      cmakeConfigPreset: 'ci-msvc'
 
     - os: MacOS
       cxxCompiler: GCC
       cxxCompilerVersions: [11, 12, 13, 14]
       platforms: [x64]
+      cmakeConfigPreset: 'ci-gcc'
 
     - os: MacOS
       cxxCompiler: AppleClang
       cxxCompilerVersions: [14, 15, 16]
       platforms: [x64]
+      cmakeConfigPreset: 'ci-clang'
