@@ -2016,7 +2016,7 @@ using std::shared_ptr;
 #else // host code
 # if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 #  if gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
-#   define  gsl_TRAP_()  __fastfail( 0 ) /* legacy failure code for buffer-overrun errors, cf. winnt.h, "Fast fail failure codes" */
+#   define  gsl_TRAP_()  __fastfail( 5 ) /* failure code for invalid arguments, cf. winnt.h, "Fast fail failure codes" */
 #  elif gsl_COMPILER_GNUC_VERSION
 #   define  gsl_TRAP_()  __builtin_trap()
 #  elif defined(__has_builtin)
