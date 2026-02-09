@@ -123,7 +123,7 @@ template< class P >
 requires ( std::is_pointer_v<P> )
 using owner = P;
 ```
-(*Note:* The actual definition uses a SFINAE constraint to support C\+\+11 to C\+\+17).
+(*Note:* The actual definition uses a SFINAE constraint to support C\+\+11 to C\+\+17.)
 
 As far as the type system and the runtime behavior is concerned, `owner<P>` is exactly equivalent to `P`. However, the annotation conveys
 intent to a reader, and static analysis tools may use the annotation to impose semantic checks based on the assumption of ownership.
@@ -313,7 +313,7 @@ This can be written as a one-liner with `gsl_lite::as_nullable()`:
 - If `P` is hashable (that is, the [`std::hash<P>`](https://en.cppreference.com/w/cpp/utility/hash) specialization is *enabled*), `not_null<P>` is hashable.
 
 For C++14 and older, where [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
-is not available, *gsl-lite* defines a set of helper functions `make_not_null()` for explicitly constructing `not_null<>` objects.
+is not available, *gsl-lite* defines the helper function `make_not_null()` for explicitly constructing `not_null<>` objects.
 
 *gsl-lite* additionally defines the helper functions `make_unique<T>()` and `make_shared<T>()` which behave like
 [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) and
@@ -372,8 +372,8 @@ private:
     FilePtr file_;
 
 public:
-    FileHandle( FileHandle & rhs ) = default;
-    FileHandle & operator =( FileHandle & rhs ) = default;
+    FileHandle( FileHandle && rhs ) = default;
+    FileHandle & operator =( FileHandle && rhs ) = default;
 
     explicit FileHandle( FilePtr _file )
         : file_( std::move( _file ) )
@@ -396,12 +396,12 @@ private:
     FilePtr file_;
 
 public:
-    FileHandle( FileHandle & rhs )
+    FileHandle( FileHandle && rhs )
         : file_( std::move( rhs.file_ ) )
     {
         gsl_Expects( file_ != nullptr );
     }
-    FileHandle & operator =( FileHandle & rhs )
+    FileHandle & operator =( FileHandle && rhs )
     {
         gsl_Expects( rhs.file_ != nullptr );
         file_ = std::move(rhs.file_);
@@ -435,10 +435,10 @@ private:
 
 public:
         // implicit precondition check `rhs.file_ != nullptr`
-    FileHandle( FileHandle & rhs ) = default;
+    FileHandle( FileHandle && rhs ) = default;
 
         // implicit precondition check `rhs.file_ != nullptr`
-    FileHandle & operator =( FileHandle & rhs ) = default;
+    FileHandle & operator =( FileHandle && rhs ) = default;
 
     explicit FileHandle( not_null<FilePtr> _file )  // <--
         : file_( std::move( _file ) )
@@ -490,7 +490,7 @@ auto npi = gsl_lite::make_unique<int>( 42 );
 if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
 ```
 
-*gsl-lite* also defines a set of helper functions `make_not_null()` for explicitly constructing `not_null<>`
+*gsl-lite* also defines the helper function `make_not_null()` for explicitly constructing `not_null<>`
 objects. This is useful for type inference in C++14 and older where
 [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
 is not available. Example:
@@ -519,7 +519,7 @@ use( not_null( &i ) );  // runtime check
 ```
 
 This choice has the generally desirable consequence that it encourages propagation of non-nullability.
-Explicit conversions are needed only when converting a nullable to a non-nullable pointer; therefore, as
+Explicit conversions are needed only when converting a nullable pointer to a non-nullable pointer; therefore, as
 more and more of a code base is converted to `not_null<>`, fewer explicit conversions need to be used.
 
 However, in some codebases it may not be feasible to insert explicit not-null checks at every invocation
@@ -669,7 +669,7 @@ Exposition-only definition:
 
 ```c++
 template< class Container >
-auto at( Container& c, index i )
+auto at( Container & c, index i )
 {
     gsl_Expects( i >= 0 && i < std::ssize( c ) );
     return c[ i ];
