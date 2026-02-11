@@ -196,7 +196,7 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`gsl_Ensures()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks postcondition at runtime |
 [`gsl_EnsuresDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_EnsuresAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
-[`gsl_Assert()`](doc/Reference.md#contract-and-assertion-checks)         | -           | -             | ✓                   | Checks invariant at runtime |
+[`gsl_Assert()`<br>`gsl_Verify()`](doc/Reference.md#contract-and-assertion-checks) | - | -             | ✓                   | Checks invariant at runtime |
 [`gsl_AssertDebug()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_AssertAudit()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp; | &nbsp; | &nbsp; |
