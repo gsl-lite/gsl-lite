@@ -250,7 +250,7 @@
 # define lest_TRY        if (1)
 # define lest_CATCH(x)   else if (0)
 # define lest_CATCH_ALL  else if (0)
-# define lest_THROW(x)   std::terminate()
+# define lest_THROW(x)   ( (void) sizeof( x ), std::terminate() )
 # define lest_RETHROW
 #endif // lest_HAVE( EXCEPTIONS )
 
