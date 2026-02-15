@@ -3363,10 +3363,10 @@ is_valid( not_null<T> const & p )
     return detail::not_null_accessor<T>::is_valid( p );
 }
 
+#if gsl_HAVE( EXPRESSION_SFINAE )
 template< class P >
-gsl_NODISCARD gsl_api gsl_constexpr14 gsl_TRAILING_RETURN_TYPE_( not_null< typename P::pointer > )
-get( not_null<P> const & p )
-gsl_RETURN_DECLTYPE_( gsl_lite::make_not_null( p.get() ) )
+gsl_NODISCARD gsl_api gsl_constexpr14 auto
+get( not_null<P> const & p ) -> decltype( gsl_lite::make_not_null( p.get() ) )
 {
     return gsl_lite::make_not_null( p.get() );
 }
@@ -3377,9 +3377,8 @@ get( not_null<T *> const & p )
     return p;
 }
 template< class P >
-gsl_NODISCARD gsl_api gsl_constexpr14 gsl_TRAILING_RETURN_TYPE_( typename P::pointer )
-get( P const & p )
-gsl_RETURN_DECLTYPE_( p.get() )
+gsl_NODISCARD gsl_api gsl_constexpr14 auto
+get( P const & p ) -> decltype( p.get() )
 {
     return p.get();
 }
@@ -3391,28 +3390,24 @@ get( T * const & p )
 }
 
 template< class S >
-gsl_NODISCARD gsl_api gsl_constexpr14 gsl_TRAILING_RETURN_TYPE_( not_null< typename S::value_type > )
-c_str( S const & str )
-gsl_RETURN_DECLTYPE_( gsl_lite::make_not_null( str.c_str() ) )
+gsl_NODISCARD gsl_api gsl_constexpr14 auto
+c_str( S const & str ) -> decltype( gsl_lite::make_not_null( str.c_str() ) )
 {
     return gsl_lite::make_not_null( str.c_str() );
 }
-template< class C, std::size_t N
-    gsl_ENABLE_IF_NTTP_(( detail::is_char<C>::value ))
->
-gsl_NODISCARD gsl_api gsl_constexpr14 not_null< C const * >
+template< class C, std::size_t N >
+gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<C>::value, not_null< C const * > >::type
 c_str( C const ( & literal )[ N ] )
 {
     return literal;
 }
-template< class C
-    gsl_ENABLE_IF_NTTP_(( detail::is_char<C>::value ))
->
-gsl_NODISCARD gsl_api gsl_constexpr14 C const *
+template< class C >
+gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<C>::value, C const * >::type
 c_str( C const * const & str )
 {
     return str;
 }
+#endif // gsl_HAVE( EXPRESSION_SFINAE )
 
 } // namespace no_adl
 } // namespace detail
