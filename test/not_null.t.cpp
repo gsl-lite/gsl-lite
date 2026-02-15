@@ -1,9 +1,9 @@
-﻿//
+//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
 // Copyright (c) 2015-2019 Martin Moene
-// Copyright (c) 2019-2021 Moritz Beutel
+// Copyright (c) 2019-2026 Moritz Beutel
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
 //
 // This code is licensed under the MIT License (MIT).
@@ -159,7 +159,13 @@ CASE( "not_null<>: Convertibility is correctly reported by type traits" )
     static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 # endif
 
+    // Do not permit implicit conversion to bool even if the pointer type permits an implicit conversion to bool.
+    static_assert(  std::is_convertible< int*, bool >::value, "static assertion failed" );
     static_assert( !std::is_convertible< not_null < int* >, bool >::value, "static assertion failed" );
+
+    // Do not permit implicit conversion to bool if the pointer type permits an explicit conversion to bool.
+    static_assert( !std::is_convertible< std::unique_ptr< int >, bool >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< std::shared_ptr< int >, bool >::value, "static assertion failed" );
     static_assert( !std::is_convertible< not_null < std::unique_ptr< int > >, bool >::value, "static assertion failed" );
     static_assert( !std::is_convertible< not_null < std::shared_ptr< int > >, bool >::value, "static assertion failed" );
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
@@ -241,13 +247,19 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
     static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >&, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 
-    // Do not permit conversion to bool
+    // Do not permit explicit conversion to bool even if the pointer type permits an implicit conversion to bool.
+    static_assert(  std::is_constructible< bool, int* >::value, "static assertion failed");
+    static_assert(  std::is_assignable<    bool&, int* >::value, "static assertion failed");
     static_assert( !std::is_constructible< bool, not_null < int* > >::value, "static assertion failed");
     static_assert( !std::is_assignable<    bool&, not_null < int* > >::value, "static assertion failed");
 
+    // Do not permit explicit conversion to bool even if the pointer type permits an explicit conversion to bool.
+    static_assert(  std::is_constructible< bool, std::unique_ptr< int > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, std::unique_ptr< int > >::value, "static assertion failed");
+    static_assert(  std::is_constructible< bool, std::shared_ptr< int > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, std::shared_ptr< int > >::value, "static assertion failed");
     static_assert( !std::is_constructible< bool, not_null < std::unique_ptr< int > > >::value, "static assertion failed");
     static_assert( !std::is_assignable<    bool&, not_null < std::unique_ptr< int > > >::value, "static assertion failed");
-
     static_assert( !std::is_constructible< bool, not_null < std::shared_ptr< int > > >::value, "static assertion failed");
     static_assert( !std::is_assignable<    bool&, not_null < std::shared_ptr< int > > >::value, "static assertion failed");
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
@@ -1835,7 +1847,7 @@ CASE( "not_null<>: Supports std::function<> for construction, assignment, and in
     not_null< std::function< int( int ) > > insp = make_not_null( std::function< int( int ) >( inspector ) );
     int i = 41;
     EXPECT( insp( i ) == 41 );
-    auto insp2 = std::move( insp );
+    not_null< std::function< int( int ) > > insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
     if ( ! gsl_lite::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
     {
@@ -1860,7 +1872,7 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     not_null< std::function< int( int ) > > insp = inspector;
     int i = 41;
     EXPECT( insp( i ) == 41 );
-    auto insp2 = std::move( insp );
+    not_null< std::function< int( int ) > > insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
     if ( ! gsl_lite::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
     {
@@ -1874,6 +1886,24 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     i = 41;
     mut( i );
     EXPECT( i == 41 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+}
+
+CASE( "not_null<>: Supports implicit conversion to nullable std::function<>" )
+{
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    not_null< std::function< int( int ) > > insp = make_not_null( std::function< int( int ) >( inspector ) );
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+    std::function< int( int ) > ninsp = insp;  // copy construction
+    EXPECT( ninsp( i ) == 41 );
+    ninsp = insp;  // copy assignment
+    EXPECT( ninsp( i ) == 41 );
+    ninsp = std::move( insp );  // move assignment
+    EXPECT( ninsp( i ) == 41 );
+    insp = make_not_null( std::move( ninsp ) );
+    std::function< int( int ) > insp2 = std::move( insp );  // move construction
+    EXPECT( insp2( i ) == 41 );
 # endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
 

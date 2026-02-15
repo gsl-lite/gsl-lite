@@ -3066,6 +3066,29 @@ public:
 # endif
 
     // implicit conversion operator
+    gsl_NODISCARD gsl_api gsl_constexpr
+    operator T() const
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    &
+# endif
+    {
+        return accessor::get_checked( *this );
+    }
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    gsl_NODISCARD gsl_api gsl_constexpr
+    operator T() &&
+    {
+        return accessor::get_checked( std::move( *this ) );
+    }
+# endif
+# if gsl_HAVE( IS_DELETE )
+#  if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    operator bool() const & = delete;
+    operator bool() && = delete;
+#  else
+    operator bool() const = delete;
+#  endif
+# endif
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
