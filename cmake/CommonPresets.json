@@ -1,8 +1,4 @@
-﻿{
-    // Collection of generally useful CMake configuration presets.
-    // Version 0.1.0β
-    // The contents of this file are in the public domain.
-    // (Moritz Beutel, 2025)
+{
     "version": 7,
     "configurePresets": [
         {
@@ -26,7 +22,6 @@
         },
 
         {
-            // "CI" covers AppVeyor, GitHub Actions, GitLab CI, Travis CI, and possibly others.
             "name": "CI",
             "hidden": true,
             "condition": {
@@ -37,11 +32,6 @@
         },
 
         {
-            // For MSVC, enable UTF-8 source file encoding, the highest warning level, and some additional warnings:
-            // W44062: enumerator 'identifier' in a switch of enum 'enumeration' is not handled
-            // W44242: 'identifier': conversion from 'type1' to 'type2', possible loss of data
-            // W44254: 'operator': conversion from 'type1' to 'type2', possible loss of data
-            // W44265: 'class': class has virtual functions, but destructor is not virtual
             "name": "MSVC presets",
             "hidden": true,
             "inherits": "compiler presets",
@@ -52,8 +42,8 @@
                 "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:/permissive-;/W4;/w44062;/w44242;/w44254;/w44265>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/permissive-,/W4,/w44062,/w44242,/w44254,/w44265>",
                 "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/WX>",
                 "_PRESET_ASAN": "/fsanitize=address",
-                "_PRESET_UBSAN": "/fsanitize=undefined", // not currently supported
-                "_PRESET_TSAN": "/fsanitize=thread", // not currently supported
+                "_PRESET_UBSAN": "/fsanitize=undefined",
+                "_PRESET_TSAN": "/fsanitize=thread",
                 "_PRESET_DEBUGCHECKS": "/D_ITERATOR_DEBUG_LEVEL=1"
             },
             "condition": {
@@ -63,7 +53,6 @@
             }
         },
         {
-            // For clang-cl, use the same general presets as for MSVC with some minor changes.
             "name": "clang-cl presets",
             "hidden": true,
             "inherits": "compiler presets",
@@ -75,7 +64,7 @@
                 "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:/WX>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=/WX>",
                 "_PRESET_ASAN": "/fsanitize=address",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
-                "_PRESET_TSAN": "-fsanitize=thread", // not currently supported
+                "_PRESET_TSAN": "-fsanitize=thread",
                 "_PRESET_DEBUGCHECKS": "/D_ITERATOR_DEBUG_LEVEL=1"
             },
             "condition": {
@@ -85,7 +74,6 @@
             }
         },
         {
-            // For GCC, enable the highest warning level and pedantic mode.
             "name": "GCC presets",
             "hidden": true,
             "inherits": "compiler presets",
@@ -94,7 +82,7 @@
                 "_PRESET_CXXFLAGS": "",
                 "_PRESET_CUDAFLAGS": "",
                 "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wall,-Wextra,-pedantic>",
-                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>",  // avoid -Werror for CUDA host compilers for now
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>",
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-undefined-trap-on-error",
                 "_PRESET_TSAN": "-fsanitize=thread",
@@ -102,7 +90,6 @@
             }
         },
         {
-            // For Clang, enable the highest warning level and pedantic mode.
             "name": "Clang presets",
             "hidden": true,
             "inherits": "compiler presets",
@@ -111,11 +98,10 @@
                 "_PRESET_CXXFLAGS": "",
                 "_PRESET_CUDAFLAGS": "",
                 "_PRESET_WARN": "$<$<COMPILE_LANGUAGE:C,CXX>:-Wall;-Wextra;-pedantic>$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wall,-Wextra,-pedantic>",
-                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>",  // avoid -Werror for CUDA host compilers for now
+                "_PRESET_WARNERR": "$<$<COMPILE_LANGUAGE:C,CXX>:-Werror>",
                 "_PRESET_ASAN": "-fsanitize=address -fno-omit-frame-pointer",
                 "_PRESET_UBSAN": "-fsanitize=undefined -fno-omit-frame-pointer -fsanitize-trap=undefined -fsanitize=implicit-integer-arithmetic-value-change",
                 "_PRESET_TSAN": "-fsanitize=thread",
-                // cf. https://libcxx.llvm.org/Hardening.html
                 "_PRESET_DEBUGCHECKS": "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG"
             }
         },

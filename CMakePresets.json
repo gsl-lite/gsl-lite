@@ -1,4 +1,4 @@
-﻿{
+{
     "version": 9,
     "include": [ "cmake/CommonPresets.json" ],
     "configurePresets": [
@@ -16,7 +16,6 @@
             "hidden": true,
             "inherits": [ "defaults", "CI", "high warning level", "warnings as errors" ],
             "cacheVariables": {
-                // Project-specific settings
                 "GSL_LITE_OPT_BUILD_TESTS": "ON",
                 "GSL_LITE_OPT_BUILD_EXAMPLES": "ON"
             }
