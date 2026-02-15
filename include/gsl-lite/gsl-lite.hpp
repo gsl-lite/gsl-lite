@@ -1228,9 +1228,11 @@
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_TRAILING_RETURN_TYPE_(T)  auto
+# define gsl_TRAILING_RETURN_TYPE_2_(T, U)  auto
 # define gsl_RETURN_DECLTYPE_(EXPR)    -> decltype( EXPR )
 #else
 # define gsl_TRAILING_RETURN_TYPE_(T)  T
+# define gsl_TRAILING_RETURN_TYPE_2_(T, U)  T, U
 # define gsl_RETURN_DECLTYPE_(EXPR)
 #endif
 
@@ -3580,7 +3582,9 @@ gsl_RETURN_DECLTYPE_( !( l < r ) )
 // print not_null
 
 template< class CharType, class Traits, class T >
-std::basic_ostream< CharType, Traits > & operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
+gsl_TRAILING_RETURN_TYPE_2_( std::basic_ostream< CharType, Traits > & )
+operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
+gsl_RETURN_DECLTYPE_( os << p.operator->() )
 {
     return os << p.operator->();
 }
@@ -6075,6 +6079,7 @@ gsl_RESTORE_MSVC_WARNINGS()
 #undef gsl_ENABLE_IF_NTTP_
 #undef gsl_ENABLE_IF_
 #undef gsl_TRAILING_RETURN_TYPE_
+#undef gsl_TRAILING_RETURN_TYPE_2_
 #undef gsl_RETURN_DECLTYPE_
 
 #endif // GSL_LITE_GSL_LITE_HPP_INCLUDED
