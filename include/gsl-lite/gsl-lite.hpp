@@ -3366,9 +3366,9 @@ is_valid( not_null<T> const & p )
 #if gsl_HAVE( EXPRESSION_SFINAE )
 template< class P >
 gsl_NODISCARD gsl_api gsl_constexpr14 auto
-get( not_null<P> const & p ) -> decltype( gsl_lite::make_not_null( p.get() ) )
+get( not_null<P> const & p ) -> decltype( gsl_lite::make_not_null( p.operator->().get() ) )
 {
-    return gsl_lite::make_not_null( p.get() );
+    return gsl_lite::make_not_null( p.operator->().get() );
 }
 template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr14 not_null< T * >
@@ -3378,7 +3378,7 @@ get( not_null<T *> const & p )
 }
 template< class P >
 gsl_NODISCARD gsl_api gsl_constexpr14 auto
-get( P const & p ) -> decltype( p.get() )
+get( P const & p ) -> typename std::enable_if< !detail::is_not_null_or_bool_oracle<P>::value, decltype( p.get() )>::type
 {
     return p.get();
 }
@@ -3394,6 +3394,12 @@ gsl_NODISCARD gsl_api gsl_constexpr14 auto
 c_str( S const & str ) -> decltype( gsl_lite::make_not_null( str.c_str() ) )
 {
     return gsl_lite::make_not_null( str.c_str() );
+}
+template< class C >
+gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<typename std::remove_cv<C>::type>::value, not_null< C const * > >::type
+c_str( not_null< C * > const & zstr )
+{
+    return zstr;
 }
 template< class C, std::size_t N >
 gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<C>::value, not_null< C const * > >::type
