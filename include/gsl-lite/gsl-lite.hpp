@@ -1,12 +1,12 @@
-﻿//
+//
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
 // gsl-lite is originally based on Microsoft GSL, which is an implementation of the C++ Core Guidelines Support Library:
 // https://github.com/microsoft/GSL
 //
 // Copyright (c) 2015-2019 Martin Moene
-// Copyright (c) 2019-2025 Moritz Beutel
-// Copyright (c) 2015-2025 Microsoft Corporation. All rights reserved.
+// Copyright (c) 2019-2026 Moritz Beutel
+// Copyright (c) 2015 Microsoft Corporation. All rights reserved.
 //
 // This code is licensed under the MIT License (MIT).
 //
@@ -37,8 +37,8 @@
 #endif
 
 #define  gsl_lite_MAJOR  1
-#define  gsl_lite_MINOR  0
-#define  gsl_lite_PATCH  1
+#define  gsl_lite_MINOR  1
+#define  gsl_lite_PATCH  0
 
 #define  gsl_lite_VERSION  gsl_STRINGIFY(gsl_lite_MAJOR) "." gsl_STRINGIFY(gsl_lite_MINOR) "." gsl_STRINGIFY(gsl_lite_PATCH)
 
@@ -3144,18 +3144,19 @@ gsl_is_delete_access:
     not_null & operator=( int ) gsl_is_delete;
 #endif
 
-#if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
+#if gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ( ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION ) )
     template< class... Ts >
     gsl_api gsl_constexpr14 auto
     operator()( Ts&&... args ) const
-# if ! gsl_COMPILER_NVCC_VERSION
+# if ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
+        // NVCC and NVHPC think that Substitution Failure Is An Error here
         // NVCC thinks that Substitution Failure Is An Error here
         -> decltype( data_.ptr_( std::forward<Ts>( args )... ) )
-# endif // ! gsl_COMPILER_NVCC_VERSION
+# endif // ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
     {
         return accessor::get_checked( *this )( std::forward<Ts>( args )... );
     }
-#endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ! gsl_COMPILER_NVCC_VERSION )
+#endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ( ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION ) )
 
     // unwanted operators...pointers only point to single objects!
     not_null & operator++() gsl_is_delete;
