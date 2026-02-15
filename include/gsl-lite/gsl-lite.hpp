@@ -3363,6 +3363,57 @@ is_valid( not_null<T> const & p )
     return detail::not_null_accessor<T>::is_valid( p );
 }
 
+template< class P >
+gsl_NODISCARD gsl_api gsl_constexpr14 gsl_TRAILING_RETURN_TYPE_( not_null< typename P::pointer > )
+get( not_null<P> const & p )
+gsl_RETURN_DECLTYPE_( gsl_lite::make_not_null( p.get() ) )
+{
+    return gsl_lite::make_not_null( p.get() );
+}
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null< T * >
+get( not_null<T *> const & p )
+{
+    return p;
+}
+template< class P >
+gsl_NODISCARD gsl_api gsl_constexpr14 gsl_TRAILING_RETURN_TYPE_( typename P::pointer )
+get( P const & p )
+gsl_RETURN_DECLTYPE_( p.get() )
+{
+    return p.get();
+}
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr14 T *
+get( T * const & p )
+{
+    return p;
+}
+
+template< class S >
+gsl_NODISCARD gsl_api gsl_constexpr14 gsl_TRAILING_RETURN_TYPE_( not_null< typename S::value_type > )
+c_str( S const & str )
+gsl_RETURN_DECLTYPE_( gsl_lite::make_not_null( str.c_str() ) )
+{
+    return gsl_lite::make_not_null( str.c_str() );
+}
+template< class C, std::size_t N
+    gsl_ENABLE_IF_NTTP_(( detail::is_char<C>::value ))
+>
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null< C const * >
+c_str( C const ( & literal )[ N ] )
+{
+    return literal;
+}
+template< class C
+    gsl_ENABLE_IF_NTTP_(( detail::is_char<C>::value ))
+>
+gsl_NODISCARD gsl_api gsl_constexpr14 C const *
+c_str( C const * const & str )
+{
+    return str;
+}
+
 } // namespace no_adl
 } // namespace detail
 

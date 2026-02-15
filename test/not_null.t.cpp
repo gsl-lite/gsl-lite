@@ -2007,4 +2007,33 @@ CASE( "not_null<>: Supports constructing and assigning std::function<> from non-
 #endif
 }
 
+CASE( "not_null<>: Free function c_str() preserves non-nullability" )
+{
+    std::string str1 = "a null-terminated string literal";
+    not_null< czstring > nnzstr1 = gsl_lite::c_str( str1 );  // call member function str1.c_str()
+    nnzstr1 = gsl_lite::c_str( str1 );  // call member function str1.c_str()
+    EXPECT( std::strcmp( str1.c_str(), nnzstr1 ) == 0 );
+    not_null< czstring > nnzstr2 = gsl_lite::c_str( "a null-terminated string literal" );  // pass through
+    EXPECT( std::strcmp( str1.c_str(), nnzstr2 ) == 0 );
+    czstring zstr3 = gsl_nullptr;
+    czstring zstr4 = gsl_lite::c_str( zstr3 );  // pass through
+    EXPECT( zstr4 == gsl_nullptr );
+}
+
+CASE( "not_null<>: Free function get() preserves non-nullability" )
+{
+#if gsl_HAVE( UNIQUE_PTR )
+    not_null< std::unique_ptr< int > > nnup = gsl_lite::make_unique< int >( 41 );
+    not_null< int * > nnp = gsl_lite::get( nnup );  // call member function nnup.get()
+    EXPECT( *nnp == 41 );
+    not_null< int * > nnp2 = gsl_lite::get( nnp );  // pass through
+    EXPECT( *nnp2 == 41 );
+    std::unique_ptr< int > up = gsl_lite::make_unique< int >( 42 );
+    int * p = gsl_lite::get( up );  // call member function up.get()
+    EXPECT( *p == 42 );
+    int * p2 = gsl_lite::get( p );  // pass through
+    EXPECT( *p2 == 42 );
+#endif // gsl_HAVE( UNIQUE_PTR )
+}
+
 // end of file
