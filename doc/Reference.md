@@ -32,6 +32,7 @@ There are several macros for expressing preconditions, postconditions, and invar
 - `gsl_ExpectsAudit( cond )` for preconditions that are expensive or include potentially opaque function calls
 - `gsl_EnsuresAudit( cond )` for postconditions that are expensive or include potentially opaque function calls
 - `gsl_AssertAudit( cond )` for assertions that are expensive or include potentially opaque function calls
+- `gsl_Verify( cond )` for assertion expressions
 
 **Example:**
 ```c++
@@ -52,10 +53,41 @@ auto median( RandomIt first, RandomIt last )
 }
 ```
 
-The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of [configuration macros](#contract-checking-configuration-macros):
+The assertion expression `gsl_Verify( cond )` is useful when writing code that must work correctly even when
+compiled with contract checking disabled. For example, a function may assert that a certain variable be not `nullptr`,
+which would constitute a bug, but it may also use a safety check before dereferencing that variable so that
+the bug does not lead to a crash:
+```c++
+bool readInt( std::FILE* file, int & val )
+{
+    gsl_Assert( file != nullptr );
+    if ( file == nullptr ) return false;
+    std::size_t s = std::fread( &val, sizeof(int), 1, file );
+    return s == sizeof( int );
+}
+```
+This can be written more concisely with `gsl_Verify()`:
+```c++
+bool readInt( std::FILE* file, int & val )
+{
+    if ( !gsl_Verify( file != nullptr ) ) return false;
+    std::size_t s = std::fread( &val, sizeof(int), 1, file );
+    return s == sizeof( int );
+}
+```
+Unlike `gsl_Assert()` and the other contract checking macros, the expression `cond` in `gsl_Verify( cond )` is
+always evaluated. As far as program logic is concerned, `gsl_Verify( cond )` can be considered equivalent to
+`cond`, while also acting as a contract check assertion if contract checking is enabled.
+
+The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of
+[configuration macros](#contract-checking-configuration-macros):
 
 - The macros **`gsl_Expects()`**, **`gsl_Ensures()`**, and **`gsl_Assert()`** are compiled to runtime checks unless contract
   checking is disabled with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
+
+- The macro **`gsl_Verify()`** is compiled to a runtime check. `gsl_Verify( cond )` evaluates to the Boolean value of `cond`.
+  Additionally, if contract checking is enabled, `gsl_Verify( cond )` will enact a contract violation like `gsl_Assert( cond )`
+  if `cond` evaluates to `false`.
 
 - Contract checks expressed with **`gsl_ExpectsAudit()`**, **`gsl_EnsuresAudit()`**, and **`gsl_AssertAudit()`** are discarded by
   default. In order to have them checked at runtime, the `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` configuration macro must be defined.
@@ -92,11 +124,6 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
     
   `gsl_FailFast()` behaves as if annotated by the [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn)
   attribute. A C++11 compiler will therefore not emit a warning about a missing return statement in `colorToString()`.
-  <!--(Unrelated note: the `switch` statement above deliberately elides the `default:` clause. Because the switch statement is wrapped
-  in a dedicated function, we can use `return` instead of `break` to conclude the `case` clauses, and hence the default handler
-  can simply go after the `switch` statement. The benefit of avoiding the `default:` clause is that most compilers will understand
-  that the `switch` statement is supposed to handle all defined enumeration values and thus issue a warning if the programmer adds
-  a new enumeration value (say, `Color::yellow`) but forgets to amend the `switch` statement.)-->
 
 
 ## Pointer annotations

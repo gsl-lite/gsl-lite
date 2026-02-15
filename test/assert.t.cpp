@@ -25,6 +25,7 @@ namespace {
 bool expects( bool x ) { gsl_Expects( x ); return x; }
 bool ensures( bool x ) { gsl_Ensures( x ); return x; }
 bool assert_( bool x ) { gsl_Assert( x ); return x; }
+bool verify( bool x ) { return gsl_Verify( x ); }
 void failFast() { gsl_FailFast(); }
 bool expectsDebug( bool x ) { gsl_ExpectsDebug( x ); return x; }
 bool ensuresDebug( bool x ) { gsl_EnsuresDebug( x ); return x; }
@@ -83,6 +84,11 @@ CASE( "gsl_Assert(): Allows a true expression" )
     EXPECT_NO_THROW( assert_( true  ) );
 }
 
+CASE( "gsl_Verify(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( verify(  true  ) );
+}
+
 CASE( "gsl_Expects(): Terminates on a false expression" )
 {
     EXPECT_THROWS( expects( false ) );
@@ -96,6 +102,11 @@ CASE( "gsl_Ensures(): Terminates on a false expression" )
 CASE( "gsl_Assert(): Terminates on a false expression" )
 {
     EXPECT_THROWS( assert_( false ) );
+}
+
+CASE( "gsl_Verify(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( verify(  false ) );
 }
 
 CASE( "gsl_FailFast(): Suppresses compiler warning about missing return value" )
@@ -225,5 +236,10 @@ CASE( "gsl_Expects(): Supports explicit conversions to bool" )
     if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
 }
 
+CASE( "gsl_Verify(): Supports explicit conversions to bool, return value" )
+{
+    // `gsl_Expects()` should be compatible with explicit conversions to bool.
+    EXPECT( gsl_Verify( ConvertibleToBool() ) );
+}
 
 // end of file
