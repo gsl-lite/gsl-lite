@@ -751,8 +751,8 @@ inline std::string to_string( T const & value );
 inline std::string to_string( std::nullptr_t const &     ) { return "nullptr"; }
 #endif
 inline std::string to_string( std::string     const & txt ) { return "\"" + make_tran_string(                 txt   ) + "\""; }
-inline std::string to_string( wchar_t const * const & txt ) { return "\"" + make_tran_string( std::wstring(   txt ) ) + "\""; }
-inline std::string to_string( char const *    const & txt ) { return "\"" + make_tran_string( std::string(    txt ) ) + "\""; }
+inline std::string to_string( wchar_t const * const & txt ) { return (txt ? "\"" + make_tran_string(std::wstring(txt)) + "\"" : std::string(lest_STRING(lest_nullptr))); }
+inline std::string to_string( char const *    const & txt ) { return (txt ? "\"" + make_tran_string(std::string(txt)) + "\"" : std::string(lest_STRING(lest_nullptr))); }
 inline std::string to_string(          char   const & chr ) { return  "'" + make_tran_string( std::string( 1, chr ) ) +  "'"; }
 
 inline std::string to_string(   signed char const & chr ) { return to_string( static_cast<char>( chr ) ); }
