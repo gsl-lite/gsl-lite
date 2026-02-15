@@ -1791,6 +1791,29 @@ namespace detail {
 
 /*enum*/ class enabler{};
 
+template< class C >
+struct is_char : std11::false_type{};
+template<>
+struct is_char<char> : std11::true_type{};
+#if gsl_HAVE( WCHAR )
+template<>
+struct is_char<wchar_t> : std11::true_type{};
+#endif
+#ifdef __cpp_char8_t  // C++20
+template<>
+struct is_char<char8_t> : std11::true_type{};
+#endif
+#if gsl_CPP11_140
+template<>
+struct is_char<char16_t> : std11::true_type{};
+template<>
+struct is_char<char32_t> : std11::true_type{};
+#endif
+template< class T, class C >
+struct is_czstring : std11::false_type{};
+template< class C >
+struct is_czstring< C const *, C > : is_char<C>{};
+
 #if gsl_HAVE( TYPE_TRAITS )
 
 template< class Q >
@@ -2942,6 +2965,13 @@ public:
     }
 # endif // gsl_HAVE( MOVE_FORWARD )
 #endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    template< class C, std::size_t N
+        gsl_ENABLE_IF_NTTP_(( detail::is_czstring<T, C>::value ))
+    >
+    gsl_api gsl_constexpr14 not_null( C const ( & literal )[ N ] ) gsl_noexcept
+        : data_( literal )
+    {
+    }
 
 #if gsl_HAVE( MOVE_FORWARD )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
@@ -3173,7 +3203,6 @@ gsl_is_delete_access:
     operator()( Ts&&... args ) const
 # if ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
         // NVCC and NVHPC think that Substitution Failure Is An Error here
-        // NVCC thinks that Substitution Failure Is An Error here
         -> decltype( data_.ptr_( std::forward<Ts>( args )... ) )
 # endif // ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
     {

@@ -1982,5 +1982,29 @@ CASE( "not_null<>: Invocability is correctly reported by type traits" )
 #endif // gsl_STDLIB_CPP20_OR_GREATER
 }
 
+CASE( "not_null<>: Supports constructing and assigning std::function<> from non-nullable function object" )
+{
+    not_null< czstring > nnstr1( "a null-terminated string literal" );
+    not_null< czstring > nnstr2 = "a null-terminated string literal";
+    nnstr2 = "a null-terminated string literal";
+    EXPECT( std::strcmp( nnstr1, "a null-terminated string literal") == 0 );
+    EXPECT( std::strcmp( nnstr2, "a null-terminated string literal") == 0 );
+
+# if gsl_HAVE( WCHAR )
+    not_null< cwzstring > nnwstr1( L"a null-terminated wide string literal" );
+    not_null< cwzstring > nnwstr2 = L"a null-terminated wide string literal";
+    nnwstr2 = L"a null-terminated wide string literal";
+    EXPECT( std::wcscmp( nnwstr1, L"a null-terminated wide string literal") == 0 );
+    EXPECT( std::wcscmp( nnwstr2, L"a null-terminated wide string literal") == 0 );
+# endif
+
+#ifdef __cpp_char8_t  // C++20
+    not_null< u8czstring > nnu8str1( u8"a null-terminated UTF-8 string literal" );
+    not_null< u8czstring > nnu8str2 = u8"a null-terminated UTF-8 string literal";
+    nnu8str2 = u8"a null-terminated UTF-8 string literal";
+    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< u8czstring >( nnu8str1 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
+    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< u8czstring >( nnu8str2 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
+#endif
+}
 
 // end of file
