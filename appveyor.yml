@@ -1,16 +1,16 @@
-﻿version: "{branch} #{build}"
+version: "{branch} #{build}"
 
 shallow_clone: true
 
 image:
-    #- Visual Studio 2019
+    - Visual Studio 2019
     - Visual Studio 2017
     - Visual Studio 2015
 
 environment:
     matrix:
         # VS 2019 and newer are tested with Azure Pipelines
-        #- generator: "Visual Studio 16 2019"
+        - generator: "Visual Studio 16 2019"
         - generator: "Visual Studio 15 2017"
         - generator: "Visual Studio 14 2015"
         - generator: "Visual Studio 12 2013"
@@ -44,8 +44,8 @@ before_build:
     - cmake -A %platform% -G "%generator%" -DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON ..
 
 build_script:
-    #- cmake --build . --config %configuration% -- -verbosity:normal
-    - cmake --build . --config %configuration% -- -verbosity:minimal
+    - cmake --build . --config %configuration% -- -verbosity:normal
+    #- cmake --build . --config %configuration% -- -verbosity:minimal
 
 test_script:
     - ctest --output-on-failure -C %configuration%

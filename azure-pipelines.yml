@@ -97,7 +97,7 @@ jobs:
     
     - os: Windows
       cxxCompiler: Clang
-      cxxCompilerVersions: [VS2019, VS2022]
+      cxxCompilerVersions: [VS2022]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
@@ -114,7 +114,7 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [16]
+      cxxCompilerVersions: [17]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
@@ -150,12 +150,12 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [11, 12, 13, 14, 15, 16, 17, 18]
+      cxxCompilerVersions: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
       platforms: [x64]
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [19]
+      cxxCompilerVersions: [21]
       cxxStandardLibraryDebugMode: true
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
@@ -166,7 +166,7 @@ jobs:
 
     - os: Linux
       cxxCompiler: Clang
-      cxxCompilerVersions: [19]
+      cxxCompilerVersions: [21]
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
@@ -175,7 +175,7 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [11]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_6]
+      cudaCompilerVersions: [12_9]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -183,15 +183,15 @@ jobs:
 
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019]
+      cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [11_8, 12_1]
+      cudaCompilerVersions: [12_9]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
     
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2019, VS2022]
+      cxxCompilerVersions: [VS2022]
       platforms: [x86, x64]
 
     - os: MacOS
@@ -201,5 +201,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [14, 15, 16]
+      cxxCompilerVersions: [14, 15, 16, 17]
       platforms: [x64]
