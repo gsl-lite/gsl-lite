@@ -5639,6 +5639,18 @@ typedef wchar_t * wzstring;
 typedef const wchar_t * cwzstring;
 # endif
 
+#ifdef __cpp_char8_t  // C++20
+typedef char8_t * u8zstring;
+typedef const char8_t * u8czstring;
+#endif
+
+#if gsl_CPP11_140
+typedef char16_t * u16zstring;
+typedef const char16_t * u16czstring;
+typedef char32_t * u32zstring;
+typedef const char32_t * u32czstring;
+#endif
+
 #if gsl_FEATURE( STRING_SPAN )
 
 typedef basic_string_span< char > string_span;
