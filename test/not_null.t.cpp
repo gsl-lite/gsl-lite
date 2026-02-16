@@ -1,9 +1,9 @@
-﻿//
+//
 // gsl-lite is based on GSL: Guidelines Support Library.
 // For more information see https://github.com/gsl-lite/gsl-lite
 //
 // Copyright (c) 2015-2019 Martin Moene
-// Copyright (c) 2019-2021 Moritz Beutel
+// Copyright (c) 2019-2026 Moritz Beutel
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
 //
 // This code is licensed under the MIT License (MIT).
@@ -159,9 +159,19 @@ CASE( "not_null<>: Convertibility is correctly reported by type traits" )
     static_assert( !std::is_convertible< std::unique_ptr< MyBase >, not_null< std::unique_ptr< MyDerived > > >::value, "static assertion failed" );
 # endif
 
+    // Do not permit implicit conversion to bool even if the pointer type permits an implicit conversion to bool.
+    static_assert(  std::is_convertible< int*, bool >::value, "static assertion failed" );
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
     static_assert( !std::is_convertible< not_null < int* >, bool >::value, "static assertion failed" );
+# endif // gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
+
+    // Do not permit implicit conversion to bool if the pointer type permits an explicit conversion to bool.
+    static_assert( !std::is_convertible< std::unique_ptr< int >, bool >::value, "static assertion failed" );
+    static_assert( !std::is_convertible< std::shared_ptr< int >, bool >::value, "static assertion failed" );
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
     static_assert( !std::is_convertible< not_null < std::unique_ptr< int > >, bool >::value, "static assertion failed" );
     static_assert( !std::is_convertible< not_null < std::shared_ptr< int > >, bool >::value, "static assertion failed" );
+# endif // gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
 }
 
@@ -241,13 +251,19 @@ CASE( "not_null<>: Copyability and assignability are correctly reported by type 
     static_assert( !std::is_constructible< std::unique_ptr< MyDerived >, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
     static_assert( !std::is_assignable<    std::unique_ptr< MyDerived >&, not_null< std::unique_ptr< MyBase > > >::value, "static assertion failed" );
 
-    // Do not permit conversion to bool
+    // Do not permit explicit conversion to bool even if the pointer type permits an implicit conversion to bool.
+    static_assert(  std::is_constructible< bool, int* >::value, "static assertion failed");
+    static_assert(  std::is_assignable<    bool&, int* >::value, "static assertion failed");
     static_assert( !std::is_constructible< bool, not_null < int* > >::value, "static assertion failed");
     static_assert( !std::is_assignable<    bool&, not_null < int* > >::value, "static assertion failed");
 
+    // Do not permit explicit conversion to bool even if the pointer type permits an explicit conversion to bool.
+    static_assert(  std::is_constructible< bool, std::unique_ptr< int > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, std::unique_ptr< int > >::value, "static assertion failed");
+    static_assert(  std::is_constructible< bool, std::shared_ptr< int > >::value, "static assertion failed");
+    static_assert( !std::is_assignable<    bool&, std::shared_ptr< int > >::value, "static assertion failed");
     static_assert( !std::is_constructible< bool, not_null < std::unique_ptr< int > > >::value, "static assertion failed");
     static_assert( !std::is_assignable<    bool&, not_null < std::unique_ptr< int > > >::value, "static assertion failed");
-
     static_assert( !std::is_constructible< bool, not_null < std::shared_ptr< int > > >::value, "static assertion failed");
     static_assert( !std::is_assignable<    bool&, not_null < std::shared_ptr< int > > >::value, "static assertion failed");
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
@@ -1835,7 +1851,7 @@ CASE( "not_null<>: Supports std::function<> for construction, assignment, and in
     not_null< std::function< int( int ) > > insp = make_not_null( std::function< int( int ) >( inspector ) );
     int i = 41;
     EXPECT( insp( i ) == 41 );
-    auto insp2 = std::move( insp );
+    not_null< std::function< int( int ) > > insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
     if ( ! gsl_lite::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
     {
@@ -1860,7 +1876,7 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     not_null< std::function< int( int ) > > insp = inspector;
     int i = 41;
     EXPECT( insp( i ) == 41 );
-    auto insp2 = std::move( insp );
+    not_null< std::function< int( int ) > > insp2 = std::move( insp );
     EXPECT( insp2( i ) == 41 );
     if ( ! gsl_lite::is_valid( insp ) )  // a moved-from `std::function<>` object is in a valid but unspecified state, and may thus still be holding the old value
     {
@@ -1874,6 +1890,24 @@ CASE( "not_null<>: Supports converting to std::function<> from function referenc
     i = 41;
     mut( i );
     EXPECT( i == 41 );
+# endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+}
+
+CASE( "not_null<>: Supports implicit conversion to nullable std::function<>" )
+{
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
+    not_null< std::function< int( int ) > > insp = make_not_null( std::function< int( int ) >( inspector ) );
+    int i = 41;
+    EXPECT( insp( i ) == 41 );
+    std::function< int( int ) > ninsp = insp;  // copy construction
+    EXPECT( ninsp( i ) == 41 );
+    ninsp = insp;  // copy assignment: calls function<>::function(auto&&)
+    EXPECT( ninsp( i ) == 41 );
+    ninsp = std::move( insp );  // move assignment: calls function<>::function(auto&&)
+    EXPECT( ninsp( i ) == 41 );
+    insp = make_not_null( std::move( ninsp ) );
+    std::function< int( int ) > insp2 = std::move( insp );  // move construction
+    EXPECT( insp2( i ) == 41 );
 # endif // ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 }
 
@@ -1952,5 +1986,62 @@ CASE( "not_null<>: Invocability is correctly reported by type traits" )
 #endif // gsl_STDLIB_CPP20_OR_GREATER
 }
 
+CASE( "not_null<>: Supports constructing and assigning std::function<> from non-nullable function object" )
+{
+    not_null< czstring > nnstr1( "a null-terminated string literal" );
+    not_null< czstring > nnstr2 = "a null-terminated string literal";
+    nnstr2 = "a null-terminated string literal";
+    EXPECT( std::strcmp( nnstr1, "a null-terminated string literal") == 0 );
+    EXPECT( std::strcmp( nnstr2, "a null-terminated string literal") == 0 );
+
+# if gsl_HAVE( WCHAR )
+    not_null< cwzstring > nnwstr1( L"a null-terminated wide string literal" );
+    not_null< cwzstring > nnwstr2 = L"a null-terminated wide string literal";
+    nnwstr2 = L"a null-terminated wide string literal";
+    EXPECT( std::wcscmp( nnwstr1, L"a null-terminated wide string literal") == 0 );
+    EXPECT( std::wcscmp( nnwstr2, L"a null-terminated wide string literal") == 0 );
+# endif
+
+#ifdef __cpp_char8_t  // C++20
+    not_null< u8czstring > nnu8str1( u8"a null-terminated UTF-8 string literal" );
+    not_null< u8czstring > nnu8str2 = u8"a null-terminated UTF-8 string literal";
+    nnu8str2 = u8"a null-terminated UTF-8 string literal";
+    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< u8czstring >( nnu8str1 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
+    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< u8czstring >( nnu8str2 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
+#endif
+}
+
+CASE( "not_null<>: Free function c_str() preserves non-nullability" )
+{
+#if gsl_HAVE( EXPRESSION_SFINAE )
+    std::string str1 = "a null-terminated string literal";
+    not_null< czstring > nnzstr1 = gsl_lite::c_str( str1 );  // call member function str1.c_str()
+    nnzstr1 = gsl_lite::c_str( str1 );  // call member function str1.c_str()
+    EXPECT( std::strcmp( str1.c_str(), nnzstr1 ) == 0 );
+    not_null< czstring > nnzstr2 = gsl_lite::c_str( "a null-terminated string literal" );  // pass through
+    EXPECT( std::strcmp( str1.c_str(), nnzstr2 ) == 0 );
+    not_null< czstring > nnzstr3 = gsl_lite::c_str( nnzstr2 );  // pas through
+    EXPECT( std::strcmp( str1.c_str(), nnzstr3 ) == 0 );
+    czstring zstr3 = gsl_nullptr;
+    czstring zstr4 = gsl_lite::c_str( zstr3 );  // pass through
+    EXPECT( zstr4 == gsl_nullptr );
+#endif // gsl_HAVE( EXPRESSION_SFINAE )
+}
+
+CASE( "not_null<>: Free function get() preserves non-nullability" )
+{
+#if gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( EXPRESSION_SFINAE )
+    not_null< std::unique_ptr< int > > nnup = gsl_lite::make_unique< int >( 41 );
+    not_null< int * > nnp = gsl_lite::get( nnup );  // call member function nnup.get()
+    EXPECT( *nnp == 41 );
+    not_null< int * > nnp2 = gsl_lite::get( nnp );  // pass through
+    EXPECT( *nnp2 == 41 );
+    std::unique_ptr< int > up = gsl_lite::make_unique< int >( 42 );
+    int * p = gsl_lite::get( up );  // call member function up.get()
+    EXPECT( *p == 42 );
+    int * p2 = gsl_lite::get( p );  // pass through
+    EXPECT( *p2 == 42 );
+#endif // gsl_HAVE( UNIQUE_PTR ) && gsl_HAVE( EXPRESSION_SFINAE )
+}
 
 // end of file

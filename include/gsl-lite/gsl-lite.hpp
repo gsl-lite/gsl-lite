@@ -1228,9 +1228,11 @@
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
 # define gsl_TRAILING_RETURN_TYPE_(T)  auto
+# define gsl_TRAILING_RETURN_TYPE_2_(T, U)  auto
 # define gsl_RETURN_DECLTYPE_(EXPR)    -> decltype( EXPR )
 #else
 # define gsl_TRAILING_RETURN_TYPE_(T)  T
+# define gsl_TRAILING_RETURN_TYPE_2_(T, U)  T, U
 # define gsl_RETURN_DECLTYPE_(EXPR)
 #endif
 
@@ -1790,6 +1792,29 @@ namespace detail {
 /// for gsl_ENABLE_IF_()
 
 /*enum*/ class enabler{};
+
+template< class C >
+struct is_char : std11::false_type{};
+template<>
+struct is_char<char> : std11::true_type{};
+#if gsl_HAVE( WCHAR )
+template<>
+struct is_char<wchar_t> : std11::true_type{};
+#endif
+#ifdef __cpp_char8_t  // C++20
+template<>
+struct is_char<char8_t> : std11::true_type{};
+#endif
+#if gsl_CPP11_140
+template<>
+struct is_char<char16_t> : std11::true_type{};
+template<>
+struct is_char<char32_t> : std11::true_type{};
+#endif
+template< class T, class C >
+struct is_czstring : std11::false_type{};
+template< class C >
+struct is_czstring< C const *, C > : is_char<C>{};
 
 #if gsl_HAVE( TYPE_TRAITS )
 
@@ -2958,6 +2983,13 @@ public:
     }
 # endif // gsl_HAVE( MOVE_FORWARD )
 #endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
+    template< class C, std::size_t N
+        gsl_ENABLE_IF_NTTP_(( detail::is_czstring<T, C>::value ))
+    >
+    gsl_api gsl_constexpr14 not_null( C const ( & literal )[ N ] ) gsl_noexcept
+        : data_( literal )
+    {
+    }
 
 #if gsl_HAVE( MOVE_FORWARD )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
@@ -3072,6 +3104,15 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
+    operator U() &
+    {
+        return U( accessor::get_checked( *this ) );
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14 explicit
@@ -3079,9 +3120,53 @@ public:
     {
         return U( accessor::get_checked( std::move( *this ) ) );
     }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
+    operator U() const &&
+    {
+        return U( accessor::get_checked( *this ) );
+    }
 # endif
 
     // implicit conversion operator
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator T() const
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    &
+# endif
+    {
+        return accessor::get_checked( *this );
+    }
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator T() &
+    {
+        return accessor::get_checked( *this );
+    }
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator T() &&
+    {
+        return accessor::get_checked( std::move( *this ) );
+    }
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator T() const &&
+    {
+        return accessor::get_checked( *this );
+    }
+# endif
+# if gsl_HAVE( IS_DELETE )
+#  if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    operator bool() const & = delete;
+    operator bool() & = delete;
+    operator bool() && = delete;
+    operator bool() const && = delete;
+#  else
+    operator bool() const = delete;
+#  endif
+# endif
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
@@ -3097,12 +3182,30 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator U() &
+    {
+        return accessor::get_checked( *this );
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() &&
     {
         return accessor::get_checked( std::move( *this ) );
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator U() const &&
+    {
+        return accessor::get_checked( *this );
     }
 # endif
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
@@ -3166,7 +3269,6 @@ gsl_is_delete_access:
     operator()( Ts&&... args ) const
 # if ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
         // NVCC and NVHPC think that Substitution Failure Is An Error here
-        // NVCC thinks that Substitution Failure Is An Error here
         -> decltype( data_.ptr_( std::forward<Ts>( args )... ) )
 # endif // ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
     {
@@ -3324,6 +3426,58 @@ is_valid( not_null<T> const & p )
 {
     return detail::not_null_accessor<T>::is_valid( p );
 }
+
+#if gsl_HAVE( EXPRESSION_SFINAE )
+template< class P >
+gsl_NODISCARD gsl_api gsl_constexpr14 auto
+get( not_null<P> const & p ) -> decltype( gsl_lite::make_not_null( p.operator->().get() ) )
+{
+    return gsl_lite::make_not_null( p.operator->().get() );
+}
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null< T * >
+get( not_null<T *> const & p )
+{
+    return p;
+}
+template< class P >
+gsl_NODISCARD gsl_api gsl_constexpr14 auto
+get( P const & p ) -> typename std::enable_if< !detail::is_not_null_or_bool_oracle<P>::value, decltype( p.get() )>::type
+{
+    return p.get();
+}
+template< class T >
+gsl_NODISCARD gsl_api gsl_constexpr14 T *
+get( T * const & p )
+{
+    return p;
+}
+
+template< class S >
+gsl_NODISCARD gsl_api gsl_constexpr14 auto
+c_str( S const & str ) -> decltype( gsl_lite::make_not_null( str.c_str() ) )
+{
+    return gsl_lite::make_not_null( str.c_str() );
+}
+template< class C >
+gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<typename std::remove_cv<C>::type>::value, not_null< C const * > >::type
+c_str( not_null< C * > const & zstr )
+{
+    return zstr;
+}
+template< class C, std::size_t N >
+gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<C>::value, not_null< C const * > >::type
+c_str( C const ( & literal )[ N ] )
+{
+    return literal;
+}
+template< class C >
+gsl_NODISCARD gsl_api gsl_constexpr14 typename std::enable_if< detail::is_char<C>::value, C const * >::type
+c_str( C const * const & str )
+{
+    return str;
+}
+#endif // gsl_HAVE( EXPRESSION_SFINAE )
 
 } // namespace no_adl
 } // namespace detail
@@ -3544,7 +3698,9 @@ gsl_RETURN_DECLTYPE_( !( l < r ) )
 // print not_null
 
 template< class CharType, class Traits, class T >
-std::basic_ostream< CharType, Traits > & operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
+gsl_TRAILING_RETURN_TYPE_2_( std::basic_ostream< CharType, Traits > & )
+operator<<( std::basic_ostream< CharType, Traits > & os, not_null<T> const & p )
+gsl_RETURN_DECLTYPE_( os << p.operator->() )
 {
     return os << p.operator->();
 }
@@ -5632,6 +5788,18 @@ typedef wchar_t * wzstring;
 typedef const wchar_t * cwzstring;
 # endif
 
+#ifdef __cpp_char8_t  // C++20
+typedef char8_t * u8zstring;
+typedef const char8_t * u8czstring;
+#endif
+
+#if gsl_CPP11_140
+typedef char16_t * u16zstring;
+typedef const char16_t * u16czstring;
+typedef char32_t * u32zstring;
+typedef const char32_t * u32czstring;
+#endif
+
 #if gsl_FEATURE( STRING_SPAN )
 
 typedef basic_string_span< char > string_span;
@@ -6027,6 +6195,7 @@ gsl_RESTORE_MSVC_WARNINGS()
 #undef gsl_ENABLE_IF_NTTP_
 #undef gsl_ENABLE_IF_
 #undef gsl_TRAILING_RETURN_TYPE_
+#undef gsl_TRAILING_RETURN_TYPE_2_
 #undef gsl_RETURN_DECLTYPE_
 
 #endif // GSL_LITE_GSL_LITE_HPP_INCLUDED
