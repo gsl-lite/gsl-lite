@@ -161,13 +161,17 @@ CASE( "not_null<>: Convertibility is correctly reported by type traits" )
 
     // Do not permit implicit conversion to bool even if the pointer type permits an implicit conversion to bool.
     static_assert(  std::is_convertible< int*, bool >::value, "static assertion failed" );
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
     static_assert( !std::is_convertible< not_null < int* >, bool >::value, "static assertion failed" );
+# endif // gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
 
     // Do not permit implicit conversion to bool if the pointer type permits an explicit conversion to bool.
     static_assert( !std::is_convertible< std::unique_ptr< int >, bool >::value, "static assertion failed" );
     static_assert( !std::is_convertible< std::shared_ptr< int >, bool >::value, "static assertion failed" );
+# if gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
     static_assert( !std::is_convertible< not_null < std::unique_ptr< int > >, bool >::value, "static assertion failed" );
     static_assert( !std::is_convertible< not_null < std::shared_ptr< int > >, bool >::value, "static assertion failed" );
+# endif // gsl_HAVE( FUNCTION_REF_QUALIFIER ) && gsl_HAVE( IS_DELETE )
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && !gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 120 )
 }
 
