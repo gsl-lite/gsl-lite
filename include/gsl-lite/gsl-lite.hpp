@@ -3104,10 +3104,19 @@ public:
     {
         return U( accessor::get_checked( std::move( *this ) ) );
     }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
+    operator U() const &&
+    {
+        return U( accessor::get_checked( *this ) );
+    }
 # endif
 
     // implicit conversion operator
-    gsl_NODISCARD gsl_api gsl_constexpr
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator T() const
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     &
@@ -3116,21 +3125,28 @@ public:
         return accessor::get_checked( *this );
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
-    gsl_NODISCARD gsl_api gsl_constexpr
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator T() &
     {
         return accessor::get_checked( *this );
     }
-    gsl_NODISCARD gsl_api gsl_constexpr
+    gsl_NODISCARD gsl_api gsl_constexpr14
     operator T() &&
     {
         return accessor::get_checked( std::move( *this ) );
+    }
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator T() const &&
+    {
+        return accessor::get_checked( *this );
     }
 # endif
 # if gsl_HAVE( IS_DELETE )
 #  if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     operator bool() const & = delete;
+    operator bool() & = delete;
     operator bool() && = delete;
+    operator bool() const && = delete;
 #  else
     operator bool() const = delete;
 #  endif
@@ -3165,6 +3181,15 @@ public:
     operator U() &&
     {
         return accessor::get_checked( std::move( *this ) );
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator U() const &&
+    {
+        return accessor::get_checked( *this );
     }
 # endif
 #else // a.k.a. #if !( gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT ) )
