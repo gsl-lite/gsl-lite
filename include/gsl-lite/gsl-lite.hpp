@@ -3088,6 +3088,15 @@ public:
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14 explicit
+    operator U() &
+    {
+        return U( accessor::get_checked( *this ) );
+    }
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14 explicit
@@ -3107,6 +3116,11 @@ public:
         return accessor::get_checked( *this );
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    gsl_NODISCARD gsl_api gsl_constexpr
+    operator T() &
+    {
+        return accessor::get_checked( *this );
+    }
     gsl_NODISCARD gsl_api gsl_constexpr
     operator T() &&
     {
@@ -3134,6 +3148,15 @@ public:
         return accessor::get_checked( *this );
     }
 # if gsl_HAVE( FUNCTION_REF_QUALIFIER )
+    template< class U
+        // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+    >
+    gsl_NODISCARD gsl_api gsl_constexpr14
+    operator U() &
+    {
+        return accessor::get_checked( *this );
+    }
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))

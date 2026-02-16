@@ -1897,9 +1897,9 @@ CASE( "not_null<>: Supports implicit conversion to nullable std::function<>" )
     EXPECT( insp( i ) == 41 );
     std::function< int( int ) > ninsp = insp;  // copy construction
     EXPECT( ninsp( i ) == 41 );
-    ninsp = insp;  // copy assignment
+    ninsp = insp;  // copy assignment: calls function<>::function(auto&&)
     EXPECT( ninsp( i ) == 41 );
-    ninsp = std::move( insp );  // move assignment
+    ninsp = std::move( insp );  // move assignment: calls function<>::function(auto&&)
     EXPECT( ninsp( i ) == 41 );
     insp = make_not_null( std::move( ninsp ) );
     std::function< int( int ) > insp2 = std::move( insp );  // move construction
