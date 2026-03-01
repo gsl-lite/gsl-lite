@@ -1,4 +1,4 @@
-﻿# Copyright 2015-2019 by Martin Moene
+# Copyright 2015-2019 by Martin Moene
 # Copyright 2019-2021 by Moritz Beutel
 #
 # gsl-lite is based on GSL: Guidelines Support Library,
@@ -30,20 +30,20 @@ set( HAS_CPP11_FLAG FALSE )
 set( HAS_CPP14_FLAG FALSE )
 set( HAS_CPP17_FLAG FALSE )
 set( HAS_CPP20_FLAG FALSE )
+set( HAS_CPP23_FLAG FALSE )
 set( HAS_CPPLATEST_FLAG FALSE )
 
 # Preset available CUDA language compiler flags:
 
 set( HAS_CUDA14_FLAG FALSE )
 set( HAS_CUDA17_FLAG FALSE )
+set( HAS_CUDA20_FLAG FALSE )
 
 set( HOST_COMPILER_PREFIX "" )
 
 # Determine compiler-specifics for MSVC, GNUC, Clang:
 
 if( MSVC )
-    set( HAS_STD_FLAGS TRUE )
-
     # remove "/EHx" from CMAKE_CXX_FLAGS if present
     if( CMAKE_CXX_FLAGS MATCHES "/EH[ascr-]+" )
         string( REGEX REPLACE "/EH[ascr-]+" " " CMAKE_CXX_FLAGS_NEW "${CMAKE_CXX_FLAGS}" )
@@ -60,6 +60,7 @@ if( MSVC )
     if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
         message( STATUS "Matched: clang-cl ${CMAKE_CXX_COMPILER_VERSION}" )
 
+        set( HAS_STD_FLAGS  TRUE )
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.3.0 )
             set( HAS_CPP11_FLAG TRUE )
         endif()
@@ -73,11 +74,15 @@ if( MSVC )
     else()
         message( STATUS "Matched: MSVC ${CMAKE_CXX_COMPILER_VERSION}" )
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.00 )
+            set( HAS_STD_FLAGS  TRUE )
             set( HAS_CPP14_FLAG TRUE )
             set( HAS_CPPLATEST_FLAG TRUE )
         endif()
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.11 )
             set( HAS_CPP17_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.30 )
+            set( HAS_CPP20_FLAG TRUE )
         endif()
     endif()
 
@@ -100,8 +105,11 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang|PGI|NVHPC" )
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.1.0 )
             set( HAS_CPP17_FLAG TRUE )
         endif()
-        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0.0 )
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.1.0 )
             set( HAS_CPP20_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.1.0 )
+            set( HAS_CPP23_FLAG TRUE )
         endif()
 
     # AppleClang: available -std flags depends on version
@@ -134,6 +142,9 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang|PGI|NVHPC" )
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0.0 )
             set( HAS_CPP20_FLAG TRUE )
         endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0.0 )
+            set( HAS_CPP23_FLAG TRUE )
+        endif()
     # Older CMake versions identify NVHPC compilers as PGI.
     elseif( CMAKE_CXX_COMPILER_ID MATCHES "PGI|NVHPC" )
         message( STATUS "Matched: NVHPC/PGI ${CMAKE_CXX_COMPILER_VERSION}" )
@@ -162,6 +173,9 @@ if( CUDA IN_LIST _languages )
         set( HAS_CUDA14_FLAG TRUE )
         if( CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0 )
             set( HAS_CUDA17_FLAG TRUE )
+        endif()
+        if( CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 12.0 )
+            set( HAS_CUDA20_FLAG TRUE )
         endif()
     endif()
 endif()
