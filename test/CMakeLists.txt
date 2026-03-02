@@ -109,7 +109,7 @@ make_test_targets( "gsl-lite-v1-special" 3 14
     DEFAULTS_VERSION v1
 )
 
-make_test_targets( "gsl-lite-v1-unenforced" 3 14
+make_test_targets( "gsl-lite-v1-unenforced" 3 20
     SOURCES
         gsl-lite.t.cpp
         assert.t.cpp
@@ -121,7 +121,7 @@ make_test_targets( "gsl-lite-v1-unenforced" 3 14
 
 if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0 ) # VS 2015 and later
         OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
-    make_test_targets( "gsl-lite-v1-assume" 3 14
+    make_test_targets( "gsl-lite-v1-assume" 3 20
         SOURCES
             gsl-lite.t.cpp
             assert.t.cpp
@@ -145,7 +145,7 @@ if( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.4 ) # VS 2022 and la
     )
 endif()
 
-make_test_targets( "gsl-lite-v1-terminates" 3 14
+make_test_targets( "gsl-lite-v1-terminates" 3 20
     SOURCES
         gsl-lite.t.cpp
         assert.t.cpp
@@ -163,7 +163,7 @@ make_test_targets( "gsl-lite-v1-asserts" 3 20
     COMPILE_ONLY
 )
 
-make_test_targets( "gsl-lite-v1-calls-handler" 3 14
+make_test_targets( "gsl-lite-v1-calls-handler" 3 20
     SOURCES
         gsl-lite.t.cpp
         assert.t.cpp
@@ -174,7 +174,7 @@ make_test_targets( "gsl-lite-v1-calls-handler" 3 14
 
 if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0 ) # VS 2012 and later
         OR CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang" )
-    make_test_targets( "gsl-lite-v1-traps" 3 14
+    make_test_targets( "gsl-lite-v1-traps" 3 20
         SOURCES
             gsl-lite.t.cpp
             assert.t.cpp

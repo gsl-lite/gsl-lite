@@ -35,7 +35,7 @@ bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
 
 #if gsl_CPP20_OR_GREATER
-bool assertAt( bool x, std::source_location const & loc = std::source_location::current() ) { gsl_AssertAt ( loc, x ); return x; }
+bool assertAt( bool x, std::source_location const & loc = std::source_location::current() ) { gsl_AssertAt( loc, x ); return x; }
 bool verifyAt( bool x, std::source_location const & loc = std::source_location::current() ) { return gsl_VerifyAt( loc, x ); }
 void failFastAt( std::source_location const & loc = std::source_location::current() ) { gsl_FailFastAt( loc ); }
 bool assertAtDebug( bool x, std::source_location const & loc = std::source_location::current() ) { gsl_AssertAtDebug( loc, x ); return x; }
@@ -88,6 +88,105 @@ struct ConvertibleToBool
 
 
 } // anonymous namespace
+
+#if gsl_CPP20_OR_GREATER
+CASE( "gsl_AssertAt(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assertAt( true  ) );
+}
+
+CASE( "gsl_VerifyAt(): Allows a true expression" )
+{
+    EXPECT( verifyAt( true ) );
+}
+
+CASE( "gsl_AssertAt(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( assertAt( false ) );
+}
+
+CASE( "gsl_VerifyAt(): Terminates on a false expression" )
+{
+    EXPECT_THROWS( verifyAt( false ) );
+}
+
+CASE( "gsl_FailFastAt(): Suppresses compiler warning about missing return value" )
+{
+    EXPECT( colorToStringAt(red) == "red" );
+}
+
+CASE( "gsl_FailFastAt(): Terminates" )
+{
+    EXPECT_THROWS( failFastAt() );
+#if gsl_CPP11_OR_GREATER
+    EXPECT_THROWS( colorToStringAt( Color( 42 ) ) );
+#endif
+}
+
+CASE( "gsl_AssertAtDebug(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assertAtDebug( true  ) );
+}
+
+CASE( "gsl_AssertAtAudit(): Terminates on a false expression in debug build or AUDIT mode" )
+{
+#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( assertAtDebug( false ) );
+#else
+    EXPECT_NO_THROW( assertAtDebug( false ) );
+#endif
+}
+
+CASE( "gsl_AssertAtAudit(): Allows a true expression" )
+{
+    EXPECT_NO_THROW( assertAtAudit( true  ) );
+}
+
+CASE( "gsl_AssertAtAudit(): Terminates on a false expression in AUDIT mode" )
+{
+#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
+    EXPECT_THROWS( assertAtAudit( false ) );
+#else
+    EXPECT_NO_THROW( assertAtAudit( false ) );
+#endif
+}
+
+int myAtAt( int i, std::vector<int> const& v, std::source_location const & loc = std::source_location::current() )
+{
+    // The arguments to `__assume( x )` (MSVC) and `__builtin_assume( x )` (Clang) are never evaluated, so they cannot incur side-effects. We would like to implement
+    // `gsl_ASSUME_()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
+    // `__attribute__ ((pure))` or `__attribute__ ((const))` is considered a potential side-effect (e.g. the call to `v.size()` below). In many cases Clang is capable
+    // of inlining the expression and find it free of side-effects, cf. https://gcc.godbolt.org/z/ZcKfbp, but the warning is produced anyway.
+    //
+    // To avoid littering user code with warnings, we instead define `gsl_ASSUME_()` in terms of `__builtin_unreachable()`. The following `gsl_ASSUME_()` statement
+    // should thus compile without any warnings.
+
+    gsl_AssertAt( loc, i >= 0 && static_cast<std::size_t>(i) < v.size() );
+    return v.at( static_cast<std::size_t>(i) );
+}
+
+CASE( "gsl_AssertAt(): No warnings produced for function calls in precondition checks" )
+{
+    std::vector<int> v;
+    v.push_back( 42 );
+    EXPECT_NO_THROW( myAtAt( 0, v ) );
+    EXPECT_THROWS( myAtAt( 1, v ) );
+}
+
+CASE( "gsl_AssertAt(): Supports explicit conversions to bool" )
+{
+    // `gsl_AssertAt()` should be compatible with explicit conversions to bool.
+    gsl_AssertAt( std::source_location::current(), ConvertibleToBool() );
+
+    if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
+}
+
+CASE( "gsl_VerifyAt(): Supports explicit conversions to bool, return value" )
+{
+    // `gsl_Expects()` should be compatible with explicit conversions to bool.
+    EXPECT( gsl_VerifyAt( std::source_location::current(), ConvertibleToBool() ) );
+}
+#endif // gsl_CPP20_OR_GREATER
 
 CASE( "gsl_Expects(): Allows a true expression" )
 {
@@ -261,104 +360,5 @@ CASE( "gsl_Verify(): Supports explicit conversions to bool, return value" )
     // `gsl_Expects()` should be compatible with explicit conversions to bool.
     EXPECT( gsl_Verify( ConvertibleToBool() ) );
 }
-
-#if gsl_CPP20_OR_GREATER
-CASE( "gsl_AssertAt(): Allows a true expression" )
-{
-    EXPECT_NO_THROW( assertAt( true  ) );
-}
-
-CASE( "gsl_VerifyAt(): Allows a true expression" )
-{
-    EXPECT( verifyAt( true ) );
-}
-
-CASE( "gsl_AssertAt(): Terminates on a false expression" )
-{
-    EXPECT_THROWS( assertAt( false ) );
-}
-
-CASE( "gsl_VerifyAt(): Terminates on a false expression" )
-{
-    EXPECT_THROWS( verifyAt( false ) );
-}
-
-CASE( "gsl_FailFastAt(): Suppresses compiler warning about missing return value" )
-{
-    EXPECT( colorToStringAt(red) == "red" );
-}
-
-CASE( "gsl_FailFastAt(): Terminates" )
-{
-    EXPECT_THROWS( failFastAt() );
-#if gsl_CPP11_OR_GREATER
-    EXPECT_THROWS( colorToStringAt( Color( 42 ) ) );
-#endif
-}
-
-CASE( "gsl_AssertAtDebug(): Allows a true expression" )
-{
-    EXPECT_NO_THROW( assertAtDebug( true  ) );
-}
-
-CASE( "gsl_AssertAtAudit(): Terminates on a false expression in debug build or AUDIT mode" )
-{
-#if !defined( NDEBUG ) || defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
-    EXPECT_THROWS( assertAtDebug( false ) );
-#else
-    EXPECT_NO_THROW( assertAtDebug( false ) );
-#endif
-}
-
-CASE( "gsl_AssertAtAudit(): Allows a true expression" )
-{
-    EXPECT_NO_THROW( assertAtAudit( true  ) );
-}
-
-CASE( "gsl_AssertAtAudit(): Terminates on a false expression in AUDIT mode" )
-{
-#if defined( gsl_CONFIG_CONTRACT_CHECKING_AUDIT )
-    EXPECT_THROWS( assertAtAudit( false ) );
-#else
-    EXPECT_NO_THROW( assertAtAudit( false ) );
-#endif
-}
-
-int myAtAt( int i, std::vector<int> const& v, std::source_location const & loc = std::source_location::current() )
-{
-    // The arguments to `__assume( x )` (MSVC) and `__builtin_assume( x )` (Clang) are never evaluated, so they cannot incur side-effects. We would like to implement
-    // `gsl_ASSUME_()` in terms of these. However, Clang always emits a diagnostic if a potential side-effect is discarded, and every call to a function not annotated
-    // `__attribute__ ((pure))` or `__attribute__ ((const))` is considered a potential side-effect (e.g. the call to `v.size()` below). In many cases Clang is capable
-    // of inlining the expression and find it free of side-effects, cf. https://gcc.godbolt.org/z/ZcKfbp, but the warning is produced anyway.
-    //
-    // To avoid littering user code with warnings, we instead define `gsl_ASSUME_()` in terms of `__builtin_unreachable()`. The following `gsl_ASSUME_()` statement
-    // should thus compile without any warnings.
-
-    gsl_AssertAt( loc, i >= 0 && static_cast<std::size_t>(i) < v.size() );
-    return v.at( static_cast<std::size_t>(i) );
-}
-
-CASE( "gsl_AssertAt(): No warnings produced for function calls in precondition checks" )
-{
-    std::vector<int> v;
-    v.push_back( 42 );
-    EXPECT_NO_THROW( myAtAt( 0, v ) );
-    EXPECT_THROWS( myAtAt( 1, v ) );
-}
-
-CASE( "gsl_AssertAt(): Supports explicit conversions to bool" )
-{
-    // `gsl_AssertAt()` should be compatible with explicit conversions to bool.
-    gsl_AssertAt( std::source_location::current(), ConvertibleToBool() );
-
-    if ( ConvertibleToBool() ) { } // to get rid of weird NVCC warning about never-referenced conversion operator
-}
-
-CASE( "gsl_VerifyAt(): Supports explicit conversions to bool, return value" )
-{
-    // `gsl_Expects()` should be compatible with explicit conversions to bool.
-    EXPECT( gsl_VerifyAt( std::source_location::current(), ConvertibleToBool() ) );
-}
-#endif // gsl_CPP20_OR_GREATER
 
 // end of file

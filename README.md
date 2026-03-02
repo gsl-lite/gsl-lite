@@ -196,9 +196,10 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`gsl_Ensures()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks postcondition at runtime |
 [`gsl_EnsuresDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_EnsuresAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
-[`gsl_Assert()`<br>`gsl_Verify()`](doc/Reference.md#contract-and-assertion-checks) | - | -             | ✓                   | Checks invariant at runtime |
+[`gsl_Assert()`<br>`gsl_Verify()`<br>`gsl_AssertAt()`<br>`gsl_VerifyAt()`](doc/Reference.md#contract-and-assertion-checks) | - | - | ✓ | Checks invariant at runtime |
 [`gsl_AssertDebug()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_AssertAudit()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
+[`gsl_FailFast()`<br>`gsl_FailFastAt()`](doc/Reference.md#contract-and-assertion-checks) | - | -       | ✓                   | Terminates execution |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp; | &nbsp; | &nbsp; |
 [`finally()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | ✓         | ✓             | ✓¹¹                | Returns an object that executes a given action in its destructor; use for ad hoc resource cleanup |
 [`on_return()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -        | -             | (✓¹¹)               | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |

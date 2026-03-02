@@ -22,17 +22,13 @@
 
 There are several macros for expressing preconditions, postconditions, and invariants:
 
-- `gsl_FailFast()` to indicate unreachable code
-- `gsl_Expects( cond )` for simple preconditions
-- `gsl_Ensures( cond )` for simple postconditions
-- `gsl_Assert( cond )` for simple assertions
-- `gsl_ExpectsDebug( cond )` for debug-mode preconditions
-- `gsl_EnsuresDebug( cond )` for debug-mode postconditions
-- `gsl_AssertDebug( cond )` for debug-mode assertions
-- `gsl_ExpectsAudit( cond )` for preconditions that are expensive or include potentially opaque function calls
-- `gsl_EnsuresAudit( cond )` for postconditions that are expensive or include potentially opaque function calls
-- `gsl_AssertAudit( cond )` for assertions that are expensive or include potentially opaque function calls
-- `gsl_Verify( cond )` for assertion expressions
+Assertion level  | precondition check      | postcondition check     | assertion              |
+-----------------|:-----------------------:|:-----------------------:|:----------------------:|:----------------------------------------------
+always checked   |                         |                         | `gsl_FailFast()`       | to indicate unreachable code
+always evaluated |                         |                         | `gsl_Verify( c )`      | evaluates to `c`; raises an assertion failure if `! c` unless contract checking is disabled
+default          | `gsl_Expects( c )`      | `gsl_Ensures( c )`      | `gsl_Assert( c )`      | checked unless contract checking is disabled
+debug            | `gsl_ExpectsDebug( c )` | `gsl_EnsuresDebug( c )` | `gsl_AssertDebug( c )` | checked in Debug build only
+audit            | `gsl_ExpectsAudit( c )` | `gsl_EnsuresAudit( c )` | `gsl_AssertAudit( c )` | disabled by default (expensive to evaluate)
 
 **Example:**
 ```c++
@@ -124,6 +120,38 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
     
   `gsl_FailFast()` behaves as if annotated by the [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn)
   attribute. A C++11 compiler will therefore not emit a warning about a missing return statement in `colorToString()`.
+
+When compiling for C++20 or later, the following contract checking macros are available in addition:
+
+Assertion level  | assertion                |
+-----------------|:------------------------:|:----------------------------------------------
+always checked   | `gsl_FailFastAt( loc )`  | to indicate unreachable code
+always evaluated | `gsl_VerifyAt( loc, c )` | evaluates to `c`; raises an assertion failure if `! c` unless contract checking is disabled
+default          | `gsl_AssertAt( loc, c )` | checked unless contract checking is disabled
+
+These macros take an additional argument of type [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location.html).
+They behave like their conventional counterparts except that the source location represented by `loc`, rather than
+[`__FILE__` and `__LINE__`](https://en.cppreference.com/w/cpp/preprocessor/replace.html#Predefined_macros), is passed to the assertion handler.
+This is useful for defining functions with assertion semantics:
+```c++
+// my-header.hpp
+template <std::integral T, std::integral U>
+T NarrowFailfast( U value, std::source_location loc = std::source_location::current() )
+{
+    gsl_AssertAt( loc, std::in_range<T>( value ) );
+    return static_cast<T>( value );
+}
+
+// my-source.cpp
+#include "my-header.hpp"
+int main()
+{
+    int i = -1;
+    auto u = NarrowFailfast<unsigned>( i );  // assertion at my-source.cpp:5: `std::in_range<T>( value )`
+}
+```
+Had `gsl_Assert()` been used instead of `gsl_AssertAt()`, the assertion message would have
+referenced the location `my-header.hpp:4` rather than the call site `my-source.cpp:5`.
 
 
 ## Pointer annotations
