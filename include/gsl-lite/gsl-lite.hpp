@@ -28,7 +28,7 @@
 #include <stdexcept> // for logic_error
 #include <utility>   // for move(), forward<>(), swap()
 #include <cstddef>   // for size_t, ptrdiff_t, nullptr_t
-#include <cstdlib>   // for abort(), sprintf() before C++11
+#include <cstdlib>   // for abort()
 
 #if defined( __has_include )
 # if __has_include( <version> )
@@ -1346,6 +1346,9 @@
 
 #if ! gsl_CPP11_OR_GREATER
 # include <algorithm> // for swap() before C++11
+# if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#  include <cstdio>    // for sprintf()
+# endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #endif // ! gsl_CPP11_OR_GREATER
 
 #if gsl_HAVE( ARRAY )
@@ -2369,7 +2372,7 @@ gsl_NORETURN inline void fail_fast_throw( char const * expression, char const * 
 #else
     s += ":";
     char buf[64];
-    int n = std::sprintf(buf, "%d", line);
+    int n = std::sprintf( buf, "%u", line );
     if ( n >= 0 )
     {
         s += ":";
