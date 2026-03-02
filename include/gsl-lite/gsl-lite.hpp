@@ -1393,11 +1393,19 @@
 #endif
 
 #if gsl_CPP20_OR_GREATER
+# ifdef __has_include
+#  if __has_include(<version>)
+#   include <version>
+#  endif
+# endif
+#endif
+
+#ifdef __cpp_lib_source_location
 # include <source_location>
 #endif
 
 #if gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE
-# if gsl_CPP23_OR_GREATER
+# ifdef __cpp_lib_stacktrace
 #  include <iostream>
 #  include <stacktrace>
 # else

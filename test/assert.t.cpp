@@ -34,7 +34,7 @@ bool expectsAudit( bool x ) { gsl_ExpectsAudit( x ); return x; }
 bool ensuresAudit( bool x ) { gsl_EnsuresAudit( x ); return x; }
 bool assertAudit( bool x ) { gsl_AssertAudit( x ); return x; }
 
-#if gsl_CPP20_OR_GREATER
+#ifdef __cpp_lib_source_location
 bool assertAt( bool x, std::source_location const & loc = std::source_location::current() ) { gsl_AssertAt( loc, x ); return x; }
 bool verifyAt( bool x, std::source_location const & loc = std::source_location::current() ) { return gsl_VerifyAt( loc, x ); }
 void failFastAt( std::source_location const & loc = std::source_location::current() ) { gsl_FailFastAt( loc ); }
@@ -65,7 +65,7 @@ std::string colorToString( Color color )
 # pragma diag_default 941
 #endif
 
-#if gsl_CPP20_OR_GREATER
+#ifdef __cpp_lib_source_location
 std::string colorToStringAt( Color color, std::source_location const & loc = std::source_location::current() )
 {
     switch (color)
@@ -89,7 +89,7 @@ struct ConvertibleToBool
 
 } // anonymous namespace
 
-#if gsl_CPP20_OR_GREATER
+#ifdef __cpp_lib_source_location
 CASE( "gsl_AssertAt(): Allows a true expression" )
 {
     EXPECT_NO_THROW( assertAt( true  ) );
