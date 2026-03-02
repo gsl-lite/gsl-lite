@@ -24,11 +24,11 @@ There are several macros for expressing preconditions, postconditions, and invar
 
 | Assertion&nbsp;level  | precondition check    | postcondition check   | assertion            |                                                                                            |
 |-----------------------|:----------------------|:----------------------|:---------------------|:-------------------------------------------------------------------------------------------|
-| always&nbsp;checked   |                       |                       | `gsl_FailFast()`     | to indicate unreachable code                                                               |
+| always&nbsp;checked   |                       |                       | `gsl_FailFast()`     | use to indicate unreachable code                                                           |
 | always&nbsp;evaluated |                       |                       | `gsl_Verify(c)`      | evaluates to `c`; raises an assertion failure if `!c` unless contract checking is disabled |
 | default               | `gsl_Expects(c)`      | `gsl_Ensures(c)`      | `gsl_Assert(c)`      | checked unless contract checking is disabled                                               |
 | debug                 | `gsl_ExpectsDebug(c)` | `gsl_EnsuresDebug(c)` | `gsl_AssertDebug(c)` | checked in Debug build only                                                                |
-| audit                 | `gsl_ExpectsAudit(c)` | `gsl_EnsuresAudit(c)` | `gsl_AssertAudit(c)` | disabled by default (expensive to evaluate)                                                |
+| audit                 | `gsl_ExpectsAudit(c)` | `gsl_EnsuresAudit(c)` | `gsl_AssertAudit(c)` | disabled by default; use if `c` is expensive to evaluate                                   |
 
 **Example:**
 ```c++
@@ -123,11 +123,13 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 
 When compiling for C++20 or later, the following contract checking macros are available in addition:
 
-| Assertion&nbsp;level  | assertion             |                                                                                            |
-|-----------------------|:----------------------|:-------------------------------------------------------------------------------------------|
-| always&nbsp;checked   | `gsl_FailFastAt(loc)` | to indicate unreachable code                                                               |
-| always&nbsp;evaluated | `gsl_VerifyAt(loc,c)` | evaluates to `c`; raises an assertion failure if `!c` unless contract checking is disabled |
-| default               | `gsl_AssertAt(loc,c)` | checked unless contract checking is disabled                                               |
+| Assertion&nbsp;level  | assertion                  |                                                                                            |
+|-----------------------|:---------------------------|:-------------------------------------------------------------------------------------------|
+| always&nbsp;checked   | `gsl_FailFastAt(loc)`      | use to indicate unreachable code                                                           |
+| always&nbsp;evaluated | `gsl_VerifyAt(loc,c)`      | evaluates to `c`; raises an assertion failure if `!c` unless contract checking is disabled |
+| default               | `gsl_AssertAt(loc,c)`      | checked unless contract checking is disabled                                               |
+| debug                 | `gsl_AssertAtDebug(loc,c)` | checked in Debug build only                                                                |
+| audit                 | `gsl_AssertAtAudit(loc,c)` | disabled by default; use if `c` is expensive to evaluate                                   |
 
 These macros take an additional argument of type [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location.html).
 They behave like their conventional counterparts except that the source location represented by `loc`, rather than
@@ -136,7 +138,7 @@ This is useful for defining functions with assertion semantics:
 ```c++
 // my-header.hpp
 template <std::integral T, std::integral U>
-T NarrowFailfast( U value, std::source_location loc = std::source_location::current() )
+T narrowFailFast( U value, std::source_location loc = std::source_location::current() )
 {
     gsl_AssertAt( loc, std::in_range<T>( value ) );
     return static_cast<T>( value );
@@ -147,11 +149,11 @@ T NarrowFailfast( U value, std::source_location loc = std::source_location::curr
 int main()
 {
     int i = -1;
-    auto u = NarrowFailfast<unsigned>( i );  // assertion at my-source.cpp:5: `std::in_range<T>( value )`
+    auto u = narrowFailFast<unsigned>( i );  // my-source.cpp:5: Assertion `narrowFailFast: std::in_range<T>( value )' failed
 }
 ```
 Had `gsl_Assert()` been used instead of `gsl_AssertAt()`, the assertion message would have
-referenced the location `my-header.hpp:4` rather than the call site `my-source.cpp:5`.
+referenced the location `my-header.hpp:4` instead of the call site `my-source.cpp:5`.
 
 
 ## Pointer annotations
@@ -1092,17 +1094,17 @@ The following macros can be used to selectively disable checking for a particula
 The following macros control the handling of runtime contract violations:
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` (default)**  
-  If this macro is defined, and if the `assert()` macro is available for runtime checks (that is, if `NDEBUG` is not defined),
-  contract checking macros are implemented in terms of `assert()`. If `assert()` is unavailable (i.e. if `NDEBUG` was defined),
-  `std::abort()` is called directly when a contract is violated.  
+  If this macro is defined, contract assertions are handled with the assertion handler of the C++ runtime library.
+  This is usually the most convenient choice. The exact behavior can be controlled with the configuration macro
+  [`gsl_CONFIG_USE_CRT_ASSERT_FUNCTION`](#gsl_config_use_crt_assert_function2).
   **This is the default.**  
     
-  This option may be preferable over `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` because `assert()` prints diagnostic information
-  (such as the current source file, a line number, and the function name), and because vendor-specific extensions of `assert()`
-  can be used (for instance, the `assert()` implementation of the Microsoft C runtime displays a dialog box which permits breaking
-  into the debugger or continuing execution).  
-    
-  Note that `gsl_FailFast()` will call `std::abort()` if `assert()` continues execution.
+  This option may be preferable over `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` because, for most C++ runtime libraries, the default
+  assertion handler reports diagnostic information (the current source file, line number, function name, and the assertion expression)
+  in a way that is convenent for the programmer. For instance, with the Visual C++ runtime on Microsoft Windows, the assertion mechanism
+  displays an error message dialog which permits breaking into the debugger or continuing execution.  
+  
+  Note that `gsl_FailFast()` will call `std::abort()` if the assertion handler continues execution.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`**  
   Define this macro to call `std::terminate()` on a contract violation.
@@ -1161,7 +1163,7 @@ contract checks if `NDEBUG` is defined.
   expression cannot be used in an unevaluated context, for instance, when using a lambda expression in C++11/14/17.
   
   The compile-time verification of contract check expressions is controlled by the configuration macro
-  `gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS`, which defaults to *`1`*. To suppress the verification, define
+  [`gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS`](#gsl_config_validates_unenforced_contract_expressions0), which defaults to *`1`*. To suppress the verification, define
   `gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS=0`.
 
 - **`gsl_CONFIG_UNENFORCED_CONTRACTS_ASSUME`**  
@@ -1355,6 +1357,17 @@ The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NON
 #### `gsl_CONFIG_CONFIRMS_COMPILATION_ERRORS=0`
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite.  
 **Default is 0.**
+
+#### `gsl_CONFIG_USE_CRT_ASSERT_FUNCTION=2`
+This macro controls how contract violations are handled if `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` is defined. It can be defined to one of the following values:
+
+| Value           | Meaning |
+|:----------------|:--------|
+| **2** (default) | In a Debug build, the debug assertion handler of the C++ runtime library (e.g. [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw?view=msvc-170) for MSVC on Windows) is called to handle a contract violation. In a Release build, or if no Debug assertion handler is available, the regular assertion handler ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms) is called instead. |
+| 1               | The assertion handler of the C++ runtime library ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms)  is called to handle a contract violation. |
+| 0 (portable)    | If `NDEBUG` is not defined, the `assert()` macro is used to implement contract checks. If `NDEBUG` is defined, `std::abort()` is called directly when a contract is violated. |
+
+**Default is 2.**
 
 
 ## Configuration changes, deprecated and removed features

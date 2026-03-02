@@ -52,6 +52,9 @@
 
 #define gsl_DETAIL_CFG_TOGGLE_VALUE_1  1
 #define gsl_DETAIL_CFG_TOGGLE_VALUE_0  1
+#define gsl_DETAIL_CFG_3STATE_VALUE_2  1
+#define gsl_DETAIL_CFG_3STATE_VALUE_1  1
+#define gsl_DETAIL_CFG_3STATE_VALUE_0  1
 #define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_1  1
 #define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_0  1
 #define gsl_DETAIL_CFG_STD_VALUE_98  1
@@ -67,6 +70,7 @@
 #define gsl_DETAIL_CFG_NO_VALUE_   1
 #define gsl_DETAIL_CFG_NO_VALUE_1  1 // many compilers treat the command-line parameter "-Dfoo" as equivalent to "-Dfoo=1", so we tolerate that
 #define gsl_CHECK_CFG_TOGGLE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_TOGGLE_VALUE_, x )
+#define gsl_CHECK_CFG_3STATE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_3STATE_VALUE_, x )
 #define gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_, x )
 #define gsl_CHECK_CFG_STD_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_STD_VALUE_, x )
 #define gsl_CHECK_CFG_NO_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_NO_VALUE, gsl_CONCAT_( _, x ) )
@@ -386,12 +390,12 @@
 #define  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS_()  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS
 
 #if defined( gsl_CONFIG_USE_CRT_ASSERT_FUNCTION )
-# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_USE_CRT_ASSERT_FUNCTION )
-#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_USE_CRT_ASSERT_FUNCTION=" gsl_STRINGIFY(gsl_CONFIG_USE_CRT_ASSERT_FUNCTION) ", must be 0 or 1")
+# if ! gsl_CHECK_CFG_3STATE_VALUE_( gsl_CONFIG_USE_CRT_ASSERT_FUNCTION )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_USE_CRT_ASSERT_FUNCTION=" gsl_STRINGIFY(gsl_CONFIG_USE_CRT_ASSERT_FUNCTION) ", must be 0, 1, or 2")
 # endif
 #else
-# if defined(_MSC_VER) || defined( __GNUC__ ) || defined( __clang__ ) || defined( __NVCOMPILER )
-#  define gsl_CONFIG_USE_CRT_ASSERT_FUNCTION  1  // default
+# if defined( _MSC_VER ) || defined( __GNUC__ ) || defined( __clang__ ) || defined( __NVCOMPILER )
+#  define gsl_CONFIG_USE_CRT_ASSERT_FUNCTION  2  // default
 # else
 #  define gsl_CONFIG_USE_CRT_ASSERT_FUNCTION  0  // default
 # endif
@@ -585,7 +589,7 @@
 
 #ifndef   gsl_CPLUSPLUS
 # if defined(_MSVC_LANG ) && !defined(__clang__)
-#  define gsl_CPLUSPLUS  (_MSC_VER == 1900 ? 201103L : _MSVC_LANG )
+#  define gsl_CPLUSPLUS  ( _MSC_VER == 1900 ? 201103L : _MSVC_LANG )
 # else
 #  define gsl_CPLUSPLUS  __cplusplus
 # endif
@@ -1195,7 +1199,7 @@
         return lhs = lhs ^ rhs;                                            \
     }
 
-#if gsl_STDLIB_CPP20_OR_GREATER
+#if defined( __cpp_lib_three_way_comparison )
 # define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                        \
     [[maybe_unused, nodiscard]] gsl_api inline constexpr std::strong_ordering \
     operator<=>( ENUM lhs, ENUM rhs ) gsl_noexcept                            \
@@ -1203,7 +1207,7 @@
         using U = std::underlying_type_t<ENUM>;                               \
         return U( lhs ) <=> U( rhs );                                         \
     }
-#else // ! gsl_STDLIB_CPP20_OR_GREATER
+#else // ! defined( __cpp_lib_three_way_comparison )
 # define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                     \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool       \
     operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                           \
@@ -1229,7 +1233,7 @@
         typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) >= U( rhs );                                       \
     }
-#endif // gsl_STDLIB_CPP20_OR_GREATER
+#endif // defined( __cpp_lib_three_way_comparison )
 
     //
     // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
@@ -1339,10 +1343,12 @@
 
 // Additional includes:
 
-#if gsl_FEATURE( STRING_SPAN ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
+#if gsl_FEATURE( STRING_SPAN )
 # include <ios>    // for ios_base, streamsize
+#endif
+#if gsl_FEATURE( STRING_SPAN ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || ( defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) && ! ( gsl_COMPILER_MS_STL_VER && defined( _DEBUG ) ) )
 # include <string>
-#endif // gsl_FEATURE( STRING_SPAN )
+#endif
 
 #if ! gsl_CPP11_OR_GREATER
 # include <algorithm> // for swap() before C++11
@@ -1359,9 +1365,9 @@
 # include <iterator> // for reverse_iterator<>
 #endif
 
-#if gsl_STDLIB_CPP20_OR_GREATER
+#ifdef __cpp_lib_three_way_comparison
 # include <compare>
-#endif // gsl_STDLIB_CPP20_OR_GREATER
+#endif
 
 #if ! gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || ! gsl_HAVE( AUTO )
 # include <vector>
@@ -1392,12 +1398,8 @@
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
-#if gsl_CPP20_OR_GREATER
-# ifdef __has_include
-#  if __has_include(<version>)
-#   include <version>
-#  endif
-# endif
+#if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VER && defined( _DEBUG )
+# include <crtdbg.h>
 #endif
 
 #ifdef __cpp_lib_source_location
@@ -1416,7 +1418,7 @@
 // Declare __cxa_get_globals() or equivalent in namespace gsl_lite::detail for uncaught_exceptions():
 
 #if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-# if defined( _MSC_VER )                                           // MS-STL with either MSVC or clang-cl
+# if gsl_COMPILER_MS_STL_VER
 namespace gsl_lite { namespace detail { extern "C" char * __cdecl _getptd(); } }
 # elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 #  if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
@@ -2151,37 +2153,35 @@ using std::shared_ptr;
 #  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), false ) gsl_DIAG_RESTORE_236_ )
 #  define    gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::fail_fast_assert_handler( "unreachable", gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), gsl_TRAP_FALLBACK_() ) /* do not let the custom assertion handler continue execution */
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-#  if gsl_CONFIG_USE_CRT_ASSERT_FUNCTION
-#   if defined( _MSC_VER ) && ! defined( NDEBUG )
-#    define  gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_FAILFAST_()                    ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
-#    define  gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_FAILFAST_AT_( loc )            ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
-#   else // ! defined( _MSC_VER ) || defined( NDEBUG )
-#    define  gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) )
-#    define  gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ), false ) gsl_DIAG_RESTORE_236_ )
-#    define  gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) )
-#   endif
+#  if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VER && defined( _DEBUG )
+#   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_()                    ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_AT_( loc )            ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
+#  elif gsl_CONFIG( USE_CRT_ASSERT_FUNCTION )
+#   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) )
 #  elif ! defined( NDEBUG )
 #   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ assert( x ) gsl_DIAG_RESTORE_236_ )
 #   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( assert( false && #x ), false ) gsl_DIAG_RESTORE_236_ )
 #   define   gsl_FAILFAST_()                    ( gsl_DIAG_SUPPRESS_236_ assert( false ) gsl_DIAG_RESTORE_236_, gsl_TRAP_FALLBACK_() )
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
+#   define   gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
 #  else // defined( NDEBUG )
 #   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_abort() gsl_DIAG_RESTORE_236_ )
 #   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_abort(), false ) gsl_DIAG_RESTORE_236_ )
 #   define   gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_abort() )
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
-#  endif
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
+#   define   gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#   endif
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #  define    gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
 #  define    gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_throw( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
@@ -2276,29 +2276,29 @@ using std::shared_ptr;
 #endif
 #define   gsl_FailFast()         gsl_FAILFAST_()
 
-#if gsl_CPP20_OR_GREATER
-#if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAt( loc, x )        gsl_CONTRACT_CHECK_AT_( loc, x )
-#else
-# define  gsl_AssertAt( loc, x )        gsl_CONTRACT_UNENFORCED_( ( static_cast<void>( loc ), ( x ) ) )
-#endif
-#if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAtDebug( loc, x )   gsl_CONTRACT_CHECK_AT_( loc, x )
-#else
-# define  gsl_AssertAtDebug( loc, x )   gsl_ELIDE_( ( static_cast<void>( loc ), ( x ) ) )
-#endif
-#if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAtAudit( loc, x )   gsl_CONTRACT_CHECK_AT_( loc, x )
-#else
-# define  gsl_AssertAtAudit( loc, x )   gsl_ELIDE_( ( static_cast<void>( loc ), ( x ) ) )
-#endif
+#ifdef __cpp_lib_source_location
 # if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_VerifyAt( loc, x )        gsl_CONTRACT_VERIFY_AT_( loc, x )
+#  define gsl_AssertAt( loc, x )        gsl_CONTRACT_CHECK_AT_( loc, x )
 # else
-# define  gsl_VerifyAt( loc, x )        ( static_cast<void>( loc ), !!( x ) )
+#  define gsl_AssertAt( loc, x )        gsl_CONTRACT_UNENFORCED_( ( static_cast<void>( loc ), ( x ) ) )
 # endif
-# define   gsl_FailFastAt( loc )        gsl_FAILFAST_AT_( loc )
-#endif // gsl_CPP20_OR_GREATER
+# if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+#  define gsl_AssertAtDebug( loc, x )   gsl_CONTRACT_CHECK_AT_( loc, x )
+# else
+#  define gsl_AssertAtDebug( loc, x )   gsl_ELIDE_( ( static_cast<void>( loc ), ( x ) ) )
+# endif
+# if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+#  define gsl_AssertAtAudit( loc, x )   gsl_CONTRACT_CHECK_AT_( loc, x )
+# else
+#  define gsl_AssertAtAudit( loc, x )   gsl_ELIDE_( ( static_cast<void>( loc ), ( x ) ) )
+# endif
+# if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
+#  define gsl_VerifyAt( loc, x )        gsl_CONTRACT_VERIFY_AT_( loc, x )
+# else
+#  define gsl_VerifyAt( loc, x )        ( static_cast<void>( loc ), !!( x ) )
+# endif
+# define  gsl_FailFastAt( loc )        gsl_FAILFAST_AT_( loc )
+#endif // __cpp_lib_source_location
 
 #undef gsl_CHECK_CONTRACTS_
 #undef gsl_CHECK_DEBUG_CONTRACTS_
@@ -2307,14 +2307,14 @@ using std::shared_ptr;
 
 struct fail_fast : public std::logic_error
 {
-    explicit fail_fast( std::string const & message )
+    explicit fail_fast( char const * message )
     : std::logic_error( message ) {}
 };
 
 namespace detail {
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION )
-# if defined( _MSC_VER ) && defined( NDEBUG )  // MS-STL (with either MSVC or clang-cl) in non-Debug build
+# if gsl_COMPILER_MS_STL_VER
 #  ifdef _DLL
 #   define gsl_CRTIMP_  __declspec( dllimport )
 #  else
@@ -2324,8 +2324,8 @@ namespace detail {
 // (cf. https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert)
 extern "C" gsl_CRTIMP_ void __cdecl _assert( char const * expr, char const * file, unsigned line );
 #  undef gsl_CRTIMP_
-# endif // defined( _MSC_VER ) && defined( NDEBUG )
-# if defined( _MSC_VER ) && ! defined( NDEBUG )  // MS-STL (with either MSVC or clang-cl) in Debug build
+# endif // gsl_COMPILER_MS_STL_VER
+# if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VER && defined( _DEBUG )
 // Function returns `true` if a debug break is desired, `false` otherwise.
 inline bool fail_fast_assert_debug( char const * expression, char const * message, char const * filename, unsigned line )
 {
@@ -2342,19 +2342,19 @@ gsl_NORETURN inline void fail_fast_assert( char const * expression, char const *
         std::string s = message;
         s += ": ";
         s += expression;
-#  if defined( _MSC_VER )
+#  if gsl_COMPILER_MS_STL_VER
         detail::_assert( s.c_str(), filename, line );
         std::abort();
-#  else // ! defined( _MSC_VER )
+#  else // ! gsl_COMPILER_MS_STL_VER
         ::__assert( s.c_str(), filename, static_cast<int>( line ) );
 #  endif
     }
     else
     {
-#  if defined( _MSC_VER )
+#  if gsl_COMPILER_MS_STL_VER
         detail::_assert( expression, filename, line );
         std::abort();
-#  else 
+#  else // ! gsl_COMPILER_MS_STL_VER
         ::__assert( expression, filename, static_cast<int>( line ) );
 #  endif
     }
@@ -2384,10 +2384,10 @@ gsl_NORETURN inline void fail_fast_throw( char const * expression, char const * 
     if ( n >= 0 )
     {
         s += ":";
-        s.append( buf, n );
+        s.append( buf, static_cast<std::size_t>( n ) );
     }
 #endif
-    throw fail_fast( s );
+    throw fail_fast( s.c_str() );
 }
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE )
@@ -2438,7 +2438,7 @@ inline int uncaught_exceptions() gsl_noexcept
 }
 
 #else // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-# if defined( _MSC_VER ) // MS-STL with either MSVC or clang-cl
+# if gsl_COMPILER_MS_STL_VER
 
 inline int uncaught_exceptions() gsl_noexcept
 {
@@ -2459,7 +2459,7 @@ inline int uncaught_exceptions() gsl_noexcept
 
 namespace std11 {
 
-#if gsl_HAVE( UNCAUGHT_EXCEPTIONS ) || defined( _MSC_VER ) || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
+#if gsl_HAVE( UNCAUGHT_EXCEPTIONS ) || gsl_COMPILER_MS_STL_VER || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 // Retain alias for backward compatibility
 using ::gsl_lite::std17::uncaught_exceptions;
 #endif
@@ -3771,7 +3771,7 @@ gsl_RETURN_DECLTYPE_(l.operator->() == r )
 {
     return l.operator->() == r;
 }
-#if ! gsl_CPP20_OR_GREATER
+#ifndef __cpp_lib_three_way_comparison
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator==( T const & l, not_null<U> const & r )
@@ -3779,7 +3779,7 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
 {
     return l == r.operator->();
 }
-#endif // ! gsl_CPP20_OR_GREATER
+#endif
 
 // The C++ Core Guidelines discourage the use of pointer arithmetic, and gsl-lite consequently refrains from defining operators
 // for pointer arithmetic or the subscript operator in `not_null<>`. However, comparison of `not_null<>` objects is supported;
@@ -3789,7 +3789,7 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
 // can be sorted and searched, or that pointers can be used as a key in a relational container such as `std::map<>`.
 // Therefore, we also define relational comparison operators for `not_null<>`.
 
-#if gsl_STDLIB_CPP20_OR_GREATER
+#ifdef __cpp_lib_three_way_comparison
 template< class T, class U >
 [[nodiscard]] inline gsl_api constexpr auto
 operator<=>( not_null<T> const & l, not_null<U> const & r )
@@ -3804,7 +3804,7 @@ operator<=>( not_null<T> const & l, U const & r )
 {
     return l.operator->() <=> r;
 }
-#endif // gsl_STDLIB_CPP20_OR_GREATER
+#endif
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator<( not_null<T> const & l, not_null<U> const & r )
@@ -3827,7 +3827,7 @@ gsl_RETURN_DECLTYPE_( l < r.operator->() )
     return l < r.operator->();
 }
 
-#if ! gsl_CPP20_OR_GREATER
+#ifndef __cpp_lib_three_way_comparison
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
 operator!=( not_null<T> const & l, not_null<U> const & r )
@@ -3849,7 +3849,7 @@ gsl_RETURN_DECLTYPE_( !( l == r ) )
 {
     return !( l == r );
 }
-#endif // ! gsl_CPP20_OR_GREATER
+#endif
 
 template< class T, class U >
 gsl_NODISCARD inline gsl_api gsl_constexpr gsl_TRAILING_RETURN_TYPE_( bool )
@@ -4194,10 +4194,10 @@ public:
     typedef T * pointer;
     typedef T & reference;
 
-#ifdef _MSC_VER
+#ifdef gsl_COMPILER_MS_STL_VER
     typedef pointer _Unchecked_type;
     typedef span_iterator _Prevent_inheriting_unwrap;
-#endif // _MSC_VER
+#endif // gsl_COMPILER_MS_STL_VER
 #if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr span_iterator() = default;
 #else // ! gsl_HAVE( IS_DEFAULT )
@@ -4369,7 +4369,7 @@ public:
         return !( *this < rhs );
     }
 
-#ifdef _MSC_VER
+#ifdef gsl_COMPILER_MS_STL_VER
     // MSVC++ iterator debugging support; allows STL algorithms in 15.8+
     // to unwrap span_iterator to a pointer type after a range check in STL
     // algorithm calls.
@@ -5029,7 +5029,7 @@ public:
     }
 #endif // ! gsl_DEPRECATE_TO_LEVEL( 9 )
 
-#ifdef _MSC_VER
+#ifdef gsl_COMPILER_MS_STL_VER
     // Tell MSVC how to unwrap spans in range-based-for
     gsl_api gsl_constexpr pointer _Unchecked_begin() const gsl_noexcept { return data(); }
     gsl_api gsl_constexpr pointer _Unchecked_end() const gsl_noexcept
@@ -5037,7 +5037,7 @@ public:
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
         return data() + size();
     }
-#endif // _MSC_VER
+#endif // gsl_COMPILER_MS_STL_VER
 
 private:
     // Needed to remove unnecessary null check in subspans
