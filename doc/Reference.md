@@ -22,13 +22,13 @@
 
 There are several macros for expressing preconditions, postconditions, and invariants:
 
-Assertion level  | precondition check      | postcondition check     | assertion              |
------------------|:-----------------------:|:-----------------------:|:----------------------:|:----------------------------------------------
-always checked   |                         |                         | `gsl_FailFast()`       | to indicate unreachable code
-always evaluated |                         |                         | `gsl_Verify( c )`      | evaluates to `c`; raises an assertion failure if `! c` unless contract checking is disabled
-default          | `gsl_Expects( c )`      | `gsl_Ensures( c )`      | `gsl_Assert( c )`      | checked unless contract checking is disabled
-debug            | `gsl_ExpectsDebug( c )` | `gsl_EnsuresDebug( c )` | `gsl_AssertDebug( c )` | checked in Debug build only
-audit            | `gsl_ExpectsAudit( c )` | `gsl_EnsuresAudit( c )` | `gsl_AssertAudit( c )` | disabled by default (expensive to evaluate)
+| Assertion level  | precondition check      | postcondition check     | assertion              |                                                                                             |
+|------------------|:------------------------|:------------------------|:-----------------------|:--------------------------------------------------------------------------------------------|
+| always checked   |                         |                         | `gsl_FailFast()`       | to indicate unreachable code                                                                |
+| always evaluated |                         |                         | `gsl_Verify( c )`      | evaluates to `c`; raises an assertion failure if `! c` unless contract checking is disabled |
+| default          | `gsl_Expects( c )`      | `gsl_Ensures( c )`      | `gsl_Assert( c )`      | checked unless contract checking is disabled                                                |
+| debug            | `gsl_ExpectsDebug( c )` | `gsl_EnsuresDebug( c )` | `gsl_AssertDebug( c )` | checked in Debug build only                                                                 |
+| audit            | `gsl_ExpectsAudit( c )` | `gsl_EnsuresAudit( c )` | `gsl_AssertAudit( c )` | disabled by default (expensive to evaluate)                                                 |
 
 **Example:**
 ```c++
@@ -123,11 +123,11 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 
 When compiling for C++20 or later, the following contract checking macros are available in addition:
 
-Assertion level  | assertion                |
------------------|:------------------------:|:----------------------------------------------
-always checked   | `gsl_FailFastAt( loc )`  | to indicate unreachable code
-always evaluated | `gsl_VerifyAt( loc, c )` | evaluates to `c`; raises an assertion failure if `! c` unless contract checking is disabled
-default          | `gsl_AssertAt( loc, c )` | checked unless contract checking is disabled
+| Assertion level  | assertion                |                                                                                             |
+|------------------|:-------------------------|:--------------------------------------------------------------------------------------------|
+| always checked   | `gsl_FailFastAt( loc )`  | to indicate unreachable code                                                                |
+| always evaluated | `gsl_VerifyAt( loc, c )` | evaluates to `c`; raises an assertion failure if `! c` unless contract checking is disabled |
+| default          | `gsl_AssertAt( loc, c )` | checked unless contract checking is disabled                                                |
 
 These macros take an additional argument of type [`std::source_location`](https://en.cppreference.com/w/cpp/utility/source_location.html).
 They behave like their conventional counterparts except that the source location represented by `loc`, rather than
