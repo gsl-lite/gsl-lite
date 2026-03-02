@@ -8,7 +8,7 @@
 - [Safe contiguous ranges](#safe-contiguous-ranges): `span<T, Extent>`
 - [Bounds-checked element access](#bounds-checked-element-access): `at( container, index )`
 - [Integer type aliases](#integer-type-aliases): `index`, `dim`, `stride`, `diff`
-- [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`
+- [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`, `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, `u32czstring`
 - [Ad hoc resource management (C++11 and higher)](#ad-hoc-resource-management-c11-and-higher): `finally( action )`, `on_return( action )`, and `on_error( action )`
 - [Feature checking macros](#feature-checking-macros)
 - [Polyfills](#polyfills)
@@ -24,7 +24,7 @@ There are several macros for expressing preconditions, postconditions, and invar
 
 | Assertion&nbsp;level  | precondition check    | postcondition check   | assertion            |                                                                                            |
 |-----------------------|:----------------------|:----------------------|:---------------------|:-------------------------------------------------------------------------------------------|
-| always&nbsp;checked   |                       |                       | `gsl_FailFast()`     | use to indicate unreachable code                                                           |
+| always&nbsp;checked   |                       |                       | `gsl_FailFast()`     | use to mark unreachable code                                                               |
 | always&nbsp;evaluated |                       |                       | `gsl_Verify(c)`      | evaluates to `c`; raises an assertion failure if `!c` unless contract checking is disabled |
 | default               | `gsl_Expects(c)`      | `gsl_Ensures(c)`      | `gsl_Assert(c)`      | checked unless contract checking is disabled                                               |
 | debug                 | `gsl_ExpectsDebug(c)` | `gsl_EnsuresDebug(c)` | `gsl_AssertDebug(c)` | checked in Debug build only                                                                |
@@ -49,7 +49,7 @@ auto median( RandomIt first, RandomIt last )
 }
 ```
 
-The assertion expression `gsl_Verify( cond )` is useful when writing code that must work correctly even when
+The assertion expression `gsl_Verify( c )` is useful when writing code that must work correctly even when
 compiled with contract checking disabled. For example, a function may assert that a certain variable be not `nullptr`,
 which would constitute a bug, but it may also use a safety check before dereferencing that variable so that
 the bug does not lead to a crash:
@@ -71,9 +71,9 @@ bool readInt( std::FILE* file, int & val )
     return s == sizeof( int );
 }
 ```
-Unlike `gsl_Assert()` and the other contract checking macros, the expression `cond` in `gsl_Verify( cond )` is
-always evaluated. As far as program logic is concerned, `gsl_Verify( cond )` can be considered equivalent to
-`cond`, while also acting as a contract check assertion if contract checking is enabled.
+Unlike `gsl_Assert()` and the other contract checking macros, the expression `c` in `gsl_Verify( c )` is
+always evaluated. As far as program logic is concerned, `gsl_Verify( c )` can be considered equivalent to
+`c`, while also acting as a contract check assertion if contract checking is enabled.
 
 The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of
 [configuration macros](#contract-checking-configuration-macros):
@@ -81,9 +81,9 @@ The behavior of the different flavors of pre-/postcondition checks and assertion
 - The macros **`gsl_Expects()`**, **`gsl_Ensures()`**, and **`gsl_Assert()`** are compiled to runtime checks unless contract
   checking is disabled with the `gsl_CONFIG_CONTRACT_CHECKING_OFF` configuration macro.
 
-- The macro **`gsl_Verify()`** is compiled to a runtime check. `gsl_Verify( cond )` evaluates to the Boolean value of `cond`.
-  Additionally, if contract checking is enabled, `gsl_Verify( cond )` will enact a contract violation like `gsl_Assert( cond )`
-  if `cond` evaluates to `false`.
+- The macro **`gsl_Verify()`** is compiled to a runtime check. `gsl_Verify( c )` evaluates to the Boolean value of `c`.
+  Additionally, if contract checking is enabled, `gsl_Verify( c )` will enact a contract violation like `gsl_Assert( c )`
+  if `c` evaluates to `false`.
 
 - Contract checks expressed with **`gsl_ExpectsAudit()`**, **`gsl_EnsuresAudit()`**, and **`gsl_AssertAudit()`** are discarded by
   default. In order to have them checked at runtime, the `gsl_CONFIG_CONTRACT_CHECKING_AUDIT` configuration macro must be defined.
@@ -125,7 +125,7 @@ When compiling for C++20 or later, the following contract checking macros are av
 
 | Assertion&nbsp;level  | assertion                  |                                                                                            |
 |-----------------------|:---------------------------|:-------------------------------------------------------------------------------------------|
-| always&nbsp;checked   | `gsl_FailFastAt(loc)`      | use to indicate unreachable code                                                           |
+| always&nbsp;checked   | `gsl_FailFastAt(loc)`      | use to mark unreachable code                                                               |
 | always&nbsp;evaluated | `gsl_VerifyAt(loc,c)`      | evaluates to `c`; raises an assertion failure if `!c` unless contract checking is disabled |
 | default               | `gsl_AssertAt(loc,c)`      | checked unless contract checking is disabled                                               |
 | debug                 | `gsl_AssertAtDebug(loc,c)` | checked in Debug build only                                                                |
@@ -359,6 +359,14 @@ This can be written as a one-liner with `gsl_lite::as_nullable()`:
       return call( std::labs, val );
   }
   ```
+  Likewise, a string literal implicitly converts to `not_null<czstring>`:
+  ```c++
+  void PrintLn( not_null<czstring> str );
+  int main()
+  {
+      PrintLn( "Hello, World!" );
+  }
+  ``` 
 - `Q` explicitly converts to `not_null<P>` if `Q` is nullable and implicitly converts to `P`, or if `Q` explicitly converts to `P`.  
   For example:
   ```c++
@@ -416,7 +424,7 @@ For example, consider the following resource handle class:
 ```c++
 struct FileCloser
 {
-    void operator ()(std::FILE* file) const noexcept
+    void operator ()( std::FILE* file ) const noexcept
     {
         std::fclose( file );
     }
@@ -772,17 +780,24 @@ configuration macro is set to a different type (which is not recommended).
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
-(*Note:* `wzstring` and `cwzstring` are *gsl-lite* extensions and not part of the C++ Core Guidelines.)
+(*Note:* `wzstring`, `cwzstring`, `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, and `u32czstring`
+are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
-*gsl-lite* defines the aliases `gsl_lite::zstring`, `gsl_lite::czstring`, `gsl_lite::wzstring`, and `gsl_lite::cwzstring` for
-C-style strings (where a C-style string is understood to be either a zero-terminated sequence of characters or a `nullptr`):
+*gsl-lite* defines the aliases `gsl_lite::zstring`, `gsl_lite::czstring`, and others to represent C-style strings,
+where a C-style string is understood to be either a zero-terminated sequence of characters or a `nullptr`:
 
-Type alias  | Type              |
------------:|:------------------|
-`zstring`   | `char *`          |
-`czstring`  | `char const *`    |
-`wzstring`  | `wchar_t *`       |
-`cwzstring` | `wchar_t const *` |
+Type alias    | Type               |
+-------------:|:-------------------|
+`zstring`     | `char *`           |
+`czstring`    | `char const *`     |
+`wzstring`    | `wchar_t *`        |
+`cwzstring`   | `wchar_t const *`  |
+`u8zstring`   | `char8_t *`        |
+`u8wzstring`  | `char8_t const *`  |
+`u16zstring`  | `char16_t *`       |
+`u16wzstring` | `char16_t const *` |
+`u32zstring`  | `char32_t *`       |
+`u32wzstring` | `char32_t const *` |
 
 
 ## Ad hoc resource management (C++11 and higher)
@@ -951,18 +966,18 @@ The keyword and attribute macros allow to conditionally take advantage of newer 
 
 Name                        | Expands to      |
 ---------------------------:|:----------------|
-`gsl_DIMENSION_OF( a )`     | `( sizeof( a ) / sizeof( 0[ a ] ) )`, which is the number of elements in a C-style array `a` |
+`gsl_DIMENSION_OF(a)`       | `( sizeof( a ) / sizeof( 0[ a ] ) )`, which is the number of elements in a C-style array `a` |
 `gsl_constexpr`             | [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++11 and higher, to nothing otherwise |
 `gsl_constexprXX`           | [`constexpr`](https://en.cppreference.com/w/cpp/language/constexpr) in C++XX and higher, to nothing otherwise<br>(substitute 14, 17, 20, 23, 26) |
 `gsl_explicit`              | [`explicit`](https://en.cppreference.com/w/cpp/language/explicit) specifier in C++11 and higher, to nothing otherwise |
 `gsl_is_delete`             | `= delete` in C++11 and higher, to nothing otherwise |
 `gsl_is_delete_access`      | `public` in C++11 and higher, to `private` otherwise |
 `gsl_noexcept`              | [`noexcept`](https://en.cppreference.com/w/cpp/language/noexcept_spec) specifier in C++11 and higher, to nothing otherwise |
-`gsl_noexcept_if( expr )`   | [`noexcept( expr )`](https://en.cppreference.com/w/cpp/language/noexcept) operator in C++11 and higher, to nothing otherwise |
+`gsl_noexcept_if(expr)`     | [`noexcept( expr )`](https://en.cppreference.com/w/cpp/language/noexcept) operator in C++11 and higher, to nothing otherwise |
 `gsl_nullptr`               | `nullptr` in C++11 and higher, to `NULL` otherwise |
 `gsl_NORETURN`              | [`[[noreturn]]`](https://en.cppreference.com/w/cpp/language/attributes/noreturn) attribute in C++11 and higher, to a compiler-specific attribute if available, or to nothing otherwise |
 `gsl_DEPRECATED`            | [`[[deprecated]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
-`gsl_DEPRECATED_MSG( msg )` | [`[[deprecated( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
+`gsl_DEPRECATED_MSG(msg)`   | [`[[deprecated( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
 `gsl_NODISCARD`             | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute in C++17 and higher, to nothing otherwise |
 `gsl_MAYBE_UNUSED`          | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher, or to nothing otherwise |
 `gsl_MAYBE_UNUSED_MEMBER`   | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher if that attribute does not raise a warning when applied to class data members (as is the case for GNU GCC), or to nothing otherwise |
@@ -1361,11 +1376,11 @@ Define this macro to 1 to experience the by-design compile-time errors of the GS
 #### `gsl_CONFIG_USE_CRT_ASSERT_FUNCTION=2`
 This macro controls how contract violations are handled if `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` is defined. It can be defined to one of the following values:
 
-| Value           | Meaning |
-|:----------------|:--------|
-| **2** (default) | In a Debug build, the debug assertion handler of the C++ runtime library (e.g. [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw?view=msvc-170) for MSVC on Windows) is called to handle a contract violation. In a Release build, or if no Debug assertion handler is available, the regular assertion handler ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms) is called instead. |
-| 1               | The assertion handler of the C++ runtime library ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms)  is called to handle a contract violation. |
-| 0 (portable)    | If `NDEBUG` is not defined, the `assert()` macro is used to implement contract checks. If `NDEBUG` is defined, `std::abort()` is called directly when a contract is violated. |
+| Value         | Meaning |
+|:--------------|:--------|
+| 2( default)   | In a Debug build, the debug assertion handler of the C++ runtime library (e.g. [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw?view=msvc-170) for MSVC on Windows) is called to handle a contract violation. In a Release build, or if no Debug assertion handler is available, the regular assertion handler ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms) is called instead. |
+| 1             | The assertion handler of the C++ runtime library ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms)  is called to handle a contract violation. |
+| 0 (portable)  | If `NDEBUG` is not defined, the `assert()` macro is used to implement contract checks. If `NDEBUG` is defined, `std::abort()` is called directly when a contract is violated. |
 
 **Default is 2.**
 
@@ -1441,7 +1456,7 @@ Version | Level | Feature / Notes |
 
 ### Removed features
 
-The following features are removed since the indicated version.
+The following features have been removed in the version indicated.
 
 Version | Feature / Notes |
 -------:|:----------------|
