@@ -38,18 +38,18 @@
 
 namespace my_lib {
 
-        // Define this in your own namespace.
+    // Define this in your own namespace.
     namespace gsl = ::gsl_lite;
 
-        // `span<T[, Extent]>`: contiguous range with bounds checks
+    // `span<T[, Extent]>`: contiguous range with bounds checks
     double mean( gsl::span<double const> values )
     {
-            // `gsl_Expects( cond )`: precondition check
+        // `gsl_Expects( cond )`: precondition check
         gsl_Expects( !values.empty() );
     
         double sum = std::accumulate( values.begin(), values.end(), 0. );
 
-            // `narrow_failfast<T>( u )`: checked numeric cast
+        // `narrow_failfast<T>( u )`: checked numeric cast
         double num = gsl::narrow_failfast<double>( std::ssize( values ) );
 
         return sum / num;
@@ -62,13 +62,13 @@ namespace my_lib {
         Resource( std::size_t size );
     };
 
-        // Type-encoded precondition with `not_null<P>`
+    // Type-encoded precondition with `not_null<P>`
     void consumeResource( gsl::not_null<std::unique_ptr<Resource>> resource );
 
-        // Type-encoded postcondition with `not_null<P>`
+    // Type-encoded postcondition with `not_null<P>`
     gsl::not_null<std::unique_ptr<Resource>> acquireResource( std::size_t size )
     {
-            // A flavor of `make_unique<T>()` which returns `not_null<std::unique_ptr<T>>`
+        // A flavor of `make_unique<T>()` which returns `not_null<std::unique_ptr<T>>`
         return gsl::make_unique<Resource>( size );
     }
 
@@ -107,7 +107,7 @@ cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 project( my-program LANGUAGES CXX )
 
-find_package( gsl-lite 1.0 REQUIRED )
+find_package( gsl-lite 1.1 REQUIRED )
 
 add_executable( my-program main.cpp )
 target_compile_features( my-program PRIVATE cxx_std_17 )
