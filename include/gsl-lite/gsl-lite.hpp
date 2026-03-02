@@ -646,16 +646,6 @@
 // MSVC++ 14.3  _MSC_VER >= 1930  gsl_COMPILER_MSVC_VERSION == 143  (Visual Studio 2022)
 // MSVC++ 14.5  _MSC_VER >= 1950  gsl_COMPILER_MSVC_VERSION == 145  (Visual Studio 2026)
 
-#if defined( _MSC_VER ) && ! defined( __clang__ )
-# define gsl_COMPILER_MSVC_VER           (_MSC_VER )
-# define gsl_COMPILER_MSVC_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
-# define gsl_COMPILER_MSVC_VERSION_FULL  (_MSC_VER - 100 * ( 5 + (_MSC_VER < 1900 ) ) )
-#else
-# define gsl_COMPILER_MSVC_VER           0
-# define gsl_COMPILER_MSVC_VERSION       0
-# define gsl_COMPILER_MSVC_VERSION_FULL  0
-#endif
-
 #if defined( _MSC_VER )
 # define gsl_COMPILER_MS_STL_VER           (_MSC_VER )
 # define gsl_COMPILER_MS_STL_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
@@ -664,6 +654,16 @@
 # define gsl_COMPILER_MS_STL_VER           0
 # define gsl_COMPILER_MS_STL_VERSION       0
 # define gsl_COMPILER_MS_STL_VERSION_FULL  0
+#endif
+
+#if defined( _MSC_VER ) && ! defined( __clang__ )
+# define gsl_COMPILER_MSVC_VER           gsl_COMPILER_MS_STL_VER
+# define gsl_COMPILER_MSVC_VERSION       gsl_COMPILER_MS_STL_VERSION
+# define gsl_COMPILER_MSVC_VERSION_FULL  gsl_COMPILER_MS_STL_VERSION_FULL
+#else
+# define gsl_COMPILER_MSVC_VER           0
+# define gsl_COMPILER_MSVC_VERSION       0
+# define gsl_COMPILER_MSVC_VERSION_FULL  0
 #endif
 
 #define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
@@ -1172,7 +1172,7 @@
 
 #if gsl_HAVE( TYPE_TRAITS )
 
-#define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                         \
+# define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                        \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ENUM       \
     operator~( ENUM val ) gsl_noexcept                                     \
     {                                                                      \
@@ -1213,16 +1213,15 @@
         return lhs = lhs ^ rhs;                                            \
     }
 
-#if defined( __cpp_lib_three_way_comparison )
-# define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                        \
-    [[maybe_unused, nodiscard]] gsl_api inline constexpr std::strong_ordering \
-    operator<=>( ENUM lhs, ENUM rhs ) gsl_noexcept                            \
-    {                                                                         \
-        using U = std::underlying_type_t<ENUM>;                               \
-        return U( lhs ) <=> U( rhs );                                         \
+# if defined( __cpp_lib_three_way_comparison )
+#  define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                                      \
+    [[maybe_unused, nodiscard]] gsl_api inline constexpr std::strong_ordering                \
+    operator<=>( ENUM lhs, ENUM rhs ) gsl_noexcept                                           \
+    {                                                                                        \
+        return std::underlying_type_t<ENUM>( lhs ) <=> std::underlying_type_t<ENUM>( rhs );  \
     }
-#else // ! defined( __cpp_lib_three_way_comparison )
-# define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                     \
+# else // ! defined( __cpp_lib_three_way_comparison )
+#  define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )                    \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool       \
     operator<( ENUM lhs, ENUM rhs ) gsl_noexcept                           \
     {                                                                      \
@@ -1247,7 +1246,7 @@
         typedef typename ::gsl_lite::std11::underlying_type<ENUM>::type U; \
         return U( lhs ) >= U( rhs );                                       \
     }
-#endif // defined( __cpp_lib_three_way_comparison )
+# endif // defined( __cpp_lib_three_way_comparison )
 
     //
     // Defines bitmask operators `|`, `&`, `^`, `~`, `|=`, `&=`, and `^=` for the given enum type.
@@ -1255,7 +1254,7 @@
     //     enum class Vegetables { tomato = 0b001, onion = 0b010, eggplant = 0b100 };
     //     gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
     //
-#define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
+# define gsl_DEFINE_ENUM_BITMASK_OPERATORS( ENUM ) gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )
 
     //
     // Defines relational operators `<=>`, `<`, `>`, `<=`, `>=` for the given enum type.
@@ -1263,7 +1262,7 @@
     //     enum class OperatorPrecedence { additive = 0, multiplicative = 1, power = 2 };
     //     gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
     //
-#define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
+# define gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( ENUM ) gsl_DEFINE_ENUM_RELATIONAL_OPERATORS_( ENUM )
 
 #endif // gsl_HAVE( TYPE_TRAITS )
 
@@ -2014,13 +2013,18 @@ using std::unique_ptr;
 using std::shared_ptr;
 #endif
 
-#if  gsl_HAVE( ALIAS_TEMPLATE )
-  template< class T
-# if gsl_HAVE( TYPE_TRAITS )
-          , typename = typename std::enable_if< std::is_pointer<T>::value >::type
-# endif
-  >
+#if gsl_HAVE( ALIAS_TEMPLATE )
+# if defined( __cpp_lib_concepts )
+  template< class T >
+  requires std::is_pointer_v<T>
   using owner = T;
+# elif gsl_HAVE( TYPE_TRAITS )
+  template< class T, typename = typename std::enable_if< std::is_pointer<T>::value >::type >
+  using owner = T;
+# else // ! gsl_HAVE( TYPE_TRAITS )
+  template< class T >
+  using owner = T;
+# endif
 #endif
 
 #define gsl_HAVE_OWNER_TEMPLATE     gsl_HAVE_ALIAS_TEMPLATE

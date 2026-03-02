@@ -160,8 +160,8 @@ int main( int argc, char* argv[] )
 - *gsl-lite* maintains support for older versions of C++ (C++98, C++03, C++11) and older compilers.  
   (see: [Reported to work with](#reported-to-work-with))
 - *gsl-lite* supports [CUDA](https://developer.nvidia.com/cuda-toolkit), and many of its features can be used in CUDA kernel code.
-- [Contract and assertion checks](doc/Reference.md#contract-and-assertion-checks) are more fine-grained, and runtime enforcement is
-  [configurable](doc/Reference.md#contract-checking-configuration-macros).
+- [Contract and assertion checks](doc/Reference.md#contract-and-assertion-checks) are more versatile and fine-grained, and
+  runtime enforcement is [configurable](doc/Reference.md#contract-checking-configuration-macros).
 - In *gsl-lite*, `not_null<P>` retains the copyability and movability of `P` and therefore may have a [*moved-from state*](doc/Reference.md#nullability-and-the-moved-from-state),
   which Microsoft GSL [expressly disallows](https://github.com/microsoft/GSL/issues/1022#issuecomment-1022713632).
   As a consequence, `not_null<std::unique_ptr<T>>` is movable in *gsl-lite* but not in Microsoft GSL.
@@ -187,19 +187,23 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`span<>`](doc/Reference.md#safe-contiguous-ranges)                      | ✓          | ✓             | ✓                  | Like [`std::span<>`](https://en.cppreference.com/w/cpp/container/span) but with bounds-checking |
 [`zstring`<br>`czstring`](doc/Reference.md#string-type-aliases)          | ✓          | ✓             | ✓                  | Aliases for `char *` and `char const *` to be used for 0-terminated strings (C-style strings) |
 [`wzstring`<br>`wczstring`](doc/Reference.md#string-type-aliases)        | -           | ✓             | ✓                  | Aliases for `wchar_t *` and `wchar_t const *` to be used for 0-terminated strings (C-style strings) |
+[`u8zstring`<br>`u8czstring`](doc/Reference.md#string-type-aliases)      | -           | ✓             | ✓²⁰                | Aliases for `char8_t *` and `char8_t const *` to be used for 0-terminated UTF-8 strings |
+[`u16zstring`<br>`u16czstring`](doc/Reference.md#string-type-aliases)    | -           | ✓             | ✓¹¹                | Aliases for `char16_t *` and `char16_t const *` to be used for 0-terminated UTF-16 strings |
+[`u32zstring`<br>`u32czstring`](doc/Reference.md#string-type-aliases)    | -           | ✓             | ✓¹¹                | Aliases for `char32_t *` and `char32_t const *` to be used for 0-terminated UTF-32 strings |
 [**Assertions:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslassert-assertions) | &nbsp; | &nbsp; | &nbsp; | &nbsp;|
-[`Expects()`](doc/Reference.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only defined in [GSL compatibility mode](doc/Reference.md#gsl_feature_gsl_compatibility_mode0)) |
-[`Ensures()`](doc/Reference.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition at runtime<br>(only defined in [GSL compatibility mode](doc/Reference.md#gsl_feature_gsl_compatibility_mode0)) |
-[`gsl_Expects()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks precondition at runtime |
-[`gsl_ExpectsDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
-[`gsl_ExpectsAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
-[`gsl_Ensures()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks postcondition at runtime |
-[`gsl_EnsuresDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
-[`gsl_EnsuresAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
-[`gsl_Assert()`<br>`gsl_Verify()`<br>`gsl_AssertAt()`<br>`gsl_VerifyAt()`](doc/Reference.md#contract-and-assertion-checks) | - | - | ✓ | Checks invariant at runtime |
-[`gsl_AssertDebug()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
-[`gsl_AssertAudit()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
-[`gsl_FailFast()`<br>`gsl_FailFastAt()`](doc/Reference.md#contract-and-assertion-checks) | - | -       | ✓                   | Terminates execution |
+[`Expects()`](doc/Reference.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition<br>(only defined in [GSL compatibility mode](doc/Reference.md#gsl_feature_gsl_compatibility_mode0)) |
+[`Ensures()`](doc/Reference.md#contract-and-assertion-checks)            | ✓          | ✓             | (✓)                 | Checks precondition<br>(only defined in [GSL compatibility mode](doc/Reference.md#gsl_feature_gsl_compatibility_mode0)) |
+[`gsl_Expects()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks precondition |
+[`gsl_ExpectsDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
+[`gsl_ExpectsAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks precondition if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
+[`gsl_Ensures()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks postcondition |
+[`gsl_EnsuresDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
+[`gsl_EnsuresAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
+[`gsl_Assert()`<br>`gsl_AssertAt()`](doc/Reference.md#contract-and-assertion-checks) | - | -           | ✓<br>✓²⁰           | Checks invariant (statement) |
+[`gsl_Verify()`<br>`gsl_VerifyAt()`](doc/Reference.md#contract-and-assertion-checks) | - | -           | ✓<br>✓²⁰           | Checks invariant (expression) |
+[`gsl_AssertDebug()`<br>`gsl_AssertAtDebug()`](doc/Reference.md#contract-and-assertion-checks) | - | - | ✓<br>✓²⁰           | Checks invariant unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
+[`gsl_AssertAudit()`<br>`gsl_AssertAtAudit()`](doc/Reference.md#contract-and-assertion-checks) | - | - | ✓<br>✓²⁰           | Checks invariant if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
+[`gsl_FailFast()`<br>`gsl_FailFastAt()`](doc/Reference.md#contract-and-assertion-checks) | - | -       | ✓<br>✓²⁰           | Terminates execution |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp; | &nbsp; | &nbsp; |
 [`finally()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | ✓         | ✓             | ✓¹¹                | Returns an object that executes a given action in its destructor; use for ad hoc resource cleanup |
 [`on_return()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -        | -             | (✓¹¹)               | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |
@@ -213,7 +217,8 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`narrow<>()`](doc/Reference.md#narrowt-u-)                              | ✓          | ✓             | ✓                 | Checked narrowing cast; throws `narrowing_error` if cast is lossy |
 [`narrow_failfast<>()`](doc/Reference.md#narrow_failfastt-u-)            | -           | -             | ✓                 | Checked narrowing cast; fails assertion check if cast is lossy |
 
-¹¹: C++11 or newer required
+¹¹: C++11 or newer required  
+²⁰: C++20 or newer required
 
 
 ## Migration guide
@@ -309,12 +314,12 @@ GCC                  | Linux           | x64       | 4.7 and newer     | [9, 10,
 GCC (MinGW)          | Windows         | x86, x64  | 4.8.4 and newer   |    |
 GCC (DJGPP)          | DOSBox, FreeDOS | x86       | 7.2               |    |
 GCC                  | MacOS           | x64       | 6 and newer       | [11, 12, 13, 14](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang                | Linux           | x64       | 3.5 and newer     | [11, 12, 13, 14, 15, 16, 17, 18, 19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-Clang with libstdc++ | Linux           | x64       | 11 and newer      | [19](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang                | Linux           | x64       | 3.5 and newer     | [11, 12, 13, 14, 15, 16, 17, 18, 19, 20](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+Clang with libstdc++ | Linux           | x64       | 11 and newer      | [20](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS | VS [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2019, 2022](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [14, 15, 16](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [12.8](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017, 2019](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2022, 2026](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [14, 15, 16, 17](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [12.9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 ARMCC                |                 | ARM       | 5 and newer       | |
 
 
