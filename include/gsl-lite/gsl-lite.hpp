@@ -224,12 +224,26 @@
 #endif
 #define  gsl_FEATURE_OWNER_MACRO_()  gsl_FEATURE_OWNER_MACRO
 
+#if defined( gsl_FEATURE_SPAN )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_SPAN )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_SPAN=" gsl_STRINGIFY(gsl_FEATURE_SPAN) ", must be 0 or 1")
+# endif
+#else
+# define gsl_FEATURE_SPAN  1  // default
+#endif
+#define  gsl_FEATURE_SPAN_()  gsl_FEATURE_SPAN
+
 #if defined( gsl_FEATURE_STRING_SPAN )
 # if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_FEATURE_STRING_SPAN )
 #  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_FEATURE_STRING_SPAN=" gsl_STRINGIFY(gsl_FEATURE_STRING_SPAN) ", must be 0 or 1")
 # endif
-#else
+# if gsl_FEATURE_STRING_SPAN && ! gsl_FEATURE_SPAN
+#  error configuration value gsl_FEATURE_STRING_SPAN=1 is incompatible with gsl_FEATURE_SPAN=0
+# endif
+#elif gsl_FEATURE_SPAN
 # define gsl_FEATURE_STRING_SPAN  (gsl_CONFIG_DEFAULTS_VERSION == 0)  // default
+#else
+# define gsl_FEATURE_STRING_SPAN  0  // gsl_FEATURE_SPAN == 0 implies gsl_FEATURE_STRING_SPAN == 0
 #endif
 #define  gsl_FEATURE_STRING_SPAN_()  gsl_FEATURE_STRING_SPAN
 
@@ -1489,6 +1503,7 @@ gsl_DISABLE_MSVC_WARNINGS( 26432 26410 26415 26418 26472 26439 26440 26455 26473
 
 namespace gsl_lite {
 
+#if gsl_FEATURE( SPAN )
 // forward declare span<>:
 
 #if gsl_CPP17_OR_GREATER
@@ -1498,10 +1513,11 @@ gsl_constexpr const gsl_CONFIG_SPAN_INDEX_TYPE dynamic_extent = static_cast<gsl_
 
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent = dynamic_extent >
 class span;
+#endif // gsl_FEATURE( SPAN )
 
 namespace detail {
 
-#if gsl_FEATURE( STRING_SPAN ) || gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
+#if gsl_FEATURE( STRING_SPAN ) || ( gsl_FEATURE( SPAN ) && gsl_CONFIG( ALLOWS_SPAN_COMPARISON ) )
 // We implement `equal()` and `lexicographical_compare()` here to avoid having to pull in the <algorithm> header.
 template< class InputIt1, class InputIt2 >
 bool equal( InputIt1 first1, InputIt1 last1, InputIt2 first2 )
@@ -1524,7 +1540,7 @@ bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, 
     }
     return first1 == last1 && first2 != last2;
 }
-#endif // gsl_FEATURE( STRING_SPAN ) || gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
+#endif // gsl_FEATURE( STRING_SPAN ) || ( gsl_FEATURE( SPAN ) && gsl_CONFIG( ALLOWS_SPAN_COMPARISON ) )
 
 } // namespace detail
 
@@ -1867,7 +1883,7 @@ struct is_czstring : std11::false_type{};
 template< class C >
 struct is_czstring< C const *, C > : is_char<C>{};
 
-#if gsl_HAVE( TYPE_TRAITS )
+#if gsl_FEATURE( SPAN ) && gsl_HAVE( TYPE_TRAITS )
 
 template< class Q >
 struct is_span_oracle : std::false_type{};
@@ -2877,12 +2893,14 @@ at( std::initializer_list<T> cont, size_t pos )
 }
 #endif
 
+#if gsl_FEATURE( SPAN )
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
 at( span<T, Extent> s, size_t pos )
 {
     return s[ pos ];
 }
+#endif
 
 //
 // GSL.views: views
@@ -4130,50 +4148,43 @@ const  gsl_constexpr   with_container_t with_container; // TODO: this can lead t
 #endif
 
 
+#if gsl_FEATURE( SPAN )
 // The span<> and span_iterator<> implementation below was mostly borrowed from Microsoft GSL.
 
 
-#if gsl_COMPILER_MSVC_VER
-# pragma warning( push )
+# if gsl_COMPILER_MSVC_VER
+#  pragma warning( push )
 
 // turn off some warnings that are noisy about our Expects statements
-# pragma warning( disable : 4127 ) // conditional expression is constant
-# pragma warning( disable : 4146 ) // unary minus operator applied to unsigned type, result still unsigned
-# pragma warning( disable : 4702 ) // unreachable code
+#  pragma warning( disable : 4127 ) // conditional expression is constant
+#  pragma warning( disable : 4146 ) // unary minus operator applied to unsigned type, result still unsigned
+#  pragma warning( disable : 4702 ) // unreachable code
 
 // Turn off MSVC /analyze rules that generate too much noise
-# pragma warning( disable : 26495 ) // uninitialized member when constructor calls constructor
-# pragma warning( disable : 26446 ) // parser bug does not allow attributes on some templates
+#  pragma warning( disable : 26495 ) // uninitialized member when constructor calls constructor
+#  pragma warning( disable : 26446 ) // parser bug does not allow attributes on some templates
 
-#endif // gsl_COMPILER_MSVC_VER
+# endif // gsl_COMPILER_MSVC_VER
 
 // GCC 7 does not like the signed unsigned mismatch (size_t ptrdiff_t)
 // While there is a conversion from signed to unsigned, it happens at
 // compiletime, so the compiler wouldn't have to warn indiscriminately, but
 // could check if the source value actually doesn't fit into the target type
 // and only warn in those cases.
-#if defined( __GNUC__ ) && __GNUC__ > 6
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wsign-conversion"
-#endif // defined( __GNUC__ ) && __GNUC__ > 6
+# if defined( __GNUC__ ) && __GNUC__ > 6
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+# endif // defined( __GNUC__ ) && __GNUC__ > 6
 
 // Turn off clang unsafe buffer warnings as all accessed are guarded by runtime checks
-#if defined( __clang__ )
-# if __has_warning( "-Wunsafe-buffer-usage" )
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-# endif // __has_warning( "-Wunsafe-buffer-usage" )
-#endif // defined( __clang__ )
+# if defined( __clang__ )
+#  if __has_warning( "-Wunsafe-buffer-usage" )
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#  endif // __has_warning( "-Wunsafe-buffer-usage" )
+# endif // defined( __clang__ )
 
 namespace detail {
-
-template< class T >
-gsl_api gsl_constexpr14 T * endptr( T * data, gsl_CONFIG_SPAN_INDEX_TYPE size )  // TODO: remove?
-{
-        // Be sure to run the check before doing pointer arithmetics, which would be UB for `nullptr` and non-0 integers.
-    gsl_Expects( size == 0 || data != gsl_nullptr );
-    return data + size;
-}
 
 template< gsl_CONFIG_SPAN_INDEX_TYPE From, gsl_CONFIG_SPAN_INDEX_TYPE To >
 struct is_allowed_extent_conversion
@@ -4181,39 +4192,39 @@ struct is_allowed_extent_conversion
 {
 };
 
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 template< class From, class To >
 struct is_allowed_element_type_conversion
     : std17::bool_constant< std::is_convertible< From (*)[], To (*)[] >::value >
 {
 };
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 
 template< class T >
 class span_iterator
 {
 public:
-#if gsl_STDLIB_CPP20_OR_GREATER
+# if gsl_STDLIB_CPP20_OR_GREATER
     typedef typename std::contiguous_iterator_tag iterator_concept;
-#endif // gsl_STDLIB_CPP20_OR_GREATER
+# endif // gsl_STDLIB_CPP20_OR_GREATER
     typedef typename std::random_access_iterator_tag iterator_category;
     typedef typename std11::remove_cv< T >::type value_type;
     typedef std::ptrdiff_t difference_type;
     typedef T * pointer;
     typedef T & reference;
 
-#ifdef gsl_COMPILER_MS_STL_VERSION
+# ifdef gsl_COMPILER_MS_STL_VERSION
     typedef pointer _Unchecked_type;
     typedef span_iterator _Prevent_inheriting_unwrap;
-#endif // gsl_COMPILER_MS_STL_VERSION
-#if gsl_HAVE( IS_DEFAULT )
+# endif // gsl_COMPILER_MS_STL_VERSION
+# if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr span_iterator() = default;
-#else // ! gsl_HAVE( IS_DEFAULT )
+# else // ! gsl_HAVE( IS_DEFAULT )
     gsl_api gsl_constexpr span_iterator() gsl_noexcept
         : begin_( gsl_nullptr ), end_( gsl_nullptr ), current_( gsl_nullptr )
     {
     }
-#endif // gsl_HAVE( IS_DEFAULT )
+# endif // gsl_HAVE( IS_DEFAULT )
 
     gsl_api gsl_constexpr14 span_iterator( pointer begin, pointer end, pointer current )
         : begin_( begin ), end_( end ), current_( current )
@@ -4377,7 +4388,7 @@ public:
         return !( *this < rhs );
     }
 
-#ifdef gsl_COMPILER_MS_STL_VERSION
+# ifdef gsl_COMPILER_MS_STL_VERSION
     // MSVC++ iterator debugging support; allows STL algorithms in 15.8+
     // to unwrap span_iterator to a pointer type after a range check in STL
     // algorithm calls.
@@ -4408,11 +4419,11 @@ public:
 
     // Tell the STL that span_iterator should not be unwrapped if it can't
     // validate in advance, even in release / optimized builds:
-# if gsl_CPP17_OR_GREATER
+#  if gsl_CPP17_OR_GREATER
     static constexpr bool _Unwrap_when_unverified = false;
-# else
+#  else
     static gsl_constexpr const bool _Unwrap_when_unverified = false;
-# endif
+#  endif
     gsl_SUPPRESS_MSGSL_WARNING(con.3) // TODO: false positive
     gsl_api gsl_constexpr14 void _Seek_to( pointer const p ) gsl_noexcept
     {
@@ -4420,22 +4431,22 @@ public:
         // after _Unwrapped
         current_ = p;
     }
-#endif
+# endif
 
-#if gsl_HAVE( IS_DEFAULT )
+# if gsl_HAVE( IS_DEFAULT )
     pointer begin_ = nullptr;
     pointer end_ = nullptr;
     pointer current_ = nullptr;
-#else // ! gsl_HAVE( IS_DEFAULT )
+# else // ! gsl_HAVE( IS_DEFAULT )
     pointer begin_;
     pointer end_;
     pointer current_;
-#endif // gsl_HAVE( IS_DEFAULT )
+# endif // gsl_HAVE( IS_DEFAULT )
 
-#if gsl_STDLIB_CPP11_OR_GREATER
+# if gsl_STDLIB_CPP11_OR_GREATER
     template< class Ptr >
     friend struct std::pointer_traits;
-#endif // gsl_STDLIB_CPP11_OR_GREATER
+# endif // gsl_STDLIB_CPP11_OR_GREATER
 };
 
 template< gsl_CONFIG_SPAN_INDEX_TYPE Ext >
@@ -4444,11 +4455,11 @@ class extent_type
 public:
     typedef gsl_CONFIG_SPAN_INDEX_TYPE size_type;
 
-#if gsl_HAVE( IS_DEFAULT )
+# if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr extent_type() gsl_noexcept = default;
-#else // ! gsl_HAVE( IS_DEFAULT )
+# else // ! gsl_HAVE( IS_DEFAULT )
     gsl_constexpr extent_type() gsl_noexcept { }
-#endif // gsl_HAVE( IS_DEFAULT )
+# endif // gsl_HAVE( IS_DEFAULT )
 
     gsl_api gsl_constexpr14 gsl_explicit extent_type( extent_type< dynamic_extent > );
 
@@ -4457,11 +4468,11 @@ public:
     gsl_api gsl_constexpr size_type size() const gsl_noexcept { return Ext; }
 
 private:
-#if gsl_CPP17_OR_GREATER
+# if gsl_CPP17_OR_GREATER
     static constexpr size_type size_ = Ext; // static size equal to Ext
-#else
+# else
     static gsl_constexpr const size_type size_ = Ext; // static size equal to Ext
-#endif
+# endif
 };
 
 template<>
@@ -4540,26 +4551,26 @@ public:
     typedef std::reverse_iterator< iterator > reverse_iterator;
     typedef std::reverse_iterator< const_iterator > const_reverse_iterator;
 
-#if gsl_CPP17_OR_GREATER
+# if gsl_CPP17_OR_GREATER
     static constexpr size_type extent{ Extent };
-#else
+# else
     static gsl_constexpr const size_type extent = Extent;
-#endif
+# endif
 
     // [span.cons], span constructors, copy, assignment, and destructor
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( detail::is_allowed_extent_conversion< 0, MyExtent >::value ))
     >
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+# endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
     gsl_api gsl_constexpr span() gsl_noexcept
         : storage_( detail::extent_type< 0 >( ) )
     {
     }
 
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template<
         gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
@@ -4643,7 +4654,7 @@ public:
     {
         gsl_Expects( firstElem <= lastElem );
     }
-#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) )
+# else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) )
     gsl_api gsl_constexpr14 span( pointer ptr, size_type count )
         : storage_( ptr, count )
     {
@@ -4667,7 +4678,7 @@ public:
         gsl_Expects( firstElem <= lastElem );
         gsl_Expects( Extent == dynamic_extent || lastElem - firstElem == static_cast< difference_type >( Extent ) );
     }
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+# endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 
     template<
         class U, std::size_t N
@@ -4679,7 +4690,7 @@ public:
     {
     }
 
-#if gsl_HAVE( ARRAY )
+# if gsl_HAVE( ARRAY )
     template<
         class U, std::size_t N
         gsl_ENABLE_IF_(( detail::is_allowed_extent_conversion< N, Extent >::value &&
@@ -4698,10 +4709,10 @@ public:
         : storage_( known_not_null( arr.data() ), detail::extent_type< N >( ) )
     {
     }
-#endif // gsl_HAVE( ARRAY )
+# endif // gsl_HAVE( ARRAY )
 
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
-# if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+# if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#  if ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template< class Container, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
         gsl_ENABLE_IF_NTTP_(( MyExtent != dynamic_extent &&
@@ -4741,7 +4752,7 @@ public:
         : storage_( std17::data( cont ), std17::size( cont ) )
     {
     }
-# else // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+#  else // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template< class Container
         gsl_ENABLE_IF_(( detail::is_compatible_container< Container, element_type >::value ))
     >
@@ -4757,8 +4768,8 @@ public:
         : storage_( std17::data( cont ), std17::size( cont ) )
     {
     }
-# endif // ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
-#elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
+#  endif // ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+# elif gsl_HAVE( UNCONSTRAINED_SPAN_CONTAINER_CTOR )
     template< class Container >
     gsl_constexpr span( Container & cont )
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
@@ -4769,9 +4780,9 @@ public:
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
     {
     }
-#endif
+# endif
 
-#if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
     template< class Container >
     gsl_constexpr span( with_container_t, Container & cont )
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
@@ -4782,30 +4793,30 @@ public:
         : storage_( cont.size() == 0 ? gsl_nullptr : gsl_ADDRESSOF( cont[0] ), cont.size() )
     {
     }
-#endif
+# endif
 
-#if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
+# if gsl_HAVE( IS_DEFAULT ) && ! gsl_BETWEEN( gsl_COMPILER_GNUC_VERSION, 430, 600)
     gsl_constexpr span( span && ) gsl_noexcept = default;
     gsl_constexpr span( span const & ) = default;
-#else
+# else
     gsl_api gsl_constexpr span( span const & other )
         : storage_( other.storage_ )
     {
     }
-#endif
+# endif
 
-#if gsl_HAVE( IS_DEFAULT )
+# if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr14 span & operator=( span && ) gsl_noexcept = default;
     gsl_constexpr14 span & operator=( span const & ) gsl_noexcept = default;
-#else
+# else
     gsl_constexpr14 span & operator=( span const & other ) gsl_noexcept
     {
         storage_ = other.storage_;
         return *this;
     }
-#endif
+# endif
 
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+# if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
     template<
         class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent, gsl_CONFIG_SPAN_INDEX_TYPE MyExtent = Extent
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
@@ -4826,7 +4837,7 @@ public:
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
     {
     }
-#else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) )
+# else // !( gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) )
     template< class OtherElementType, gsl_CONFIG_SPAN_INDEX_TYPE OtherExtent >
     gsl_api gsl_constexpr14 span( span< OtherElementType, OtherExtent > const & other )
         : storage_( other.data(), detail::extent_type< OtherExtent >( other.size() ) )
@@ -4836,7 +4847,7 @@ public:
             "attempting copy-construction from incompatible span" );
         gsl_Expects( Extent == dynamic_extent || other.size() == Extent );
     }
-#endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+# endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
 
     // [span.sub], span subviews
 
@@ -5025,7 +5036,7 @@ public:
         std::swap( storage_, other.storage_ );
     }
 
-#if ! gsl_DEPRECATE_TO_LEVEL( 9 )
+# if ! gsl_DEPRECATE_TO_LEVEL( 9 )
     template< class U >
     gsl_DEPRECATED_MSG("as_span() member function is unsafe")
     gsl_NODISCARD gsl_api typename detail::calculate_recast_span_type< element_type, U, Extent >::type
@@ -5035,9 +5046,9 @@ public:
         typedef typename detail::calculate_recast_span_type< element_type, U, Extent >::type type;
         return type( reinterpret_cast<U *>( data() ), size_bytes() / sizeof( U ) ); // NOLINT
     }
-#endif // ! gsl_DEPRECATE_TO_LEVEL( 9 )
+# endif // ! gsl_DEPRECATE_TO_LEVEL( 9 )
 
-#ifdef gsl_COMPILER_MS_STL_VERSION
+# ifdef gsl_COMPILER_MS_STL_VERSION
     // Tell MSVC how to unwrap spans in range-based-for
     gsl_api gsl_constexpr pointer _Unchecked_begin() const gsl_noexcept { return data(); }
     gsl_api gsl_constexpr pointer _Unchecked_end() const gsl_noexcept
@@ -5045,7 +5056,7 @@ public:
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
         return data() + size();
     }
-#endif // gsl_COMPILER_MS_STL_VERSION
+# endif // gsl_COMPILER_MS_STL_VERSION
 
 private:
     // Needed to remove unnecessary null check in subspans
@@ -5132,7 +5143,7 @@ private:
 
 // class template argument deduction guides:
 
-#if gsl_HAVE( DEDUCTION_GUIDES )   // gsl_CPP17_OR_GREATER
+# if gsl_HAVE( DEDUCTION_GUIDES )   // gsl_CPP17_OR_GREATER
 
 template<class Type, std::size_t Extent >
 span( Type (&)[Extent] ) -> span< Type, Extent >;
@@ -5151,38 +5162,38 @@ template< class Container,
           class Element = std::remove_pointer_t<decltype( std::declval< Container const & >().data()) > >
 span( Container const & ) -> span< Element >;
 
-#endif // gsl_HAVE( DEDUCTION_GUIDES )
+# endif // gsl_HAVE( DEDUCTION_GUIDES )
 
-#if ! gsl_CPP17_OR_GREATER
-# if defined( __clang__ ) && defined( _MSC_VER )
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wdeprecated" // Bug in clang-cl.exe which raises a C++17 -Wdeprecated warning about this static constexpr workaround in C++14 mode.
-# endif // defined( __clang__ ) && defined( _MSC_VER )
+# if ! gsl_CPP17_OR_GREATER
+#  if defined( __clang__ ) && defined( _MSC_VER )
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wdeprecated" // Bug in clang-cl.exe which raises a C++17 -Wdeprecated warning about this static constexpr workaround in C++14 mode.
+#  endif // defined( __clang__ ) && defined( _MSC_VER )
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 gsl_constexpr const typename span< T, Extent >::size_type span< T, Extent >::extent;
-# if defined( __clang__ ) && defined( _MSC_VER )
-#  pragma clang diagnostic pop
-# endif // defined( __clang__ ) && defined( _MSC_VER )
-#endif // ! gsl_CPP17_OR_GREATER
+#  if defined( __clang__ ) && defined( _MSC_VER )
+#   pragma clang diagnostic pop
+#  endif // defined( __clang__ ) && defined( _MSC_VER )
+# endif // ! gsl_CPP17_OR_GREATER
 
-#if gsl_COMPILER_MSVC_VER
-# pragma warning( pop )
-#endif // gsl_COMPILER_MSVC_VER
+# if gsl_COMPILER_MSVC_VER
+#  pragma warning( pop )
+# endif // gsl_COMPILER_MSVC_VER
 
-#if defined( __GNUC__ ) && __GNUC__ > 6
-# pragma GCC diagnostic pop
-#endif // defined( __GNUC__ ) && __GNUC__ > 6
+# if defined( __GNUC__ ) && __GNUC__ > 6
+#  pragma GCC diagnostic pop
+# endif // defined( __GNUC__ ) && __GNUC__ > 6
 
-#if defined( __clang__ )
-# if __has_warning( "-Wunsafe-buffer-usage" )
-#  pragma clang diagnostic pop
-# endif // __has_warning( "-Wunsafe-buffer-usage" )
-#endif // defined( __clang__ )
+# if defined( __clang__ )
+#  if __has_warning( "-Wunsafe-buffer-usage" )
+#   pragma clang diagnostic pop
+#  endif // __has_warning( "-Wunsafe-buffer-usage" )
+# endif // defined( __clang__ )
 
 // 26.7.3.7 Comparison operators [span.comparison]
 
-#if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
-# if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+# if gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
+#  if gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -5200,7 +5211,7 @@ gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T, LExtent> const & l, 
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
 
-# else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+#  else // a.k.a. !gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_SUPPRESS_MSGSL_WARNING(stl.1)
@@ -5217,7 +5228,7 @@ gsl_NODISCARD inline gsl_constexpr bool operator< ( span<T, LExtent> const & l, 
 {
     return detail::lexicographical_compare( l.begin(), l.end(), r.begin(), r.end() );
 }
-# endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
+#  endif // gsl_CONFIG( ALLOWS_NONSTRICT_SPAN_COMPARISON )
 
 template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_NODISCARD inline gsl_constexpr bool
@@ -5246,7 +5257,7 @@ operator>=( span<T, LExtent> const & l, span<U, RExtent> const & r )
 {
     return !( l < r );
 }
-#endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
+# endif // gsl_CONFIG( ALLOWS_SPAN_COMPARISON )
 
 // span algorithms
 
@@ -5279,20 +5290,21 @@ gsl_api gsl_constexpr14 inline OI copy_n( II first, N count, OI result )
     }
     return result;
 }
-}
+
+} // namespace detail
 
 template< class T, class U, gsl_CONFIG_SPAN_INDEX_TYPE LExtent, gsl_CONFIG_SPAN_INDEX_TYPE RExtent >
 gsl_api gsl_constexpr14 inline void copy( span<T, LExtent> src, span<U, RExtent> dest )
 {
-#if gsl_CPP14_OR_GREATER // gsl_HAVE( TYPE_TRAITS ) (circumvent Travis clang 3.4)
+# if gsl_CPP14_OR_GREATER // gsl_HAVE( TYPE_TRAITS ) (circumvent Travis clang 3.4)
     static_assert( std::is_assignable<U &, T const &>::value, "Cannot assign elements of source span to elements of destination span" );
-#endif
+# endif
     gsl_STATIC_ASSERT_( RExtent >= LExtent || LExtent == dynamic_extent || RExtent == dynamic_extent ,"incompatible span extents" );
     gsl_Expects( dest.size() >= src.size() );
     detail::copy_n( src.data(), src.size(), dest.data() );
 }
 
-#if gsl_FEATURE( BYTE )
+# if gsl_FEATURE( BYTE )
 // span creator functions (see ctors)
 
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
@@ -5308,9 +5320,9 @@ as_writable_bytes( span< T, Extent > spn ) gsl_noexcept
 {
     return span< byte >( reinterpret_cast<byte *>( spn.data() ), spn.size_bytes() ); // NOLINT
 }
-#endif // gsl_FEATURE( BYTE )
+# endif // gsl_FEATURE( BYTE )
 
-#if gsl_FEATURE_TO_STD( MAKE_SPAN )
+# if gsl_FEATURE_TO_STD( MAKE_SPAN )
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<T>
@@ -5333,7 +5345,7 @@ make_span( T (&arr)[N] )
     return span<T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>( arr );
 }
 
-# if gsl_HAVE( ARRAY )
+#  if gsl_HAVE( ARRAY )
 
 template< class T, std::size_t N >
 gsl_NODISCARD inline gsl_constexpr span<T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>
@@ -5348,7 +5360,7 @@ make_span( std::array<T, N> const & arr )
 {
     return span<const T, static_cast<gsl_CONFIG_SPAN_INDEX_TYPE>( N )>( arr );
 }
-# endif
+#  endif
 
 # if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) && gsl_HAVE( AUTO )
 
@@ -5366,7 +5378,7 @@ make_span( Container const & cont ) -> span< const typename std::remove_pointer<
     return span< const typename std::remove_pointer<EP>::type >( cont );
 }
 
-# else
+#  else
 
 template< class T >
 inline span<T>
@@ -5382,9 +5394,9 @@ make_span( std::vector<T> const & cont )
     return span<const T>( cont.data(), cont.data() + cont.size() );
 }
 
-# endif
+#  endif
 
-# if gsl_FEATURE_TO_STD( WITH_CONTAINER )
+#  if gsl_FEATURE_TO_STD( WITH_CONTAINER )
 
 template< class Container >
 gsl_NODISCARD inline gsl_constexpr span<typename Container::value_type>
@@ -5400,10 +5412,10 @@ make_span( with_container_t, Container const & cont ) gsl_noexcept
     return span< const typename Container::value_type >( with_container, cont );
 }
 
-# endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
-#endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
+#  endif // gsl_FEATURE_TO_STD( WITH_CONTAINER )
+# endif // gsl_FEATURE_TO_STD( MAKE_SPAN )
 
-#if gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
+# if gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
 
 template< class T >
 gsl_NODISCARD gsl_api inline gsl_constexpr span<byte>
@@ -5419,7 +5431,8 @@ byte_span( T const & t ) gsl_noexcept
     return span<const byte>( reinterpret_cast<byte const *>( &t ), sizeof(T) );
 }
 
-#endif // gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
+# endif // gsl_FEATURE( BYTE ) && gsl_FEATURE_TO_STD( BYTE_SPAN )
+#endif // gsl_FEATURE( SPAN )
 
 #if gsl_FEATURE( STRING_SPAN )
 //
@@ -6378,7 +6391,7 @@ public:
 
 #endif // gsl_HAVE( HASH )
 
-#if gsl_STDLIB_CPP11_OR_GREATER
+#if gsl_FEATURE( SPAN ) && gsl_STDLIB_CPP11_OR_GREATER
 namespace std {
 
 template< class T >
@@ -6392,7 +6405,7 @@ struct pointer_traits< ::gsl_lite::detail::span_iterator< T > >
 };
 
 } // namespace std
-#endif // gsl_STDLIB_CPP11_OR_GREATER
+#endif // gsl_FEATURE( SPAN ) && gsl_STDLIB_CPP11_OR_GREATER
 
 #if gsl_FEATURE( GSL_COMPATIBILITY_MODE )
 

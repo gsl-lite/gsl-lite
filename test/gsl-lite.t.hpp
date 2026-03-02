@@ -113,6 +113,7 @@ inline std::ostream & operator<<( std::ostream & os, byte b )
 }
 #endif // gsl_FEATURE( BYTE )
 
+#if gsl_FEATURE( SPAN )
 template< typename T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
 inline std::ostream & operator<<( std::ostream & os, span< T, Extent > s )
 {
@@ -134,15 +135,16 @@ inline std::ostream & operator<<( std::ostream & os, std::reverse_iterator< span
 }
 
 } // namespace detail
+#endif // gsl_FEATURE( SPAN )
 
 } // namespace gsl_lite
 
-# if gsl_FEATURE( STRING_SPAN )
+#if gsl_FEATURE( STRING_SPAN )
 inline void suppress_warning_unused_template_ensure_sentinel()
 {
     (void) gsl_lite::ensure_z( "zero-terminated" );
 }
-# endif // gsl_FEATURE( STRING_SPAN )
+#endif // gsl_FEATURE( STRING_SPAN )
 
 #endif // GSL_TEST_GSL_LITE_HPP_INCLUDED
 
