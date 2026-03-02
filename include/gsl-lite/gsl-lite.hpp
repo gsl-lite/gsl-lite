@@ -1107,7 +1107,7 @@
 
 #if gsl_CPP20_OR_GREATER
 # if defined( _MSC_VER ) // MSVC or MSVC-compatible compiler
-#  if gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 // VS2019 v16.10 and later, or Clang 18 and later
+#  if gsl_COMPILER_MSVC_VER >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 // VS2019 v16.10 and later, or Clang 18 and later
 #   define gsl_NO_UNIQUE_ADDRESS    [[msvc::no_unique_address]]
 #  endif
 # else // ! defined( _MSC_VER )
@@ -1346,16 +1346,13 @@
 #if gsl_FEATURE( STRING_SPAN )
 # include <ios>    // for ios_base, streamsize
 #endif
-#if gsl_FEATURE( STRING_SPAN ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || ( defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) && ! ( gsl_COMPILER_MS_STL_VER && defined( _DEBUG ) ) )
+#if gsl_FEATURE( STRING_SPAN ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || ( defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) && ! ( gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG ) ) )
 # include <string>
 #endif
 
 #if ! gsl_CPP11_OR_GREATER
 # include <algorithm> // for swap() before C++11
-# if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  include <cstdio>    // for sprintf()
-# endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#endif // ! gsl_CPP11_OR_GREATER
+#endif
 
 #if gsl_HAVE( ARRAY )
 # include <array> // indirectly includes reverse_iterator<>
@@ -1381,7 +1378,7 @@
 # include <cassert>
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_COMPILER_MS_STL_VER >= 110 // __fastfail() supported by VS 2012 and later
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_COMPILER_MS_STL_VERSION >= 110 // __fastfail() supported by VS 2012 and later
 # include <intrin.h>
 #endif
 
@@ -1398,7 +1395,7 @@
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
-#if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VER && defined( _DEBUG )
+#if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
 # include <crtdbg.h>
 #endif
 
@@ -1418,7 +1415,7 @@
 // Declare __cxa_get_globals() or equivalent in namespace gsl_lite::detail for uncaught_exceptions():
 
 #if ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-# if gsl_COMPILER_MS_STL_VER
+# if gsl_COMPILER_MS_STL_VERSION
 namespace gsl_lite { namespace detail { extern "C" char * __cdecl _getptd(); } }
 # elif gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 #  if defined( __GLIBCXX__ ) || defined( __GLIBCPP__ )             // libstdc++: prototype from cxxabi.h
@@ -1437,7 +1434,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 
 // Warning suppression macros:
 
-#if gsl_COMPILER_MSVC_VER >= 140 && ! gsl_COMPILER_NVCC_VERSION
+#if gsl_COMPILER_MSVC_VERSION >= 140 && ! gsl_COMPILER_NVCC_VERSION
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
@@ -2024,10 +2021,13 @@ using std::shared_ptr;
 # define gsl_ELIDE_( x )  gsl_NO_OP_()
 #endif
 
-#if gsl_COMPILER_NVHPC_VERSION
 // Suppress "controlling expression is constant" warning when using `gsl_Expects()`, `gsl_Ensures()`, `gsl_Assert()`, etc.
+#if gsl_COMPILER_NVHPC_VERSION
 # define gsl_DIAG_SUPPRESS_236_  _Pragma("diag_suppress 236")
 # define gsl_DIAG_RESTORE_236_   _Pragma("diag_default 236")
+#elif gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 110, 140 )  // VS 2012 and 2013
+# define gsl_DIAG_SUPPRESS_236_  gsl_DISABLE_MSVC_WARNINGS( 4127 )
+# define gsl_DIAG_RESTORE_236_   gsl_RESTORE_MSVC_WARNINGS()
 #else
 # define gsl_DIAG_SUPPRESS_236_
 # define gsl_DIAG_RESTORE_236_
@@ -2078,7 +2078,7 @@ using std::shared_ptr;
 # else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
 #  define   gsl_CONTRACT_UNENFORCED_( x )  gsl_ELIDE_( x )
 # endif
-# if gsl_COMPILER_MS_STL_VER >= 110 // __fastfail() supported by VS 2012 and later
+# if gsl_COMPILER_MS_STL_VERSION >= 110 // __fastfail() supported by VS 2012 and later
 #  define   gsl_TRAP_()  __fastfail( 5 ) /* failure code for invalid arguments, cf. winnt.h, "Fast fail failure codes" */
 # elif gsl_COMPILER_GNUC_VERSION
 #  define   gsl_TRAP_()  __builtin_trap()
@@ -2153,7 +2153,7 @@ using std::shared_ptr;
 #  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), false ) gsl_DIAG_RESTORE_236_ )
 #  define    gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::fail_fast_assert_handler( "unreachable", gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), gsl_TRAP_FALLBACK_() ) /* do not let the custom assertion handler continue execution */
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-#  if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VER && defined( _DEBUG )
+#  if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
 #   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
 #   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
 #   define   gsl_FAILFAST_()                    ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
@@ -2314,7 +2314,7 @@ struct fail_fast : public std::logic_error
 namespace detail {
 
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION )
-# if gsl_COMPILER_MS_STL_VER
+# if gsl_COMPILER_MS_STL_VERSION
 #  ifdef _DLL
 #   define gsl_CRTIMP_  __declspec( dllimport )
 #  else
@@ -2324,8 +2324,8 @@ namespace detail {
 // (cf. https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert)
 extern "C" gsl_CRTIMP_ void __cdecl _assert( char const * expr, char const * file, unsigned line );
 #  undef gsl_CRTIMP_
-# endif // gsl_COMPILER_MS_STL_VER
-# if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VER && defined( _DEBUG )
+# endif // gsl_COMPILER_MS_STL_VERSION
+# if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
 // Function returns `true` if a debug break is desired, `false` otherwise.
 inline bool fail_fast_assert_debug( char const * expression, char const * message, char const * filename, unsigned line )
 {
@@ -2342,19 +2342,19 @@ gsl_NORETURN inline void fail_fast_assert( char const * expression, char const *
         std::string s = message;
         s += ": ";
         s += expression;
-#  if gsl_COMPILER_MS_STL_VER
+#  if gsl_COMPILER_MS_STL_VERSION
         detail::_assert( s.c_str(), filename, line );
         std::abort();
-#  else // ! gsl_COMPILER_MS_STL_VER
+#  else // ! gsl_COMPILER_MS_STL_VERSION
         ::__assert( s.c_str(), filename, static_cast<int>( line ) );
 #  endif
     }
     else
     {
-#  if gsl_COMPILER_MS_STL_VER
+#  if gsl_COMPILER_MS_STL_VERSION
         detail::_assert( expression, filename, line );
         std::abort();
-#  else // ! gsl_COMPILER_MS_STL_VER
+#  else // ! gsl_COMPILER_MS_STL_VERSION
         ::__assert( expression, filename, static_cast<int>( line ) );
 #  endif
     }
@@ -2374,17 +2374,25 @@ gsl_NORETURN inline void fail_fast_throw( char const * expression, char const * 
     s += expression;
     s += "' at ";
     s += filename;
-#if gsl_CPP11_110
     s += ":";
+#if gsl_CPP11_110
     s += std::to_string( line );
 #else
-    s += ":";
-    char buf[64];
-    int n = std::sprintf( buf, "%u", line );
-    if ( n >= 0 )
+    // The C++98 standard library offers no reasonable way to convert an integer to a string.
+    // We'd rather avoid calling `sprintf()`, so we implement simple base-10 conversion here.
+    std::string::size_type pos = s.length();
+    if ( line == 0 )
     {
-        s += ":";
-        s.append( buf, static_cast<std::size_t>( n ) );
+        s += '0';
+    }
+    else
+    {
+        while ( line != 0 )
+        {
+            unsigned digit = line % 10;
+            line /= 10;
+            s.insert( pos, 1, static_cast<char>( '0' + digit ) );
+        }
     }
 #endif
     throw fail_fast( s.c_str() );
@@ -2438,7 +2446,7 @@ inline int uncaught_exceptions() gsl_noexcept
 }
 
 #else // ! gsl_HAVE( UNCAUGHT_EXCEPTIONS )
-# if gsl_COMPILER_MS_STL_VER
+# if gsl_COMPILER_MS_STL_VERSION
 
 inline int uncaught_exceptions() gsl_noexcept
 {
@@ -2459,7 +2467,7 @@ inline int uncaught_exceptions() gsl_noexcept
 
 namespace std11 {
 
-#if gsl_HAVE( UNCAUGHT_EXCEPTIONS ) || gsl_COMPILER_MS_STL_VER || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
+#if gsl_HAVE( UNCAUGHT_EXCEPTIONS ) || gsl_COMPILER_MS_STL_VERSION || gsl_COMPILER_CLANG_VERSION || gsl_COMPILER_GNUC_VERSION || gsl_COMPILER_APPLECLANG_VERSION || gsl_COMPILER_NVHPC_VERSION
 // Retain alias for backward compatibility
 using ::gsl_lite::std17::uncaught_exceptions;
 #endif
@@ -4194,10 +4202,10 @@ public:
     typedef T * pointer;
     typedef T & reference;
 
-#ifdef gsl_COMPILER_MS_STL_VER
+#ifdef gsl_COMPILER_MS_STL_VERSION
     typedef pointer _Unchecked_type;
     typedef span_iterator _Prevent_inheriting_unwrap;
-#endif // gsl_COMPILER_MS_STL_VER
+#endif // gsl_COMPILER_MS_STL_VERSION
 #if gsl_HAVE( IS_DEFAULT )
     gsl_constexpr span_iterator() = default;
 #else // ! gsl_HAVE( IS_DEFAULT )
@@ -4369,7 +4377,7 @@ public:
         return !( *this < rhs );
     }
 
-#ifdef gsl_COMPILER_MS_STL_VER
+#ifdef gsl_COMPILER_MS_STL_VERSION
     // MSVC++ iterator debugging support; allows STL algorithms in 15.8+
     // to unwrap span_iterator to a pointer type after a range check in STL
     // algorithm calls.
@@ -5029,7 +5037,7 @@ public:
     }
 #endif // ! gsl_DEPRECATE_TO_LEVEL( 9 )
 
-#ifdef gsl_COMPILER_MS_STL_VER
+#ifdef gsl_COMPILER_MS_STL_VERSION
     // Tell MSVC how to unwrap spans in range-based-for
     gsl_api gsl_constexpr pointer _Unchecked_begin() const gsl_noexcept { return data(); }
     gsl_api gsl_constexpr pointer _Unchecked_end() const gsl_noexcept
@@ -5037,7 +5045,7 @@ public:
         gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
         return data() + size();
     }
-#endif // gsl_COMPILER_MS_STL_VER
+#endif // gsl_COMPILER_MS_STL_VERSION
 
 private:
     // Needed to remove unnecessary null check in subspans
