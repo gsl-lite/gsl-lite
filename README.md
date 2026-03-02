@@ -38,18 +38,18 @@
 
 namespace my_lib {
 
-        // Define this in your own namespace.
+    // Define this in your own namespace.
     namespace gsl = ::gsl_lite;
 
-        // `span<T[, Extent]>`: contiguous range with bounds checks
+    // `span<T[, Extent]>`: contiguous range with bounds checks
     double mean( gsl::span<double const> values )
     {
-            // `gsl_Expects( cond )`: precondition check
+        // `gsl_Expects( cond )`: precondition check
         gsl_Expects( !values.empty() );
     
         double sum = std::accumulate( values.begin(), values.end(), 0. );
 
-            // `narrow_failfast<T>( u )`: checked numeric cast
+        // `narrow_failfast<T>( u )`: checked numeric cast
         double num = gsl::narrow_failfast<double>( std::ssize( values ) );
 
         return sum / num;
@@ -62,13 +62,13 @@ namespace my_lib {
         Resource( std::size_t size );
     };
 
-        // Type-encoded precondition with `not_null<P>`
+    // Type-encoded precondition with `not_null<P>`
     void consumeResource( gsl::not_null<std::unique_ptr<Resource>> resource );
 
-        // Type-encoded postcondition with `not_null<P>`
+    // Type-encoded postcondition with `not_null<P>`
     gsl::not_null<std::unique_ptr<Resource>> acquireResource( std::size_t size )
     {
-            // A flavor of `make_unique<T>()` which returns `not_null<std::unique_ptr<T>>`
+        // A flavor of `make_unique<T>()` which returns `not_null<std::unique_ptr<T>>`
         return gsl::make_unique<Resource>( size );
     }
 
@@ -107,7 +107,7 @@ cmake_minimum_required( VERSION 3.20 FATAL_ERROR )
 
 project( my-program LANGUAGES CXX )
 
-find_package( gsl-lite 1.0 REQUIRED )
+find_package( gsl-lite 1.1 REQUIRED )
 
 add_executable( my-program main.cpp )
 target_compile_features( my-program PRIVATE cxx_std_17 )
@@ -196,9 +196,10 @@ Feature \\ library | GSL spec | MS GSL | *gsl&#8209;lite* | Notes |
 [`gsl_Ensures()`](doc/Reference.md#contract-and-assertion-checks)        | -           | -             | ✓                   | Checks postcondition at runtime |
 [`gsl_EnsuresDebug()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_EnsuresAudit()`](doc/Reference.md#contract-and-assertion-checks)   | -           | -             | ✓                   | Checks postcondition at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
-[`gsl_Assert()`<br>`gsl_Verify()`](doc/Reference.md#contract-and-assertion-checks) | - | -             | ✓                   | Checks invariant at runtime |
+[`gsl_Assert()`<br>`gsl_Verify()`<br>`gsl_AssertAt()`<br>`gsl_VerifyAt()`](doc/Reference.md#contract-and-assertion-checks) | - | - | ✓ | Checks invariant at runtime |
 [`gsl_AssertDebug()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>unless [`NDEBUG`](https://en.cppreference.com/w/cpp/error/assert) is defined |
 [`gsl_AssertAudit()`](doc/Reference.md#contract-and-assertion-checks)    | -           | -             | ✓                   | Checks invariant at runtime<br>if [audit mode](doc/Reference.md#runtime-enforcement) is enabled |
+[`gsl_FailFast()`<br>`gsl_FailFastAt()`](doc/Reference.md#contract-and-assertion-checks) | - | -       | ✓                   | Terminates execution |
 [**Utilities:**](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslutil-utilities) | &nbsp;  | &nbsp; | &nbsp; | &nbsp; |
 [`finally()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | ✓         | ✓             | ✓¹¹                | Returns an object that executes a given action in its destructor; use for ad hoc resource cleanup |
 [`on_return()`](doc/Reference.md#ad-hoc-resource-management-c11-and-higher) | -        | -             | (✓¹¹)               | Creates an object that executes a given action in its destructor if no exception occurred<br>([opt-in](doc/Reference.md#gsl_feature_experimental_return_guard0) feature) |

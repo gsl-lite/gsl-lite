@@ -49,6 +49,7 @@ CASE( "finally: Allows to run lambda on leaving scope" )
 CASE( "finally: Allows to run function (bind) on leaving scope" )
 {
 #if gsl_STDLIB_CPP11_OR_GREATER_WRT_FINAL
+# if ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1700, 1800 )  // libc++ with Clang 17 seems to have a problem with `std::tuple<>` (as used by `std::bind()` internally) and `std::reference_wrapper<>`
     struct F { static void incr( int & i ) { i += 1; } };
 
     int i = 0;
@@ -57,6 +58,7 @@ CASE( "finally: Allows to run function (bind) on leaving scope" )
         EXPECT( i == 0 );
     }
     EXPECT( i == 1 );
+# endif
 #else
     EXPECT( !!"auto and std::ref perhaps not available (no C++11)" );
 #endif
