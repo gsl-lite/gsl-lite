@@ -132,7 +132,7 @@ if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0 ) # VS 2015 and 
     )
 endif()
 
-if( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.4 ) # VS 2022 and later
+if( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.30 ) # VS 2022 and later
     make_test_targets( "gsl-lite-v1-stacktrace" 23 23
         SOURCES
             gsl-lite.t.cpp
