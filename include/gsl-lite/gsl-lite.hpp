@@ -638,6 +638,16 @@
 # define gsl_COMPILER_MSVC_VERSION_FULL  0
 #endif
 
+#if defined( _MSC_VER )
+# define gsl_COMPILER_MS_STL_VER           (_MSC_VER )
+# define gsl_COMPILER_MS_STL_VERSION       (_MSC_VER / 10 - 10 * ( 5 + (_MSC_VER < 1900 ) ) )
+# define gsl_COMPILER_MS_STL_VERSION_FULL  (_MSC_VER - 100 * ( 5 + (_MSC_VER < 1900 ) ) )
+#else
+# define gsl_COMPILER_MS_STL_VER           0
+# define gsl_COMPILER_MS_STL_VERSION       0
+# define gsl_COMPILER_MS_STL_VERSION_FULL  0
+#endif
+
 #define gsl_COMPILER_VERSION( major, minor, patch ) ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
 // AppleClang  7.0.0  __apple_build_version__ ==  7000172  gsl_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.0, 7.0.1)               (LLVM  3.7.0)
@@ -810,20 +820,20 @@
 # define gsl_HAS_CPP0X  0
 #endif
 
-#define gsl_CPP11_100  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
-#define gsl_CPP11_110  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1700)
-#define gsl_CPP11_120  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
-#define gsl_CPP11_140  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+#define gsl_CPP11_100  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1600)
+#define gsl_CPP11_110  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1700)
+#define gsl_CPP11_120  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1800)
+#define gsl_CPP11_140  (gsl_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1900)
 
 #define gsl_CPP14_000  (gsl_CPP14_OR_GREATER)
-#define gsl_CPP14_120  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
-#define gsl_CPP14_140  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+#define gsl_CPP14_120  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1800)
+#define gsl_CPP14_140  (gsl_CPP14_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1900)
 
 #define gsl_CPP17_000  (gsl_CPP17_OR_GREATER)
-#define gsl_CPP17_140  (gsl_CPP17_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+#define gsl_CPP17_140  (gsl_CPP17_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1900)
 
-#define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1500 && gsl_HAS_CPP0X))
-#define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1600 && gsl_HAS_CPP0X))
+#define gsl_CPP11_140_CPP0X_90   (gsl_CPP11_140 || (gsl_COMPILER_MS_STL_VER >= 1500 && gsl_HAS_CPP0X))
+#define gsl_CPP11_140_CPP0X_100  (gsl_CPP11_140 || (gsl_COMPILER_MS_STL_VER >= 1600 && gsl_HAS_CPP0X))
 
 // Presence of C++11 language features:
 
@@ -921,20 +931,20 @@
 # define gsl_STDLIB_CPP26_OR_GREATER  gsl_CPP26_OR_GREATER
 #endif
 
-#define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1600)
-#define gsl_STDLIB_CPP11_110  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1700)
-#define gsl_STDLIB_CPP11_120  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
-#define gsl_STDLIB_CPP11_140  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+#define gsl_STDLIB_CPP11_100  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1600)
+#define gsl_STDLIB_CPP11_110  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1700)
+#define gsl_STDLIB_CPP11_120  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1800)
+#define gsl_STDLIB_CPP11_140  (gsl_STDLIB_CPP11_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1900)
 
 #define gsl_STDLIB_CPP14_000  (gsl_STDLIB_CPP14_OR_GREATER)
-#define gsl_STDLIB_CPP14_120  (gsl_STDLIB_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1800)
-#define gsl_STDLIB_CPP14_140  (gsl_STDLIB_CPP14_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+#define gsl_STDLIB_CPP14_120  (gsl_STDLIB_CPP14_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1800)
+#define gsl_STDLIB_CPP14_140  (gsl_STDLIB_CPP14_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1900)
 
 #define gsl_STDLIB_CPP17_000  (gsl_STDLIB_CPP17_OR_GREATER)
-#define gsl_STDLIB_CPP17_140  (gsl_STDLIB_CPP17_OR_GREATER || gsl_COMPILER_MSVC_VER >= 1900)
+#define gsl_STDLIB_CPP17_140  (gsl_STDLIB_CPP17_OR_GREATER || gsl_COMPILER_MS_STL_VER >= 1900)
 
-#define gsl_STDLIB_CPP11_140_CPP0X_90   (gsl_STDLIB_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1500 && gsl_HAS_CPP0X))
-#define gsl_STDLIB_CPP11_140_CPP0X_100  (gsl_STDLIB_CPP11_140 || (gsl_COMPILER_MSVC_VER >= 1600 && gsl_HAS_CPP0X))
+#define gsl_STDLIB_CPP11_140_CPP0X_90   (gsl_STDLIB_CPP11_140 || (gsl_COMPILER_MS_STL_VER >= 1500 && gsl_HAS_CPP0X))
+#define gsl_STDLIB_CPP11_140_CPP0X_100  (gsl_STDLIB_CPP11_140 || (gsl_COMPILER_MS_STL_VER >= 1600 && gsl_HAS_CPP0X))
 
 #define gsl_HAVE_ADDRESSOF                 gsl_STDLIB_CPP17_000
 #define gsl_HAVE_ARRAY                     gsl_STDLIB_CPP11_110
@@ -1362,7 +1372,7 @@
 # include <cassert>
 #endif
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS ) && gsl_COMPILER_MS_STL_VER >= 110 // __fastfail() supported by VS 2012 and later
 # include <intrin.h>
 #endif
 
@@ -1414,7 +1424,7 @@ namespace __cxxabiv1 { struct __cxa_eh_globals; extern "C" __cxa_eh_globals * __
 
 // Warning suppression macros:
 
-#if gsl_COMPILER_MSVC_VERSION >= 140 && ! gsl_COMPILER_NVCC_VERSION
+#if gsl_COMPILER_MSVC_VER >= 140 && ! gsl_COMPILER_NVCC_VERSION
 # define gsl_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define gsl_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define gsl_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
@@ -2055,7 +2065,7 @@ using std::shared_ptr;
 # else // defined( gsl_CONFIG_UNENFORCED_CONTRACTS_ELIDE ) [default]
 #  define   gsl_CONTRACT_UNENFORCED_( x )  gsl_ELIDE_( x )
 # endif
-# if gsl_COMPILER_MSVC_VERSION >= 110 // __fastfail() supported by VS 2012 and later
+# if gsl_COMPILER_MS_STL_VER >= 110 // __fastfail() supported by VS 2012 and later
 #  define   gsl_TRAP_()  __fastfail( 5 ) /* failure code for invalid arguments, cf. winnt.h, "Fast fail failure codes" */
 # elif gsl_COMPILER_GNUC_VERSION
 #  define   gsl_TRAP_()  __builtin_trap()

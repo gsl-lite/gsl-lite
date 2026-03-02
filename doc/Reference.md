@@ -842,12 +842,13 @@ Name                                    | Meaning         |
 `gsl_STDLIB_CPPXX_OR_GREATER`           | Whether C++xx standard library features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 **Compiler version detection:**         | &nbsp;          |
 `gsl_BETWEEN( V, L, H )`                | V ≥ L and V < H |
-`gsl_COMPILER_GNUC_VERSION`             | Evaluates to version number when compiled with GNU GCC, 0 otherwise |
-`gsl_COMPILER_CLANG_VERSION`            | Evaluates to version number when compiled with Clang, 0 otherwise |
-`gsl_COMPILER_MSVC_VERSION`             | Evaluates to version number when compiled with Microsoft Visual C++, 0 otherwise |
-`gsl_COMPILER_APPLECLANG_VERSION`       | Evaluates to version number when compiled with Apple Clang, 0 otherwise |
-`gsl_COMPILER_NVCC_VERSION`             | Evaluates to version number when compiled with NVIDIA NVCC, 0 otherwise |
-`gsl_COMPILER_ARMCC_VERSION`            | Evaluates to version number when compiled with ARMCC, 0 otherwise |
+`gsl_COMPILER_GNUC_VERSION`             | Evaluates to GCC version number when compiled with GNU GCC, 0 otherwise |
+`gsl_COMPILER_CLANG_VERSION`            | Evaluates to Clang version number when compiled with Clang, 0 otherwise |
+`gsl_COMPILER_MSVC_VERSION`             | Evaluates to MSVC version number when compiled with Microsoft Visual C++, 0 otherwise |
+`gsl_COMPILER_MS_STL_VERSION`           | Evaluates to MSVC version number when compiled with Microsoft Visual C++ or Clang with Microsoft STL, 0 otherwise |
+`gsl_COMPILER_APPLECLANG_VERSION`       | Evaluates to AppleClang version number when compiled with Apple Clang, 0 otherwise |
+`gsl_COMPILER_NVCC_VERSION`             | Evaluates to NVCC version number when compiled with NVIDIA NVCC, 0 otherwise |
+`gsl_COMPILER_ARMCC_VERSION`            | Evaluates to ARMCC version number when compiled with ARMCC, 0 otherwise |
 `gsl_DEVICE_CODE`                       | Whether CUDA device code is being compiled |
 `gsl_HAVE( EXCEPTIONS )`                | Evaluates to 1 if exceptions are available, 0 when compiling with exceptions disabled |
 `gsl_HAVE( WCHAR )`                     | Evaluates to 1 if `wchar_t` type is available, 0 otherwise |
