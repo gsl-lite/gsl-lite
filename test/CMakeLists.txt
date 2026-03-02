@@ -106,6 +106,7 @@ make_test_targets( "gsl-lite-v1-special" 3 14
         "-Dgsl_CONFIG_ACKNOWLEDGE_NONSTANDARD_ABI=1"
         "-Dgsl_CONFIG_TRANSPARENT_NOT_NULL=0"
         "-DNOT_NULL_GET_BY_CONST_REF=1"
+        "-Dgsl_FEATURE_SPAN=0"
     DEFAULTS_VERSION v1
 )
 
