@@ -1851,7 +1851,26 @@ using std20::type_identity_t;
 
 namespace std23 {
 
+#if gsl_HAVE( TYPE_TRAITS ) || gsl_HAVE( TR1_TYPE_TRAITS )
+template< class EnumT >
+gsl_NODISCARD gsl_constexpr typename std11::underlying_type<EnumT>::type
+to_underlying( EnumT value ) gsl_noexcept
+{
+    return static_cast<typename std11::underlying_type<EnumT>::type>( value );
+}
+#endif // gsl_HAVE( TYPE_TRAITS ) || gsl_HAVE( TR1_TYPE_TRAITS )
+
 } // namespace std23
+
+#if gsl_HAVE( TYPE_TRAITS ) || gsl_HAVE( TR1_TYPE_TRAITS )
+using std23::to_underlying;
+#endif // gsl_HAVE( TYPE_TRAITS ) || gsl_HAVE( TR1_TYPE_TRAITS )
+
+// C++26 emulation:
+
+namespace std26 {
+
+} // namespace std26
 
 namespace detail {
 

@@ -1035,6 +1035,7 @@ Name                                              | C++ feature     |
 `gsl_lite::type_identity<>`, `gsl_lite::std20::type_identity<>` | [`std::type_identity<>`](https://en.cppreference.com/w/cpp/types/type_identity) (C++20) |
 `gsl_lite::identity`, `gsl_lite::std20::identity` | [`std::identity`](https://en.cppreference.com/w/cpp/utility/functional/identity) (C++20) |
 `gsl_lite::std20::remove_cvref<>`                 | [`std::remove_cvref<>`](https://en.cppreference.com/w/cpp/types/remove_cvref) (C++20) |
+`gsl_lite::to_underlying()`, `gsl_lite::std23::to_underlying()` | [`std::to_underlying()`](https://en.cppreference.com/w/cpp/utility/to_underlying.html) (C++23) |
 
 
 ## Configuration options and switches
