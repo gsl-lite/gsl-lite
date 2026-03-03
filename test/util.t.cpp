@@ -336,4 +336,60 @@ CASE( "gsl_NO_UNIQUE_ADDRESS: Class layout is compressed if attribute is used on
 }
 #endif // gsl_CPP20_OR_GREATER && ( ! defined( _MSC_VER ) || gsl_COMPILER_MSVC_VERSION >= 1929 || gsl_COMPILER_CLANG_VERSION >= 1800 )
 
+#if gsl_HAVE( ENUM_CLASS ) && gsl_HAVE( TYPE_TRAITS )
+
+enum class MyFlags { MyFlag1 = 1, MyFlag2 = 2 };
+gsl_DEFINE_ENUM_BITMASK_OPERATORS( MyFlags )
+
+template< class CharT, class CharTraitsT >
+std::basic_ostream<CharT, CharTraitsT> & operator<<( std::basic_ostream<CharT, CharTraitsT> & stream, MyFlags flags )
+{
+    return stream << gsl_lite::to_underlying( flags );
+}
+
+CASE( "gsl_DEFINE_ENUM_BITMASK_OPERATORS(): Support standard bitflag operators" )
+{
+    MyFlags flag1 = MyFlags();
+    MyFlags flag2 = flag1 | MyFlags::MyFlag1;
+    EXPECT( flag1 == MyFlags() );
+    EXPECT( flag2 != MyFlags() );
+    MyFlags flag3 = flag2 & MyFlags::MyFlag1;
+    EXPECT( flag3 != MyFlags() );
+    MyFlags flag4 = flag2 & MyFlags::MyFlag2;
+    EXPECT( flag4 == MyFlags() );
+    MyFlags flag5 = flag2 ^ MyFlags::MyFlag2;
+    EXPECT( flag5 == ( MyFlags::MyFlag1 | MyFlags::MyFlag2 ) );
+    MyFlags flag6 = ~flag5;
+    EXPECT( flag6 != MyFlags() );
+    EXPECT( ( flag6 & ( MyFlags::MyFlag1 | MyFlags::MyFlag2 ) ) == MyFlags() );
+    flag2 &= ~MyFlags::MyFlag1;
+    EXPECT( flag2 == MyFlags() );
+    flag3 |= MyFlags::MyFlag2;
+    EXPECT( flag3 == ( MyFlags::MyFlag1 | MyFlags::MyFlag2 ) );
+    flag4 ^= MyFlags::MyFlag1;
+    EXPECT( flag4 != MyFlags() );
+    flag4 ^= MyFlags::MyFlag1;
+    EXPECT( flag4 == MyFlags() );
+}
+
+CASE( "gsl_DEFINE_ENUM_BITMASK_OPERATORS(): Allow explicit conversion to bool" )
+{
+    MyFlags flag1 = MyFlags();
+    MyFlags flag2 = flag1 | MyFlags::MyFlag1;
+    EXPECT(  ! flag1 );
+    EXPECT( !! flag2 );
+    if ( flag2 & MyFlags::MyFlag1 ) { /* fine */ } else { EXPECT( false ); }
+# if gsl_HAVE( AUTO )
+    //if ( flag1 | MyFlags::MyFlag1 )  // does not compile: supporting this would encourage mistakes (`|` instead of `&`)
+    static_assert( ! std::is_convertible< decltype( flag1 | MyFlags::MyFlag1 ), bool >::value, "static assertion failed" );
+# endif // gsl_HAVE( AUTO )
+    if ( flag1 ^ MyFlags::MyFlag1 ) { /* fine */ } else { EXPECT( false ); }
+# if gsl_HAVE( AUTO )
+    //if ( ~flag1 )  // does not compile: supporting this would encourage mistakes (`~` instead of `!`)
+    static_assert( ! std::is_convertible< decltype( ~flag1 ), bool >::value, "static assertion failed" );
+# endif // gsl_HAVE( AUTO )
+}
+
+#endif // gsl_HAVE( ENUM_CLASS ) && gsl_HAVE( TYPE_TRAITS )
+
 // end of file
