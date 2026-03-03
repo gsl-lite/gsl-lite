@@ -998,7 +998,13 @@ The following macros help avoid writing repetitive code:
       eggplant = 0b100
   };
   gsl_DEFINE_ENUM_BITMASK_OPERATORS( Vegetables )
-  ```
+  ```  
+  Some explicit Boolean conversions are supported to simplify bitflag checking:
+  ```c++
+  Vegetables ingredients = ...;
+  if ( ! ingredients ) { ... }
+  else if ( ingredients & Vegetables::tomato ) { ... }
+  ```  
 
 - `gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( e )`:  
   Defines relational operators (`<=>` in C++20 and newer, `<`, `>`, `<=`, and `>=` otherwise) for the enum type `e`.  
@@ -1011,6 +1017,14 @@ The following macros help avoid writing repetitive code:
       power = 2
   };
   gsl_DEFINE_ENUM_RELATIONAL_OPERATORS( OperatorPrecedence )
+  ```
+  This code generation macro can save a lot of boilerplate in pre-C++20 code, but in C++20 it is almost unnecessary
+  because only `operator <=>` must be defined:
+  ```c++
+    [[nodiscard]] inline constexpr std::strong_ordering operator<=>( OperatorPrecedence lhs, OperatorPrecedence rhs ) noexcept
+    {
+        return gsl_lite::to_underlying( lhs ) <=> gsl_lite::to_underlying( rhs );
+    }
   ```
 
 ### Types and functions
