@@ -1384,6 +1384,10 @@
 # include <compare>
 #endif
 
+#ifdef __cpp_lib_concepts
+# include <concepts>
+#endif
+
 #if ! gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR ) || ! gsl_HAVE( AUTO )
 # include <vector>
 #endif
@@ -1428,6 +1432,13 @@
 # else
 #  error gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE: requires C++23 for std::stacktrace
 # endif
+#endif
+
+#if defined( __cpp_lib_concepts ) && defined( __cpp_lib_source_location ) && defined( __cpp_lib_three_way_comparison ) && defined( __cpp_lib_integer_comparison_functions )
+// If a C++20 baseline can be assumed, many things can be simplified, and we can omit many the compatibility hacks for outdated compilers.
+# define gsl_BASELINE_CPP20_  1
+#else
+# define gsl_BASELINE_CPP20_  0
 #endif
 
 // Declare __cxa_get_globals() or equivalent in namespace gsl_lite::detail for uncaught_exceptions():
@@ -1705,7 +1716,12 @@ template < class T0, class T1 > struct disjunction : detail::disjunction_<T0::va
 
 #endif // gsl_CPP11_120
 
-#if gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
+#if gsl_HAVE( STD_SSIZE )
+
+using std::size;
+using std::data;
+
+#elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
 template< class T, size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr auto
@@ -2733,14 +2749,120 @@ struct narrowing_error : public std::exception
     }
 };
 
-#if gsl_HAVE( TYPE_TRAITS )
+
+#if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+# define  gsl_NARROW_FAIL_()  throw narrowing_error()
+#else // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+# if gsl_DEVICE_CODE
+#  define gsl_NARROW_FAIL_()  gsl_TRAP_()
+# else // host code
+#  define gsl_NARROW_FAIL_()  std::terminate()
+# endif
+#endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+
+#if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+# define gsl_NARROW_API_
+#else // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+# define gsl_NARROW_API_  gsl_api
+#endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+
+#if gsl_BASELINE_CPP20_
+
+namespace detail {
+
+template <typename T, typename U>
+constexpr bool are_all_values_representable_impl()
+{
+    if constexpr ( std::same_as<T, U> ) return true;
+    else if constexpr ( std::integral<T> && std::integral<U> )
+    {
+        return ( std::is_signed_v<T> == std::is_signed_v<U> && std::numeric_limits<T>::digits >= std::numeric_limits<U>::digits )
+            || ( std::is_signed_v<T> /*&& ! std::is_signed_v<U>*/ && std::numeric_limits<T>::digits > std::numeric_limits<U>::digits );
+        }
+        else return false;  // no assumptions can be made about other types, including floating-point types, because the standard does not mandate a specific representation
+    }
+
+template <typename T, typename U>
+constexpr bool are_all_values_representable = are_all_values_representable_impl<T, U>();
+
+} // namespace detail
+
+template< class T, class U >
+requires std::constructible_from<T, U> && std::constructible_from<U, T>
+[[nodiscard]] gsl_NARROW_API_ constexpr inline T
+narrow( U u )
+{
+    static_assert( ! ( std::same_as<T, bool> || std::same_as<U, bool> ), "narrow<>() does not support bool" );
+# if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    static_assert( detail::dependent_false< T >::value,
+        "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
+        "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
+        "violation if the given value cannot be represented in the target type." );
+# endif
+
+    T t = static_cast<T>( u );
+    if constexpr ( ! detail::are_all_values_representable<T, U> )
+    {
+        if constexpr ( std::is_signed_v<T> && std::is_signed_v<U> )
+        {
+            if ( static_cast<U>( t ) != u || ( ( t < 0 ) != ( u < 0 ) ) ) gsl_NARROW_FAIL_();
+        }
+        else if constexpr ( std::is_signed_v<T> )
+        {
+            if ( static_cast<U>( t ) != u || t < 0 ) gsl_NARROW_FAIL_();
+        }
+        else if constexpr ( std::is_signed_v<U> )
+        {
+            if ( static_cast<U>( t ) != u || u < 0 ) gsl_NARROW_FAIL_();
+        }
+        else
+        {
+            if ( static_cast<U>( t ) != u ) gsl_NARROW_FAIL_();
+        }
+    }
+    return t;
+}
+
+template< class T, class U >
+requires std::constructible_from<T, U> && std::constructible_from<U, T>
+[[nodiscard]] gsl_api constexpr inline T
+narrow_failfast( U u, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+{
+    static_assert( ! ( std::same_as<T, bool> || std::same_as<U, bool> ), "narrow_failfast<>() does not support bool" );
+
+    T t = static_cast<T>( u );
+    if constexpr ( ! detail::are_all_values_representable<T, U> )
+    {
+        if constexpr ( std::is_signed_v<T> && std::is_signed_v<U> )
+        {
+            gsl_AssertAt( loc, static_cast<U>( t ) == u && ( ( t < 0 ) == ( u < 0 ) ) );
+        }
+        else if constexpr ( std::is_signed_v<T> )
+        {
+            gsl_AssertAt( loc, static_cast<U>( t ) == u && t >= 0 );
+        }
+        else if constexpr ( std::is_signed_v<U> )
+        {
+            gsl_AssertAt( loc, static_cast<U>( t ) == u && u >= 0 );
+        }
+        else
+        {
+            gsl_AssertAt( loc, static_cast<U>( t ) == u );
+        }
+    }
+    return t;
+}
+
+#else // ! gsl_BASELINE_CPP20_
+
+# if gsl_HAVE( TYPE_TRAITS )
 
 namespace detail {
 
     template< class T, class U >
     struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
 
-# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+#  if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
     template< class T >
     gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
@@ -2762,76 +2884,15 @@ namespace detail {
     {
         return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
     }
-# endif // gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+#  endif // gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 } // namespace detail
 
-#endif
+# endif
 
 template< class T, class U >
-gsl_NODISCARD gsl_constexpr14
-#if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-gsl_api
-#endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-inline
-gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value, T )
-narrow( U u )
-{
-#if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-    gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
-        "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
-        "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
-        "violation if the given value cannot be represented in the target type." );
-#endif
-
-    T t = static_cast<T>( u );
-
-#if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
-    if ( static_cast<U>( t ) != u
-        || ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
-# else
-    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-    if ( static_cast<U>( t ) != u
-        || ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) ) )
-# endif
-#else
-    // Don't assume T() works:
-    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-# if gsl_COMPILER_NVHPC_VERSION
-    // Suppress: pointless comparison of unsigned integer with zero.
-#  pragma diag_suppress 186
-# endif
-    if ( static_cast<U>( t ) != u
-        || ( t < 0 ) != ( u < 0 ) )
-# if gsl_COMPILER_NVHPC_VERSION
-    // Restore: pointless comparison of unsigned integer with zero.
-#  pragma diag_default 186
-# endif
-
-#endif
-    {
-#if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-        throw narrowing_error();
-#else // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-# if gsl_DEVICE_CODE
-        gsl_TRAP_();
-# else // host code
-        std::terminate();
-# endif
-#endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-    }
-
-    return t;
-}
-#if gsl_HAVE( TYPE_TRAITS )
-template< class T, class U  >
-gsl_NODISCARD gsl_constexpr14
-# if ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-gsl_api
-# endif // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
-inline
-gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value, T )
+gsl_NODISCARD gsl_constexpr14 gsl_NARROW_API_ inline
+gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, T )
 narrow( U u )
 {
 # if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2843,7 +2904,30 @@ narrow( U u )
 
     T t = static_cast<T>( u );
 
-    if ( static_cast<U>( t ) != u )
+# if gsl_HAVE( TYPE_TRAITS )
+#  if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+    if ( static_cast<U>( t ) != u
+        || ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
+#  else
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+    if ( static_cast<U>( t ) != u
+        || ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) ) )
+#  endif
+# else
+    // Don't assume T() works:
+    gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
+#  if gsl_COMPILER_NVHPC_VERSION
+    // Suppress: pointless comparison of unsigned integer with zero.
+#   pragma diag_suppress 186
+#  endif
+    if ( static_cast<U>( t ) != u
+        || ( t < 0 ) != ( u < 0 ) )
+#  if gsl_COMPILER_NVHPC_VERSION
+    // Restore: pointless comparison of unsigned integer with zero.
+#   pragma diag_default 186
+#  endif
+
+# endif
     {
 # if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
         throw narrowing_error();
@@ -2858,57 +2942,111 @@ narrow( U u )
 
     return t;
 }
-#endif // gsl_HAVE( TYPE_TRAITS )
+# if gsl_HAVE( TYPE_TRAITS )
+template< class T, class U  >
+gsl_NODISCARD gsl_constexpr14 gsl_NARROW_API_ inline
+gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value || !std::is_arithmetic<U>::value, T )
+narrow( U u )
+{
+#  if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    gsl_STATIC_ASSERT_( detail::dependent_false< T >::value,
+        "According to the GSL specification, narrow<>() throws an exception of type narrowing_error on truncation. Therefore "
+        "it cannot be used if exceptions are disabled. Consider using narrow_failfast<>() instead which raises a precondition "
+        "violation if the given value cannot be represented in the target type." );
+#  endif
+
+    T t = static_cast<T>( u );
+
+    if ( static_cast<U>( t ) != u )
+    {
+#  if gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+        throw narrowing_error();
+#  else // ! gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+#   if gsl_DEVICE_CODE
+        gsl_TRAP_();
+#   else // host code
+        std::terminate();
+#   endif
+#  endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+    }
+
+    return t;
+}
+# endif // gsl_HAVE( TYPE_TRAITS )
 
 template< class T, class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 inline
-gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value, T )
+gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, T )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
 
-#if gsl_HAVE( TYPE_TRAITS )
-# if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
+# if gsl_HAVE( TYPE_TRAITS )
+#  if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     gsl_Assert( static_cast<U>( t ) == u
         && ::gsl_lite::detail::have_same_sign( t, u, ::gsl_lite::detail::is_same_signedness<T, U>() ) );
-# else
+#  else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     gsl_Assert( static_cast<U>( t ) == u
         && ( ::gsl_lite::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
-# endif
-#else
+#  endif
+# else
     // Don't assume T() works:
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
-# if gsl_COMPILER_NVHPC_VERSION
+#  if gsl_COMPILER_NVHPC_VERSION
     // Suppress: pointless comparison of unsigned integer with zero.
-#  pragma diag_suppress 186
-# endif
+#   pragma diag_suppress 186
+#  endif
     gsl_Assert( static_cast<U>( t ) == u
         && ( t < 0 ) == ( u < 0 ) );
-# if gsl_COMPILER_NVHPC_VERSION
+#  if gsl_COMPILER_NVHPC_VERSION
     // Restore: pointless comparison of unsigned integer with zero.
-#  pragma diag_default 186
+#   pragma diag_default 186
+#  endif
 # endif
-#endif
 
     return t;
 }
-#if gsl_HAVE( TYPE_TRAITS )
+# if gsl_HAVE( TYPE_TRAITS )
 template< class T, class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 inline
-gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value, T )
+gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value || !std::is_arithmetic<U>::value, T )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
     gsl_Assert( static_cast<U>( t ) == u );
     return t;
 }
-#endif // gsl_HAVE( TYPE_TRAITS )
+# endif // gsl_HAVE( TYPE_TRAITS )
 
+#endif // gsl_BASELINE_CPP20_
+
+#undef gsl_NARROW_FAIL_
+#undef gsl_NARROW_API_
 
 //
 // at() - Bounds-checked way of accessing static arrays, std::array, std::vector.
 //
+
+#if gsl_BASELINE_CPP20_
+
+template< class T >
+[[nodiscard]] gsl_api inline constexpr auto
+at( T&& range, size_t pos, std::source_location const & loc = std::source_location::current() )
+-> decltype( static_cast<T&&>( range )[pos] )
+{
+    gsl_AssertAt( loc, pos < std::size( range ) );
+    return static_cast<T&&>( range )[pos];
+}
+template< class T >
+gsl_NODISCARD gsl_api inline const gsl_constexpr14 T
+at( std::initializer_list<T> list, size_t pos, std::source_location const & loc = std::source_location::current() )
+{
+    gsl_AssertAt( loc, pos < list.size() );
+    return *( list.begin() + pos );
+}
+
+#else // ! gsl_BASELINE_CPP20_
 
 template< class T, size_t N >
 gsl_NODISCARD gsl_api inline gsl_constexpr14 T &
@@ -2934,7 +3072,7 @@ at( Container const & cont, size_t pos )
     return cont[pos];
 }
 
-#if gsl_HAVE( INITIALIZER_LIST )
+# if gsl_HAVE( INITIALIZER_LIST )
 template< class T >
 gsl_NODISCARD gsl_api inline const gsl_constexpr14 T
 at( std::initializer_list<T> cont, size_t pos )
@@ -2942,7 +3080,7 @@ at( std::initializer_list<T> cont, size_t pos )
     gsl_Expects( pos < cont.size() );
     return *( cont.begin() + pos );
 }
-#endif
+# endif
 
 #if gsl_FEATURE( SPAN )
 template< class T, gsl_CONFIG_SPAN_INDEX_TYPE Extent >
@@ -2952,6 +3090,8 @@ at( span<T, Extent> s, size_t pos )
     return s[ pos ];
 }
 #endif
+
+#endif // gsl_USE_MODERN_IMPLEMENTATION_
 
 //
 // GSL.views: views
@@ -6491,6 +6631,7 @@ gsl_RESTORE_MSVC_WARNINGS()
 #undef gsl_TRAILING_RETURN_TYPE_
 #undef gsl_TRAILING_RETURN_TYPE_2_
 #undef gsl_RETURN_DECLTYPE_
+#undef gsl_BASELINE_CPP20_
 
 #endif // GSL_LITE_GSL_LITE_HPP_INCLUDED
 
