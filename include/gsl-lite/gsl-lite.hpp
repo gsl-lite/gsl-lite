@@ -1436,7 +1436,11 @@
 # endif
 #endif
 
-#if defined( __cpp_lib_concepts ) && defined( __cpp_lib_source_location ) && defined( __cpp_lib_three_way_comparison ) && defined( __cpp_lib_integer_comparison_functions )
+// We have to keep some older compilers from taking the modern route even though they technically support C++20:
+// - Clang 18 has a weird codegen error that leads to the creation of temporaries when `std::source_location` is used, cf. https://gcc.godbolt.org/z/Ead5bMWhK.
+// - MSVC 14.33 and earlier may wrongly default-construct `not_null<>` when `std::source_location` is used, cf. https://gcc.godbolt.org/z/xcWboMjoj.
+#if defined( __cpp_lib_concepts ) && defined( __cpp_lib_source_location ) && defined( __cpp_lib_three_way_comparison ) && defined( __cpp_lib_integer_comparison_functions ) && \
+    ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 1900 ) && ! gsl_BETWEEN( gsl_COMPILER_MSVC_VER, 1, 1934 )
 // If a C++20 baseline can be assumed, many things can be simplified, and we can omit many the compatibility hacks for outdated compilers.
 # define gsl_BASELINE_CPP20_  1
 #else
