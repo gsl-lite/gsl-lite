@@ -2003,11 +2003,11 @@ CASE( "not_null<>: Supports constructing and assigning std::function<> from non-
 # endif
 
 #ifdef __cpp_char8_t  // C++20
-    not_null< u8czstring > nnu8str1( u8"a null-terminated UTF-8 string literal" );
-    not_null< u8czstring > nnu8str2 = u8"a null-terminated UTF-8 string literal";
+    not_null< cu8zstring > nnu8str1( u8"a null-terminated UTF-8 string literal" );
+    not_null< cu8zstring > nnu8str2 = u8"a null-terminated UTF-8 string literal";
     nnu8str2 = u8"a null-terminated UTF-8 string literal";
-    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< u8czstring >( nnu8str1 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
-    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< u8czstring >( nnu8str2 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
+    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< cu8zstring >( nnu8str1 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
+    EXPECT( std::strcmp( reinterpret_cast< czstring >( static_cast< cu8zstring >( nnu8str2 ) ), reinterpret_cast< czstring >( u8"a null-terminated UTF-8 string literal" ) ) == 0 );
 #endif
 }
 
