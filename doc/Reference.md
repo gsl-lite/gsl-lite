@@ -8,7 +8,7 @@
 - [Safe contiguous ranges](#safe-contiguous-ranges): `span<T, Extent>`
 - [Bounds-checked element access](#bounds-checked-element-access): `at( container, index )`
 - [Integer type aliases](#integer-type-aliases): `index`, `dim`, `stride`, `diff`
-- [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`, `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, `u32czstring`
+- [String type aliases](#string-type-aliases): `zstring`, `czstring`, `wzstring`, `cwzstring`, `u8zstring`, `cu8zstring`, `u16zstring`, `cu16zstring`, `u32zstring`, `cu32zstring`
 - [Ad hoc resource management (C++11 and higher)](#ad-hoc-resource-management-c11-and-higher): `finally( action )`, `on_return( action )`, and `on_error( action )`
 - [Feature checking macros](#feature-checking-macros)
 - [Polyfills](#polyfills)
@@ -49,31 +49,23 @@ auto median( RandomIt first, RandomIt last )
 }
 ```
 
-The assertion expression `gsl_Verify( c )` is useful when writing code that must work correctly even when
-compiled with contract checking disabled. For example, a function may assert that a certain variable be not `nullptr`,
-which would constitute a bug, but it may also use a safety check before dereferencing that variable so that
-the bug does not lead to a crash:
+Unlike `gsl_Assert( c )`, which may be elided depending on configuration switches, `gsl_Verify( c )` guarantees that the
+expression `c` is evaluated. This implies that `gsl_Verify()` can be used for expressions with side-effects, for instance when
+checking return values:
 ```c++
-bool readInt( std::FILE* file, int & val )
+gsl_Verify( CloseHandle( hModule ) );
+```
+
+Unlike `gsl_Assert( c )`, which is a statement, `gsl_Verify( c )` is an expression with a Boolean value equivalent to `c`.
+It may be used to handle assertion failures defensively if runtime contract enforcement is disabled:
+```c++
+if( ! gsl_Verify( CloseHandle( hModule ) ) )
 {
-    gsl_Assert( file != nullptr );
-    if ( file == nullptr ) return false;
-    std::size_t s = std::fread( &val, sizeof(int), 1, file );
-    return s == sizeof( int );
+    std::println( stderr,
+        "BUG: closing module handle {} failed; we probably forgot to call DuplicateHandle() somewhere",
+        static_cast<void const *>( hModule ) );
 }
 ```
-This can be written more concisely with `gsl_Verify()`:
-```c++
-bool readInt( std::FILE* file, int & val )
-{
-    if ( !gsl_Verify( file != nullptr ) ) return false;
-    std::size_t s = std::fread( &val, sizeof(int), 1, file );
-    return s == sizeof( int );
-}
-```
-Unlike `gsl_Assert()` and the other contract checking macros, the expression `c` in `gsl_Verify( c )` is
-always evaluated. As far as program logic is concerned, `gsl_Verify( c )` can be considered equivalent to
-`c`, while also acting as a contract check assertion if contract checking is enabled.
 
 The behavior of the different flavors of pre-/postcondition checks and assertions depends on a number of
 [configuration macros](#contract-checking-configuration-macros):
@@ -332,6 +324,8 @@ This can be written as a one-liner with `gsl_lite::as_nullable()`:
 
 #### Reference
 
+##### `gsl_lite::not_null<>`
+
 `not_null<P>` strives to behave like the underlying type `P` as transparently as reasonably possible:
 
 - There is no runtime size overhead: `sizeof( not_null<P> ) == sizeof( P )`.
@@ -377,17 +371,41 @@ This can be written as a one-liner with `gsl_lite::as_nullable()`:
   ```
 - If `P` is hashable (that is, the [`std::hash<P>`](https://en.cppreference.com/w/cpp/utility/hash) specialization is *enabled*), `not_null<P>` is hashable.
 
-For C++14 and older, where [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
-is not available, *gsl-lite* defines the helper function `make_not_null()` for explicitly constructing `not_null<>` objects.
+`not_null<P>` is meant to point to single objects, not arrays of objects. It therefore does not define a subscript operator,
+pointer increment or decrement operators, or pointer addition or subtraction operators.
 
-*gsl-lite* additionally defines the helper functions `make_unique<T>()` and `make_shared<T>()` which behave like
+##### `gsl_lite::make_not_null()`
+
+For C++14 and older, where [class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
+is not available, *gsl-lite* defines the helper function `make_not_null()` for explicitly constructing `not_null<>` objects. Example:
+```c++
+auto filePtr = FilePtr( std::fopen( ... ) );
+if ( filePtr == nullptr ) throw std::runtime_error( ... );
+auto file = FileHandle( make_not_null( std::move( filePtr ) ) );
+```
+
+##### `gsl_lite::make_unique<>()` and `gsl_lite::make_shared<>()`
+
+*gsl-lite* defines the helper functions `make_unique<T>()` and `make_shared<T>()` which behave like
 [`std::make_unique<T>()`](https://en.cppreference.com/w/cpp/memory/unique_ptr/make_unique) and
 [`std::make_shared<T>()`](https://en.cppreference.com/w/cpp/memory/shared_ptr/make_shared) but return `not_null<std::unique_ptr<T>>`
 and `not_null<std::shared_ptr<T>>`, respectively.
 
-`not_null<P>` is meant to point to single objects, not arrays of objects. It therefore does not define a subscript operator,
-pointer increment or decrement operators, or pointer addition or subtraction operators, and
-`gsl_lite::make_unique<T>()` and `gsl_lite::make_shared<T>()` are not defined for array types.
+`not_null<P>` is meant to point to single objects, not arrays of objects, therefore `gsl_lite::make_unique<T>()` and
+`gsl_lite::make_shared<T>()` are not defined for array types `T`.
+
+##### `gsl_lite::is_valid()`
+
+A `not_null<P>` cannot be directly compared to a `nullptr` because it is not meant to be nullable.
+If you have to check for the moved-from state, use the `gsl_lite::is_valid()` predicate:
+```c++
+auto npi = gsl_lite::make_unique<int>( 42 );
+// ...
+//if ( npi == nullptr ) { ... }  // compile error
+if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
+```
+
+##### `gsl_lite::as_nullable()`
 
 To extract the nullable object wrapped by a `not_null<>` object, call `gsl_lite::as_nullable()`:
 ```c++
@@ -406,11 +424,38 @@ void insertAfter( not_null<ListNode *> x, not_null<std::unique_ptr<ListNode>> ne
 }
 ```
 
+##### `gsl_lite::get()`
+
+The raw pointer stored by a smart pointer can typically be extracted by calling the `get()` member function. `not_null<P>`
+conditionally defines a `get()` member function which transparently forwards to `P::get()` if it exists. However, nullability
+is not preserved when calling the `get()` member function:
+
+```c++
+auto pi = std::make_unique<int>( 42 );  // std::unique_ptr<int>
+auto npi = gsl_lite::make_unique<int>( 42 );  // not_null<std::unique_ptr<int>>
+auto rpi = pi.get();  // int*
+auto rnpi = npi.get();  // int*
+```
+
+To preserve the nullability when extracting the pointer, the free function `gsl_lite::get()` may be used:
+
+```c++
+auto rpi = gsl_lite::get( pi );  // int*
+auto rnpi = gsl_lit::get( npi );  // not_null<int*>
+
+auto rpi2 = gsl_lite::get( rpi );  // int*
+auto rnpi2 = gsl_lite::get( rnpi );  // not_null<int*>
+```
+
 
 #### Nullability and the moved-from state
 
-Because `not_null<P>` retains the copyability and movability of `P`, a `not_null<P>` object may have a *moved-from state* if the
-underlying pointer `P` has one. Therefore, a `not_null<P>` object may in fact be `nullptr` after it has been moved from:
+For pointer types `P` which are [trivially move-constructible](https://en.cppreference.com/w/cpp/types/is_move_constructible.html),
+a `not_null<P>` object is guaranteed to hold a pointer value that is different from `nullptr`.
+
+This is different for custom pointer types such as `std::unique_ptr<>` which define a non-trivial move constructor. `not_null<P>`
+retains the copyability and movability of `P`, and hence a `not_null<P>` object may have a *moved-from state* if the
+underlying pointer `P` has one. A `not_null<P>` object may therefore be `nullptr` after it has been moved from:
 ```c++
 auto x = gsl_lite::make_unique<int>( 42 );  // not_null<std::unique_ptr<int>>()
 auto y = std::move( x );  // x is now nullptr
@@ -545,25 +590,6 @@ Also, *use-after-move* errors can often be detected by static analysis tools, so
 <!--(Recommended further reading: Herb Sutter's article ["Move, simply"](https://herbsutter.com/2020/02/17/move-simply/),
 which argues that objects that have a special moved-from state in which most of their operations may not be used
 are buggy, and [Sean Parent's rebuttal](https://herbsutter.com/2020/02/17/move-simply/#comment-41129) in the comments below.)-->
-
-A `not_null<P>` cannot be directly compared to a `nullptr` because it is not meant to be nullable.
-If you have to check for the moved-from state, use the `gsl_lite::is_valid()` predicate:
-```c++
-auto npi = gsl_lite::make_unique<int>( 42 );
-// ...
-//if ( npi == nullptr ) { ... }  // compile error
-if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
-```
-
-*gsl-lite* also defines the helper function `make_not_null()` for explicitly constructing `not_null<>`
-objects. This is useful for type inference in C++14 and older where
-[class template argument deduction](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)
-is not available. Example:
-```c++
-auto filePtr = FilePtr( std::fopen( ... ) );
-if ( filePtr == nullptr ) throw std::runtime_error( ... );
-auto file = FileHandle( make_not_null( std::move( filePtr ) ) );
-```
 
 
 ### `not_null_ic<P>`
@@ -780,7 +806,7 @@ configuration macro is set to a different type (which is not recommended).
 
 (Core Guidelines reference: [GSL.view: Views](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#gslview-views))
 
-(*Note:* `wzstring`, `cwzstring`, `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, and `u32czstring`
+(*Note:* `wzstring`, `cwzstring`, `u8zstring`, `cu8zstring`, `u16zstring`, `cu16zstring`, `u32zstring`, and `cu32zstring`
 are a *gsl-lite* extension and not part of the C++ Core Guidelines.)
 
 *gsl-lite* defines the aliases `gsl_lite::zstring`, `gsl_lite::czstring`, and others to represent C-style strings,
@@ -793,11 +819,45 @@ Type alias    | Type               |
 `wzstring`    | `wchar_t *`        |
 `cwzstring`   | `wchar_t const *`  |
 `u8zstring`   | `char8_t *`        |
-`u8wzstring`  | `char8_t const *`  |
+`cu8zstring`  | `char8_t const *`  |
 `u16zstring`  | `char16_t *`       |
-`u16wzstring` | `char16_t const *` |
+`cu16zstring` | `char16_t const *` |
 `u32zstring`  | `char32_t *`       |
-`u32wzstring` | `char32_t const *` |
+`cu32zstring` | `char32_t const *` |
+
+### Non-nullable C-style strings
+
+To represent a C-style string which must not be `nullptr`, the string aliases may be combined with `not_null<>`:
+
+```c++
+template <typename OutIt>
+copy_z( not_null<czstring> in, OutIt out )
+{
+    for ( czstring p = in; *p != '\0'; )
+    {
+        *out++ = *p++;
+    }
+}
+```
+
+### `gsl_lite::c_str()`
+
+`std::string` and similar string types store a string with a trailing 0-terminator. The string can therefore be used
+as a C-style string, which is returned by the `c_str()` member function. However, even though `std::string::c_str()` is
+guaranteed not to return a `nullptr`, the return type is `czstring`. To preserve nullability when obtaining a C-style string,
+the free function `gsl_lite::c_str()` may be used:
+
+```c++
+auto str = std::string{ "Hello, World" };
+auto cstr = str.c_str();  // czstring
+auto ncstr = gsl_lite::c_str( str );  // not_null<czstring>
+
+auto lit = "Hello, World!";  // czstring
+auto nlit = gsl_lite::c_str( "Hello, World!" );  // not_null<czstring>
+
+auto cstr2 = gsl_lite::c_str( cstr );  // czstring
+auto ncstr2 = gsl_lite::c_str( ncstr );  // not_null<czstring>
+```
 
 
 ## Ad hoc resource management (C++11 and higher)
@@ -884,7 +944,7 @@ Name                                    | Meaning         |
 `gsl_lite_VERSION`                      | A string holding the semantic version number \<major\>.\<minor\>.\<patch\> of *gsl-lite* (e.g. `"1.0.0"`) |
 **Language and library support:**       | &nbsp;          |
 `gsl_CPPxx_OR_GREATER`                  | Whether C++xx language features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
-`gsl_STDLIB_CPPXX_OR_GREATER`           | Whether C++xx standard library features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
+`gsl_STDLIB_CPPxx_OR_GREATER`           | Whether C++xx standard library features are available<br>(substitute `11`, `14`, `17`, `20`, `23`, `26`) |
 **Compiler version detection:**         | &nbsp;          |
 `gsl_BETWEEN( V, L, H )`                | V ≥ L and V < H |
 `gsl_COMPILER_GNUC_VERSION`             | Evaluates to GCC version number when compiled with GNU GCC, 0 otherwise |
@@ -1021,7 +1081,7 @@ The following macros help avoid writing repetitive code:
   This code generation macro can save a lot of boilerplate in pre-C++20 code, but in C++20 it is almost unnecessary
   because only `operator <=>` must be defined:
   ```c++
-    [[nodiscard]] inline constexpr std::strong_ordering operator<=>( OperatorPrecedence lhs, OperatorPrecedence rhs ) noexcept
+    [[nodiscard]] constexpr auto operator<=>( OperatorPrecedence lhs, OperatorPrecedence rhs ) noexcept
     {
         return gsl_lite::to_underlying( lhs ) <=> gsl_lite::to_underlying( rhs );
     }
@@ -1129,15 +1189,19 @@ The following macros control the handling of runtime contract violations:
   [`gsl_CONFIG_USE_CRT_ASSERT_FUNCTION`](#gsl_config_use_crt_assert_function2).
   **This is the default.**  
     
-  This option may be preferable over `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES` because, for most C++ runtime libraries, the default
-  assertion handler reports diagnostic information (the current source file, line number, function name, and the assertion expression)
-  in a way that is convenent for the programmer. For instance, with the Visual C++ runtime on Microsoft Windows, the assertion mechanism
-  displays an error message dialog which permits breaking into the debugger or continuing execution.  
+  This is the preferred option because, for most C++ runtime libraries, the default assertion handler reports diagnostic information
+  (the current source file, line number, function name, and the assertion expression) in a way that is convenient for the programmer.
+  For instance, with the Visual C++ Debug runtime on Microsoft Windows, the assertion mechanism displays an error message dialog
+  which permits breaking into the debugger or continuing execution.  
   
   Note that `gsl_FailFast()` will call `std::abort()` if the assertion handler continues execution.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES`**  
   Define this macro to call `std::terminate()` on a contract violation.
+
+- **`gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE`** (C++23)  
+  Define this macro to print a stacktrace on a contract violation before `std::terminate()` is called.  
+  Requires C++23 for the [`<stacktrace>`](https://en.cppreference.com/w/cpp/header/stacktrace.html) functionality.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_TRAPS`**  
   Define this macro to execute a trap instruction on a contract violation.  
@@ -1150,7 +1214,7 @@ The following macros control the handling of runtime contract violations:
   Handling contract violations with exceptions can be desirable when executing in an interactive programming environment, or if
   there are other reasons why process termination must be avoided.  
     
-  This setting is also useful for writing unit tests that exercise contract checks.
+  This setting is also useful when writing unit tests for contract checks.
 
 - **`gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER`**  
   Define this macro to call a user-defined handler function `gsl_lite::fail_fast_assert_handler()` on a contract violation.
@@ -1393,7 +1457,7 @@ This macro controls how contract violations are handled if `gsl_CONFIG_CONTRACT_
 
 | Value         | Meaning |
 |:--------------|:--------|
-| 2( default)   | In a Debug build, the debug assertion handler of the C++ runtime library (e.g. [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw?view=msvc-170) for MSVC on Windows) is called to handle a contract violation. In a Release build, or if no Debug assertion handler is available, the regular assertion handler ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms) is called instead. |
+| 2 (default)   | In a Debug build, the debug assertion handler of the C++ runtime library (e.g. [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw?view=msvc-170) for MSVC on Windows) is called to handle a contract violation. In a Release build, or if no Debug assertion handler is available, the regular assertion handler ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms) is called instead. |
 | 1             | The assertion handler of the C++ runtime library ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms)  is called to handle a contract violation. |
 | 0 (portable)  | If `NDEBUG` is not defined, the `assert()` macro is used to implement contract checks. If `NDEBUG` is defined, `std::abort()` is called directly when a contract is violated. |
 

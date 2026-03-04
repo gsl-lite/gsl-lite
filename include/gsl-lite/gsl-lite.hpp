@@ -6084,14 +6084,14 @@ typedef const wchar_t * cwzstring;
 
 #ifdef __cpp_char8_t  // C++20
 typedef char8_t * u8zstring;
-typedef const char8_t * u8czstring;
+typedef const char8_t * cu8zstring;
 #endif
 
 #if gsl_CPP11_140
 typedef char16_t * u16zstring;
-typedef const char16_t * u16czstring;
+typedef const char16_t * cu16zstring;
 typedef char32_t * u32zstring;
-typedef const char32_t * u32czstring;
+typedef const char32_t * cu32zstring;
 #endif
 
 #if gsl_FEATURE( STRING_SPAN )
