@@ -402,7 +402,7 @@ If you have to check for the moved-from state, use the `gsl_lite::is_valid()` pr
 auto npi = gsl_lite::make_unique<int>( 42 );
 // ...
 //if ( npi == nullptr ) { ... }  // compile error
-if ( !gsl_lite::is_valid( npi ) ) { ... }  // ok
+if ( ! gsl_lite::is_valid( npi ) ) { ... }  // ok
 ```
 
 ##### `gsl_lite::as_nullable()`
@@ -848,7 +848,7 @@ guaranteed not to return a `nullptr`, the return type is `czstring`. To preserve
 the free function `gsl_lite::c_str()` may be used:
 
 ```c++
-auto str = std::string{ "Hello, World" };
+std::string str = "Hello, World";
 auto cstr = str.c_str();  // czstring
 auto ncstr = gsl_lite::c_str( str );  // not_null<czstring>
 
