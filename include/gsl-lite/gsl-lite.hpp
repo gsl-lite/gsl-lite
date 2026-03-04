@@ -1151,11 +1151,13 @@
 #endif
 
 #if gsl_HAVE( C99_PREPROCESSOR )
-# if gsl_CPP20_OR_GREATER
+# ifdef __cpp_lib_concepts
 #  define gsl_CONSTRAINT(...)  __VA_ARGS__
 # else
 #  define gsl_CONSTRAINT(...)  typename
 # endif
+#else
+# define  gsl_CONSTRAINT( x )  typename
 #endif
 
 #if gsl_HAVE( TYPE_TRAITS )
@@ -2285,32 +2287,32 @@ using std::shared_ptr;
 #endif
 
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "precondition ", x )
+# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "precondition", x )
 #else
 # define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "precondition ", x )
+# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "precondition", x )
 #else
 # define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "precondition ", x )
+# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "precondition", x )
 #else
 # define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "postcondition ", x )
+# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "postcondition", x )
 #else
 # define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "postcondition ", x )
+# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "postcondition", x )
 #else
 # define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "postcondition ", x )
+# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "postcondition", x )
 #else
 # define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #endif
@@ -2778,9 +2780,9 @@ constexpr bool are_all_values_representable_impl()
     {
         return ( std::is_signed_v<T> == std::is_signed_v<U> && std::numeric_limits<T>::digits >= std::numeric_limits<U>::digits )
             || ( std::is_signed_v<T> /*&& ! std::is_signed_v<U>*/ && std::numeric_limits<T>::digits > std::numeric_limits<U>::digits );
-        }
-        else return false;  // no assumptions can be made about other types, including floating-point types, because the standard does not mandate a specific representation
     }
+    else return false;  // no assumptions can be made about other types, including floating-point types, because the standard does not mandate a specific representation
+}
 
 template <typename T, typename U>
 constexpr bool are_all_values_representable = are_all_values_representable_impl<T, U>();
@@ -3101,25 +3103,37 @@ at( span<T, Extent> s, size_t pos )
 // not_null<> - Wrap any indirection and enforce non-null.
 //
 
-template< class T >
+#if __cpp_lib_concepts
+template< class T > constexpr bool is_nullable_v = std::is_assignable_v<std::remove_cv_t<T>&, std::nullptr_t>;
+template< class T > struct is_nullable : std::bool_constant<is_nullable_v<T>> { };
+template< class T > concept nullable = is_nullable_v<T>;
+#else // ! __cpp_lib_concepts
+# if gsl_HAVE( TYPE_TRAITS )
+template< class T > struct is_nullable : std::is_assignable< typename std::remove_cv< T >::type &, std::nullptr_t > { };
+#  if gsl_CPP14_OR_GREATER
+template< class T > constexpr bool is_nullable_v = is_nullable< T >::value;
+#  endif // gsl_CPP14_OR_GREATER
+# endif // gsl_HAVE( TYPE_TRAITS )
+#endif
+
+template< gsl_CONSTRAINT( nullable ) T >
 class not_null;
 
 namespace detail {
-
-template< class T > struct is_void : std11::false_type { };
-template< > struct is_void< void > : std11::true_type { };
 
 // helper class to figure out whether a pointer has an element type
 #if gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE )
 // Avoid SFINAE for unary `operator*` (doesn't work for `std::unique_ptr<>` and the like) if an `element_type` member exists.
 template< class T, class E = void >
+struct has_element_typedef : std11::false_type { };
+template< class T >
+struct has_element_typedef< T, std17::void_t< typename T::element_type > > : std11::true_type { };
+template< class T, class E = void >
 struct has_element_type_ : std11::false_type { };
 template< class T >
 struct has_element_type_< T, std17::void_t< decltype( *std::declval<T>() ) > > : std11::true_type { };
 template< class T, class E = void >
-struct has_element_type : has_element_type_< T > { };
-template< class T >
-struct has_element_type< T, std17::void_t< typename T::element_type > > : std11::true_type { };
+struct has_element_type : std17::disjunction< has_element_typedef< T >, has_element_type_< T > > { };
 # else // a.k.a. ! ( gsl_STDLIB_CPP11_OR_GREATER && gsl_HAVE( EXPRESSION_SFINAE ) )
 // Without C++11 and expression SFINAE, just assume that non-pointer types (e.g. smart pointers) have an `element_type` member
 template< class T, class E = void >
@@ -3153,6 +3167,10 @@ struct element_type_helper< T * >
 {
     typedef T type;
 };
+#if gsl_HAVE( ALIAS_TEMPLATE )
+template< class T >
+using element_type_t = typename element_type_helper<T>::type;
+#endif
 
 template< class T >
 struct is_not_null_or_bool_oracle : std11::false_type { };
@@ -3160,13 +3178,54 @@ template< class T >
 struct is_not_null_or_bool_oracle< not_null<T> > : std11::true_type { };
 template<>
 struct is_not_null_or_bool_oracle< bool > : std11::true_type { };
+#if gsl_CPP14_OR_GREATER
+template< class T >
+constexpr bool is_not_null_or_bool_oracle_v = is_not_null_or_bool_oracle<T>::value;
+#endif
 
+#if gsl_BASELINE_CPP20_
+template< class T >
+constexpr bool has_trivial_move_v = std::is_trivially_move_constructible_v< T > && std::is_trivially_move_assignable_v< T >;
+template< class T >
+struct has_trivial_move : std::bool_constant<has_trivial_move_v<T>> { };
+#elif gsl_HAVE( TYPE_TRAITS )
+template< class T >
+struct has_trivial_move : std17::conjunction< std::is_trivially_move_constructible< T >, std::is_trivially_move_assignable< T > > { };
+# else // ! gsl_HAVE( TYPE_TRAITS )
+template< class T >
+struct has_trivial_move : std11::false_type { };
+template< class T >
+struct has_trivial_move<T*> : std11::true_type { };
+#endif
 
-template< class T, bool IsCopyable >
+#if gsl_HAVE( TYPE_TRAITS )
+template< class T >
+struct is_copyable : std17::conjunction< std::is_copy_constructible<T>, std::is_copy_assignable<T> > { };
+# if gsl_HAVE( UNIQUE_PTR ) && gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
+// Type traits are buggy in VC++ 2013, so we explicitly declare `unique_ptr<>` non-copyable.
+template< class T, class Deleter >
+struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type { };
+# endif
+#else // ! gsl_HAVE( TYPE_TRAITS )
+template< class T >
+struct is_copyable : std11::true_type { };
+#endif
+
+template< class T > struct is_void : std11::false_type { };
+template< > struct is_void< void > : std11::true_type { };
+
+template< class T > struct is_void_ptr : is_void< typename detail::element_type_helper< T >::type > { };
+
+template< class T > struct is_dereferencable : std17::conjunction< has_element_type< T >, std17::negation< is_void_ptr< T > > > { };
+#if gsl_CPP14_OR_GREATER
+template< class T > constexpr bool is_dereferencable_v = is_dereferencable<T>::value;
+#endif // gsl_CPP14_OR_GREATER
+
+template< class T, bool IsCopyable = detail::is_copyable< T >::value, bool HasTrivialMove = detail::has_trivial_move< T >::value >
 struct not_null_data;
 #if gsl_HAVE( MOVE_FORWARD )
 template< class T >
-struct not_null_data< T, false >
+struct not_null_data< T, false, false >
 {
     T ptr_;
 
@@ -3195,7 +3254,7 @@ gsl_is_delete_access:
 };
 #endif // gsl_HAVE( MOVE_FORWARD )
 template< class T >
-struct not_null_data< T, true >
+struct not_null_data< T, true, false >
 {
     T ptr_;
 
@@ -3237,38 +3296,32 @@ struct not_null_data< T, true >
         return *this;
     }
 };
-template< class T >
-struct not_null_data< T *, true >
+template< class T, bool IsCopyable >
+struct not_null_data< T, IsCopyable, true >
 {
-    T * ptr_;
+    T ptr_;
 
-    gsl_api gsl_constexpr14 not_null_data( T * _ptr ) gsl_noexcept
+    gsl_api gsl_constexpr14 not_null_data( T _ptr ) gsl_noexcept
     : ptr_( _ptr )
     {
     }
 };
 
 template< class T >
-struct is_copyable
-#if gsl_HAVE( TYPE_TRAITS )
-: std::integral_constant< bool, std::is_copy_constructible<T>::value && std::is_copy_assignable<T>::value >
-#else
-: std11::true_type
-#endif
-{
-};
-#if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( UNIQUE_PTR ) && gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 )
-// Type traits are buggy in VC++ 2013, so we explicitly declare `unique_ptr<>` non-copyable.
-template< class T, class Deleter >
-struct is_copyable< std::unique_ptr< T, Deleter > > : std11::false_type
-{
-};
-#endif
-
-template< class T >
 struct not_null_accessor;
 
-template< class Derived, class T, bool HasElementType >
+#if gsl_BASELINE_CPP20_
+template< class T, bool HasElementType = has_element_type<T>::value >
+struct not_null_base
+{
+    using element_type = element_type_t<T>;
+};
+template< class T >
+struct not_null_base< T, false >
+{
+};
+#else // ! gsl_BASELINE_CPP20_
+template< class T, class Derived, bool HasElementType = has_element_type< T >::value >
 struct not_null_elem
 {
     typedef typename element_type_helper<T>::type element_type;
@@ -3281,13 +3334,13 @@ struct not_null_elem
     }
 #endif // gsl_CONFIG( TRANSPARENT_NOT_NULL )
 };
-template< class Derived, class T >
-struct not_null_elem< Derived, T, false >
+template< class T, class Derived >
+struct not_null_elem< T, Derived, false >
 {
 };
-template< class Derived, class T, bool IsDereferencable >
-struct gsl_EMPTY_BASES_ not_null_deref
-    : not_null_elem< Derived, T, detail::has_element_type< T >::value >
+template< class T, class Derived = not_null<T>, bool IsDereferencable = is_dereferencable< T >::value >
+struct gsl_EMPTY_BASES_ not_null_base
+    : not_null_elem< T, Derived >
 {
     gsl_NODISCARD gsl_api gsl_constexpr14 typename element_type_helper<T>::type &
     operator*() const
@@ -3295,50 +3348,77 @@ struct gsl_EMPTY_BASES_ not_null_deref
         return *not_null_accessor<T>::get_checked( static_cast< Derived const & >( *this ) );
     }
 };
-template< class Derived, class T >
-struct gsl_EMPTY_BASES_ not_null_deref< Derived, T, false >  // e.g. `void*`, `std::function<>`
-    : not_null_elem< Derived, T, detail::has_element_type< T >::value >
+template< class T, class Derived >
+struct gsl_EMPTY_BASES_ not_null_base< T, Derived, false >  // e.g. `void*`, `std::function<>`
+    : not_null_elem< T, Derived >
 {
 };
-
-template< class T > struct is_void_ptr : is_void< typename detail::element_type_helper< T >::type > { };
-
-template< class T > struct is_dereferencable : std17::conjunction< has_element_type< T >, std17::negation< is_void_ptr< T > > > { };
+#endif // ! gsl_BASELINE_CPP20_
 
 } // namespace detail
 
-#if gsl_HAVE( TYPE_TRAITS )
-template< class T > struct is_nullable : std::is_assignable< typename std::remove_cv< T >::type &, std::nullptr_t > { };
-
-# if gsl_CPP14_OR_GREATER
-template< class T > constexpr bool is_nullable_v = is_nullable< T >::value;
-# endif // gsl_CPP14_OR_GREATER
-
-#endif // gsl_HAVE( TYPE_TRAITS )
-
-template< class T >
+template< gsl_CONSTRAINT( nullable ) T >
 class
 gsl_EMPTY_BASES_  // not strictly needed, but will become necessary if we add more base classes
-not_null : public detail::not_null_deref< not_null< T >, T, detail::is_dereferencable< T >::value >
+not_null : public detail::not_null_base<T>
 {
 private:
-    detail::not_null_data< T, detail::is_copyable< T >::value > data_;
+    detail::not_null_data<T> data_;
 
     // need to access `not_null<U>::data_`
     template< class U >
     friend struct detail::not_null_accessor;
+    template< gsl_CONSTRAINT( nullable ) U >
+    friend class not_null;
 
+#if ! gsl_BASELINE_CPP20_
     typedef detail::not_null_accessor<T> accessor;
+#endif // ! gsl_BASELINE_CPP20_
 
-public:
 #if gsl_HAVE( TYPE_TRAITS )
     static_assert( ! std::is_reference<T>::value, "T may not be a reference type" );
     static_assert( ! std::is_const<T>::value && ! std::is_volatile<T>::value, "T may not be cv-qualified" );
+# ifndef __cpp_lib_concepts
     static_assert( is_nullable<T>::value, "T must be a nullable type" );
+# endif
 #endif
 
+public:
+#if gsl_BASELINE_CPP20_
+    template< class U >
+    requires std::is_constructible_v<T, U> && ( ! std::is_convertible_v<U, T> )
+    gsl_api constexpr explicit not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+    : data_( T( std::move( other ) ) )
+    {
+        if constexpr ( nullable<U> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+    }
+#endif // gsl_BASELINE_CPP20_
+
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# if gsl_HAVE( MOVE_FORWARD )
+# if gsl_BASELINE_CPP20_
+    template< class U >
+    requires std::is_convertible_v<U, T> && std::is_function_v<U>
+    gsl_api constexpr /*implicit*/ not_null( U const & other, std::source_location const & = std::source_location::current() ) noexcept
+    : data_( other )
+    {
+    }
+    template< class U >
+    requires std::is_convertible_v<U, T> && ( ! std::is_function_v<U> ) && nullable<U>
+    gsl_api constexpr explicit not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+    : data_( std::move( other ) )
+    {
+        gsl_AssertAt( loc, data_.ptr_ != nullptr );
+    }
+    template< class U >
+    requires std::is_convertible_v<U, T> && ( ! std::is_function_v<U> ) && ( ! nullable<U> )
+    gsl_api constexpr /*implicit*/ not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+    : data_( std::move( other ) )
+    {
+    }
+# elif gsl_HAVE( MOVE_FORWARD )
     template< class U
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
@@ -3369,7 +3449,6 @@ public:
     gsl_api gsl_constexpr14 /*implicit*/ not_null( U other )
     : data_( T( std::move( other ) ) )
     {
-        gsl_Expects( data_.ptr_ != gsl_nullptr );
     }
 #  endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
 # else // a.k.a. ! gsl_HAVE( MOVE_FORWARD )
@@ -3381,7 +3460,18 @@ public:
     }
 # endif // gsl_HAVE( MOVE_FORWARD )
 #else // a.k.a. !gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-# if gsl_HAVE( MOVE_FORWARD )
+# if gsl_BASELINE_CPP20_
+    template< class U >
+    requires std::is_convertible_v<U, T>
+    gsl_api constexpr /*implicit*/ not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+    : data_( std::move( other ) )
+    {
+        if constexpr ( nullable<U> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+    }
+# elif gsl_HAVE( MOVE_FORWARD )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 #  if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
@@ -3422,15 +3512,45 @@ public:
     }
 # endif // gsl_HAVE( MOVE_FORWARD )
 #endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
-    template< class C, std::size_t N
-        gsl_ENABLE_IF_NTTP_(( detail::is_czstring<T, C>::value ))
-    >
-    gsl_api gsl_constexpr14 not_null( C const ( & literal )[ N ] ) gsl_noexcept
+#if gsl_BASELINE_CPP20_
+    template< class C, std::size_t N >
+    requires detail::is_czstring<T, C>::value
+    gsl_api constexpr /*implicit*/ not_null( C const ( & literal )[N], std::source_location const & = std::source_location::current() ) gsl_noexcept
         : data_( literal )
     {
     }
+#else // ! gsl_BASELINE_CPP20_
+    template< class C, std::size_t N
+        gsl_ENABLE_IF_NTTP_(( detail::is_czstring<T, C>::value ))
+    >
+    gsl_api gsl_constexpr14 /*implicit*/ not_null( C const ( & literal )[N] ) gsl_noexcept
+        : data_( literal )
+    {
+    }
+#endif // gsl_BASELINE_CPP20_
 
-#if gsl_HAVE( MOVE_FORWARD )
+#if gsl_BASELINE_CPP20_
+    template< class U >
+    requires std::is_constructible_v<T, U> && ( ! std::is_convertible_v<U, T> )
+    gsl_api constexpr explicit not_null( not_null<U> other, std::source_location const & loc = std::source_location::current() )
+    : data_( std::move( other.data_.ptr_ ) )
+    {
+        if constexpr ( ! detail::has_trivial_move_v<U> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+    }
+    template< class U >
+    requires std::is_convertible_v<U, T>
+    gsl_api constexpr /*implicit*/ not_null( not_null<U> other, std::source_location const & loc = std::source_location::current() )
+    : data_( std::move( other.data_.ptr_ ) )
+    {
+        if constexpr ( ! detail::has_trivial_move_v<U> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+    }
+#elif gsl_HAVE( MOVE_FORWARD )
     // In Clang 3.x, `is_constructible<not_null<unique_ptr<X>>, unique_ptr<X>>` tries to instantiate the copy constructor of `unique_ptr<>`, triggering an error.
     // Note that Apple Clang's `__clang_major__` etc. are different from regular Clang.
 # if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && ! gsl_BETWEEN( gsl_COMPILER_CLANG_VERSION, 1, 400 ) && ! gsl_BETWEEN( gsl_COMPILER_APPLECLANG_VERSION, 1, 1001 )
@@ -3480,21 +3600,71 @@ public:
     }
 #endif // gsl_HAVE( MOVE_FORWARD )
 
-#if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
-# if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+#if gsl_BASELINE_CPP20_
+# if gsl_CONFIG( TRANSPARENT_NOT_NULL )
+    [[nodiscard]] gsl_api constexpr decltype( auto )
+    get( [[maybe_unused]] std::source_location const & loc = std::source_location::current() ) const
+    requires detail::has_element_typedef<T>::value
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+        return data_.ptr_.get();
+    }
+# else // ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+#  if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    [[nodiscard]] gsl_api constexpr T const &
+    get( [[maybe_unused]] std::source_location const & loc = std::source_location::current() ) const
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+        return data_.ptr_;
+    }
+#  else // a.k.a. ! gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+    [[nodiscard]] gsl_api constexpr T
+    get( [[maybe_unused]] std::source_location const & loc = std::source_location::current() ) const
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_AssertAt( loc, data_.ptr_ != nullptr );
+        }
+        return data_.ptr_;
+    }
+#  endif // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+# endif
+#else // ! gsl_BASELINE_CPP20_
+# if ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+#  if gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     get() const
     {
         return accessor::get_checked( *this );
     }
-# else // a.k.a. ! gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+#  else // a.k.a. ! gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
     gsl_NODISCARD gsl_api gsl_constexpr14 T
     get() const
     {
         return accessor::get_checked( *this );
     }
-# endif // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
-#endif // ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+#  endif // gsl_CONFIG( NOT_NULL_GET_BY_CONST_REF )
+# endif // ! gsl_CONFIG( TRANSPARENT_NOT_NULL )
+#endif // gsl_BASELINE_CPP20_
+
+#if gsl_BASELINE_CPP20_
+    [[nodiscard]] gsl_api constexpr decltype( auto )
+    operator*() const noexcept( detail::has_trivial_move_v<T> )
+    requires detail::is_dereferencable_v<T>  // do not define for `void*`, `std::function<>` etc.
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return *data_.ptr_;
+    }
+#endif // gsl_BASELINE_CPP20_
 
     // We want an implicit conversion operator that can be used to convert from both lvalues (by
     // const reference or by copy) and rvalues (by move). So it seems like we could define
@@ -3525,7 +3695,143 @@ public:
     //     std::shared_ptr<U> vs = sp; // no extra copy
     //     std::unique_ptr<U> vu = std::move( p );
 
-#if gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
+#if gsl_BASELINE_CPP20_
+    // explicit conversion operator
+
+    template< class U >
+    requires std::is_constructible_v<U, T const &> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit
+    operator U() const &
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( data_.ptr_ );
+    }
+    template< class U >
+    requires std::is_constructible_v<U, T const &> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit
+    operator U() &
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( data_.ptr_ );
+    }
+    template< class U >
+    requires std::is_constructible_v<U, T const &> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit
+    operator U() const &&
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( data_.ptr_ );
+    }
+    template< class U >
+    requires std::is_constructible_v<U, T> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit
+    operator U() &&
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( std::move( data_.ptr_ ) );
+    }
+
+    // implicit conversion operator
+    [[nodiscard]] gsl_api constexpr
+    operator T() const &
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return data_.ptr_;
+    }
+    [[nodiscard]] gsl_api constexpr
+    operator T() &
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return data_.ptr_;
+    }
+    [[nodiscard]] gsl_api constexpr
+    operator T() const &&
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return data_.ptr_;
+    }
+    [[nodiscard]] gsl_api constexpr
+    operator T() &&
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return std::move( data_.ptr_ );
+    }
+
+    operator bool() const & = delete;
+    operator bool() & = delete;
+    operator bool() && = delete;
+    operator bool() const && = delete;
+
+    template< class U >
+    requires std::is_constructible_v<U, T const &> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr
+    operator U() const &
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( data_.ptr_ );
+    }
+    template< class U >
+    requires std::is_constructible_v<U, T const &> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr
+    operator U() &
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( data_.ptr_ );
+    }
+    template< class U >
+    requires std::is_constructible_v<U, T const &> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr
+    operator U() const &&
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( data_.ptr_ );
+    }
+    template< class U >
+    requires std::is_constructible_v<U, T> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr
+    operator U() &&
+    {
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return U( std::move( data_.ptr_ ) );
+    }
+
+#elif gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
     // explicit conversion operator
 
     template< class U
@@ -3561,7 +3867,7 @@ public:
     }
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+        gsl_ENABLE_IF_NTTP_(( std::is_constructible<U, T const &>::value && !std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14 explicit
     operator U() const &&
@@ -3639,7 +3945,7 @@ public:
     }
     template< class U
         // We *have* to use SFINAE with an NTTP arg here, otherwise the overload is ambiguous.
-        gsl_ENABLE_IF_NTTP_(( std::is_convertible<T, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
+        gsl_ENABLE_IF_NTTP_(( std::is_convertible<T const &, U>::value && !detail::is_not_null_or_bool_oracle<U>::value ))
     >
     gsl_NODISCARD gsl_api gsl_constexpr14
     operator U() const &&
@@ -3659,10 +3965,18 @@ public:
     gsl_NODISCARD gsl_api gsl_constexpr14 T const &
     operator->() const
     {
+#if gsl_BASELINE_CPP20_
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return data_.ptr_;
+#else // ! gsl_BASELINE_CPP20_
         return accessor::get_checked( *this );
+#endif
     }
 
-#if gsl_HAVE( MOVE_FORWARD )
+#if gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) && gsl_HAVE( MOVE_FORWARD )
     // Visual C++ 2013 doesn't generate default move constructors, so we declare them explicitly.
     gsl_api gsl_constexpr14 not_null( not_null && other )
     gsl_noexcept_not_testing  // we want to be nothrow-movable despite the assertion
@@ -3675,18 +3989,28 @@ public:
         data_ = std::move( other.data_ );
         return *this;
     }
-#endif // gsl_HAVE( MOVE_FORWARD )
+#endif // gsl_BETWEEN( gsl_COMPILER_MSVC_VERSION, 1, 140 ) && gsl_HAVE( MOVE_FORWARD )
 
 #if gsl_HAVE( IS_DEFAULT )
-    gsl_constexpr14 not_null( not_null const & ) = default;
-    gsl_constexpr14 not_null & operator=( not_null const & ) = default;
+    not_null( not_null && ) = default;
+    not_null & operator=( not_null && ) = default;
+    not_null( not_null const & ) = default;
+    not_null & operator=( not_null const & ) = default;
 #endif
 
     gsl_api gsl_constexpr20 friend void swap( not_null & lhs, not_null & rhs )
     gsl_noexcept_not_testing // we want to be nothrow-swappable despite the precondition check
     {
+#if gsl_BASELINE_CPP20_
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( lhs.data_.ptr_ != nullptr );
+            gsl_Assert( rhs.data_.ptr_ != nullptr );
+        }
+#else // ! gsl_BASELINE_CPP20_
         accessor::check( lhs );
         accessor::check( rhs );
+#endif
         using std::swap;
         swap( lhs.data_.ptr_, rhs.data_.ptr_ );
     }
@@ -3711,11 +4035,20 @@ gsl_is_delete_access:
         -> decltype( data_.ptr_( std::forward<Ts>( args )... ) )
 # endif // ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION
     {
-        return accessor::get_checked( *this )( std::forward<Ts>( args )... );
+# if gsl_BASELINE_CPP20_
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            gsl_Assert( data_.ptr_ != nullptr );
+        }
+        return data_.ptr_( static_cast<Ts&&>( args )... );
+# else // ! gsl_BASELINE_CPP20_
+        return accessor::get_checked( *this )( static_cast<Ts&&>( args )... );
+# endif
     }
 #endif // gsl_STDLIB_CPP11_140 && ( gsl_CPP14_OR_GREATER || ( ! gsl_COMPILER_NVCC_VERSION && ! gsl_COMPILER_NVHPC_VERSION ) )
 
     // unwanted operators...pointers only point to single objects!
+    // TODO: revise for not_null<czstring> and the like?
     not_null & operator++() gsl_is_delete;
     not_null & operator--() gsl_is_delete;
     not_null   operator++( int ) gsl_is_delete;
@@ -3738,7 +4071,20 @@ not_null( not_null<U> ) -> not_null<U>;
 #if gsl_HAVE( NULLPTR )
 void make_not_null( std::nullptr_t ) gsl_is_delete;
 #endif // gsl_HAVE( NULLPTR )
-#if gsl_HAVE( MOVE_FORWARD )
+#if gsl_BASELINE_CPP20_
+template< class U >
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
+make_not_null( U u, std::source_location const & loc = std::source_location::current() )
+{
+    return not_null<U>( std::move( u ), loc );
+}
+template< class U >
+gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
+make_not_null( not_null<U> u )
+{
+    return std::move( u );
+}
+#elif gsl_HAVE( MOVE_FORWARD )
 template< class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 not_null<U>
 make_not_null( U u )
@@ -3781,7 +4127,12 @@ struct as_nullable_helper< not_null<T> >
 template< class T >
 struct not_null_accessor
 {
-#if gsl_HAVE( MOVE_FORWARD )
+    static gsl_api bool is_valid( not_null<T> const & p ) gsl_noexcept
+    {
+        return p.data_.ptr_ != gsl_nullptr;
+    }
+#if ! gsl_BASELINE_CPP20_
+# if gsl_HAVE( MOVE_FORWARD )
     static gsl_api T get( not_null<T>&& p ) gsl_noexcept
     {
         return std::move( p.data_.ptr_ );
@@ -3791,14 +4142,10 @@ struct not_null_accessor
         gsl_Assert( p.data_.ptr_ != gsl_nullptr );
         return std::move( p.data_.ptr_ );
     }
-#endif
+# endif
     static gsl_api T const & get( not_null<T> const & p ) gsl_noexcept
     {
         return p.data_.ptr_;
-    }
-    static gsl_api bool is_valid( not_null<T> const & p ) gsl_noexcept
-    {
-        return p.data_.ptr_ != gsl_nullptr;
     }
     static gsl_api void check( not_null<T> const & p )
     {
@@ -3809,7 +4156,9 @@ struct not_null_accessor
         gsl_Assert( p.data_.ptr_ != gsl_nullptr );
         return p.data_.ptr_;
     }
+#endif // ! gsl_BASELINE_CPP20_
 };
+#if ! gsl_BASELINE_CPP20_
 template< class T >
 struct not_null_accessor< T * >
 {
@@ -3829,6 +4178,7 @@ struct not_null_accessor< T * >
         return p.data_.ptr_;
     }
 };
+#endif // ! gsl_BASELINE_CPP20_
 
 namespace no_adl {
 
@@ -3843,11 +4193,12 @@ gsl_noexcept_if( std::is_nothrow_move_constructible<T>::value )
 template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr14 T as_nullable( not_null<T> && p )
 {
-    return detail::not_null_accessor<T>::get_checked( std::move( p ) );
+    return std::move( p );
 }
 #else // ! gsl_HAVE( MOVE_FORWARD )
 template< class T >
-gsl_NODISCARD gsl_api gsl_constexpr T const & as_nullable( T const & p ) gsl_noexcept
+gsl_NODISCARD gsl_api gsl_constexpr T const &
+as_nullable( T const & p ) gsl_noexcept
 {
     return p;
 }
@@ -3856,7 +4207,7 @@ template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr14 T const &
 as_nullable( not_null<T> const & p )
 {
-    return detail::not_null_accessor<T>::get_checked( p );
+    return p.operator ->();
 }
 
 template< class T >
@@ -3929,9 +4280,14 @@ template< class T >
 class not_null_ic : public not_null<T>
 {
 public:
+#if gsl_BASELINE_CPP20_
+    template< class U >
+    requires std::is_constructible_v<T, U>
+#else // ! gsl_BASELINE_CPP20_
     template< class U
         gsl_ENABLE_IF_(( std::is_constructible<T, U>::value ))
     >
+#endif
     gsl_api gsl_constexpr14
 #if gsl_HAVE( MOVE_FORWARD )
     not_null_ic( U u )
