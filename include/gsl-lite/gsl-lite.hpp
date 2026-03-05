@@ -4455,7 +4455,7 @@ gsl_RETURN_DECLTYPE_( l == r.operator->() )
 // can be sorted and searched, or that pointers can be used as a key in a relational container such as `std::map<>`.
 // Therefore, we also define relational comparison operators for `not_null<>`.
 
-#ifdef __cpp_lib_three_way_comparison
+#ifdef __cpp_impl_three_way_comparison
 template< class T, class U >
 [[nodiscard]] inline gsl_api constexpr auto
 operator<=>( not_null<T> const & l, not_null<U> const & r )
