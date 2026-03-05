@@ -128,6 +128,12 @@ elseif( CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang|PGI|NVHPC" )
         if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.2.0 )
             set( HAS_CPP17_FLAG TRUE )
         endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12.0.5 )
+            set( HAS_CPP20_FLAG TRUE )
+        endif()
+        if( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14.0.3 )
+            set( HAS_CPP23_FLAG TRUE )
+        endif()
 
     # Clang: available -std flags depends on version
     elseif( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
