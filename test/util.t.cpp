@@ -137,7 +137,7 @@ CASE( "narrow_cast<>: Allows narrowing with value loss" )
     EXPECT( narrow_cast<unsigned char>( 300 ) == 44 );
 }
 
-enum PlainEnum { };
+enum PlainEnum { val0 = 0, val1 = 100 };
 
 #if gsl_STDLIB_CPP11_OR_GREATER
 const std::uint8_t  u8   = std::uint8_t ((std::numeric_limits<std::uint8_t >::max)() - 1);
