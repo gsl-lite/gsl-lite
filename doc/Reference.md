@@ -1346,6 +1346,15 @@ the deprecated class `basic_zstring_span<>` with the aliases `zstring_span`, `cz
 functions such as `to_string()`, and `ensure_z()`.  
 **Default is 0.**
 
+#### `gsl_FEATURE_SPAN=1`
+Controls whether `gsl_lite::span<>` and related functions such as `make_span()` are defined.  
+Although C++ has introduced [`std::span<>`](https://en.cppreference.com/w/cpp/container/span.html), `span<>` from the C++ Core Guidelines Support Library
+has not been deprecated because, unlike `std::span<>`, it checks for out-of-bounds accesses at runtime. However, C++26 will introduce
+[*standard library hardening*](https://en.cppreference.com/w/cpp/standard_library.html#Standard_library_hardening) which adds limited support for
+bounds checks to `std::span<>`, addressing most of the concerns voiced by the editors of the Core Guidelines. *gsl-lite* still defines the `span<>` class
+by default, but it can be disabled by setting `gsl_FEATURE_SPAN=0`.  
+**Default is 1.**
+
 #### `gsl_FEATURE_BYTE=0`
 The `byte` type has been superseded by [`std::byte`](https://en.cppreference.com/w/cpp/types/byte) in C++17 and thus is no longer part of the GSL specification.
 If the macro `gsl_FEATURE_BYTE` is set to 1, *gsl-lite* continues to provide an implementation of `byte` and related functions such as `as_bytes()`, `to_byte()`,

@@ -4,22 +4,24 @@
 version 1.1.0 2026-03-??
 
 Additions:
-- Add `gsl_Verify()` for expression-valued contract checks (#361)
-- Define null-terminated string type aliases `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, `u32czstring`
-- Define the free function `gsl_lite::c_str()` which extracts a null-terminated string from a string type, wrapping the resulting pointer in `not_null<>` if non-nullability can be guaranteed
-- Define the free function `gsl_lite::get()` which extracts the raw pointer held by a pointer type, wrapping it in `not_null<>` if non-nullability can be guaranteed
+- `gsl_Verify()` for assertion expressions (#361)
+- Null-terminated string type aliases `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, `u32czstring`
+- The free function `gsl_lite::c_str()` extracts a null-terminated string from a string type, wrapping the resulting pointer in `not_null<>` if non-nullability can be guaranteed
+- The free function `gsl_lite::get()` extracts the raw pointer held by a pointer type, wrapping it in `not_null<>` if non-nullability can be guaranteed
 - Add configuration option `gsl_CONFIG_USE_CRT_ASSERT_FUNCTION` to control the behavior of the default contract violation handler (#368)
+- C++23 polyfill: `to_underlying()` (b4cf1717887a29a007741343ee362520ef535f0c)
 - For C++20 and later:
-  - Add `gsl_VerifyAt()`, `gsl_AssertAt()`, `gsl_AssertAtDebug()`, `gsl_AssertAtAudit()`, `gsl_FailFastAt()` for `std::source_location` support (#362)
+  - The macros `gsl_VerifyAt()`, `gsl_AssertAt()`, `gsl_AssertAtDebug()`, `gsl_AssertAtAudit()`, `gsl_FailFastAt()` for assertions with a `std::source_location` (#362)
 - For C++23 and later:
-  - Add configuration switch `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE` for a contract violation handler that prints a stacktrace before terminating (#355)
+  - The configuration switch `gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE` enables a contract violation handler that prints a stacktrace before terminating (#355)
 
 Changes:
 - `not_null<czstring>` can now be assigned a string literal without explicit constructor call (#363)
-- Improve assertion error messages
-- Introduce configuration option `gsl_FEATURE_SPAN` to control whether `gsl_lite::span<>` is defined (preparing for possible future deprecation)
+- Improve assertion error message reporting
+- Introduce configuration option `gsl_FEATURE_SPAN` to control whether `gsl_lite::span<>` is defined (preparing for possible future deprecation) (afc83410900721fb3f032908237a37947bd9528d)
+- `gsl_DEFINE_ENUM_BITMASK_OPERATORS()` now defines operators that permit explicit conversion to `bool`, making bitflag checking easier (#365)
 - For C++20 and later:
-  - `not_null<>`, `narrow_failfast<>()`, and `at()` now use `std::source_location` to forward the call site to internal assertions
+  - `narrow_failfast<>()`, `at()`, and `not_null<>` now use `gsl_AssertAt()` to report assertions at the call site (#362)
 
 Fixes:
 - Work around SFINAE issue with NVHPC compiler (e90ab3afe3151a2b6c6b0ef56e2ee2decbb03ec3, #359, thanks to @wuyifff)

@@ -2016,11 +2016,14 @@ CASE( "not_null<>: Free function c_str() preserves non-nullability" )
 #if gsl_HAVE( EXPRESSION_SFINAE )
     std::string str1 = "a null-terminated string literal";
     not_null< czstring > nnzstr1 = gsl_lite::c_str( str1 );  // call member function str1.c_str()
+    EXPECT( nnzstr1 == str1.c_str() );
+    EXPECT( std::strcmp( str1.c_str(), nnzstr1 ) == 0 );
     nnzstr1 = gsl_lite::c_str( str1 );  // call member function str1.c_str()
+    EXPECT( nnzstr1 == str1.c_str() );
     EXPECT( std::strcmp( str1.c_str(), nnzstr1 ) == 0 );
     not_null< czstring > nnzstr2 = gsl_lite::c_str( "a null-terminated string literal" );  // pass through
     EXPECT( std::strcmp( str1.c_str(), nnzstr2 ) == 0 );
-    not_null< czstring > nnzstr3 = gsl_lite::c_str( nnzstr2 );  // pas through
+    not_null< czstring > nnzstr3 = gsl_lite::c_str( nnzstr2 );  // pass through
     EXPECT( std::strcmp( str1.c_str(), nnzstr3 ) == 0 );
     czstring zstr3 = gsl_nullptr;
     czstring zstr4 = gsl_lite::c_str( zstr3 );  // pass through
