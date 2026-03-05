@@ -22,7 +22,7 @@ jobs:
     cache: False
     cmakeBuildConfigurations: [Debug]
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
-    cmakeTestArgs: '--exclude-regex cuda'  # do not run CUDA tests
+    cmakeTestArgs: '--exclude-regex "cuda"'  # do not run CUDA tests
 
     targets:
 
@@ -44,8 +44,8 @@ jobs:
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v1-cpp20'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
     
     - os: Linux
       cxxCompiler: GCC
@@ -82,8 +82,8 @@ jobs:
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
-      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex gsl-lite-v[0-1]-cpp20'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
     
     - os: Windows
       cxxCompiler: MSVC
@@ -93,7 +93,7 @@ jobs:
       platforms: [x86, x64]
       cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpplatest"'
     
     - os: Windows
       cxxCompiler: Clang
@@ -101,7 +101,7 @@ jobs:
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpplatest'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpplatest"'
     
     - os: Windows
       cxxCompiler: MSVC
@@ -117,8 +117,8 @@ jobs:
       cxxCompilerVersions: [17]
       cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v1-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpp(17|20)"'
 
     # GCC 4.7, 4.8, 4.9, 5, and 6 are tested with Travis
     #- os: Linux
@@ -139,8 +139,8 @@ jobs:
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v[0-1]-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
 
     # Clang 3.5, 3.6, 3.7, 3.8, and 3.9, 4, and 5 are tested with Travis
     #- os: Linux
@@ -161,8 +161,8 @@ jobs:
       platforms: [x64]
       tag: 'sanitize'
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
-      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t'
-      cmakeTestArgs: '<cmakeTestArgs> --tests-regex gsl-lite-v[0-1]-cpp17'
+      cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
+      cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
 
     - os: Linux
       cxxCompiler: Clang
