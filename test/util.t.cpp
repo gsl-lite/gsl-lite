@@ -137,14 +137,38 @@ CASE( "narrow_cast<>: Allows narrowing with value loss" )
     EXPECT( narrow_cast<unsigned char>( 300 ) == 44 );
 }
 
+enum PlainEnum { };
+
 #if gsl_STDLIB_CPP11_OR_GREATER
-const  std::uint8_t  u8  =  std::uint8_t((std::numeric_limits< std::uint8_t>::max)() - 1);
+const std::uint8_t  u8   = std::uint8_t ((std::numeric_limits<std::uint8_t >::max)() - 1);
 const std::uint16_t u16  = std::uint16_t((std::numeric_limits<std::uint16_t>::max)() - 1);
-const   std::int8_t  i8n =   std::int8_t((std::numeric_limits<  std::int8_t>::min)() + 1);
-const  std::int16_t i16n =  std::int16_t((std::numeric_limits< std::int16_t>::min)() + 1);
-const   std::int8_t  i8p =   std::int8_t((std::numeric_limits<  std::int8_t>::max)() - 1);
-const  std::int16_t i16p =  std::int16_t((std::numeric_limits< std::int16_t>::max)() - 1);
-#endif // gsl_CPP11_OR_GREATER
+const std:: int8_t  i8n  = std:: int8_t ((std::numeric_limits<std:: int8_t >::min)() + 1);
+const std:: int16_t i16n = std:: int16_t((std::numeric_limits<std:: int16_t>::min)() + 1);
+const std:: int8_t  i8p  = std:: int8_t ((std::numeric_limits<std:: int8_t >::max)() - 1);
+const std:: int16_t i16p = std:: int16_t((std::numeric_limits<std:: int16_t>::max)() - 1);
+#endif // gsl_STDLIB_CPP11_OR_GREATER
+#if gsl_HAVE( ENUM_CLASS ) && gsl_STDLIB_CPP11_OR_GREATER
+enum class FancyEnum_i8  : std:: int8_t  { };
+enum class FancyEnum_i16 : std:: int16_t { };
+enum class FancyEnum_u8  : std::uint8_t  { };
+enum class FancyEnum_u16 : std::uint16_t { };
+
+std::ostream & operator <<( std::ostream & stream, FancyEnum_i8  value ) { return stream << gsl_lite::to_underlying( value ); }
+std::ostream & operator <<( std::ostream & stream, FancyEnum_i16 value ) { return stream << gsl_lite::to_underlying( value ); }
+std::ostream & operator <<( std::ostream & stream, FancyEnum_u8  value ) { return stream << gsl_lite::to_underlying( value ); }
+std::ostream & operator <<( std::ostream & stream, FancyEnum_u16 value ) { return stream << gsl_lite::to_underlying( value ); }
+#endif // gsl_HAVE( ENUM_CLASS ) && gsl_STDLIB_CPP11_OR_GREATER
+
+CASE( "narrow<>(): Allows casting between integers and enum" )
+{
+#if gsl_HAVE( EXCEPTIONS )
+    PlainEnum pe = PlainEnum(42);
+    int i = 43;
+    EXPECT_NO_THROW( ( i = narrow<int>( pe ) ) ); EXPECT( i == int( pe ) );
+    i = 43;
+    EXPECT_NO_THROW( ( pe = narrow<PlainEnum>( i ) ) ); EXPECT( int( pe ) == i );
+#endif // gsl_HAVE( EXCEPTIONS )
+}
 
 CASE( "narrow<>(): Allows narrowing without value loss" )
 {
@@ -158,25 +182,68 @@ CASE( "narrow<>(): Allows narrowing without value loss" )
     std::int16_t li16;
 
     // uint <-> uint
-    EXPECT_NO_THROW((lu16 = narrow<std::uint16_t>( std::uint8_t( u8)))); EXPECT(lu16 == u8);
-    EXPECT_NO_THROW(( lu8 = narrow< std::uint8_t>( std::uint8_t( u8)))); EXPECT( lu8 == u8);
-    EXPECT_NO_THROW(( lu8 = narrow< std::uint8_t>(std::uint16_t( u8)))); EXPECT( lu8 == u8);
+    lu16 = 0;               EXPECT_NO_THROW((lu16 = narrow<std::uint16_t>(std::uint8_t(  u8)))); EXPECT(lu16 ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW((lu8  = narrow<std::uint8_t >(std::uint8_t(  u8)))); EXPECT(lu8  ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW((lu8  = narrow<std::uint8_t >(std::uint16_t( u8)))); EXPECT(lu8  ==               u8 );
 
     // int <-> int
-    EXPECT_NO_THROW((li16 = narrow< std::int16_t>(  std::int8_t(i8n)))); EXPECT(li16 == i8n);
-    EXPECT_NO_THROW((li16 = narrow< std::int16_t>(  std::int8_t(i8p)))); EXPECT(li16 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>(  std::int8_t(i8n)))); EXPECT( li8 == i8n);
-    EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>(  std::int8_t(i8p)))); EXPECT( li8 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>( std::int16_t(i8n)))); EXPECT( li8 == i8n);
-    EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>( std::int16_t(i8p)))); EXPECT( li8 == i8p);
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow<std::int16_t >(std:: int8_t( i8n)))); EXPECT(li16 ==               i8n );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow<std::int16_t >(std:: int8_t( i8p)))); EXPECT(li16 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow<std::int8_t  >(std:: int8_t( i8n)))); EXPECT(li8  ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow<std::int8_t  >(std:: int8_t( i8p)))); EXPECT(li8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow<std::int8_t  >(std:: int16_t(i8n)))); EXPECT(li8  ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow<std::int8_t  >(std:: int16_t(i8p)))); EXPECT(li8  ==               i8p );
 
     // uint <-> int
-    EXPECT_NO_THROW((lu16 = narrow<std::uint16_t>(  std::int8_t(i8p)))); EXPECT(lu16 == i8p);
-    EXPECT_NO_THROW((li16 = narrow< std::int16_t>( std::uint8_t(i8p)))); EXPECT(li16 == i8p);
-    EXPECT_NO_THROW(( lu8 = narrow< std::uint8_t>(  std::int8_t(i8p)))); EXPECT( lu8 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>( std::uint8_t(i8p)))); EXPECT( li8 == i8p);
-    EXPECT_NO_THROW(( lu8 = narrow< std::uint8_t>( std::int16_t(i8p)))); EXPECT( lu8 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow<  std::int8_t>(std::uint16_t(i8p)))); EXPECT( li8 == i8p);
+    lu16 = 0;               EXPECT_NO_THROW((lu16 = narrow<std::uint16_t>(std:: int8_t( i8p)))); EXPECT(lu16 ==               i8p );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow< std::int16_t>(std::uint8_t( i8p)))); EXPECT(li16 ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW((lu8  = narrow< std::uint8_t>(std:: int8_t( i8p)))); EXPECT(lu8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow<  std::int8_t>(std::uint8_t( i8p)))); EXPECT(li8  ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW((lu8  = narrow< std::uint8_t>(std:: int16_t(i8p)))); EXPECT(lu8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow<  std::int8_t>(std::uint16_t(i8p)))); EXPECT(li8  ==               i8p );
+
+#  if gsl_HAVE( ENUM_CLASS )
+    FancyEnum_u8 eu8;
+    FancyEnum_u16 eu16;
+    FancyEnum_i8 ei8;
+    FancyEnum_i16 ei16;
+
+    // uint <-> uint
+    eu16 = FancyEnum_u16(); EXPECT_NO_THROW((eu16 = narrow<FancyEnum_u16>(std::uint8_t(  u8)))); EXPECT(eu16 == FancyEnum_u16(u8));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow<FancyEnum_u8 >(std::uint8_t(  u8)))); EXPECT(eu8  == FancyEnum_u8( u8));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow<FancyEnum_u8 >(std::uint16_t( u8)))); EXPECT(eu8  == FancyEnum_u8( u8));
+    lu8  = 0;               EXPECT_NO_THROW((lu16 = narrow<std::uint16_t>(FancyEnum_u8(  u8)))); EXPECT(lu16 ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow<std::uint8_t >(FancyEnum_u8(  u8)))); EXPECT(lu8  ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow<std::uint8_t >(FancyEnum_u16( u8)))); EXPECT(lu8  ==               u8 );
+
+    // int <-> int
+    ei16 = FancyEnum_i16(); EXPECT_NO_THROW((ei16 = narrow<FancyEnum_i16>(std:: int8_t( i8n)))); EXPECT(ei16 == FancyEnum_i16(i8n));
+    ei16 = FancyEnum_i16(); EXPECT_NO_THROW((ei16 = narrow<FancyEnum_i16>(std:: int8_t( i8p)))); EXPECT(ei16 == FancyEnum_i16(i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow<FancyEnum_i8 >(std:: int8_t( i8n)))); EXPECT(ei8  == FancyEnum_i8( i8n));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow<FancyEnum_i8 >(std:: int8_t( i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow<FancyEnum_i8 >(std:: int16_t(i8n)))); EXPECT(ei8  == FancyEnum_i8( i8n));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow<FancyEnum_i8 >(std:: int16_t(i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow<std::int16_t >(FancyEnum_i8( i8n)))); EXPECT(li16 ==               i8n );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow<std::int16_t >(FancyEnum_i8( i8p)))); EXPECT(li16 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow<std::int8_t  >(FancyEnum_i8( i8n)))); EXPECT(li8  ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow<std::int8_t  >(FancyEnum_i8( i8p)))); EXPECT(li8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow<std::int8_t  >(FancyEnum_i16(i8n)))); EXPECT(li8  ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow<std::int8_t  >(FancyEnum_i16(i8p)))); EXPECT(li8  ==               i8p );
+
+    // uint <-> int
+    eu16 = FancyEnum_u16(); EXPECT_NO_THROW((eu16 = narrow<FancyEnum_u16>(std:: int8_t( i8p)))); EXPECT(eu16 == FancyEnum_u16(i8p));
+    ei16 = FancyEnum_i16(); EXPECT_NO_THROW((ei16 = narrow<FancyEnum_i16>(std::uint8_t( i8p)))); EXPECT(ei16 == FancyEnum_i16(i8p));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow<FancyEnum_u8 >(std:: int8_t( i8p)))); EXPECT(eu8  == FancyEnum_u8( i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow<FancyEnum_i8 >(std::uint8_t( i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow<FancyEnum_u8 >(std:: int16_t(i8p)))); EXPECT(eu8  == FancyEnum_u8( i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow<FancyEnum_i8 >(std::uint16_t(i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    lu16 = 0;               EXPECT_NO_THROW((lu16 = narrow<std::uint16_t>(FancyEnum_u16(i8p)))); EXPECT(lu16 ==               i8p );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow<std:: int16_t>(FancyEnum_i16(i8p)))); EXPECT(li16 ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow<std::uint8_t >(FancyEnum_u8( i8p)))); EXPECT(lu8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow<std:: int8_t >(FancyEnum_i8( i8p)))); EXPECT(li8  ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow<std::uint8_t >(FancyEnum_u8( i8p)))); EXPECT(lu8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow<std:: int8_t >(FancyEnum_i8( i8p)))); EXPECT(li8  ==               i8p );
+#  endif // gsl_HAVE( ENUM_CLASS )
 # endif // gsl_STDLIB_CPP11_OR_GREATER
 #endif // gsl_HAVE( EXCEPTIONS )
 }
@@ -197,17 +264,39 @@ CASE( "narrow<>(): Throws when narrowing with value loss" )
 
 # if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> uint
-    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>( std::uint16_t( u16) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t>( std::uint16_t(u16 ) ), narrowing_error );
 
     // int <-> int
-    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>(  std::int16_t(i16n) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>(  std::int16_t(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>(  std::int16_t(i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>(  std::int16_t(i16p) ), narrowing_error );
 
     // uint <-> int
-    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>(  std::uint8_t( u8 ) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16p) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t( u8 ) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow<  std::int8_t>( std::uint16_t(u16 ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( std::uint8_t( u8  ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t>( std:: int16_t(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( std::uint16_t(u8  ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( std::uint16_t(u16 ) ), narrowing_error );
+
+#  if gsl_HAVE( ENUM_CLASS )
+    // uint <-> uint
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_u8>( std::uint16_t(u16 ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t>( FancyEnum_u16(u16 ) ), narrowing_error );
+
+    // int <-> int
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_i8>( std:: int16_t(i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_i8>( std:: int16_t(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( FancyEnum_i16(i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( FancyEnum_i16(i16p) ), narrowing_error );
+
+    // uint <-> int
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_i8>( std::uint8_t( u8  ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_u8>( std:: int16_t(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_i8>( std::uint16_t(u8  ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_i8>( std::uint16_t(u16 ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( FancyEnum_u8( u8  ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t>( FancyEnum_i16(i16p) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( FancyEnum_u16(u8  ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std:: int8_t>( FancyEnum_u16(u16 ) ), narrowing_error );
+#  endif // gsl_HAVE( ENUM_CLASS )
 # endif // gsl_STDLIB_CPP11_OR_GREATER
 #endif // gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 }
@@ -219,10 +308,22 @@ CASE( "narrow<>(): Throws when narrowing with sign loss" )
 
 # if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> int
-    EXPECT_THROWS_AS( (void) narrow<std::uint16_t>(   std::int8_t( i8n) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(   std::int8_t( i8n) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t( i8n) ), narrowing_error );
-    EXPECT_THROWS_AS( (void) narrow< std::uint8_t>(  std::int16_t(i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint16_t>( std::int8_t(  i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t >( std::int8_t(  i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t >( std::int16_t( i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t >( std::int16_t( i16n) ), narrowing_error );
+
+#  if gsl_HAVE( ENUM_CLASS )
+    // uint <-> int
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_u16>( std::int8_t(  i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_u8 >( std::int8_t(  i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_u8 >( std::int16_t( i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<FancyEnum_u8 >( std::int16_t( i16n) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint16_t>( FancyEnum_i8( i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t >( FancyEnum_i8( i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t >( FancyEnum_i16(i8n ) ), narrowing_error );
+    EXPECT_THROWS_AS( (void) narrow<std::uint8_t >( FancyEnum_i16(i16n) ), narrowing_error );
+#  endif // gsl_HAVE( ENUM_CLASS )
 # endif // gsl_STDLIB_CPP11_OR_GREATER
 #endif // gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 }
@@ -232,6 +333,15 @@ CASE( "narrow<>(): Throws when narrowing unordered type with precision loss" )
 #if gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
     EXPECT_THROWS_AS( (void) narrow<std::complex<float>>( std::complex<double>( 4.2 ) ), narrowing_error );
 #endif // gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
+}
+
+CASE( "narrow_failfast<>(): Allows casting between integers and enum" )
+{
+    PlainEnum pe = PlainEnum(42);
+    int i = 43;
+    EXPECT_NO_THROW( ( i = narrow_failfast<int>( pe ) ) ); EXPECT( i == int( pe ) );
+    i = 43;
+    EXPECT_NO_THROW( ( pe = narrow_failfast<PlainEnum>( i ) ) ); EXPECT( int( pe ) == i );
 }
 
 CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
@@ -245,25 +355,68 @@ CASE( "narrow_failfast<>(): Allows narrowing without value loss" )
     std::int16_t li16;
 
     // uint <-> uint
-    EXPECT_NO_THROW((lu16 = narrow_failfast<std::uint16_t>( std::uint8_t( u8)))); EXPECT(lu16 == u8);
-    EXPECT_NO_THROW(( lu8 = narrow_failfast< std::uint8_t>( std::uint8_t( u8)))); EXPECT( lu8 == u8);
-    EXPECT_NO_THROW(( lu8 = narrow_failfast< std::uint8_t>(std::uint16_t( u8)))); EXPECT( lu8 == u8);
+    lu16 = 0;               EXPECT_NO_THROW((lu16 = narrow_failfast<std::uint16_t>(std::uint8_t(  u8)))); EXPECT(lu16 ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow_failfast<std::uint8_t >(std::uint8_t(  u8)))); EXPECT( lu8 ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow_failfast<std::uint8_t >(std::uint16_t( u8)))); EXPECT( lu8 ==               u8 );
 
     // int <-> int
-    EXPECT_NO_THROW((li16 = narrow_failfast< std::int16_t>(  std::int8_t(i8n)))); EXPECT(li16 == i8n);
-    EXPECT_NO_THROW((li16 = narrow_failfast< std::int16_t>(  std::int8_t(i8p)))); EXPECT(li16 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>(  std::int8_t(i8n)))); EXPECT( li8 == i8n);
-    EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>(  std::int8_t(i8p)))); EXPECT( li8 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>( std::int16_t(i8n)))); EXPECT( li8 == i8n);
-    EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>( std::int16_t(i8p)))); EXPECT( li8 == i8p);
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow_failfast<std:: int16_t>(std:: int8_t( i8n)))); EXPECT(li16 ==               i8n );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow_failfast<std:: int16_t>(std:: int8_t( i8p)))); EXPECT(li16 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow_failfast<std:: int8_t >(std:: int8_t( i8n)))); EXPECT( li8 ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow_failfast<std:: int8_t >(std:: int8_t( i8p)))); EXPECT( li8 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow_failfast<std:: int8_t >(std:: int16_t(i8n)))); EXPECT( li8 ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow_failfast<std:: int8_t >(std:: int16_t(i8p)))); EXPECT( li8 ==               i8p );
 
     // uint <-> int
-    EXPECT_NO_THROW((lu16 = narrow_failfast<std::uint16_t>(  std::int8_t(i8p)))); EXPECT(lu16 == i8p);
-    EXPECT_NO_THROW((li16 = narrow_failfast< std::int16_t>( std::uint8_t(i8p)))); EXPECT(li16 == i8p);
-    EXPECT_NO_THROW(( lu8 = narrow_failfast< std::uint8_t>(  std::int8_t(i8p)))); EXPECT( lu8 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>( std::uint8_t(i8p)))); EXPECT( li8 == i8p);
-    EXPECT_NO_THROW(( lu8 = narrow_failfast< std::uint8_t>( std::int16_t(i8p)))); EXPECT( lu8 == i8p);
-    EXPECT_NO_THROW(( li8 = narrow_failfast<  std::int8_t>(std::uint16_t(i8p)))); EXPECT( li8 == i8p);
+    lu16 = 0;               EXPECT_NO_THROW((lu16 = narrow_failfast<std::uint16_t>(std:: int8_t( i8p)))); EXPECT(lu16 ==               i8p );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow_failfast<std:: int16_t>(std::uint8_t( i8p)))); EXPECT(li16 ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW((lu8  = narrow_failfast<std::uint8_t >(std:: int8_t( i8p)))); EXPECT( lu8 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow_failfast<std:: int8_t >(std::uint8_t( i8p)))); EXPECT( li8 ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW((lu8  = narrow_failfast<std::uint8_t >(std:: int16_t(i8p)))); EXPECT( lu8 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW((li8  = narrow_failfast<std:: int8_t >(std::uint16_t(i8p)))); EXPECT( li8 ==               i8p );
+
+#  if gsl_HAVE( ENUM_CLASS )
+    FancyEnum_u8 eu8;
+    FancyEnum_u16 eu16;
+    FancyEnum_i8 ei8;
+    FancyEnum_i16 ei16;
+
+    // uint <-> uint
+    eu16 = FancyEnum_u16(); EXPECT_NO_THROW((eu16 = narrow_failfast<FancyEnum_u16>(std::uint8_t(  u8)))); EXPECT(eu16 == FancyEnum_u16(u8));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow_failfast<FancyEnum_u8 >(std::uint8_t(  u8)))); EXPECT(eu8  == FancyEnum_u8( u8));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow_failfast<FancyEnum_u8 >(std::uint16_t( u8)))); EXPECT(eu8  == FancyEnum_u8( u8));
+    lu8  = 0;               EXPECT_NO_THROW((lu16 = narrow_failfast<std::uint16_t>(FancyEnum_u8(  u8)))); EXPECT(lu16 ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow_failfast<std::uint8_t >(FancyEnum_u8(  u8)))); EXPECT(lu8  ==               u8 );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow_failfast<std::uint8_t >(FancyEnum_u16( u8)))); EXPECT(lu8  ==               u8 );
+
+    // int <-> int
+    ei16 = FancyEnum_i16(); EXPECT_NO_THROW((ei16 = narrow_failfast<FancyEnum_i16>(std:: int8_t( i8n)))); EXPECT(ei16 == FancyEnum_i16(i8n));
+    ei16 = FancyEnum_i16(); EXPECT_NO_THROW((ei16 = narrow_failfast<FancyEnum_i16>(std:: int8_t( i8p)))); EXPECT(ei16 == FancyEnum_i16(i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow_failfast<FancyEnum_i8 >(std:: int8_t( i8n)))); EXPECT(ei8  == FancyEnum_i8( i8n));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow_failfast<FancyEnum_i8 >(std:: int8_t( i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow_failfast<FancyEnum_i8 >(std:: int16_t(i8n)))); EXPECT(ei8  == FancyEnum_i8( i8n));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow_failfast<FancyEnum_i8 >(std:: int16_t(i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow_failfast<std:: int16_t>(FancyEnum_i8( i8n)))); EXPECT(li16 ==               i8n );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow_failfast<std:: int16_t>(FancyEnum_i8( i8p)))); EXPECT(li16 ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow_failfast<std:: int8_t >(FancyEnum_i8( i8n)))); EXPECT(li8  ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow_failfast<std:: int8_t >(FancyEnum_i8( i8p)))); EXPECT(li8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow_failfast<std:: int8_t >(FancyEnum_i16(i8n)))); EXPECT(li8  ==               i8n );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow_failfast<std:: int8_t >(FancyEnum_i16(i8p)))); EXPECT(li8  ==               i8p );
+
+    // uint <-> int
+    eu16 = FancyEnum_u16(); EXPECT_NO_THROW((eu16 = narrow_failfast<FancyEnum_u16>(std:: int8_t( i8p)))); EXPECT(eu16 == FancyEnum_u16(i8p));
+    ei16 = FancyEnum_i16(); EXPECT_NO_THROW((ei16 = narrow_failfast<FancyEnum_i16>(std::uint8_t( i8p)))); EXPECT(ei16 == FancyEnum_i16(i8p));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow_failfast<FancyEnum_u8 >(std:: int8_t( i8p)))); EXPECT(eu8  == FancyEnum_u8( i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow_failfast<FancyEnum_i8 >(std::uint8_t( i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    eu8  = FancyEnum_u8();  EXPECT_NO_THROW(( eu8 = narrow_failfast<FancyEnum_u8 >(std:: int16_t(i8p)))); EXPECT(eu8  == FancyEnum_u8( i8p));
+    ei8  = FancyEnum_i8();  EXPECT_NO_THROW(( ei8 = narrow_failfast<FancyEnum_i8 >(std::uint16_t(i8p)))); EXPECT(ei8  == FancyEnum_i8( i8p));
+    lu16 = 0;               EXPECT_NO_THROW((lu16 = narrow_failfast<std::uint16_t>(FancyEnum_u16(i8p)))); EXPECT(lu16 ==               i8p );
+    li16 = 0;               EXPECT_NO_THROW((li16 = narrow_failfast<std:: int16_t>(FancyEnum_i16(i8p)))); EXPECT(li16 ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow_failfast<std::uint8_t >(FancyEnum_u8 (i8p)))); EXPECT(lu8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow_failfast<std:: int8_t >(FancyEnum_i8 (i8p)))); EXPECT(li8  ==               i8p );
+    lu8  = 0;               EXPECT_NO_THROW(( lu8 = narrow_failfast<std::uint8_t >(FancyEnum_u8 (i8p)))); EXPECT(lu8  ==               i8p );
+    li8  = 0;               EXPECT_NO_THROW(( li8 = narrow_failfast<std:: int8_t >(FancyEnum_i8( i8p)))); EXPECT(li8  ==               i8p );
+#  endif // gsl_HAVE( ENUM_CLASS )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
@@ -282,17 +435,39 @@ CASE( "narrow_failfast<>(): Fails when narrowing with value loss" )
 
 #if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> uint
-    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>( std::uint16_t( u16) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t>( std::uint16_t(u16 ) ), fail_fast );
 
     // int <-> int
-    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>(  std::int16_t(i16n) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>(  std::int16_t(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( std:: int16_t(i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( std:: int16_t(i16p) ), fail_fast );
 
     // uint <-> int
-    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>(  std::uint8_t( u8 ) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16p) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>( std::uint16_t( u8 ) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast<  std::int8_t>( std::uint16_t(u16 ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( std::uint8_t( u8  ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t>( std:: int16_t(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( std::uint16_t(u8  ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( std::uint16_t(u16 ) ), fail_fast );
+
+# if gsl_HAVE( ENUM_CLASS )
+    // uint <-> uint
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_u8>( std::uint16_t(u16 ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t>( FancyEnum_u16(u16 ) ), fail_fast );
+
+    // int <-> int
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_i8>( std:: int16_t(i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_i8>( std:: int16_t(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( FancyEnum_i16(i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( FancyEnum_i16(i16p) ), fail_fast );
+
+    // uint <-> int
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_i8>( std::uint8_t( u8  ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_u8>( std:: int16_t(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_i8>( std::uint16_t(u8  ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_i8>( std::uint16_t(u16 ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( FancyEnum_u8( u8  ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t>( FancyEnum_i16(i16p) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( FancyEnum_u16(u8  ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std:: int8_t>( FancyEnum_u16(u16 ) ), fail_fast );
+# endif // gsl_HAVE( ENUM_CLASS )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 
@@ -302,10 +477,22 @@ CASE( "narrow_failfast<>(): Fails when narrowing with sign loss" )
 
 #if gsl_STDLIB_CPP11_OR_GREATER
     // uint <-> int
-    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint16_t>(   std::int8_t( i8n) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(   std::int8_t( i8n) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t( i8n) ), fail_fast );
-    EXPECT_THROWS_AS( (void) narrow_failfast< std::uint8_t>(  std::int16_t(i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint16_t>( std::int8_t(  i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t >( std::int8_t(  i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t >( std::int16_t( i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t >( std::int16_t( i16n) ), fail_fast );
+    
+# if gsl_HAVE( ENUM_CLASS )
+    // uint <-> int
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_u16>( std::int8_t(  i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_u8 >( std::int8_t(  i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_u8 >( std::int16_t( i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<FancyEnum_u8 >( std::int16_t( i16n) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint16_t>( FancyEnum_i8( i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t >( FancyEnum_i8( i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t >( FancyEnum_i16(i8n ) ), fail_fast );
+    EXPECT_THROWS_AS( (void) narrow_failfast<std::uint8_t >( FancyEnum_i16(i16n) ), fail_fast );
+# endif // gsl_HAVE( ENUM_CLASS )
 #endif // gsl_STDLIB_CPP11_OR_GREATER
 }
 

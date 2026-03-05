@@ -1664,22 +1664,22 @@ namespace detail {
 
 #if gsl_HAVE( VARIADIC_TEMPLATE )
 
-template < bool V0, class T0, class... Ts > struct conjunction_ { using type = T0; };
-template < class T0, class T1, class... Ts > struct conjunction_<true, T0, T1, Ts...> : conjunction_<T1::value, T1, Ts...> { };
-template < bool V0, class T0, class... Ts > struct disjunction_ { using type = T0; };
-template < class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
+template< bool V0, class T0, class... Ts > struct conjunction_ { using type = T0; };
+template< class T0, class T1, class... Ts > struct conjunction_<true, T0, T1, Ts...> : conjunction_<T1::value, T1, Ts...> { };
+template< bool V0, class T0, class... Ts > struct disjunction_ { using type = T0; };
+template< class T0, class T1, class... Ts > struct disjunction_<false, T0, T1, Ts...> : disjunction_<T1::value, T1, Ts...> { };
 
 #else // a.k.a. ! gsl_HAVE( VARIADIC_TEMPLATE )
 
-template < bool V0, class T0, class T1 > struct conjunction_ { typedef T0 type; };
-template < class T0, class T1 > struct conjunction_<true, T0, T1> { typedef T1 type; };
-template < bool V0, class T0, class T1 > struct disjunction_ { typedef T0 type; };
-template < class T0, class T1 > struct disjunction_<false, T0, T1> { typedef T1 type; };
+template< bool V0, class T0, class T1 > struct conjunction_ { typedef T0 type; };
+template< class T0, class T1 > struct conjunction_<true, T0, T1> { typedef T1 type; };
+template< bool V0, class T0, class T1 > struct disjunction_ { typedef T0 type; };
+template< class T0, class T1 > struct disjunction_<false, T0, T1> { typedef T1 type; };
 
 #endif // gsl_HAVE( VARIADIC_TEMPLATE )
 
 
-template <typename> struct dependent_false : std11::integral_constant<bool, false> { };
+template< class > struct dependent_false : std11::integral_constant<bool, false> { };
 
 } // namespace detail
 
@@ -1689,22 +1689,22 @@ namespace std17 {
 
 template< bool v > struct bool_constant : std11::integral_constant<bool, v>{};
 
-template < class T > struct negation : std11::integral_constant<bool, !T::value> { };
+template< class T > struct negation : std11::integral_constant<bool, !T::value> { };
 
 #if gsl_CPP11_120
 
-template < class... Ts > struct conjunction;
-template < > struct conjunction< > : std11::true_type { };
-template < class T0, class... Ts > struct conjunction<T0, Ts...> : detail::conjunction_<T0::value, T0, Ts...>::type { };
-template < class... Ts > struct disjunction;
-template < > struct disjunction< > : std11::false_type { };
-template < class T0, class... Ts > struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
+template< class... Ts > struct conjunction;
+template< > struct conjunction< > : std11::true_type { };
+template< class T0, class... Ts > struct conjunction<T0, Ts...> : detail::conjunction_<T0::value, T0, Ts...>::type { };
+template< class... Ts > struct disjunction;
+template< > struct disjunction< > : std11::false_type { };
+template< class T0, class... Ts > struct disjunction<T0, Ts...> : detail::disjunction_<T0::value, T0, Ts...>::type { };
 
 # if gsl_CPP14_OR_GREATER
 
-template < class... Ts > constexpr bool conjunction_v = conjunction<Ts...>::value;
-template < class... Ts > constexpr bool disjunction_v = disjunction<Ts...>::value;
-template < class T > constexpr bool negation_v = negation<T>::value;
+template< class... Ts > constexpr bool conjunction_v = conjunction<Ts...>::value;
+template< class... Ts > constexpr bool disjunction_v = disjunction<Ts...>::value;
+template< class T > constexpr bool negation_v = negation<T>::value;
 
 # endif // gsl_CPP14_OR_GREATER
 
@@ -1717,8 +1717,8 @@ using void_t = typename make_void< Ts... >::type;
 #else // a.k.a. ! gsl_CPP11_120
 
 // For C++98, define simpler binary variants of `conjunction<>` and `disjunction<>`.
-template < class T0, class T1 > struct conjunction : detail::conjunction_<T0::value, T0, T1>::type { };
-template < class T0, class T1 > struct disjunction : detail::disjunction_<T0::value, T0, T1>::type { };
+template< class T0, class T1 > struct conjunction : detail::conjunction_<T0::value, T0, T1>::type { };
+template< class T0, class T1 > struct disjunction : detail::disjunction_<T0::value, T0, T1>::type { };
 
 #endif // gsl_CPP11_120
 
@@ -1790,7 +1790,7 @@ namespace std20 {
 
 struct identity
 {
-    template < class T >
+    template< class T >
     gsl_constexpr T && operator ()( T && arg ) const gsl_noexcept
     {
         return std::forward<T>( arg );
@@ -1837,7 +1837,7 @@ using std::ssize;
 
 #elif gsl_HAVE( CONSTRAINED_SPAN_CONTAINER_CTOR )
 
-template < class C >
+template< class C >
 gsl_NODISCARD gsl_constexpr auto
 ssize( C const & c )
     -> typename std::common_type<std::ptrdiff_t, typename std::make_signed<decltype(c.size())>::type>::type
@@ -1846,7 +1846,7 @@ ssize( C const & c )
     return static_cast<R>( c.size() );
 }
 
-template <class T, std::size_t N>
+template< class T, std::size_t N >
 gsl_NODISCARD gsl_constexpr auto
 ssize( T const(&)[N] ) gsl_noexcept -> std::ptrdiff_t
 {
@@ -2772,11 +2772,25 @@ struct narrowing_error : public std::exception
 # define gsl_NARROW_API_  gsl_api
 #endif // gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
 
+namespace detail {
+
+#if gsl_HAVE( TYPE_TRAITS )
+template< class T, bool IsEnum = std::is_enum<T>::value >
+struct unwrap_enum { typedef T type; };
+template< class T >
+struct unwrap_enum<T, true> : std::underlying_type<T> { };
+#endif // gsl_HAVE( TYPE_TRAITS )
+
+} // namespace detail
+
 #if gsl_BASELINE_CPP20_
 
 namespace detail {
 
-template <typename T, typename U>
+template< class T, class U >
+concept static_castable = requires( U value ) { static_cast<T>( value ); };
+
+template< class T, class U >
 constexpr bool are_all_values_representable_impl()
 {
     if constexpr ( std::same_as<T, U> ) return true;
@@ -2788,13 +2802,13 @@ constexpr bool are_all_values_representable_impl()
     else return false;  // no assumptions can be made about other types, including floating-point types, because the standard does not mandate a specific representation
 }
 
-template <typename T, typename U>
+template< class T, class U >
 constexpr bool are_all_values_representable = are_all_values_representable_impl<T, U>();
 
 } // namespace detail
 
 template< class T, class U >
-requires std::constructible_from<T, U> && std::constructible_from<U, T>
+requires detail::static_castable<T, U> && detail::static_castable<U, T>
 [[nodiscard]] gsl_NARROW_API_ constexpr inline T
 narrow( U u )
 {
@@ -2806,20 +2820,23 @@ narrow( U u )
         "violation if the given value cannot be represented in the target type." );
 # endif
 
+    using TT = typename detail::unwrap_enum<T>::type;
+    using UU = typename detail::unwrap_enum<U>::type;
+
     T t = static_cast<T>( u );
-    if constexpr ( ! detail::are_all_values_representable<T, U> )
+    if constexpr ( ! detail::are_all_values_representable<TT, UU> )
     {
-        if constexpr ( std::is_signed_v<T> && std::is_signed_v<U> )
+        if constexpr ( std::is_signed_v<TT> && std::is_signed_v<UU> )
         {
-            if ( static_cast<U>( t ) != u || ( ( t < 0 ) != ( u < 0 ) ) ) gsl_NARROW_FAIL_();
+            if ( static_cast<U>( t ) != u || ( ( TT( t ) < 0 ) != ( UU( u ) < 0 ) ) ) gsl_NARROW_FAIL_();
         }
-        else if constexpr ( std::is_signed_v<T> )
+        else if constexpr ( std::is_signed_v<TT> )
         {
-            if ( static_cast<U>( t ) != u || t < 0 ) gsl_NARROW_FAIL_();
+            if ( static_cast<U>( t ) != u || TT( t ) < 0 ) gsl_NARROW_FAIL_();
         }
-        else if constexpr ( std::is_signed_v<U> )
+        else if constexpr ( std::is_signed_v<UU> )
         {
-            if ( static_cast<U>( t ) != u || u < 0 ) gsl_NARROW_FAIL_();
+            if ( static_cast<U>( t ) != u || UU( u ) < 0 ) gsl_NARROW_FAIL_();
         }
         else
         {
@@ -2830,26 +2847,29 @@ narrow( U u )
 }
 
 template< class T, class U >
-requires std::constructible_from<T, U> && std::constructible_from<U, T>
+requires detail::static_castable<T, U> && detail::static_castable<U, T>
 [[nodiscard]] gsl_api constexpr inline T
 narrow_failfast( U u, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
 {
     static_assert( ! ( std::same_as<T, bool> || std::same_as<U, bool> ), "narrow_failfast<>() does not support bool" );
 
+    using TT = typename detail::unwrap_enum<T>::type;
+    using UU = typename detail::unwrap_enum<U>::type;
+
     T t = static_cast<T>( u );
-    if constexpr ( ! detail::are_all_values_representable<T, U> )
+    if constexpr ( ! detail::are_all_values_representable<TT, UU> )
     {
-        if constexpr ( std::is_signed_v<T> && std::is_signed_v<U> )
+        if constexpr ( std::is_signed_v<TT> && std::is_signed_v<UU> )
         {
-            gsl_AssertAt( loc, static_cast<U>( t ) == u && ( ( t < 0 ) == ( u < 0 ) ) );
+            gsl_AssertAt( loc, static_cast<U>( t ) == u && ( ( TT( t ) < 0 ) == ( UU( u ) < 0 ) ) );
         }
-        else if constexpr ( std::is_signed_v<T> )
+        else if constexpr ( std::is_signed_v<TT> )
         {
-            gsl_AssertAt( loc, static_cast<U>( t ) == u && t >= 0 );
+            gsl_AssertAt( loc, static_cast<U>( t ) == u && TT( t ) >= 0 );
         }
-        else if constexpr ( std::is_signed_v<U> )
+        else if constexpr ( std::is_signed_v<UU> )
         {
-            gsl_AssertAt( loc, static_cast<U>( t ) == u && u >= 0 );
+            gsl_AssertAt( loc, static_cast<U>( t ) == u && UU( u ) >= 0 );
         }
         else
         {
@@ -2865,40 +2885,40 @@ narrow_failfast( U u, [[maybe_unused]] std::source_location const & loc = std::s
 
 namespace detail {
 
-    template< class T, class U >
-    struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
+template< class T, class U >
+struct is_same_signedness : public std::integral_constant<bool, std::is_signed<T>::value == std::is_signed<U>::value> {};
 
 #  if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
-    // We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
-    template< class T >
-    gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
-    {
-        return value < T();
-    }
-    template< class T >
-    gsl_constexpr gsl_api bool is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
-    {
-        return false;
-    }
-    template< class T, class U >
-    gsl_constexpr gsl_api bool have_same_sign( T, U, std::true_type /*isSameSignedness*/ ) gsl_noexcept
-    {
-        return true;
-    }
-    template< class T, class U >
-    gsl_constexpr gsl_api bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
-    {
-        return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
-    }
+// We do this to circumvent NVCC warnings about pointless unsigned comparisons with 0.
+template< class T >
+gsl_constexpr gsl_api bool is_negative( T value, std::true_type /*isSigned*/ ) gsl_noexcept
+{
+    return value < T();
+}
+template< class T >
+gsl_constexpr gsl_api bool is_negative( T /*value*/, std::false_type /*isUnsigned*/ ) gsl_noexcept
+{
+    return false;
+}
+template< class T, class U >
+gsl_constexpr gsl_api bool have_same_sign( T, U, std::true_type /*isSameSignedness*/ ) gsl_noexcept
+{
+    return true;
+}
+template< class T, class U >
+gsl_constexpr gsl_api bool have_same_sign( T t, U u, std::false_type /*isSameSignedness*/ ) gsl_noexcept
+{
+    return detail::is_negative( t, std::is_signed<T>() ) == detail::is_negative( u, std::is_signed<U>() );
+}
 #  endif // gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
 
 } // namespace detail
 
-# endif
+# endif // gsl_HAVE( TYPE_TRAITS )
 
 template< class T, class U >
 gsl_NODISCARD gsl_constexpr14 gsl_NARROW_API_ inline
-gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, T )
+gsl_ENABLE_IF_R_( ( std::is_arithmetic<T>::value || std::is_enum<T>::value ) && ( std::is_arithmetic<U>::value || std::is_enum<U>::value ), T )
 narrow( U u )
 {
 # if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2911,13 +2931,16 @@ narrow( U u )
     T t = static_cast<T>( u );
 
 # if gsl_HAVE( TYPE_TRAITS )
+    typedef typename detail::unwrap_enum<T>::type TT;
+    typedef typename detail::unwrap_enum<U>::type UU;
+
 #  if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     if ( static_cast<U>( t ) != u
-        || ! detail::have_same_sign( t, u, detail::is_same_signedness<T, U>() ) )
+        || ! detail::have_same_sign( TT( t ), UU( u ), detail::is_same_signedness<TT, UU>() ) )
 #  else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     if ( static_cast<U>( t ) != u
-        || ( ! detail::is_same_signedness<T, U>::value && ( t < T() ) != ( u < U() ) ) )
+        || ( ! detail::is_same_signedness<TT, UU>::value && ( TT( t ) < TT() ) != ( UU( u ) < UU() ) ) )
 #  endif
 # else
     // Don't assume T() works:
@@ -2951,7 +2974,7 @@ narrow( U u )
 # if gsl_HAVE( TYPE_TRAITS )
 template< class T, class U  >
 gsl_NODISCARD gsl_constexpr14 gsl_NARROW_API_ inline
-gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value || !std::is_arithmetic<U>::value, T )
+gsl_ENABLE_IF_R_( ! ( ( std::is_arithmetic<T>::value || std::is_enum<T>::value ) && ( std::is_arithmetic<U>::value || std::is_enum<U>::value ) ), T )
 narrow( U u )
 {
 #  if ! gsl_HAVE( EXCEPTIONS ) && gsl_CONFIG( NARROW_THROWS_ON_TRUNCATION )
@@ -2982,19 +3005,22 @@ narrow( U u )
 
 template< class T, class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 inline
-gsl_ENABLE_IF_R_( std::is_arithmetic<T>::value && std::is_arithmetic<U>::value, T )
+gsl_ENABLE_IF_R_( ( std::is_arithmetic<T>::value || std::is_enum<T>::value ) && ( std::is_arithmetic<U>::value || std::is_enum<U>::value ), T )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
 
 # if gsl_HAVE( TYPE_TRAITS )
+    typedef typename detail::unwrap_enum<T>::type TT;
+    typedef typename detail::unwrap_enum<U>::type UU;
+
 #  if gsl_COMPILER_NVCC_VERSION || gsl_COMPILER_NVHPC_VERSION
     gsl_Assert( static_cast<U>( t ) == u
-        && ::gsl_lite::detail::have_same_sign( t, u, ::gsl_lite::detail::is_same_signedness<T, U>() ) );
+        && ::gsl_lite::detail::have_same_sign( TT( t ), UU( u ), ::gsl_lite::detail::is_same_signedness<TT, UU>() ) );
 #  else
     gsl_SUPPRESS_MSVC_WARNING( 4127, "conditional expression is constant" )
     gsl_Assert( static_cast<U>( t ) == u
-        && ( ::gsl_lite::detail::is_same_signedness<T, U>::value || ( t < T() ) == ( u < U() ) ) );
+        && ( ::gsl_lite::detail::is_same_signedness<TT, UU>::value || ( TT( t ) < TT() ) == ( UU( u ) < UU() ) ) );
 #  endif
 # else
     // Don't assume T() works:
@@ -3016,7 +3042,7 @@ narrow_failfast( U u )
 # if gsl_HAVE( TYPE_TRAITS )
 template< class T, class U >
 gsl_NODISCARD gsl_api gsl_constexpr14 inline
-gsl_ENABLE_IF_R_( !std::is_arithmetic<T>::value || !std::is_arithmetic<U>::value, T )
+gsl_ENABLE_IF_R_( ! ( ( std::is_arithmetic<T>::value || std::is_enum<T>::value ) && ( std::is_arithmetic<U>::value || std::is_enum<U>::value ) ), T )
 narrow_failfast( U u )
 {
     T t = static_cast<T>( u );
@@ -4946,7 +4972,7 @@ public:
         return *( *this + n );
     }
 
-    template <
+    template<
         class U
         gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
@@ -4956,7 +4982,7 @@ public:
         return current_ == rhs.current_;
     }
 
-    template <
+    template<
         class U
         gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
@@ -4965,7 +4991,7 @@ public:
         return !( *this == rhs );
     }
 
-    template <
+    template<
         class U
         gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
@@ -4975,7 +5001,7 @@ public:
         return current_ < rhs.current_;
     }
 
-    template <
+    template<
         class U
         gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
@@ -4984,7 +5010,7 @@ public:
         return rhs < *this;
     }
 
-    template <
+    template<
         class U
         gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
@@ -4993,7 +5019,7 @@ public:
         return !( rhs < *this );
     }
 
-    template <
+    template<
         class U
         gsl_ENABLE_IF_(( std::is_same< typename std::remove_cv< U >::type, value_type >::value ))
     >
@@ -5476,7 +5502,7 @@ public:
         return span< element_type, Count >( data(), Count );
     }
 
-    template < gsl_CONFIG_SPAN_INDEX_TYPE Count >
+    template< gsl_CONFIG_SPAN_INDEX_TYPE Count >
     gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
     gsl_NODISCARD gsl_api gsl_constexpr14 span< element_type, Count >
     last() const
@@ -5488,7 +5514,7 @@ public:
         return span< element_type, Count >( data() + ( size() - Count ), Count );
     }
 
-    template < gsl_CONFIG_SPAN_INDEX_TYPE Offset, gsl_CONFIG_SPAN_INDEX_TYPE Count >
+    template< gsl_CONFIG_SPAN_INDEX_TYPE Offset, gsl_CONFIG_SPAN_INDEX_TYPE Count >
     gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
     gsl_NODISCARD gsl_api gsl_constexpr14 typename detail::calculate_subspan_type< T, Extent, Offset, Count >::type
     subspan() const
@@ -5502,7 +5528,7 @@ public:
         typedef typename detail::calculate_subspan_type< T, Extent, Offset, Count >::type type;
         return type( data() + Offset, Count == dynamic_extent ? size() - Offset : Count );
     }
-    template < gsl_CONFIG_SPAN_INDEX_TYPE Offset >
+    template< gsl_CONFIG_SPAN_INDEX_TYPE Offset >
     gsl_SUPPRESS_MSGSL_WARNING(bounds.1)
     gsl_NODISCARD gsl_api gsl_constexpr14 typename detail::calculate_subspan_type< T, Extent, Offset, dynamic_extent >::type
     subspan() const
@@ -5731,7 +5757,7 @@ private:
     {
     };
 
-    template < gsl_CONFIG_SPAN_INDEX_TYPE CallerExtent >
+    template< gsl_CONFIG_SPAN_INDEX_TYPE CallerExtent >
     gsl_api gsl_constexpr14 span< element_type, dynamic_extent >
     make_subspan( size_type offset, size_type count, subspan_selector< CallerExtent > ) const
     {
@@ -6841,7 +6867,7 @@ ensure_z( Container & cont )
 // basic_zstring_span<> - A view of contiguous null-terminated characters, replace (*,len).
 //
 
-template <typename T>
+template< class T >
 class basic_zstring_span
 {
 public:
