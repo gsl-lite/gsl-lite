@@ -1,11 +1,11 @@
 ﻿Changes in gsl-lite
 ===================
 
-version 1.1.0 2026-03-??
+version 1.1.0 2026-03-07
 
 Additions:
 - `gsl_Verify()` for assertion expressions (#361)
-- Null-terminated string type aliases `u8zstring`, `u8czstring`, `u16zstring`, `u16czstring`, `u32zstring`, `u32czstring`
+- Null-terminated string type aliases `u8zstring`, `cu8zstring`, `u16zstring`, `cu16zstring`, `u32zstring`, `cu32zstring`
 - The free function `gsl_lite::c_str()` extracts a null-terminated string from a string type, wrapping the resulting pointer in `not_null<>` if non-nullability can be guaranteed
 - The free function `gsl_lite::get()` extracts the raw pointer held by a pointer type, wrapping it in `not_null<>` if non-nullability can be guaranteed
 - Add configuration option `gsl_CONFIG_USE_CRT_ASSERT_FUNCTION` to control the behavior of the default contract violation handler (#368)
@@ -17,10 +17,10 @@ Additions:
 
 Changes:
 - `not_null<czstring>` can now be assigned a string literal without explicit constructor call (#363)
+- `narrow<>()` and `narrow_failfast<>()` now support casting from and to enums and detect changes of sign with regard to the underlying type
 - Improve assertion error message reporting
 - Introduce configuration option `gsl_FEATURE_SPAN` to control whether `gsl_lite::span<>` is defined (preparing for possible future deprecation)
 - `gsl_DEFINE_ENUM_BITMASK_OPERATORS()` now defines operators that permit explicit conversion to `bool`, making bitflag checking easier (#365)
-- `narrow<>()` and `narrow_failfast<>()` now support enum types
 - For C++20 and later:
   - `narrow_failfast<>()`, `at()`, and `not_null<>` now use `gsl_AssertAt()` to report assertions at the call site (#362)
 

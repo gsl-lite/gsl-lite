@@ -1,5 +1,5 @@
 ﻿# Copyright 2015-2019 by Martin Moene
-# Copyright 2019-2025 by Moritz Beutel
+# Copyright 2019-2026 by Moritz Beutel
 #
 # https://github.com/gsl-lite/gsl-lite
 #
@@ -13,7 +13,7 @@ cmake_minimum_required( VERSION 3.16 FATAL_ERROR )
 
 project(
     gsl-lite
-    VERSION 1.0.1
+    VERSION 1.1.0
     DESCRIPTION "defensive programming utilities for C++98, C++11 up"
     HOMEPAGE_URL "https://github.com/gsl-lite/gsl-lite"
     LANGUAGES CXX
