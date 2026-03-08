@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015-2019 Martin Moene
+// Copyright (c) 2015-2019 Martin Moene
 // Copyright (c) 2019-2021 Moritz Beutel
 // Copyright (c) 2015-2018 Microsoft Corporation. All rights reserved.
 //
@@ -51,8 +51,10 @@
 # pragma GCC   diagnostic ignored "-Wunused-function"
 # pragma GCC   diagnostic ignored "-Wuseless-cast"
 #elif defined( _MSC_VER )
-# if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
+# if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 143)
 #  pragma warning( disable : 4702 ) // unreachable code
+# endif // gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 143)
+# if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 #  pragma warning( disable : 4512 ) // assignment operator could not be generated 
 # endif // gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 140)
 # if gsl_BETWEEN(gsl_COMPILER_MSVC_VERSION, 1, 142) || !gsl_CPP17_OR_GREATER
