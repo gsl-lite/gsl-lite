@@ -1,4 +1,4 @@
-﻿# Reference documentation
+# Reference documentation
 
 ## Contents
 
@@ -1186,7 +1186,7 @@ The following macros control the handling of runtime contract violations:
 - **`gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` (default)**  
   If this macro is defined, contract assertions are handled with the assertion handler of the C++ runtime library.
   This is usually the most convenient choice. The exact behavior can be controlled with the configuration macro
-  [`gsl_CONFIG_USE_CRT_ASSERT_FUNCTION`](#gsl_config_use_crt_assert_function2).
+  [`gsl_CONFIG_USE_CRT_ASSERTION_HANDLER`](#gsl_config_use_crt_assertion_handler).
   **This is the default.**  
     
   This is the preferred option because, for most C++ runtime libraries, the default assertion handler reports diagnostic information
@@ -1461,16 +1461,18 @@ The warning can be explicitly overridden by defining `gsl_CONFIG_ACKNOWLEDGE_NON
 Define this macro to 1 to experience the by-design compile-time errors of the GSL components in the test suite.  
 **Default is 0.**
 
-#### `gsl_CONFIG_USE_CRT_ASSERT_FUNCTION=2`
-This macro controls how contract violations are handled if `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` is defined. It can be defined to one of the following values:
+#### `gsl_CONFIG_USE_CRT_ASSERTION_HANDLER`
+This macro controls how contract violations are handled if `gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS` is defined.  
+If set to 1, contract violations are handled by the assertion handler of the C runtime:  
 
-| Value         | Meaning |
-|:--------------|:--------|
-| 2 (default)   | In a Debug build, the debug assertion handler of the C++ runtime library (e.g. [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw?view=msvc-170) for MSVC on Windows) is called to handle a contract violation. In a Release build, or if no Debug assertion handler is available, the regular assertion handler ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms) is called instead. |
-| 1             | The assertion handler of the C++ runtime library ([`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert) for MSVC on Windows, [`__assert()`](https://gcc.gnu.org/pipermail/gcc-patches/2000-July/033617.html) on most other platforms)  is called to handle a contract violation. |
-| 0 (portable)  | If `NDEBUG` is not defined, the `assert()` macro is used to implement contract checks. If `NDEBUG` is defined, `std::abort()` is called directly when a contract is violated. |
+- MSVC, Debug build: [`_CrtDbgReport()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/crtdbgreport-crtdbgreportw)
+- MSVC non-Debug build: [`_assert()`](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert)
+- Linux: [`__assert_fail()`](https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib---assert-fail-1.html)
+- Other systems: [`__assert()`](https://stackoverflow.com/q/76233708) (widely available but undocumented)
 
-**Default is 2.**
+If set to 0, contracts are checked with the `assert()` macro if `NDEBUG` is not defined. `std::abort()` is called directly on contract violation if `NDEBUG` is defined.
+
+**Default is 1 when building with MSVC or for Linux targets, where a CRT assertion handler is guaranteed to be available, and 0 otherwise.**
 
 
 ## Configuration changes, deprecated and removed features

@@ -52,9 +52,6 @@
 
 #define gsl_DETAIL_CFG_TOGGLE_VALUE_1  1
 #define gsl_DETAIL_CFG_TOGGLE_VALUE_0  1
-#define gsl_DETAIL_CFG_3STATE_VALUE_2  1
-#define gsl_DETAIL_CFG_3STATE_VALUE_1  1
-#define gsl_DETAIL_CFG_3STATE_VALUE_0  1
 #define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_1  1
 #define gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_0  1
 #define gsl_DETAIL_CFG_STD_VALUE_98  1
@@ -70,7 +67,6 @@
 #define gsl_DETAIL_CFG_NO_VALUE_   1
 #define gsl_DETAIL_CFG_NO_VALUE_1  1 // many compilers treat the command-line parameter "-Dfoo" as equivalent to "-Dfoo=1", so we tolerate that
 #define gsl_CHECK_CFG_TOGGLE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_TOGGLE_VALUE_, x )
-#define gsl_CHECK_CFG_3STATE_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_3STATE_VALUE_, x )
 #define gsl_CHECK_CFG_DEFAULTS_VERSION_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_DEFAULTS_VERSION_VALUE_, x )
 #define gsl_CHECK_CFG_STD_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_STD_VALUE_, x )
 #define gsl_CHECK_CFG_NO_VALUE_( x )  gsl_CONCAT_( gsl_DETAIL_CFG_NO_VALUE, gsl_CONCAT_( _, x ) )
@@ -403,18 +399,21 @@
 #endif
 #define  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS_()  gsl_CONFIG_VALIDATES_UNENFORCED_CONTRACT_EXPRESSIONS
 
-#if defined( gsl_CONFIG_USE_CRT_ASSERT_FUNCTION )
-# if ! gsl_CHECK_CFG_3STATE_VALUE_( gsl_CONFIG_USE_CRT_ASSERT_FUNCTION )
-#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_USE_CRT_ASSERT_FUNCTION=" gsl_STRINGIFY(gsl_CONFIG_USE_CRT_ASSERT_FUNCTION) ", must be 0, 1, or 2")
+#if defined( gsl_CONFIG_USE_CRT_ASSERTION_HANDLER )
+# if ! gsl_CHECK_CFG_TOGGLE_VALUE_( gsl_CONFIG_USE_CRT_ASSERTION_HANDLER )
+#  pragma message (__FILE__ "(" gsl_STRINGIFY( __LINE__ ) "): warning: invalid configuration value gsl_CONFIG_USE_CRT_ASSERTION_HANDLER=" gsl_STRINGIFY(gsl_CONFIG_USE_CRT_ASSERTION_HANDLER) ", must be 0 or 1")
 # endif
 #else
-# if defined( _MSC_VER ) || defined( __GNUC__ ) || defined( __clang__ ) || defined( __NVCOMPILER )
-#  define gsl_CONFIG_USE_CRT_ASSERT_FUNCTION  2  // default
+// gsl_CONFIG_USE_CRT_ASSERTION_HANDLER=1: Call the CRT assertion handler (`_assert()` for MSVC, `__assert_fail()` for Linux, `__assert()` otherwise).
+// gsl_CONFIG_USE_CRT_ASSERTION_HANDLER=0: Use the `assert()` macro if available, or call `abort()` directly if not.
+// We default to 1 if we can be sure that the CRT assertion handler is accessible, and 0 otherwise.
+# if defined( _MSC_VER ) || defined( __linux__ )
+#  define gsl_CONFIG_USE_CRT_ASSERTION_HANDLER  1
 # else
-#  define gsl_CONFIG_USE_CRT_ASSERT_FUNCTION  0  // default
+#  define gsl_CONFIG_USE_CRT_ASSERTION_HANDLER  0
 # endif
 #endif
-#define  gsl_CONFIG_USE_CRT_ASSERT_FUNCTION_()  gsl_CONFIG_USE_CRT_ASSERT_FUNCTION
+#define  gsl_CONFIG_USE_CRT_ASSERTION_HANDLER_()  gsl_CONFIG_USE_CRT_ASSERTION_HANDLER
 
 #if defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
 # if ! gsl_CHECK_CFG_NO_VALUE_( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
@@ -1366,7 +1365,7 @@
 #if gsl_FEATURE( STRING_SPAN )
 # include <ios>    // for ios_base, streamsize
 #endif
-#if gsl_FEATURE( STRING_SPAN ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || ( defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) && ! ( gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG ) ) )
+#if gsl_FEATURE( STRING_SPAN ) || defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS ) || ( defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERTION_HANDLER ) && ! ( gsl_COMPILER_MS_STL_VERSION && ! defined( _DEBUG ) ) && ! defined( __linux__ ) )
 # include <string>
 #endif
 
@@ -1419,7 +1418,7 @@
 # include <tr1/type_traits> // for add_const<>, remove_cv<>, remove_const<>, remove_volatile<>, remove_reference<>, integral_constant<>
 #endif
 
-#if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
+#if gsl_CONFIG( USE_CRT_ASSERTION_HANDLER ) && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
 # include <crtdbg.h>
 #endif
 
@@ -2155,12 +2154,12 @@ using std::shared_ptr;
 # endif
 # if defined( gsl_TRAP_ )
 #  if defined( _MSC_VER )
-#  define   gsl_TRAP_FALLBACK_()  ::gsl_lite::detail::fail_fast_terminate()
+#  define   gsl_TRAP_FALLBACK_()  ::std::terminate()
 #  else // !defined( _MSC_VER )
 #  define   gsl_TRAP_FALLBACK_()  gsl_TRAP_()
 #  endif
 # else
-#  define   gsl_TRAP_FALLBACK_()  ::gsl_lite::detail::fail_fast_terminate()
+#  define   gsl_TRAP_FALLBACK_()  ::std::terminate()
 # endif
 #endif // gsl_DEVICE_CODE
 
@@ -2172,103 +2171,129 @@ using std::shared_ptr;
 
 #if gsl_DEVICE_CODE
 # if defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_TRAPS )
-#  define  gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_DIAG_RESTORE_236_ )
-#  define  gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( gsl_TRAP_(), false ) gsl_DIAG_RESTORE_236_ )
-#  define  gsl_FAILFAST_()                    gsl_TRAP_()
-#  define  gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#  define  gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#  define  gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( gsl_TRAP_(), false ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#  define  gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#  define  gsl_FAILFAST_()                     gsl_TRAP_()
+#  define  gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
+#  define  gsl_FAILFAST_AT_( loc )             ( static_cast<void>( loc ), gsl_FAILFAST_() )
 # elif defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  define  gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
-#  define  gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
-#  define  gsl_FAILFAST_()                    ( ::gsl_lite::fail_fast_assert_handler( "unreachable", "", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
-#  define  gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ) gsl_DIAG_RESTORE_236_ )
-#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), false ) gsl_DIAG_RESTORE_236_ )
-#  define  gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::fail_fast_assert_handler( "unreachable", gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, "", __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, "", __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_FAILFAST_()                     ( ::gsl_lite::fail_fast_assert_handler( "unreachable", "", __FILE__, __LINE__ ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
+#  define  gsl_CONTRACT_CHECK_MSG_( str, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_VERIFY_MSG_( str, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_CHECK_AT_( loc, x )    ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), false ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_FAILFAST_AT_( loc )             ( ::gsl_lite::fail_fast_assert_handler( "unreachable", gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), gsl_TRAP_() ) /* do not let the custom assertion handler continue execution */
 # else // defined( gsl_CONFIG_DEVICE_CONTRACT_VIOLATION_ASSERTS ) [default]
 #  if ! defined( NDEBUG )
-#   define gsl_CONTRACT_CHECK_( str, x )      assert( x )
-#   define gsl_CONTRACT_VERIFY_( str, x )     ( ( x ) ? true : ( assert( false && #x ), false ) )
-#  define  gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
+#  define  gsl_CONTRACT_CHECK_( x )            assert( x )
+#  define  gsl_CONTRACT_VERIFY_( x )           ( ( x ) ? true : ( assert( false && #x ), false ) )
+#  define  gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#  define  gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#  define  gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
 #  else
-#   define gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_DIAG_RESTORE_236_ )
-#   define gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( gsl_TRAP_(), false ) gsl_DIAG_RESTORE_236_ )
-#  define  gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
+#  define  gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( gsl_TRAP_(), false ) gsl_DIAG_RESTORE_236_ )
+#  define  gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#  define  gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#  define  gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#  define  gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
 #  endif
-#  define  gsl_FAILFAST_()                    gsl_TRAP_()
-#  define  gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#  define  gsl_FAILFAST_()                     gsl_TRAP_()
+#  define  gsl_FAILFAST_AT_( loc )             ( static_cast<void>( loc ), gsl_FAILFAST_() )
 # endif
 #else // host code
 # if defined( gsl_CONFIG_CONTRACT_VIOLATION_TRAPS )
 #  if !defined( gsl_TRAP_ )
 #   error    gsl_CONFIG_CONTRACT_VIOLATION_TRAPS: gsl-lite does not know how to generate a trap instruction for this compiler; use gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES instead
 #  endif
-#  define    gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( gsl_TRAP_(), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_()                    gsl_TRAP_FALLBACK_()
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#  define    gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : gsl_TRAP_() gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( gsl_TRAP_(), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_()                     gsl_TRAP_FALLBACK_()
+#  define    gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#  define    gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#  define    gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
+#  define    gsl_FAILFAST_AT_( loc )             ( static_cast<void>( loc ), gsl_FAILFAST_() )
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_CALLS_HANDLER )
-#  define    gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_()                    ( ::gsl_lite::fail_fast_assert_handler( "unreachable", "", __FILE__, __LINE__ ), gsl_TRAP_FALLBACK_() ) /* do not let the custom assertion handler continue execution */
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::fail_fast_assert_handler( "unreachable", gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), gsl_TRAP_FALLBACK_() ) /* do not let the custom assertion handler continue execution */
-# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
-#  if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
-#   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, str, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_FAILFAST_()                    ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
-#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( #x, gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert_debug( #x, gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_FAILFAST_AT_( loc )            ( static_cast<void>( ::gsl_lite::detail::fail_fast_assert_debug( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
-#  elif gsl_CONFIG( USE_CRT_ASSERT_FUNCTION )
-#   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) )
-#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ), false ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) )
+#  define    gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, "", __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, "", __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_()                     ( ::gsl_lite::fail_fast_assert_handler( "unreachable", "", __FILE__, __LINE__ ), gsl_TRAP_FALLBACK_() ) /* do not let the custom assertion handler continue execution */
+#  define    gsl_CONTRACT_CHECK_MSG_( str, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_MSG_( str, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_CHECK_AT_( loc, x )    ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::fail_fast_assert_handler( #x, gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_AT_( loc )             ( ::gsl_lite::fail_fast_assert_handler( "unreachable", gsl_FUNC_, loc.file_name(), static_cast<int>( loc.line() ) ), gsl_TRAP_FALLBACK_() ) /* do not let the custom assertion handler continue execution */
+# elif defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) // [default]
+#  if gsl_CONFIG( USE_CRT_ASSERTION_HANDLER ) && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
+#   define   gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::_CrtDbgReport( _CRT_ASSERT, __FILE__, __LINE__, gsl_nullptr, "`%s'", #x ) == 1 && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::_CrtDbgReport( _CRT_ASSERT, __FILE__, __LINE__, gsl_nullptr, "`%s'", #x ) == 1 && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_()                     ( static_cast<void>( ::_CrtDbgReport( _CRT_ASSERT, __FILE__, __LINE__, gsl_nullptr, "unreachable" ) == 1 && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
+#   define   gsl_CONTRACT_CHECK_MSG_( str, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::_CrtDbgReport( _CRT_ASSERT, __FILE__, __LINE__, gsl_nullptr, "%s: `%s'", str, #x ) == 1 && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_MSG_( str, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::_CrtDbgReport( _CRT_ASSERT, __FILE__, __LINE__, gsl_nullptr, "%s: `%s'", str, #x ) == 1 && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )    ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : static_cast<void>( ::_CrtDbgReport( _CRT_ASSERT, loc.file_name(), static_cast<int>( loc.line() ), gsl_nullptr, "%s: `%s'", gsl_FUNC_, #x ) == 1 && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::_CrtDbgReport( _CRT_ASSERT, loc.file_name(), static_cast<int>( loc.line() ), gsl_nullptr, "%s: `%s'", gsl_FUNC_, #x ) == 1 && ( _CrtDbgBreak(), false ) ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_AT_( loc )             ( static_cast<void>( ::_CrtDbgReport( _CRT_ASSERT, loc.file_name(), static_cast<int>( loc.line() ), gsl_nullptr, "%s: unreachable", gsl_FUNC_ ) == 1 && ( _CrtDbgBreak(), false ) ), gsl_TRAP_FALLBACK_() )
+#  elif gsl_CONFIG( USE_CRT_ASSERTION_HANDLER )
+#   define   gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, gsl_nullptr, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, gsl_nullptr, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_()                     ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) )
+#   define   gsl_CONTRACT_CHECK_MSG_( str, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_MSG_( str, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )    ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_assert( #x, gsl_FUNC_, loc.file_name(), loc.line() ), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_AT_( loc )             ( ::gsl_lite::detail::fail_fast_assert( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) )
 #  elif ! defined( NDEBUG )
-#   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ assert( x ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( assert( false && #x ), false ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_FAILFAST_()                    ( gsl_DIAG_SUPPRESS_236_ assert( false ) gsl_DIAG_RESTORE_236_, gsl_TRAP_FALLBACK_() )
-#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#   define   gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#   define   gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ assert( x ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( assert( false && #x ), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_()                     ( gsl_DIAG_SUPPRESS_236_ assert( false ) gsl_DIAG_RESTORE_236_, gsl_TRAP_FALLBACK_() )
+#   define   gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#   define   gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
+#   define   gsl_FAILFAST_AT_( loc )             ( static_cast<void>( loc ), gsl_FAILFAST_() )
 #  else // defined( NDEBUG )
-#   define   gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_abort() gsl_DIAG_RESTORE_236_ )
-#   define   gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_abort(), false ) gsl_DIAG_RESTORE_236_ )
-#   define   gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_abort() )
-#   define   gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#   define   gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#   define   gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::std::abort() gsl_DIAG_RESTORE_236_ )
+#   define   gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::std::abort(), false ) gsl_DIAG_RESTORE_236_ )
+#   define   gsl_FAILFAST_()                     ( ::std::abort() )
+#   define   gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#   define   gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#   define   gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#   define   gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
+#   define   gsl_FAILFAST_AT_( loc )             ( static_cast<void>( loc ), gsl_FAILFAST_() )
 #   endif
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-#  define    gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_throw( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_throw( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) )
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( #x, gsl_FUNC_, loc.file_name(), loc.line() ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_throw( #x, gsl_FUNC_, loc.file_name(), loc.line() ), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::detail::fail_fast_throw( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) )
+#  define    gsl_CONTRACT_CHECK_MSG_( str, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( #x, str, __FILE__, __LINE__ ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_MSG_( str, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_throw( #x, str, __FILE__, __LINE__ ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_CHECK_( x )            gsl_CONTRACT_CHECK_MSG_( gsl_nullptr, x )
+#  define    gsl_CONTRACT_VERIFY_( x )           gsl_CONTRACT_VERIFY_MSG_( gsl_nullptr, x )
+#  define    gsl_FAILFAST_()                     ( ::gsl_lite::detail::fail_fast_throw( "unreachable", gsl_nullptr, __FILE__, __LINE__ ) )
+#  define    gsl_CONTRACT_CHECK_AT_( loc, x )    ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_throw( #x, gsl_FUNC_, loc.file_name(), loc.line() ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_throw( #x, gsl_FUNC_, loc.file_name(), loc.line() ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_AT_( loc )             ( ::gsl_lite::detail::fail_fast_throw( "unreachable", gsl_FUNC_, loc.file_name(), loc.line() ) )
 # elif defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE )
-#  define    gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_trace( #x, str, 0 ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_trace( #x, str, 0 ), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_trace( "unreachable", gsl_nullptr, 0 ) )
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_trace( ( static_cast<void>( loc ), #x ), gsl_FUNC_, 1 ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_trace( ( static_cast<void>( loc ), #x ), gsl_FUNC_, 1 ), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_AT_( loc )            ( ::gsl_lite::detail::fail_fast_trace( ( static_cast<void>( loc ), "unreachable" ), gsl_FUNC_, 1 ) )
-# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES ) [default]
-#  define    gsl_CONTRACT_CHECK_( str, x )      ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_terminate() gsl_DIAG_RESTORE_236_ )
-#  define    gsl_CONTRACT_VERIFY_( str, x )     ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_terminate(), false ) gsl_DIAG_RESTORE_236_ )
-#  define    gsl_FAILFAST_()                    ( ::gsl_lite::detail::fail_fast_terminate() )
-#  define    gsl_CONTRACT_CHECK_AT_( loc, x )   gsl_CONTRACT_CHECK_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )  gsl_CONTRACT_VERIFY_( , ( static_cast<void>( loc ), x ) )
-#  define    gsl_FAILFAST_AT_( loc )            ( static_cast<void>( loc ), gsl_FAILFAST_() )
+#  define    gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_trace( #x, gsl_nullptr ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_trace( #x, gsl_nullptr ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_()                     ( ::gsl_lite::detail::fail_fast_trace( "unreachable", gsl_nullptr ) )
+#  define    gsl_CONTRACT_CHECK_MSG_( str, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_trace( #x, str ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_MSG_( str, x )  ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_trace( #x, str ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_CHECK_AT_( loc, x )    ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::gsl_lite::detail::fail_fast_trace( ( static_cast<void>( loc ), #x ), gsl_FUNC_ ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )   ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::gsl_lite::detail::fail_fast_trace( ( static_cast<void>( loc ), #x ), gsl_FUNC_ ), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_AT_( loc )             ( ::gsl_lite::detail::fail_fast_trace( ( static_cast<void>( loc ), "unreachable" ), gsl_FUNC_ ) )
+# else // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES )
+#  define    gsl_CONTRACT_CHECK_( x )            ( gsl_DIAG_SUPPRESS_236_ ( x ) ? static_cast<void>(0) : ::std::terminate() gsl_DIAG_RESTORE_236_ )
+#  define    gsl_CONTRACT_VERIFY_( x )           ( gsl_DIAG_SUPPRESS_236_ ( x ) ? true : ( ::std::terminate(), false ) gsl_DIAG_RESTORE_236_ )
+#  define    gsl_FAILFAST_()                     ( ::std::terminate() )
+#   define   gsl_CONTRACT_CHECK_MSG_( str, x )   gsl_CONTRACT_CHECK_( x )
+#   define   gsl_CONTRACT_VERIFY_MSG_( str, x )  gsl_CONTRACT_VERIFY_( x )
+#  define    gsl_CONTRACT_CHECK_AT_( loc, x )    gsl_CONTRACT_CHECK_( ( static_cast<void>( loc ), x ) )
+#  define    gsl_CONTRACT_VERIFY_AT_( loc, x )   gsl_CONTRACT_VERIFY_( ( static_cast<void>( loc ), x ) )
+#  define    gsl_FAILFAST_AT_( loc )             ( static_cast<void>( loc ), gsl_FAILFAST_() )
 # endif
 #endif // gsl_DEVICE_CODE
 
@@ -2291,52 +2316,52 @@ using std::shared_ptr;
 #endif
 
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_( "precondition", x )
+# define  gsl_Expects( x )       gsl_CONTRACT_CHECK_MSG_( "precondition", x )
 #else
 # define  gsl_Expects( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_( "precondition", x )
+# define  gsl_ExpectsDebug( x )  gsl_CONTRACT_CHECK_MSG_( "precondition", x )
 #else
 # define  gsl_ExpectsDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_EXPECTS_OFF )
-# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_( "precondition", x )
+# define  gsl_ExpectsAudit( x )  gsl_CONTRACT_CHECK_MSG_( "precondition", x )
 #else
 # define  gsl_ExpectsAudit( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_( "postcondition", x )
+# define  gsl_Ensures( x )       gsl_CONTRACT_CHECK_MSG_( "postcondition", x )
 #else
 # define  gsl_Ensures( x )       gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_( "postcondition", x )
+# define  gsl_EnsuresDebug( x )  gsl_CONTRACT_CHECK_MSG_( "postcondition", x )
 #else
 # define  gsl_EnsuresDebug( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ENSURES_OFF )
-# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_( "postcondition", x )
+# define  gsl_EnsuresAudit( x )  gsl_CONTRACT_CHECK_MSG_( "postcondition", x )
 #else
 # define  gsl_EnsuresAudit( x )  gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_Assert( x )        gsl_CONTRACT_CHECK_( "", x )
+# define  gsl_Assert( x )        gsl_CONTRACT_CHECK_( x )
 #else
 # define  gsl_Assert( x )        gsl_CONTRACT_UNENFORCED_( x )
 #endif
 #if gsl_CHECK_DEBUG_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertDebug( x )   gsl_CONTRACT_CHECK_( "", x )
+# define  gsl_AssertDebug( x )   gsl_CONTRACT_CHECK_( x )
 #else
 # define  gsl_AssertDebug( x )   gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_AUDIT_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_AssertAudit( x )   gsl_CONTRACT_CHECK_( "", x )
+# define  gsl_AssertAudit( x )   gsl_CONTRACT_CHECK_( x )
 #else
 # define  gsl_AssertAudit( x )   gsl_ELIDE_( x )
 #endif
 #if gsl_CHECK_CONTRACTS_ && !defined( gsl_CONFIG_CONTRACT_CHECKING_ASSERT_OFF )
-# define  gsl_Verify( x )        gsl_CONTRACT_VERIFY_( "", x )
+# define  gsl_Verify( x )        gsl_CONTRACT_VERIFY_( x )
 #else
 # define  gsl_Verify( x )        ( !!( x ) )
 #endif
@@ -2379,30 +2404,37 @@ struct fail_fast : public std::logic_error
 
 namespace detail {
 
-#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION )
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERTION_HANDLER ) && ! ( gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG ) )
 # if gsl_COMPILER_MS_STL_VERSION
-#  ifdef _DLL
-#   define gsl_CRTIMP_  __declspec( dllimport )
-#  else
-#   define gsl_CRTIMP_
-#  endif
-// According to the UCRT documentation, the following function is exported by the UCRT but not defined in a header file.
+// According to the UCRT documentation, the `_assert()` function is exported by the UCRT but not defined in a header file.
 // (cf. https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/assert-macro-assert-wassert)
-extern "C" gsl_CRTIMP_ void __cdecl _assert( char const * expr, char const * file, unsigned line );
-#  undef gsl_CRTIMP_
-# endif // gsl_COMPILER_MS_STL_VERSION
-# if gsl_CONFIG( USE_CRT_ASSERT_FUNCTION ) == 2 && gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG )
-// Function returns `true` if a debug break is desired, `false` otherwise.
-inline bool fail_fast_assert_debug( char const * expression, char const * message, char const * filename, unsigned line )
+extern "C"
+#  ifdef _DLL
+__declspec( dllimport )
+#  endif
+void __cdecl _assert( char const * expr, char const * file, unsigned line );
+# elif defined( __linux__ )
+// The `__assert_fail()` function is exported by the CRT on Linux according to Linux Standard Base but not necessarily
+// declared in a header file.
+// (cf. https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib---assert-fail-1.html)
+extern "C" void __assert_fail( char const * expr, char const * file, unsigned line, char const * function );
+# else
+// We assume that the function `__assert()` is exported by the CRT.
+// This function seems to be widely available but is not really documented, so it not used by default unless
+// `gsl_CONFIG_USE_CRT_ASSERTION_HANDLER` is explicitly set to 1.
+extern "C" void __assert( char const * expr, char const * file, int line );
+# endif
+gsl_NORETURN
+# if defined( _MSC_VER )
+__declspec( noinline )
+# elif defined( __GNUC__ )
+__attribute__(( noinline ))
+# endif
+inline void fail_fast_assert( char const * expression, char const * message, char const * filename, unsigned line )
 {
-    bool haveMessage = message && message[0] != '\0';
-    return _CrtDbgReport( _CRT_ASSERT, filename, static_cast<int>( line ), /*module:*/ NULL,
-        haveMessage ? "%s: `%s'" : "%s`%s'",
-        haveMessage ? message : "", expression) == 1;
-}
-# else // MS-STL in non-Debug build, or another STL in any build configuration
-gsl_NORETURN inline void fail_fast_assert( char const * expression, char const * message, char const * filename, unsigned line )
-{
+# if defined( __linux__ )
+    detail::__assert_fail( expression, filename, line, message );
+# else
     if ( message && message[0] != '\0' )
     {
         std::string s = message;
@@ -2410,25 +2442,30 @@ gsl_NORETURN inline void fail_fast_assert( char const * expression, char const *
         s += expression;
 #  if gsl_COMPILER_MS_STL_VERSION
         detail::_assert( s.c_str(), filename, line );
-        std::abort();
 #  else // ! gsl_COMPILER_MS_STL_VERSION
-        ::__assert( s.c_str(), filename, static_cast<int>( line ) );
+        detail::__assert( s.c_str(), filename, static_cast<int>( line ) );
 #  endif
     }
     else
     {
 #  if gsl_COMPILER_MS_STL_VERSION
         detail::_assert( expression, filename, line );
-        std::abort();
 #  else // ! gsl_COMPILER_MS_STL_VERSION
-        ::__assert( expression, filename, static_cast<int>( line ) );
+        detail::__assert( expression, filename, static_cast<int>( line ) );
 #  endif
     }
-}
 # endif
-#endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERT_FUNCTION )
+    std::abort();
+}
+#endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS ) && gsl_CONFIG( USE_CRT_ASSERTION_HANDLER ) && ! ( gsl_COMPILER_MS_STL_VERSION && defined( _DEBUG ) )
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
-gsl_NORETURN inline void fail_fast_throw( char const * expression, char const * message, char const * filename, unsigned line )
+gsl_NORETURN
+# if defined( _MSC_VER )
+__declspec( noinline )
+# elif defined( __GNUC__ )
+__attribute__(( noinline ))
+# endif
+inline void fail_fast_throw( char const * expression, char const * message, char const * filename, unsigned line )
 {
     // At the expense of having to assemble the string at runtime, we avoid bloating the executable by keeping filename and message strings separate.
     std::string s = "assertion failed: `";
@@ -2465,7 +2502,13 @@ gsl_NORETURN inline void fail_fast_throw( char const * expression, char const * 
 }
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE )
-gsl_NORETURN inline void fail_fast_trace( char const * expression, char const * message, int skip ) gsl_noexcept
+gsl_NORETURN
+# if defined( _MSC_VER )
+__declspec( noinline )
+# elif defined( __GNUC__ )
+__attribute__(( noinline ))
+# endif
+inline void fail_fast_trace( char const * expression, char const * message ) gsl_noexcept
 {
     std::cerr << "assertion failed: ";
     if ( message && message[0] )
@@ -2473,23 +2516,16 @@ gsl_NORETURN inline void fail_fast_trace( char const * expression, char const * 
         std::cerr << message << ": ";
     }
     std::cerr << "`" << expression << "' at:\n";
-#ifdef NDEBUG
-    skip = 0;  // in a Release build, prefer not to skip frames as the fail_fast_frace() function may get inlined
-#else
-    skip += 1;  // in a Debug build, skip one extra frame for the fail_fast_frace() function itself
-#endif
-    std::cerr << std::stacktrace::current( static_cast<std::size_t>( skip ) ) << std::endl;
+    std::size_t skip;
+# if defined( _MSC_VER ) || defined( __GNUC__ )
+    skip = 1;  // the function has a noinline attribute, so we can skip it in the call stack
+# else
+    skip = 0;  // don't know how to generate a noinline attribute for this compiler, so play it safe
+# endif
+    std::cerr << std::stacktrace::current( skip ) << std::endl;
     std::terminate();
 }
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE )
-gsl_NORETURN inline void fail_fast_terminate() gsl_noexcept
-{
-    std::terminate();
-}
-gsl_NORETURN inline void fail_fast_abort() gsl_noexcept
-{
-    std::abort();
-}
 
 } // namespace detail
 
