@@ -196,5 +196,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [14, 15, 16, 17]
+      cxxCompilerVersions: [15, 16, 17]
       platforms: [x64]
