@@ -1426,9 +1426,9 @@
 # include <source_location>
 #endif
 
-#if gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE
+#if defined( gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE )
+# include <iostream>
 # ifdef __cpp_lib_stacktrace
-#  include <iostream>
 #  include <stacktrace>
 # else
 #  error gsl_CONFIG_CONTRACT_VIOLATION_TERMINATES_WITH_STACKTRACE: requires C++23 for std::stacktrace
