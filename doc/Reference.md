@@ -1470,7 +1470,11 @@ If set to 1, contract violations are handled by the assertion handler of the C r
 - Linux: [`__assert_fail()`](https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib---assert-fail-1.html)
 - Other systems: [`__assert()`](https://stackoverflow.com/q/76233708) (widely available but undocumented)
 
-If set to 0, contracts are checked with the `assert()` macro if `NDEBUG` is not defined. `std::abort()` is called directly on contract violation if `NDEBUG` is defined.
+If set to 0, contracts are handled with a custom assertion handler that behaves like the CRT assertion handler on most platforms (that is,
+it prints an assertion message to `stderr` and terminates the program through `std::abort()`).
+
+The assertion handler is called regardless of whether or not `NDEBUG` is defined. To suppress contract check assertions in a Release
+build, define `gsl_CONFIG_CONTRACT_CHECKING_OFF` for the build configuration.
 
 **Default is 1 when building with MSVC or for Linux targets, where a CRT assertion handler is guaranteed to be available, and 0 otherwise.**
 
