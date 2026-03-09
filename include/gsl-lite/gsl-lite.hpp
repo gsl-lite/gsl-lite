@@ -2411,47 +2411,49 @@ extern "C" void __assert_fail( char const * expr, char const * file, unsigned li
 extern "C" void __assert( char const * expr, char const * file, int line );
 #  endif
 # endif // gsl_CONFIG( USE_CRT_ASSERTION_HANDLER )
+# if ! gsl_COMPILER_MS_STL_VERSION || ! defined( _DEBUG )
 gsl_NORETURN
-# if defined( _MSC_VER )
+#  if defined( _MSC_VER )
 __declspec( noinline )
-# elif defined( __GNUC__ )
+#  elif defined( __GNUC__ )
 __attribute__(( noinline ))
-# endif
+#  endif
 inline void fail_fast_assert( char const * expression, char const * message, char const * filename, unsigned line )
 {
-# if gsl_CONFIG( USE_CRT_ASSERTION_HANDLER )
-#  if defined( __linux__ )
+#  if gsl_CONFIG( USE_CRT_ASSERTION_HANDLER )
+#   if defined( __linux__ )
     detail::__assert_fail( expression, filename, line, message );
-#  else
+#   else
     if ( message && message[0] != '\0' )
     {
         std::string s = message;
         s += ": ";
         s += expression;
-#   if gsl_COMPILER_MS_STL_VERSION
+#    if gsl_COMPILER_MS_STL_VERSION
         detail::_assert( s.c_str(), filename, line );
-#   else // ! gsl_COMPILER_MS_STL_VERSION
+#    else // ! gsl_COMPILER_MS_STL_VERSION
         detail::__assert( s.c_str(), filename, static_cast<int>( line ) );
-#   endif
+#    endif
     }
     else
     {
-#   if gsl_COMPILER_MS_STL_VERSION
+#    if gsl_COMPILER_MS_STL_VERSION
         detail::_assert( expression, filename, line );
-#   else // ! gsl_COMPILER_MS_STL_VERSION
+#    else // ! gsl_COMPILER_MS_STL_VERSION
         detail::__assert( expression, filename, static_cast<int>( line ) );
-#   endif
+#    endif
     }
-#  endif
-# else // ! gsl_CONFIG( USE_CRT_ASSERTION_HANDLER )
+#   endif
+#  else // ! gsl_CONFIG( USE_CRT_ASSERTION_HANDLER )
     bool haveMessage = message && message[0] != '\0';
     std::fprintf( stderr,
         haveMessage ? "%s:%u: Assertion failed: `%s: %s'\n" : "%s:%u: Assertion failed: `%s%s'\n",
         filename, line, haveMessage ? message : "", expression );
     std::fflush( stderr );
-# endif
+#  endif
     std::abort();
 }
+# endif // ! gsl_COMPILER_MS_STL_VERSION || ! defined( _DEBUG )
 #endif // defined( gsl_CONFIG_CONTRACT_VIOLATION_ASSERTS )
 #if defined( gsl_CONFIG_CONTRACT_VIOLATION_THROWS )
 gsl_NORETURN
