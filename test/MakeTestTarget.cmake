@@ -275,6 +275,7 @@ function( make_test_target target )
             "-Wsign-conversion"
             "-fno-elide-constructors"
             "-fstrict-aliasing" "-Wstrict-aliasing=2"
+            "$<$<CONFIG:RelWithDebInfo>:-O1>"  # keep optimizations at level 1 to avoid excessive memory consumption (overrides earlier flag from defaults)
         )
         if( NOT SCOPE_CUDA )
             list( APPEND localOptions "-pedantic" ) # NVCC and "-pedantic" don't mix (GCC complains that NVCC-generated GCC-specific code is GCC specific)
