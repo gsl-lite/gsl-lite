@@ -52,7 +52,7 @@ jobs:
       cudaCompiler: NVCC
       cudaCompilerVersions: [12_9]
       platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
 
     # CImakeshift doesn't currently support Clang-CUDA.
     #- os: Linux
@@ -77,10 +77,10 @@ jobs:
         displayName: 'Install Valgrind'
       # Make Valgrind return a non-zero exit code when errors occur in order to make the job fail.
       # Also, enforce DWARF version 4 because Valgrind cannot read DWARF version 5 yet (cf. https://bugs.kde.org/show_bug.cgi?id=452758).
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4;$<$<CONFIG:RelWithDebInfo>:-O1>" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'  # keep optimizations at level 1 to avoid excessive memory consumption
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
-    
+
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2026]
@@ -112,6 +112,7 @@ jobs:
       cxxCompilerVersions: [17]
       platforms: [x64]
       tag: 'subset'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpp(17|20)"'
 
@@ -125,6 +126,7 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [9, 10, 11, 12, 13]
       platforms: [x64]
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
 
     - os: Linux
       cxxCompiler: GCC
@@ -133,7 +135,7 @@ jobs:
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
 
@@ -147,6 +149,7 @@ jobs:
       cxxCompiler: Clang
       cxxCompilerVersions: [12, 13, 14, 15, 16, 17, 18, 19, 20]
       platforms: [x64]
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
 
     - os: Linux
       cxxCompiler: Clang
@@ -155,7 +158,7 @@ jobs:
       cxxSanitizers: [AddressSanitizer, UndefinedBehaviorSanitizer, ImplicitIntegerArithmeticValueChange]
       platforms: [x64]
       tag: 'sanitize'
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
 
@@ -165,6 +168,7 @@ jobs:
       cxxStandardLibrary: libstdc++
       platforms: [x64]
       tag: 'libstdc++'
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
 
     - os: Linux
       cxxCompiler: GCC
@@ -172,7 +176,7 @@ jobs:
       cudaCompiler: NVCC
       cudaCompilerVersions: [12_9]
       platforms: [x64]
-      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
+      cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
 
     # VS 2010, 2012, 2013, 2015, and 2017 are tested with AppVeyor
 
@@ -193,8 +197,10 @@ jobs:
       cxxCompiler: GCC
       cxxCompilerVersions: [11, 12, 13, 14]
       platforms: [x64]
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
 
     - os: MacOS
       cxxCompiler: AppleClang
       cxxCompilerVersions: [15, 16, 17]
       platforms: [x64]
+      cmakeConfigArgs: '<cmakeConfigArgs> -DCMAKE_CXX_FLAGS="$<$<CONFIG:RelWithDebInfo>:-O1>"'  # keep optimizations at level 1 to avoid excessive memory consumption
