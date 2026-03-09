@@ -139,7 +139,7 @@ if( ( MSVC AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.30 ) # VS 2022 and
         SOURCES
             gsl-lite.t.cpp
             assert.t.cpp
-        EXTRA_OPTIONS "$<$<CXX_COMPILER_ID:GNU>:-lstdc++exp>"
+        EXTRA_LIBS "$<$<CXX_COMPILER_ID:GNU>:-lstdc++exp>"
         DEFAULTS_VERSION v1
         CONTRACT_CHECKING ON
         CONTRACT_VIOLATION TERMINATES_WITH_STACKTRACE
