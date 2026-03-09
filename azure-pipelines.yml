@@ -1,4 +1,4 @@
-﻿
+
 variables:
   System.Debug: true
 
@@ -20,7 +20,7 @@ jobs:
 - template: azure-pipelines/cmake.yml@CImakeshift
   parameters:
     cache: False
-    cmakeBuildConfigurations: [Debug]
+    cmakeBuildConfigurations: [Debug, RelWithDebInfo]
     cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DGSL_LITE_OPT_BUILD_EXAMPLES=ON'
     cmakeTestArgs: '--exclude-regex "cuda"'  # do not run CUDA tests
 
@@ -31,7 +31,6 @@ jobs:
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [14]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
       postSetupSteps:
@@ -46,13 +45,12 @@ jobs:
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
-    
+
     - os: Linux
       cxxCompiler: GCC
       cxxCompilerVersions: [14]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_8]
+      cudaCompilerVersions: [12_9]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
@@ -60,7 +58,6 @@ jobs:
     #- os: Linux
     #  cxxCompiler: Clang
     #  cxxCompilerVersions: [13]
-    #  cmakeBuildConfigurations: [Debug, RelWithDebInfo]
     #  cudaCompiler: Clang
     #  cudaCompilerVersions: [13]
     #  platforms: [x64]
@@ -69,7 +66,6 @@ jobs:
     - os: Linux
       cxxCompiler: Clang
       cxxCompilerVersions: [19]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
       tag: 'memcheck'
       postSetupSteps:
@@ -84,39 +80,38 @@ jobs:
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_TESTS=ON -DCMAKE_CXX_FLAGS="-gdwarf-4" -DMEMORYCHECK_COMMAND_OPTIONS="--error-exitcode=1 --leak-check=full"'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v0-cpp17.t gsl-lite-v1-cpp17.t gsl-lite-v0-cpp20.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --test-action memcheck --tests-regex "gsl-lite-v[0-1]-cpp(17|20)"'
-    
+
     - os: Windows
       cxxCompiler: MSVC
-      cxxCompilerVersions: [VS2022]
+      cxxCompilerVersions: [VS2026]
       cmakeGenerator: 'MSBuild'  # required for CppCoreCheck
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x86, x64]
+      tag: 'PREfast'
       cmakeConfigArgs: '<cmakeConfigArgs> -DGSL_LITE_OPT_BUILD_STATIC_ANALYSIS_DEMOS=ON'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t gsl-lite-v1-cpplatest-CppCoreCheck'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpplatest"'
-    
+
     - os: Windows
       cxxCompiler: Clang
-      cxxCompilerVersions: [VS2022]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      cxxCompilerVersions: [VS2026]
       platforms: [x86, x64]
+      tag: 'subset'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpplatest.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpplatest"'
-    
+
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_8]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
+      cudaCompilerVersions: [12_9]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
 
     - os: MacOS
       cxxCompiler: AppleClang
       cxxCompilerVersions: [17]
-      cmakeBuildConfigurations: [Debug, RelWithDebInfo]
       platforms: [x64]
+      tag: 'subset'
       cmakeBuildArgs: '<cmakeBuildArgs> --target gsl-lite-v1-cpp17.t gsl-lite-v1-cpp20.t'
       cmakeTestArgs: '<cmakeTestArgs> --tests-regex "gsl-lite-v1-cpp(17|20)"'
 
@@ -185,10 +180,10 @@ jobs:
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
       cudaCompiler: NVCC
-      cudaCompilerVersions: [12_9]
+      cudaCompilerVersions: [12_8]
       platforms: [x64]
       cmakeConfigArgs: '-DGSL_LITE_OPT_BUILD_CUDA_TESTS=ON'
-    
+
     - os: Windows
       cxxCompiler: MSVC
       cxxCompilerVersions: [VS2022]
@@ -201,5 +196,5 @@ jobs:
 
     - os: MacOS
       cxxCompiler: AppleClang
-      cxxCompilerVersions: [14, 15, 16, 17]
+      cxxCompilerVersions: [15, 16, 17]
       platforms: [x64]

@@ -207,7 +207,7 @@ function( make_test_target target )
 
     set( optionArgs CUDA NO_EXCEPTIONS COMPILE_ONLY NO_PCH )
     set( oneValueArgs STD DEFAULTS_VERSION CONTRACT_VIOLATION CONTRACT_CHECKING UNENFORCED_CONTRACTS )
-    set( multiValueArgs SOURCES EXTRA_OPTIONS )
+    set( multiValueArgs SOURCES EXTRA_OPTIONS EXTRA_LIBS )
     cmake_parse_arguments( "SCOPE" "${optionArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
     if( SCOPE_UNPARSED_ARGUMENTS )
         list( JOIN SCOPE_UNPARSED_ARGUMENTS "\", \"" SCOPE_UNPARSED_ARGUMENTS_STR )
@@ -275,6 +275,7 @@ function( make_test_target target )
             "-Wsign-conversion"
             "-fno-elide-constructors"
             "-fstrict-aliasing" "-Wstrict-aliasing=2"
+            "$<$<CONFIG:RelWithDebInfo>:-O1>"  # keep optimizations at level 1 to avoid excessive memory consumption (overrides earlier flag from defaults)
         )
         if( NOT SCOPE_CUDA )
             list( APPEND localOptions "-pedantic" ) # NVCC and "-pedantic" don't mix (GCC complains that NVCC-generated GCC-specific code is GCC specific)
@@ -330,6 +331,7 @@ function( make_test_target target )
     target_compile_options( ${target} PRIVATE ${localOptions} ${SCOPE_EXTRA_OPTIONS} )
     target_compile_definitions( ${target} PRIVATE ${localDefinitions} )
     target_link_libraries( ${target} PRIVATE gsl-lite-${SCOPE_DEFAULTS_VERSION} )
+    target_link_libraries( ${target} PRIVATE ${SCOPE_EXTRA_LIBS} )
 
     if( NOT SCOPE_NO_PCH
             AND NOT CMAKE_VERSION VERSION_LESS 3.16  # VERSION_GREATER_EQUAL doesn't exist in CMake 3.5

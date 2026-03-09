@@ -1,4 +1,4 @@
-﻿# *gsl-lite*
+# *gsl-lite*
 
 
 | metadata | build  | packages | try online |
@@ -318,8 +318,8 @@ Clang                | Linux           | x64       | 3.5 and newer     | [11, 12
 Clang with libstdc++ | Linux           | x64       | 11 and newer      | [20](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 Clang                | Windows         | x64       | version shipped with VS | VS [2022, 2026](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 MSVC (Visual Studio) | Windows         | x86, x64  | VS 2010 and newer | VS [2010, 2012, 2013, 2015, 2017, 2019](https://ci.appveyor.com/project/gsl-lite/gsl-lite), [2022, 2026](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [14, 15, 16, 17](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
-NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [12.9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+AppleClang (Xcode)   | MacOS           | x64       | 7.3 and newer     | [15, 16, 17](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
+NVCC (CUDA Toolkit)  | Linux, Windows  | x64       | 10.2 and newer    | [12.8, 12.9](https://dev.azure.com/gsl-lite/gsl-lite/_build?definitionId=1) |
 ARMCC                |                 | ARM       | 5 and newer       | |
 
 

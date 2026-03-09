@@ -19,7 +19,7 @@ environment:
 
 configuration:
     - Debug
-    #- Release
+    - Release
 
 platform:
     - Win32

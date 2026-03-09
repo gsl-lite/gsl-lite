@@ -435,6 +435,7 @@ namespace lest
 #define lest_EXPECT_THROWS( expr ) \
     do \
     { \
+        lest_SUPPRESS_WUNREACHABLE \
         lest_TRY \
         { \
             lest_SUPPRESS_WUNUSED \
@@ -448,12 +449,14 @@ namespace lest
             break; \
         } \
         lest_THROW( lest::expected( lest_LOCATION, #expr ) ); \
+        lest_RESTORE_WARNINGS \
     } \
     while ( false )
 
 #define lest_EXPECT_THROWS_AS( expr, excpt ) \
     do \
     { \
+        lest_SUPPRESS_WUNREACHABLE \
         lest_TRY \
         { \
             lest_SUPPRESS_WUNUSED \
@@ -468,6 +471,7 @@ namespace lest
         } \
         lest_CATCH_ALL {} \
         lest_THROW( lest::expected( lest_LOCATION, #expr, lest::of_type( #excpt ) ) ); \
+        lest_RESTORE_WARNINGS \
     } \
     while ( false )
 
