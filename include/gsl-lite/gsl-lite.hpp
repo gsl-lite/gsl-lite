@@ -1926,9 +1926,9 @@ template<>
 struct is_char<char32_t> : std11::true_type{};
 #endif
 template< class T, class C >
-struct is_czstring : std11::false_type{};
+struct is_czstring_of : std11::false_type{};
 template< class C >
-struct is_czstring< C const *, C > : is_char<C>{};
+struct is_czstring_of< C const *, C > : is_char<C>{};
 
 #if gsl_FEATURE( SPAN ) && gsl_HAVE( TYPE_TRAITS )
 
@@ -3591,14 +3591,14 @@ public:
 #endif // gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 #if gsl_BASELINE_CPP20_
     template< class C, std::size_t N >
-    requires detail::is_czstring<T, C>::value
+    requires detail::is_czstring_of<T, C>::value
     gsl_api constexpr /*implicit*/ not_null( C const ( & literal )[N], std::source_location const & = std::source_location::current() ) noexcept
         : ptr_( literal )
     {
     }
 #else // ! gsl_BASELINE_CPP20_
     template< class C, std::size_t N
-        gsl_ENABLE_IF_NTTP_(( detail::is_czstring<T, C>::value ))
+        gsl_ENABLE_IF_NTTP_(( detail::is_czstring_of<T, C>::value ))
     >
     gsl_api gsl_constexpr14 /*implicit*/ not_null( C const ( & literal )[N] ) gsl_noexcept
         : data_( literal )

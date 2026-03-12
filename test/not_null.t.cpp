@@ -1986,7 +1986,7 @@ CASE( "not_null<>: Invocability is correctly reported by type traits" )
 #endif // gsl_STDLIB_CPP20_OR_GREATER
 }
 
-CASE( "not_null<>: Supports constructing and assigning std::function<> from non-nullable function object" )
+CASE( "not_null<>: Supports constructing and assigning from string literal" )
 {
     not_null< czstring > nnstr1( "a null-terminated string literal" );
     not_null< czstring > nnstr2 = "a null-terminated string literal";
