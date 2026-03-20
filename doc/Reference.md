@@ -405,6 +405,12 @@ auto npi = gsl_lite::make_unique<int>( 42 );
 if ( ! gsl_lite::is_valid( npi ) ) { ... }  // ok
 ```
 
+Alternatively, the moved-from state can be detected by calling `not_null<>::valueless_after_move()`:
+
+```c++
+if ( npi.valueless_after_move() ) { ... }  // ok
+```
+
 ##### `gsl_lite::as_nullable()`
 
 To extract the nullable object wrapped by a `not_null<>` object, call `gsl_lite::as_nullable()`:

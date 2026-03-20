@@ -3476,8 +3476,8 @@ public:
     {
         if constexpr( nullable<U> )
         {
-        gsl_AssertAt( loc, ptr_ != nullptr );
-    }
+            gsl_AssertAt( loc, ptr_ != nullptr );
+        }
     }
 # elif gsl_HAVE( MOVE_FORWARD )
     template< class U
@@ -3718,6 +3718,23 @@ public:
         return *ptr_;
     }
 #endif // gsl_BASELINE_CPP20_
+
+    gsl_NODISCARD gsl_api gsl_constexpr bool
+    valueless_after_move() const gsl_noexcept
+    {
+#if gsl_BASELINE_CPP20_
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            return ptr_ == nullptr;
+        }
+        else
+        {
+            return false;
+        }
+#else // ! gsl_BASELINE_CPP20_
+        return accessor::is_valid( *this );
+#endif
+    }
 
     // We want an implicit conversion operator that can be used to convert from both lvalues (by
     // const reference or by copy) and rvalues (by move). So it seems like we could define
@@ -4183,12 +4200,7 @@ struct as_nullable_helper< not_null<T> >
 template< class T >
 struct not_null_accessor
 {
-#if gsl_BASELINE_CPP20_
-    static gsl_api bool is_valid( not_null<T> const & p ) noexcept
-    {
-        return p.ptr_ != nullptr;
-    }
-#else // ! gsl_BASELINE_CPP20_
+#if ! gsl_BASELINE_CPP20_
 # if gsl_HAVE( MOVE_FORWARD )
     static gsl_api T get( not_null<T>&& p ) gsl_noexcept
     {
@@ -4279,7 +4291,7 @@ template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr bool
 is_valid( not_null<T> const & p )
 {
-    return detail::not_null_accessor<T>::is_valid( p );
+    return ! p.valueless_after_move(); 
 }
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
