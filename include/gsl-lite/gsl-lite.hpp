@@ -3740,7 +3740,7 @@ public:
             return false;
         }
 #else // ! gsl_BASELINE_CPP20_
-        return accessor::is_valid( *this );
+        return ! accessor::is_valid( *this );
 #endif
     }
 
