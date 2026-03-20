@@ -1045,6 +1045,7 @@ Name                        | Expands to      |
 `gsl_DEPRECATED`            | [`[[deprecated]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
 `gsl_DEPRECATED_MSG(msg)`   | [`[[deprecated( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/deprecated) attribute in C++14 and higher, to nothing otherwise |
 `gsl_NODISCARD`             | [`[[nodiscard]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute in C++17 and higher, to nothing otherwise |
+`gsl_NODISCARD_MSG(msg)`    | [`[[nodiscard( msg )]]`](https://en.cppreference.com/w/cpp/language/attributes/nodiscard) attribute in C++20 and higher, to nothing otherwise |
 `gsl_MAYBE_UNUSED`          | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher, or to nothing otherwise |
 `gsl_MAYBE_UNUSED_MEMBER`   | [`[[maybe_unused]]`](https://en.cppreference.com/w/cpp/language/attributes/maybe_unused) attribute in C++17 and higher if that attribute does not raise a warning when applied to class data members (as is the case for GNU GCC), or to nothing otherwise |
 `gsl_NO_UNIQUE_ADDRESS`<br>(≥ C++20) | [`[[msvc::no_unique_address]]`](https://devblogs.microsoft.com/cppblog/msvc-cpp20-and-the-std-cpp20-switch/) for MSVC, to [`[[no_unique_address]]`](https://en.cppreference.com/w/cpp/language/attributes/no_unique_address) otherwise |

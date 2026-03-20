@@ -1103,9 +1103,17 @@
 #endif
 
 #if gsl_HAVE( NODISCARD )
-# define gsl_NODISCARD  [[nodiscard]]
+# define    gsl_NODISCARD           [[nodiscard]]
+# ifdef __has_cpp_attribute
+#  if __has_cpp_attribute( nodiscard ) >= 201907L
+#   define  gsl_NODISCARD_MSG( x )  [[nodiscard( x )]]
+#  endif
+# endif
 #else
-# define gsl_NODISCARD
+# define    gsl_NODISCARD
+#endif
+#ifndef gsl_NODISCARD_MSG
+# define    gsl_NODISCARD_MSG( x )  gsl_NODISCARD
 #endif
 
 #if gsl_HAVE( NORETURN )
