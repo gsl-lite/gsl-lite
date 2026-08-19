@@ -64,11 +64,11 @@ gsl_lite::owner<int*> newIntOwner() noexcept { return nullptr; }
 void newDelete() noexcept
 {
     int* pi = newInt();
-    [[gsl::suppress(r.11)]] delete pi; // expect C26401
+    [[gsl::suppress("r.11")]] delete pi; // expect C26401
     gsl_lite::owner<int*> pi2 = newInt(); // expect C26406
     std::ignore = pi2;
     gsl_lite::owner<int*> pi3 = newIntOwner();
-    [[gsl::suppress(r.11)]] delete pi3;
+    [[gsl::suppress("r.11")]] delete pi3;
 }
 
 } // anonymous namespace
