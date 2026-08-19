@@ -441,7 +441,7 @@ To preserve the nullability when extracting the pointer, the free function `gsl_
 
 ```c++
 auto rpi = gsl_lite::get( pi );  // int*
-auto rnpi = gsl_lit::get( npi );  // not_null<int*>
+auto rnpi = gsl_lite::get( npi );  // not_null<int*>
 
 auto rpi2 = gsl_lite::get( rpi );  // int*
 auto rnpi2 = gsl_lite::get( rnpi );  // not_null<int*>
