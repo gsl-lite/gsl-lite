@@ -1191,13 +1191,13 @@
         typedef ::gsl_lite::std11::underlying_type<ENUM>::type U;          \
         return ENUM( U( lhs ) | U( rhs ) );                                \
     }                                                                      \
-    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ::gsl_lite::flags<ENUM>  \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ::gsl_lite::detail::flags<ENUM>  \
     operator&( ENUM lhs, ENUM rhs ) gsl_noexcept                           \
     {                                                                      \
         typedef ::gsl_lite::std11::underlying_type<ENUM>::type U;          \
         return ENUM( U( lhs ) & U( rhs ) );                                \
     }                                                                      \
-    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ::gsl_lite::flags<ENUM>  \
+    gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr ::gsl_lite::detail::flags<ENUM>  \
     operator^( ENUM lhs, ENUM rhs ) gsl_noexcept                           \
     {                                                                      \
         typedef ::gsl_lite::std11::underlying_type<ENUM>::type U;          \
@@ -2581,6 +2581,8 @@ using ::gsl_lite::std17::uncaught_exceptions;
 
 } // namespace std11
 
+namespace detail {
+
 template< class EnumT >
 struct flags
 {
@@ -2602,7 +2604,13 @@ struct flags
     {
         return value != value_type( );
     }
+    gsl_api gsl_constexpr bool operator !() const gsl_noexcept
+    {
+        return value == value_type( );
+    }
 };
+
+} // namespace detail
 
 #if gsl_STDLIB_CPP11_110
 
