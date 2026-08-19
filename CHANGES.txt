@@ -1,6 +1,16 @@
 ﻿Changes in gsl-lite
 ===================
 
+version 1.1.1 2026-08-19
+
+Changes:
+- For C++20 or later, bitflag enums now support comparison against literal 0 (#384)
+
+Fixes:
+- Avoid ambiguity of operator! for bitflag enums (#383)
+- Avoid warning C4875 (non-string literal argument to [[gsl::suppress]] is deprecated) in VS 2026 (#382)
+
+
 version 1.1.0 2026-03-14
 
 Additions:
