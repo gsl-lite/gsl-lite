@@ -2600,7 +2600,7 @@ struct literal_zero
 {
     consteval literal_zero( int zero )
     {
-        if( zero != 0 ) throw "argument must be literal zero";
+        if( zero != 0 ) std::terminate();  // argument must be literal zero; if not, we cause a compile error by calling a runtime-only function
     }
 };
 #endif // defined( __cpp_consteval )
