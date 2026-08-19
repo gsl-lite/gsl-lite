@@ -572,7 +572,16 @@ CASE( "gsl_DEFINE_ENUM_BITMASK_OPERATORS(): Allow explicit conversion to bool" )
     //if ( flag1 | MyFlags::MyFlag1 )  // does not compile: supporting this would encourage mistakes (`|` instead of `&`)
     static_assert( ! std::is_convertible< decltype( flag1 | MyFlags::MyFlag1 ), bool >::value, "static assertion failed" );
 # endif // gsl_HAVE( AUTO )
-    if ( flag1 ^ MyFlags::MyFlag1 ) { /* fine */ } else { EXPECT( false ); }
+#if defined( __cpp_consteval )
+    if ( flag1 == 0 ) { /* fine */ } else { EXPECT( false ); }
+    if ( flag2 != 0 ) { /* fine */ } else { EXPECT( false ); }
+    if ( ( flag2 & MyFlags::MyFlag1 ) != 0 ) { /* fine */ } else { EXPECT( false ); }
+    if ( ( flag2 & MyFlags::MyFlag2 ) == 0 ) { /* fine */ } else { EXPECT( false ); }
+    //if ( flag1 == 1 )  // does not compile
+    //if ( flag2 != 1 )  // does not compile
+    //if ( ( flag2 & MyFlags::MyFlag1 ) != 1 )  // does not compile
+    //if ( ( flag2 & MyFlags::MyFlag2 ) == 1 )  // does not compile
+#endif // defined( __cpp_consteval )
 # if gsl_HAVE( AUTO )
     //if ( ~flag1 )  // does not compile: supporting this would encourage mistakes (`~` instead of `!`)
     static_assert( ! std::is_convertible< decltype( ~flag1 ), bool >::value, "static assertion failed" );

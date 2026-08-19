@@ -1173,7 +1173,19 @@
 
 #if gsl_HAVE( TYPE_TRAITS )
 
+#if defined( __cpp_consteval )
+# define gsl_DEFINE_ENUM_BITMASK_OPERATORS_LITERAL0_( ENUM )               \
+    [[maybe_unused]] [[nodiscard]] gsl_api inline constexpr bool           \
+    operator==( ENUM val, ::gsl_lite::detail::literal_zero ) noexcept      \
+    {                                                                      \
+        return val == ENUM( );                                             \
+    }
+#else
+# define gsl_DEFINE_ENUM_BITMASK_OPERATORS_LITERAL0_( ENUM )
+#endif // defined( __cpp_consteval )
+
 # define gsl_DEFINE_ENUM_BITMASK_OPERATORS_( ENUM )                        \
+    gsl_DEFINE_ENUM_BITMASK_OPERATORS_LITERAL0_( ENUM )                    \
     gsl_MAYBE_UNUSED gsl_NODISCARD gsl_api inline gsl_constexpr bool       \
     operator!( ENUM val ) gsl_noexcept                                     \
     {                                                                      \
@@ -2583,6 +2595,15 @@ using ::gsl_lite::std17::uncaught_exceptions;
 
 namespace detail {
 
+#if defined( __cpp_consteval )
+struct literal_zero
+{
+    consteval literal_zero( int zero )
+    {
+        if( zero != 0 ) throw "argument must be literal zero";
+    }
+};
+#endif // defined( __cpp_consteval )
 template< class EnumT >
 struct flags
 {
@@ -2595,11 +2616,17 @@ struct flags
     {
     }
 
+#if defined( __cpp_consteval )
+    gsl_api constexpr bool operator ==( literal_zero ) const noexcept
+    {
+        return value == value_type{ };
+    }
+#endif // defined( __cpp_consteval )
+
     gsl_api gsl_constexpr operator EnumT() const gsl_noexcept
     {
         return value;
     }
-
     gsl_api gsl_explicit gsl_constexpr operator bool() const gsl_noexcept
     {
         return value != value_type( );
