@@ -1103,9 +1103,17 @@
 #endif
 
 #if gsl_HAVE( NODISCARD )
-# define gsl_NODISCARD  [[nodiscard]]
+# define    gsl_NODISCARD           [[nodiscard]]
+# ifdef __has_cpp_attribute
+#  if __has_cpp_attribute( nodiscard ) >= 201907L
+#   define  gsl_NODISCARD_MSG( x )  [[nodiscard( x )]]
+#  endif
+# endif
 #else
-# define gsl_NODISCARD
+# define    gsl_NODISCARD
+#endif
+#ifndef gsl_NODISCARD_MSG
+# define    gsl_NODISCARD_MSG( x )  gsl_NODISCARD
 #endif
 
 #if gsl_HAVE( NORETURN )
@@ -3496,39 +3504,23 @@ private:
 #endif
 
 public:
-#if gsl_BASELINE_CPP20_
-    template< class U >
-    requires std::is_constructible_v<T, U> && ( ! std::is_convertible_v<U, T> )
-    gsl_api constexpr explicit not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
-    : ptr_( std::move( other ) )
-    {
-        if constexpr ( nullable<U> )
-        {
-            gsl_AssertAt( loc, ptr_ != nullptr );
-        }
-    }
-#endif // gsl_BASELINE_CPP20_
-
 #if gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 # if gsl_BASELINE_CPP20_
     template< class U >
-    requires std::is_convertible_v<U, T> && std::is_function_v<U>
+    requires std::is_constructible_v<T, U> && std::is_function_v<U>
     gsl_api constexpr /*implicit*/ not_null( U const & other, std::source_location const & = std::source_location::current() ) noexcept
     : ptr_( other )
     {
     }
     template< class U >
-    requires std::is_convertible_v<U, T> && ( ! std::is_function_v<U> ) && nullable<U>
-    gsl_api constexpr explicit not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+    requires std::is_constructible_v<T, U> && ( ! std::is_function_v<U> )
+    gsl_api constexpr explicit( nullable<U> || ! std::is_convertible_v<U, T> ) not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
     : ptr_( std::move( other ) )
     {
-        gsl_AssertAt( loc, ptr_ != nullptr );
-    }
-    template< class U >
-    requires std::is_convertible_v<U, T> && ( ! std::is_function_v<U> ) && ( ! nullable<U> )
-    gsl_api constexpr /*implicit*/ not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
-    : ptr_( std::move( other ) )
-    {
+        if constexpr( nullable<U> )
+        {
+            gsl_AssertAt( loc, ptr_ != nullptr );
+        }
     }
 # elif gsl_HAVE( MOVE_FORWARD )
     template< class U
@@ -3574,11 +3566,12 @@ public:
 #else // a.k.a. !gsl_CONFIG( NOT_NULL_EXPLICIT_CTOR )
 # if gsl_BASELINE_CPP20_
     template< class U >
-    requires std::is_convertible_v<U, T>
-    gsl_api constexpr /*implicit*/ not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
+    requires std::is_constructible_v<T, U>
+    gsl_api constexpr explicit( ! std::is_convertible_v<U, T> )
+    not_null( U other, [[maybe_unused]] std::source_location const & loc = std::source_location::current() )
     : ptr_( std::move( other ) )
     {
-        if constexpr ( nullable<U> )
+        if constexpr( nullable<U> )
         {
             gsl_AssertAt( loc, ptr_ != nullptr );
         }
@@ -3643,18 +3636,9 @@ public:
 
 #if gsl_BASELINE_CPP20_
     template< class U >
-    requires std::is_constructible_v<T, U> && ( ! std::is_convertible_v<U, T> )
-    gsl_api constexpr explicit not_null( not_null<U> other, std::source_location const & loc = std::source_location::current() )
-    : ptr_( std::move( other.ptr_ ) )
-    {
-        if constexpr ( ! detail::has_trivial_move_v<U> )
-        {
-            gsl_AssertAt( loc, ptr_ != nullptr );
-        }
-    }
-    template< class U >
-    requires std::is_convertible_v<U, T>
-    gsl_api constexpr /*implicit*/ not_null( not_null<U> other, std::source_location const & loc = std::source_location::current() )
+    requires std::is_constructible_v<T, U>
+    gsl_api constexpr explicit( ! std::is_convertible_v<U, T> )
+    not_null( not_null<U> other, std::source_location const & loc = std::source_location::current() )
     : ptr_( std::move( other.ptr_ ) )
     {
         if constexpr ( ! detail::has_trivial_move_v<U> )
@@ -3778,6 +3762,23 @@ public:
     }
 #endif // gsl_BASELINE_CPP20_
 
+    gsl_NODISCARD gsl_api gsl_constexpr bool
+    valueless_after_move() const gsl_noexcept
+    {
+#if gsl_BASELINE_CPP20_
+        if constexpr ( ! detail::has_trivial_move_v<T> )
+        {
+            return ptr_ == nullptr;
+        }
+        else
+        {
+            return false;
+        }
+#else // ! gsl_BASELINE_CPP20_
+        return ! accessor::is_valid( *this );
+#endif
+    }
+
     // We want an implicit conversion operator that can be used to convert from both lvalues (by
     // const reference or by copy) and rvalues (by move). So it seems like we could define
     //
@@ -3808,11 +3809,11 @@ public:
     //     std::unique_ptr<U> vu = std::move( p );
 
 #if gsl_BASELINE_CPP20_
-    // explicit conversion operator
+    // conditionally explicit conversion operator
 
     template< class U >
-    requires std::is_constructible_v<U, T const &> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr explicit
+    requires std::is_constructible_v<U, T const &> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit( ! std::is_convertible_v<T, U> )
     operator U() const &
     {
         if constexpr ( ! detail::has_trivial_move_v<T> )
@@ -3822,8 +3823,8 @@ public:
         return U( ptr_ );
     }
     template< class U >
-    requires std::is_constructible_v<U, T const &> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr explicit
+    requires std::is_constructible_v<U, T const &> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit( ! std::is_convertible_v<T, U> )
     operator U() &
     {
         if constexpr ( ! detail::has_trivial_move_v<T> )
@@ -3833,8 +3834,8 @@ public:
         return U( ptr_ );
     }
     template< class U >
-    requires std::is_constructible_v<U, T const &> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr explicit
+    requires std::is_constructible_v<U, T const &> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit( ! std::is_convertible_v<T, U> )
     operator U() const &&
     {
         if constexpr ( ! detail::has_trivial_move_v<T> )
@@ -3844,8 +3845,8 @@ public:
         return U( ptr_ );
     }
     template< class U >
-    requires std::is_constructible_v<U, T> && ( ! std::is_convertible_v<T, U> && ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr explicit
+    requires std::is_constructible_v<U, T> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
+    [[nodiscard]] gsl_api constexpr explicit( ! std::is_convertible_v<T, U> )
     operator U() &&
     {
         if constexpr ( ! detail::has_trivial_move_v<T> )
@@ -3897,51 +3898,6 @@ public:
     operator bool() & = delete;
     operator bool() && = delete;
     operator bool() const && = delete;
-
-    template< class U >
-    requires std::is_constructible_v<U, T const &> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr
-    operator U() const &
-    {
-        if constexpr ( ! detail::has_trivial_move_v<T> )
-        {
-            gsl_Assert( ptr_ != nullptr );
-        }
-        return U( ptr_ );
-    }
-    template< class U >
-    requires std::is_constructible_v<U, T const &> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr
-    operator U() &
-    {
-        if constexpr ( ! detail::has_trivial_move_v<T> )
-        {
-            gsl_Assert( ptr_ != nullptr );
-        }
-        return U( ptr_ );
-    }
-    template< class U >
-    requires std::is_constructible_v<U, T const &> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr
-    operator U() const &&
-    {
-        if constexpr ( ! detail::has_trivial_move_v<T> )
-        {
-            gsl_Assert( ptr_ != nullptr );
-        }
-        return U( ptr_ );
-    }
-    template< class U >
-    requires std::is_constructible_v<U, T> && std::is_convertible_v<T, U> && ( ! detail::is_not_null_or_bool_oracle_v<U> )
-    [[nodiscard]] gsl_api constexpr
-    operator U() &&
-    {
-        if constexpr ( ! detail::has_trivial_move_v<T> )
-        {
-            gsl_Assert( ptr_ != nullptr );
-        }
-        return U( std::move( ptr_ ) );
-    }
 
 #elif gsl_HAVE( MOVE_FORWARD ) && gsl_HAVE( TYPE_TRAITS ) && gsl_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG ) && gsl_HAVE( EXPLICIT )
     // explicit conversion operator
@@ -4287,12 +4243,7 @@ struct as_nullable_helper< not_null<T> >
 template< class T >
 struct not_null_accessor
 {
-#if gsl_BASELINE_CPP20_
-    static gsl_api bool is_valid( not_null<T> const & p ) noexcept
-    {
-        return p.ptr_ != nullptr;
-    }
-#else // ! gsl_BASELINE_CPP20_
+#if ! gsl_BASELINE_CPP20_
 # if gsl_HAVE( MOVE_FORWARD )
     static gsl_api T get( not_null<T>&& p ) gsl_noexcept
     {
@@ -4383,7 +4334,7 @@ template< class T >
 gsl_NODISCARD gsl_api gsl_constexpr bool
 is_valid( not_null<T> const & p )
 {
-    return detail::not_null_accessor<T>::is_valid( p );
+    return ! p.valueless_after_move(); 
 }
 
 #if gsl_HAVE( EXPRESSION_SFINAE )
